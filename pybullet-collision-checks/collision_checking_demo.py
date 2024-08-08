@@ -29,7 +29,7 @@ def _main():
 
     # Create wheelchair.
     wheelchair_urdf_path = (
-        Path(__file__).parent / "assets" / "urdf" / "wheelchair" / "wheelchair.urdf"
+        Path(__file__).parent.parent / "assets" / "urdf" / "wheelchair" / "wheelchair.urdf"
     )
     wheelchair_id = p.loadURDF(
         str(wheelchair_urdf_path), useFixedBase=True, physicsClientId=physics_client_id
@@ -45,9 +45,6 @@ def _main():
     collision_region_id = create_pybullet_block(
         collision_region_good_rgba,
         half_extents=collision_region_half_extents,
-        mass=-1,
-        friction=0.0,
-        orientation=collision_region_orientation,
         physics_client_id=physics_client_id,
     )
     p.resetBasePositionAndOrientation(
