@@ -49,7 +49,7 @@ def _initialize_scene() -> tuple[SingleArmPyBulletRobot, Pose, int, int, int]:
     table_orientation = (0.0, 0.0, 0.0, 1.0)
 
     cup_rgba = (0.0, 0.0, 1.0, 1.0)
-    cup_radius = 0.04
+    cup_radius = 0.02
     cup_length = 0.12
     cup_position = (0.0, 0.75, cup_length / 2)
     cup_orientation = (0.0, 0.0, 0.0, 1.0)
@@ -146,7 +146,7 @@ def _initialize_scene() -> tuple[SingleArmPyBulletRobot, Pose, int, int, int]:
 
 def _main():
 
-    cup_approach_distance = 0.1
+    cup_pregrasp_transform = Pose((0.0, -0.2, 0.0), (0, np.sqrt(2) / 2, np.sqrt(2) / 2, 0))
 
     robot, cup_id, table_id, collision_region_id = _initialize_scene()
     physics_client_id = robot.physics_client_id
@@ -160,20 +160,20 @@ def _main():
     
     visualize_pose(table_frame, physics_client_id)
 
-    # # Find target end effector pose relative to the cup.
-    # cup_position = get_pose(cup_id, physics_client_id).position
-    # target_position = np.add(cup_position, (0, 0.2, 0.0))
-    # end_effector_orn = reference_frame.orientation
-    # target_end_effector_pose = Pose(target_position, end_effector_orn)
+    # Find target end effector pose relative to the cup.
+    cup_pose = get_pose(cup_id, physics_client_id)
+    target_end_effector_pose = multiply_poses(cup_pose, cup_pregrasp_transform)
+
+    visualize_pose(target_end_effector_pose, physics_client_id)
 
     # # TODO add back
     # # p.removeBody(cup_id, physicsClientId=physics_client_id)
     # # p.removeBody(table_id, physicsClientId=physics_client_id)
 
-    # # Find target joint positions using inverse kinematics.
-    # # TODO: run multiple times until collisions are avoided.
-    # target_joint_positions = robot.inverse_kinematics(target_end_effector_pose, validate=True)
-    # robot.set_joints(target_joint_positions)
+    # Find target joint positions using inverse kinematics.
+    # TODO: run multiple times until collisions are avoided.
+    target_joint_positions = robot.inverse_kinematics(target_end_effector_pose, validate=True)
+    robot.set_joints(target_joint_positions)
 
     # TODO: run motion planning.
 
