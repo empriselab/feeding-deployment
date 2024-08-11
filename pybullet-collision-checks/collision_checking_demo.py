@@ -29,7 +29,11 @@ def _main():
 
     # Create wheelchair.
     wheelchair_urdf_path = (
-        Path(__file__).parent.parent / "assets" / "urdf" / "wheelchair" / "wheelchair.urdf"
+        Path(__file__).parent.parent
+        / "assets"
+        / "urdf"
+        / "wheelchair"
+        / "wheelchair.urdf"
     )
     wheelchair_id = p.loadURDF(
         str(wheelchair_urdf_path), useFixedBase=True, physicsClientId=physics_client_id

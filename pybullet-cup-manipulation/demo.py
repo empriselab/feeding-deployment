@@ -1,15 +1,24 @@
 """Script to develop cup manipulation skills in simulation."""
 
 from pybullet_helpers.robots import create_pybullet_robot
-from pybullet_helpers.robots.single_arm import SingleArmPyBulletRobot, SingleArmTwoFingerGripperPyBulletRobot
+from pybullet_helpers.robots.single_arm import (
+    SingleArmPyBulletRobot,
+    SingleArmTwoFingerGripperPyBulletRobot,
+)
 from pybullet_helpers.inverse_kinematics import sample_collision_free_inverse_kinematics
 from pybullet_helpers.ikfast.utils import get_ikfast_joints
 from pybullet_helpers.geometry import Pose, get_pose, multiply_poses
-from pybullet_helpers.joint import JointPositions, get_jointwise_difference, get_joint_info
-from pybullet_helpers.camera import create_gui_connection, capture_image
+from pybullet_helpers.joint import (
+    JointPositions,
+    get_jointwise_difference,
+    get_joint_info,
+)
+from pybullet_helpers.camera import capture_image
 from pybullet_helpers.utils import create_pybullet_cylinder, create_pybullet_block
 from pybullet_helpers.motion_planning import run_motion_planning
-from pybullet_helpers.gui import visualize_pose
+from pybullet_helpers.gui import visualize_pose, create_gui_connection
+from pybullet_helpers.geometry import matrix_from_quat
+from pybullet_helpers.math_utils import get_poses_facing_line
 import numpy as np
 from pathlib import Path
 import imageio.v2 as iio
@@ -26,12 +35,12 @@ def _initialize_scene() -> tuple[SingleArmPyBulletRobot, Pose, int, int, set[int
         np.pi / 2,
         -np.pi / 4,
         -np.pi / 2,
-        0.,
+        0.0,
         np.pi / 2,
         -np.pi / 2,
         np.pi / 2,
-        0.,
-        0.,
+        0.0,
+        0.0,
     ]
 
     robot_holder_rgba = (0.5, 0.5, 0.5, 1.0)
@@ -67,11 +76,14 @@ def _initialize_scene() -> tuple[SingleArmPyBulletRobot, Pose, int, int, set[int
     p.setGravity(0.0, 0.0, 0.0, physicsClientId=physics_client_id)
 
     # Create robot.
-    robot = create_pybullet_robot("kinova-gen3", physics_client_id,
-                                  base_pose=robot_base_pose,
-                                  control_mode="reset",
-                                  home_joint_positions=robot_home_joints)
-    
+    robot = create_pybullet_robot(
+        "kinova-gen3",
+        physics_client_id,
+        base_pose=robot_base_pose,
+        control_mode="reset",
+        home_joint_positions=robot_home_joints,
+    )
+
     # Create a base for visualization purposes.
     robot_holder_id = create_pybullet_block(
         robot_holder_rgba,
@@ -131,7 +143,7 @@ def _initialize_scene() -> tuple[SingleArmPyBulletRobot, Pose, int, int, set[int
 
     # Create collision areas.
     collision_region_ids = set()
-    
+
     collision_region_id1 = create_pybullet_block(
         collision_region1_rgba,
         half_extents=collision_region1_half_extents,
@@ -161,29 +173,27 @@ def _initialize_scene() -> tuple[SingleArmPyBulletRobot, Pose, int, int, set[int
     return robot, cup_id, table_id, collision_region_ids
 
 
-def _sample_grasp(cup_pose: Pose, rng: np.random.Generator) -> Pose:
-    # Pose of grasping the center of the cup.
-    default_cup_pregrasp_transform = Pose((0.0, 0.0, 0.0), (0, np.sqrt(2) / 2, np.sqrt(2) / 2, 0))
-    grasp = multiply_poses(cup_pose, default_cup_pregrasp_transform)
+def _sample_grasp(
+    cup_pose: Pose, rng: np.random.Generator, translation_distance: float = 0.2
+) -> Pose:
 
-    # Randomly rotate around the cup.
-    angle = rng.uniform(-np.pi / 4, np.pi / 4)
-    rotation_quat = p.getQuaternionFromEuler((0.0, angle, 0.0))
-    tf = Pose((0.0, 0.0, 0.0), rotation_quat)
-    grasp = multiply_poses(grasp, tf)
+    cup_point = cup_pose.position
+    cup_matrix = matrix_from_quat(cup_pose.orientation)
+    cup_z_axis = cup_matrix[:, 2]
+    angle_offset = rng.uniform(-np.pi, np.pi)
 
-    # Move the grasp away from the cup in the opposite direction of angle.
-    translation_distance = -0.2
-    translation_vector = (0.0, 0.0, translation_distance * np.cos(angle))
-    tf = Pose(translation_vector, (0.0, 0.0, 0.0, 1.0))
-    grasp = multiply_poses(grasp, tf)
+    grasp_pose = get_poses_facing_line(
+        cup_z_axis, cup_point, translation_distance, 1, angle_offset=angle_offset
+    )[0]
 
-    return grasp
+    return grasp_pose
 
 
-def _score_motion_plan(robot: SingleArmPyBulletRobot,
-                       motion_plan: list[JointPositions],
-                       joint_geometric_scalar: float = 0.9) -> float:
+def _score_motion_plan(
+    robot: SingleArmPyBulletRobot,
+    motion_plan: list[JointPositions],
+    joint_geometric_scalar: float = 0.9,
+) -> float:
     """Lower is better."""
     # TODO move to pybullet-helpers
     # TODO don't assume ikfast and clean this up...
@@ -193,11 +203,14 @@ def _score_motion_plan(robot: SingleArmPyBulletRobot,
         first_finger_idx, second_finger_idx = sorted(
             [robot.left_finger_joint_idx, robot.right_finger_joint_idx]
         )
-        first_finger_joint_info = get_joint_info(robot.robot_id, first_finger_idx, robot.physics_client_id)
-        second_finger_joint_info = get_joint_info(robot.robot_id, second_finger_idx, robot.physics_client_id)
+        first_finger_joint_info = get_joint_info(
+            robot.robot_id, first_finger_idx, robot.physics_client_id
+        )
+        second_finger_joint_info = get_joint_info(
+            robot.robot_id, second_finger_idx, robot.physics_client_id
+        )
         joint_infos.insert(first_finger_idx, first_finger_joint_info)
         joint_infos.insert(second_finger_idx, second_finger_joint_info)
-
 
     score = 0.0
 
@@ -222,39 +235,50 @@ def _main():
     collision_ids = {cup_id, table_id} | other_collision_ids
     physics_client_id = robot.physics_client_id
     robot_initial_joints = robot.get_joint_positions()
-    
+
     # Use the table pose as a frame of reference.
     table_frame = get_pose(table_id, physics_client_id)
     # Move the frame to the bottom right hand corner of the table so we can see it.
     dims = p.getVisualShapeData(table_id, physicsClientId=physics_client_id)[0][3]
     offset = Pose((dims[0] / 2, -dims[1] / 2, dims[2] / 2))
     table_frame = multiply_poses(offset, table_frame)
-    
+
     visualize_pose(table_frame, physics_client_id)
 
     # Find target end effector pose relative to the cup.
     cup_pose = get_pose(cup_id, physics_client_id)
 
     # Find a number of possible target joint positions.
-    max_grasp_candidates = 10
+    max_grasp_candidates = 25
     max_ik_candidates_per_grasp = 100
     rng = np.random.default_rng(seed)
     all_target_joint_positions = []
     for _ in range(max_grasp_candidates):
         candidate_grasp = _sample_grasp(cup_pose, rng)
-        for candidate_joints in sample_collision_free_inverse_kinematics(robot, candidate_grasp, collision_ids, max_candidates = max_ik_candidates_per_grasp):
+        for candidate_joints in sample_collision_free_inverse_kinematics(
+            robot,
+            candidate_grasp,
+            collision_ids,
+            max_candidates=max_ik_candidates_per_grasp,
+        ):
             robot.set_joints(candidate_joints)
             all_target_joint_positions.append(candidate_joints)
 
     print(f"Found {len(all_target_joint_positions)} candidate joint positions.")
-    
+
     # Motion plan to each.
     print("Starting motion planning...")
     all_motion_plans = []
     for target_joint_positions in tqdm(all_target_joint_positions):
         robot.set_joints(robot_initial_joints)
-        plan = run_motion_planning(robot, robot_initial_joints, target_joint_positions,
-                            collision_ids, seed, physics_client_id)
+        plan = run_motion_planning(
+            robot,
+            robot_initial_joints,
+            target_joint_positions,
+            collision_ids,
+            seed,
+            physics_client_id,
+        )
         if plan is not None:
             all_motion_plans.append(plan)
 
@@ -266,12 +290,12 @@ def _main():
     imgs = []
     for state in plan:
         robot.set_joints(state)
-        img = capture_image(physics_client_id, camera_yaw=180, camera_distance=2.5,
-                        camera_pitch=-35)
+        img = capture_image(
+            physics_client_id, camera_yaw=180, camera_distance=2.5, camera_pitch=-35
+        )
         imgs.append(img)
 
     iio.mimsave("motion_planning_example.mp4", imgs, fps=20)
-        
 
 
 if __name__ == "__main__":
