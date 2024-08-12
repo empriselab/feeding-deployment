@@ -422,7 +422,7 @@ def _main():
 
     # Move to staging pose.
     staging_relative_orientation = p.getQuaternionFromEuler((0.0, 0.0, np.pi / 2))
-    staging_relative_pose = Pose((0.0, 0.5, 0.0), staging_relative_orientation)
+    staging_relative_pose = Pose((-0.1, 0.5, 0.0), staging_relative_orientation)
     new_cup_pose = multiply_poses(wheelchair_head_pose, staging_relative_pose)
     fingers_to_cup = multiply_poses(
         cup_pose.invert(),
