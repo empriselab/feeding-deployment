@@ -32,6 +32,7 @@ import imageio.v2 as iio
 from tqdm import tqdm
 from numpy.typing import NDArray
 from tomsutils.structs import Image
+from functools import lru_cache
 
 import pybullet as p
 
@@ -371,14 +372,22 @@ def _capture_image(
     return combined_image.astype(np.uint8)
 
 
-def _main():
-    seed = 0
-    pregrasp_distance = 0.075
-    make_video = True
+@lru_cache(maxsize=None)
+def _generate_trajectory(
+    robot_base_pose: Pose = Pose((0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 1.0)),
+    wheelchair_pose: Pose = Pose((-0.5, 0.0, -0.25), (0.0, 0.0, 1.0, 0.0)),
+    wheelchair_relative_head_pose: Pose = Pose(
+        (0.0, -0.25, 0.75), (0.0, 0.0, 0.0, 1.0)
+    ),
+    pregrasp_distance: float = 0.075,
+    num_grasp_waypoints: int = 5,
+    staging_relative_pose=Pose(
+        (-0.1, 0.5, 0.0), p.getQuaternionFromEuler((0.0, 0.0, np.pi / 2))
+    ),
+    seed: int = 0,
+    make_video: bool = True,
+):
 
-    robot_base_pose = Pose((0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 1.0))
-    wheelchair_pose = Pose((-0.5, 0.0, -0.25), (0.0, 0.0, 1.0, 0.0))
-    wheelchair_relative_head_pose = Pose((0.0, -0.25, 0.75), (0.0, 0.0, 0.0, 1.0))
     wheelchair_center_pose = Pose(wheelchair_pose.position, robot_base_pose.orientation)
     wheelchair_head_pose = multiply_poses(
         wheelchair_center_pose, wheelchair_relative_head_pose
@@ -440,9 +449,10 @@ def _main():
             imgs.append(img)
 
     # Move to grasp.
-    num_waypoints = 5
-    tf = Pose((0.0, 0.0, pregrasp_distance / (num_waypoints - 1)), (0.0, 0.0, 0.0, 1.0))
-    for _ in range(num_waypoints):
+    tf = Pose(
+        (0.0, 0.0, pregrasp_distance / (num_grasp_waypoints - 1)), (0.0, 0.0, 0.0, 1.0)
+    )
+    for _ in range(num_grasp_waypoints):
         joints = _move_end_effector(robot, tf)
         robot.set_joints(joints)
         if make_video:
@@ -467,8 +477,7 @@ def _main():
     )
 
     # Move off the table so that the cup is no longer in collision with the table.
-    lift_amount = 0.01
-    tf = Pose((0.0, -lift_amount, 0.0), (0.0, 0.0, 0.0, 1.0))
+    tf = Pose((0.0, -0.01, 0.0), (0.0, 0.0, 0.0, 1.0))
     joints = _move_end_effector(robot, tf)
     set_robot_joints_with_held_object(
         robot, physics_client_id, held_obj_id, base_link_to_held_obj, joints
@@ -482,8 +491,6 @@ def _main():
         imgs.append(img)
 
     # Move to staging pose.
-    staging_relative_orientation = p.getQuaternionFromEuler((0.0, 0.0, np.pi / 2))
-    staging_relative_pose = Pose((-0.1, 0.5, 0.0), staging_relative_orientation)
     new_cup_pose = multiply_poses(wheelchair_head_pose, staging_relative_pose)
     fingers_to_cup = multiply_poses(
         cup_pose.invert(),
@@ -517,8 +524,17 @@ def _main():
             imgs.append(img)
 
     if make_video:
-        iio.mimsave("motion_planning_example.mp4", imgs, fps=20)
+        iio.mimsave("generated_trajectory.mp4", imgs, fps=20)
+
+    p.disconnect(physics_client_id)
 
 
 if __name__ == "__main__":
-    _main()
+    # Testing cache, should only run once.
+    for _ in range(10):
+        _generate_trajectory()
+    # Should run now again.
+    staging_relative_pose = Pose(
+        (0.0, 0.5, 0.0), p.getQuaternionFromEuler((0.0, 0.0, np.pi / 2))
+    )
+    _generate_trajectory(staging_relative_pose=staging_relative_pose)
