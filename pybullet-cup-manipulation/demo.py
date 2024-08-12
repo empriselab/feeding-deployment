@@ -386,7 +386,7 @@ def _generate_trajectory(
     ),
     seed: int = 0,
     make_video: bool = True,
-):
+) -> list[JointPositions]:
 
     wheelchair_center_pose = Pose(wheelchair_pose.position, robot_base_pose.orientation)
     wheelchair_head_pose = multiply_poses(
@@ -398,9 +398,11 @@ def _generate_trajectory(
     )
     collision_ids = {cup_id, table_id} | other_collision_ids
     physics_client_id = robot.physics_client_id
+    all_joint_positions = [robot.get_joint_positions()]
 
     # Close the fingers.
     robot.close_fingers()
+    all_joint_positions.append(robot.get_joint_positions())
 
     # Commands will be in end effector space, but grasp planning will be in
     # finger frame space.
@@ -440,6 +442,7 @@ def _generate_trajectory(
     imgs = []
     for state in plan:
         robot.set_joints(state)
+        all_joint_positions.append(state)
         if make_video:
             img = _capture_image(
                 physics_client_id,
@@ -455,6 +458,7 @@ def _generate_trajectory(
     for _ in range(num_grasp_waypoints):
         joints = _move_end_effector(robot, tf)
         robot.set_joints(joints)
+        all_joint_positions.append(joints)
         if make_video:
             img = _capture_image(
                 physics_client_id,
@@ -465,6 +469,7 @@ def _generate_trajectory(
 
     # Open the fingers to create a constraint inside the mounted holder.
     robot.open_fingers()
+    all_joint_positions.append(robot.get_joint_positions())
 
     # Simulate grasping by faking a constraint with the held object.
     held_obj_id = cup_id
@@ -482,6 +487,7 @@ def _generate_trajectory(
     set_robot_joints_with_held_object(
         robot, physics_client_id, held_obj_id, base_link_to_held_obj, joints
     )
+    all_joint_positions.append(joints)
     if make_video:
         img = _capture_image(
             physics_client_id,
@@ -515,6 +521,7 @@ def _generate_trajectory(
         set_robot_joints_with_held_object(
             robot, physics_client_id, held_obj_id, base_link_to_held_obj, state
         )
+        all_joint_positions.append(state)
         if make_video:
             img = _capture_image(
                 physics_client_id,
@@ -526,15 +533,22 @@ def _generate_trajectory(
     if make_video:
         iio.mimsave("generated_trajectory.mp4", imgs, fps=20)
 
+        # Replay the whole trajectory.
+        imgs = []
+        for state in all_joint_positions:
+            robot.set_joints(state)
+            img = _capture_image(
+                physics_client_id,
+                robot_base_pose.position,
+                wheelchair_head_pose.position,
+            )
+            imgs.append(img)
+        iio.mimsave("replayed_trajectory.mp4", imgs, fps=20)
+
     p.disconnect(physics_client_id)
+
+    return all_joint_positions
 
 
 if __name__ == "__main__":
-    # Testing cache, should only run once.
-    for _ in range(10):
-        _generate_trajectory()
-    # Should run now again.
-    staging_relative_pose = Pose(
-        (0.0, 0.5, 0.0), p.getQuaternionFromEuler((0.0, 0.0, np.pi / 2))
-    )
-    _generate_trajectory(staging_relative_pose=staging_relative_pose)
+    all_joint_positions = _generate_trajectory()
