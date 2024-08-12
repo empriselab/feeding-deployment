@@ -268,7 +268,7 @@ def _smooth_motion_plan(
     seed: int,
     held_object: int | None = None,
     base_link_to_held_obj: NDArray | None = None,
-    max_ik_candidates_per_target_pose: int = 50,
+    max_ik_candidates_per_target_pose: int = 100,
 ) -> list[JointPositions]:
 
     robot_initial_joints = robot.get_joint_positions()
@@ -370,6 +370,7 @@ def generate_trajectory(
         (0.0, -0.25, 0.75), (0.0, 0.0, 0.0, 1.0)
     ),
     pregrasp_distance: float = 0.075,
+    max_num_grasps: int = 25,
     num_grasp_waypoints: int = 5,
     staging_relative_pose=Pose(
         (-0.1, 0.5, 0.0), p.getQuaternionFromEuler((0.0, 0.0, np.pi / 2))
@@ -416,7 +417,6 @@ def generate_trajectory(
     cup_pose = get_link_pose(cup_id, cup_handle_link_id, physics_client_id)
 
     rng = np.random.default_rng(seed)
-    max_num_grasps = 5
     target_poses = [
         _sample_grasp(cup_pose, rng, pregrasp_distance) for _ in range(max_num_grasps)
     ]
