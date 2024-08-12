@@ -361,28 +361,14 @@ def _main():
         imgs.append(img)
 
     # Simulate grasping by faking a constraint with the held object.
-    # TODO move this into pybullet-utils.
     held_obj_id = cup_id
-    base_link_to_world = np.r_[
-        p.invertTransform(
-            *p.getLinkState(
-                robot.robot_id, robot.end_effector_id, physicsClientId=physics_client_id
-            )[:2]
-        )
-    ]
-    world_to_obj = np.r_[
-        p.getBasePositionAndOrientation(held_obj_id, physicsClientId=physics_client_id)
-    ]
-    # TODO can we combine these two lines?
-    held_obj_to_base_link = p.invertTransform(
-        *p.multiplyTransforms(
-            base_link_to_world[:3],
-            base_link_to_world[3:],
-            world_to_obj[:3],
-            world_to_obj[3:],
-        )
+    world_from_end_effector = get_link_pose(
+        robot.robot_id, robot.end_effector_id, physics_client_id
     )
-    base_link_to_held_obj = p.invertTransform(*held_obj_to_base_link)
+    world_from_held_object = get_pose(held_obj_id, physics_client_id)
+    base_link_to_held_obj = multiply_poses(
+        world_from_end_effector.invert(), world_from_held_object
+    )
 
     # Pick up the cup to demonstrate that we can.
     cup_transform = Pose((-0.1, 0.0, 0.2), (0.0, 0.0, 0.0, 1.0))
