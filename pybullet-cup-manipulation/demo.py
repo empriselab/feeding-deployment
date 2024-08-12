@@ -77,10 +77,18 @@ def _initialize_scene(
     table_orientation = (0.0, 0.0, 0.0, 1.0)
 
     cup_rgba = (0.0, 0.0, 1.0, 1.0)
-    cup_radius = 0.02
-    cup_length = 0.12
+    cup_radius = 0.03
+    cup_length = 0.15
     cup_position = (0.0, 0.75, cup_length / 2)
     cup_orientation = (0.0, 0.0, 0.0, 1.0)
+    cup_handle_half_extents = (cup_radius, cup_radius, cup_radius)
+    cup_handle_rgba = (0.7, 0.2, 0.5, 1.0)
+    cup_handle_relative_position = (
+        0.0,
+        -cup_radius - cup_handle_half_extents[1] / 2,
+        cup_length / 4,
+    )
+    cup_handle_relative_orientation = (0.0, 0.0, 0.0, 1.0)
 
     physics_client_id = create_gui_connection(camera_yaw=180)
     p.setGravity(0.0, 0.0, 0.0, physicsClientId=physics_client_id)
@@ -126,16 +134,46 @@ def _initialize_scene(
     collision_region_ids = {wheelchair_id}
 
     # Create cup.
-    cup_id = create_pybullet_cylinder(
-        cup_rgba,
+    cup_collision_id = p.createCollisionShape(
+        p.GEOM_CYLINDER,
+        radius=cup_radius,
+        height=cup_length,
+        physicsClientId=physics_client_id,
+    )
+    cup_visual_id = p.createVisualShape(
+        p.GEOM_CYLINDER,
         radius=cup_radius,
         length=cup_length,
-        physics_client_id=physics_client_id,
+        rgbaColor=cup_rgba,
+        physicsClientId=physics_client_id,
     )
-    p.resetBasePositionAndOrientation(
-        cup_id,
-        cup_position,
-        cup_orientation,
+    cup_handle_collision_id = p.createCollisionShape(
+        p.GEOM_BOX,
+        halfExtents=cup_handle_half_extents,
+        physicsClientId=physics_client_id,
+    )
+    cup_handle_visual_id = p.createVisualShape(
+        p.GEOM_BOX,
+        halfExtents=cup_handle_half_extents,
+        rgbaColor=cup_handle_rgba,
+        physicsClientId=physics_client_id,
+    )
+    cup_id = p.createMultiBody(
+        baseMass=-1,
+        baseCollisionShapeIndex=cup_collision_id,
+        baseVisualShapeIndex=cup_visual_id,
+        basePosition=cup_position,
+        baseOrientation=cup_orientation,
+        linkMasses=[-1],
+        linkCollisionShapeIndices=[cup_handle_collision_id],
+        linkVisualShapeIndices=[cup_handle_visual_id],
+        linkPositions=[cup_handle_relative_position],
+        linkOrientations=[cup_handle_relative_orientation],
+        linkInertialFramePositions=[(0.0, 0.0, 0.0)],
+        linkInertialFrameOrientations=[(0.0, 0.0, 0.0, 1.0)],
+        linkParentIndices=[0],
+        linkJointTypes=[p.JOINT_FIXED],
+        linkJointAxis=[(0.0, 0.0, 1.0)],
         physicsClientId=physics_client_id,
     )
 
@@ -229,7 +267,7 @@ def _move_end_effector(robot: SingleArmPyBulletRobot, tf: Pose) -> None:
     # TODO: put back into pybullet-helpers
     current_end_effector_pose = robot.get_end_effector_pose()
     next_end_effector_pose = multiply_poses(current_end_effector_pose, tf)
-    inverse_kinematics(robot, next_end_effector_pose, set_joints=True)
+    return inverse_kinematics(robot, next_end_effector_pose, set_joints=False)
 
 
 def _smooth_motion_plan(
@@ -335,7 +373,7 @@ def _capture_image(
 
 def _main():
     seed = 0
-    pregrasp_distance = 0.05
+    pregrasp_distance = 0.075
     make_video = True
 
     robot_base_pose = Pose((0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 1.0))
@@ -351,6 +389,9 @@ def _main():
     )
     collision_ids = {cup_id, table_id} | other_collision_ids
     physics_client_id = robot.physics_client_id
+
+    # Close the fingers.
+    robot.close_fingers()
 
     # Commands will be in end effector space, but grasp planning will be in
     # finger frame space.
@@ -369,8 +410,9 @@ def _main():
 
     visualize_pose(table_frame, physics_client_id)
 
-    # Find target finger frame pose relative to the cup.
-    cup_pose = get_pose(cup_id, physics_client_id)
+    # Find target finger frame pose relative to the cup handle.
+    cup_handle_link_id = 0
+    cup_pose = get_link_pose(cup_id, cup_handle_link_id, physics_client_id)
 
     rng = np.random.default_rng(seed)
     max_num_grasps = 5
@@ -401,7 +443,8 @@ def _main():
     num_waypoints = 5
     tf = Pose((0.0, 0.0, pregrasp_distance / (num_waypoints - 1)), (0.0, 0.0, 0.0, 1.0))
     for _ in range(num_waypoints):
-        _move_end_effector(robot, tf)
+        joints = _move_end_effector(robot, tf)
+        robot.set_joints(joints)
         if make_video:
             img = _capture_image(
                 physics_client_id,
@@ -409,6 +452,9 @@ def _main():
                 wheelchair_head_pose.position,
             )
             imgs.append(img)
+
+    # Open the fingers to create a constraint inside the mounted holder.
+    robot.open_fingers()
 
     # Simulate grasping by faking a constraint with the held object.
     held_obj_id = cup_id
@@ -420,6 +466,21 @@ def _main():
         world_from_end_effector.invert(), world_from_held_object
     )
 
+    # Move off the table so that the cup is no longer in collision with the table.
+    lift_amount = 0.01
+    tf = Pose((0.0, -lift_amount, 0.0), (0.0, 0.0, 0.0, 1.0))
+    joints = _move_end_effector(robot, tf)
+    set_robot_joints_with_held_object(
+        robot, physics_client_id, held_obj_id, base_link_to_held_obj, joints
+    )
+    if make_video:
+        img = _capture_image(
+            physics_client_id,
+            robot_base_pose.position,
+            wheelchair_head_pose.position,
+        )
+        imgs.append(img)
+
     # Move to staging pose.
     staging_relative_orientation = p.getQuaternionFromEuler((0.0, 0.0, np.pi / 2))
     staging_relative_pose = Pose((-0.1, 0.5, 0.0), staging_relative_orientation)
@@ -429,8 +490,9 @@ def _main():
         get_link_pose(robot.robot_id, finger_frame_id, physics_client_id),
     )
     new_fingers_pose = multiply_poses(new_cup_pose, fingers_to_cup)
+    visualize_pose(new_fingers_pose, physics_client_id)
 
-    new_collision_ids = set(collision_ids) - {held_obj_id}
+    new_collision_ids = collision_ids - {held_obj_id}
     plan = _smooth_motion_plan(
         [new_fingers_pose],
         robot,
