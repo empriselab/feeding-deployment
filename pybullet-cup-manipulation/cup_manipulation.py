@@ -92,8 +92,9 @@ def generate_trajectory(
         all_held_object_infos.append(None)
 
     # Move to grasp.
+    move_amt = scene_description.cup_grasp_distance / (num_grasp_waypoints - 1)
     tf = Pose(
-        (0.0, 0.0, scene_description.cup_grasp_distance / (num_grasp_waypoints - 1)),
+        (0.0, 0.0, move_amt),
         (0.0, 0.0, 0.0, 1.0),
     )
     for _ in range(num_grasp_waypoints):
