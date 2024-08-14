@@ -39,23 +39,32 @@ import pybullet as p
 
 def _initialize_scene(
     robot_initial_joints: list[JointPositions],
-    robot_base_pose: Pose, wheelchair_pose: Pose,
+    robot_base_pose: Pose,
+    wheelchair_pose: Pose,
     scene_rotation: Quaternion = (0.0, 0.0, 0.0, 1.0),
 ) -> tuple[SingleArmPyBulletRobot, Pose, int, int, set[int]]:
     """Returns robot, cup ID, table ID, other collision IDs."""
 
-    robot_base_pose = rotate_about_point(robot_base_pose.position, scene_rotation, robot_base_pose)
-    wheelchair_pose = rotate_about_point(robot_base_pose.position, scene_rotation, wheelchair_pose)
+    robot_base_pose = rotate_about_point(
+        robot_base_pose.position, scene_rotation, robot_base_pose
+    )
+    wheelchair_pose = rotate_about_point(
+        robot_base_pose.position, scene_rotation, wheelchair_pose
+    )
 
     robot_holder_rgba = (0.5, 0.5, 0.5, 1.0)
     robot_holder_half_extents = (0.25, 0.25, 0.5)
     robot_holder_pose = Pose((0.0, 0.0, -0.5 - 0.05))
-    robot_holder_pose = rotate_about_point(robot_base_pose.position, scene_rotation, robot_holder_pose)
+    robot_holder_pose = rotate_about_point(
+        robot_base_pose.position, scene_rotation, robot_holder_pose
+    )
 
     table_rgba = (0.5, 0.5, 0.5, 1.0)
     table_half_extents = (0.75, 0.25, 0.5)
     table_pose = Pose((-0.5, 0.75, -0.5))
-    table_pose = rotate_about_point(robot_base_pose.position, scene_rotation, table_pose)
+    table_pose = rotate_about_point(
+        robot_base_pose.position, scene_rotation, table_pose
+    )
 
     cup_rgba = (0.0, 0.0, 1.0, 1.0)
     cup_radius = 0.03
@@ -64,11 +73,13 @@ def _initialize_scene(
     cup_pose = rotate_about_point(robot_base_pose.position, scene_rotation, cup_pose)
     cup_handle_half_extents = (cup_radius, cup_radius, cup_radius)
     cup_handle_rgba = (0.7, 0.2, 0.5, 1.0)
-    cup_handle_relative_pose = Pose((
-        0.0,
-        -cup_radius - cup_handle_half_extents[1] / 2,
-        cup_length / 4,
-    ))
+    cup_handle_relative_pose = Pose(
+        (
+            0.0,
+            -cup_radius - cup_handle_half_extents[1] / 2,
+            cup_length / 4,
+        )
+    )
 
     physics_client_id = create_gui_connection(camera_yaw=180)
     p.setGravity(0.0, 0.0, 0.0, physicsClientId=physics_client_id)
@@ -341,17 +352,17 @@ def generate_trajectory(
     make_video: bool = True,
     scene_rotation: Quaternion = (0.0, 0.0, 0.0, 1.0),
 ) -> list[JointPositions]:
-    
-    print(robot_initial_joints)
 
     wheelchair_center_pose = Pose(wheelchair_pose.position, robot_base_pose.orientation)
+    wheelchair_center_pose = rotate_about_point(
+        robot_base_pose.position, scene_rotation, wheelchair_center_pose
+    )
     wheelchair_head_pose = multiply_poses(
         wheelchair_center_pose, wheelchair_relative_head_pose
     )
 
     robot, cup_id, table_id, other_collision_ids = _initialize_scene(
-        robot_initial_joints, robot_base_pose, wheelchair_pose,
-        scene_rotation
+        robot_initial_joints, robot_base_pose, wheelchair_pose, scene_rotation
     )
     collision_ids = {cup_id, table_id} | other_collision_ids
     physics_client_id = robot.physics_client_id
@@ -518,7 +529,9 @@ if __name__ == "__main__":
         0.0,
         0.0,
     )
-    scene_rotation = tuple(p.getQuaternionFromEuler((np.pi / 8, -np.pi / 4, -np.pi / 2)))
+    scene_rotation = tuple(
+        p.getQuaternionFromEuler((np.pi / 8, -np.pi / 4, -np.pi / 2))
+    )
     generate_trajectory(robot_initial_joints, scene_rotation=scene_rotation)
 
     # from scipy.spatial.transform import Rotation
