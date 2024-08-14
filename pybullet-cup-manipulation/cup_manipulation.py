@@ -216,9 +216,10 @@ def generate_trajectory(
 
 if __name__ == "__main__":
     import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--max_motion_plan_time", type=float, default=5.)
+    parser.add_argument("--max_motion_plan_time", type=float, default=5.0)
     parser.add_argument("--force_rerun", action="store_true")
     args = parser.parse_args()
 
@@ -250,7 +251,10 @@ if __name__ == "__main__":
     # Need to replan.
     if traj is None:
         traj = generate_trajectory(
-            scene, scene_description, seed=args.seed, max_motion_plan_time=args.max_motion_plan_time,
+            scene,
+            scene_description,
+            seed=args.seed,
+            max_motion_plan_time=args.max_motion_plan_time,
         )
         with open(next_filepath, "wb") as f:
             pickle.dump((scene_description, traj), f)
@@ -264,4 +268,3 @@ if __name__ == "__main__":
         video_outfile,
     )
     p.disconnect(physics_client_id)
-

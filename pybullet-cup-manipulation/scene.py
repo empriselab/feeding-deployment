@@ -131,7 +131,7 @@ class CupManipulationSceneDescription:
             self,
             **pose_dict,
         )
-    
+
     def allclose(self, other: Any) -> bool:
         if not isinstance(other, CupManipulationSceneDescription):
             return False
@@ -144,7 +144,7 @@ class CupManipulationSceneDescription:
             elif isinstance(mine, (float, int)):
                 field_close = np.isclose(mine, theirs)
             else:
-                field_close = (mine == theirs)
+                field_close = mine == theirs
             if not field_close:
                 return False
         return True
