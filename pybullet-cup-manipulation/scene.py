@@ -1,7 +1,7 @@
 """Create a cup manipulation PyBullet scene given poses for key objects."""
 
 from __future__ import annotations
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, replace, fields
 from pybullet_helpers.robots import create_pybullet_robot
 from pybullet_helpers.joint import JointPositions
 from pybullet_helpers.geometry import Pose, Pose3D, Quaternion, multiply_poses
@@ -131,6 +131,23 @@ class CupManipulationSceneDescription:
             self,
             **pose_dict,
         )
+    
+    def allclose(self, other: Any) -> bool:
+        if not isinstance(other, CupManipulationSceneDescription):
+            return False
+        for field in fields(self):
+            mine, theirs = getattr(self, field.name), getattr(other, field.name)
+            if hasattr(mine, "allclose"):
+                field_close = mine.allclose(theirs)
+            elif isinstance(mine, (tuple, list)):
+                field_close = np.allclose(mine, theirs)
+            elif isinstance(mine, (float, int)):
+                field_close = np.isclose(mine, theirs)
+            else:
+                field_close = (mine == theirs)
+            if not field_close:
+                return False
+        return True
 
 
 @dataclass(frozen=True)

@@ -26,6 +26,7 @@ from utils import make_cup_manipulation_video, CupManipulationTrajectory
 
 import pybullet as p
 import numpy as np
+import pickle
 
 
 @lru_cache(maxsize=None)
@@ -214,12 +215,47 @@ def generate_trajectory(
 
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--max_motion_plan_time", type=float, default=5.)
+    parser.add_argument("--force_rerun", action="store_true")
+    args = parser.parse_args()
+
     scene_description = CupManipulationSceneDescription()
     physics_client_id = create_gui_connection(camera_yaw=180)
     scene = create_cup_manipulation_scene(physics_client_id, scene_description)
-    traj = generate_trajectory(
-        scene, scene_description, seed=0, max_motion_plan_time=20
-    )
+
+    saved_traj_dir = Path(__file__).parent / "saved_trajs"
+    assert saved_traj_dir.exists()
+    saved_traj_files = list(saved_traj_dir.glob("*.traj"))
+    if not saved_traj_files:
+        next_file_id = 0
+    else:
+        next_file_id = len(saved_traj_files)
+    next_filepath = saved_traj_dir / f"{next_file_id}.traj"
+    assert not next_filepath.exists()
+
+    # Check if we already have saved a trajectory for this scene.
+    traj = None
+    if not args.force_rerun:
+        for saved_traj_file in saved_traj_files:
+            with open(saved_traj_file, "rb") as f:
+                saved_scene_description, saved_traj = pickle.load(f)
+            if scene_description.allclose(saved_scene_description):
+                traj = saved_traj
+                print(f"Loaded saved trajectory: {saved_traj_file.name}")
+                break
+
+    # Need to replan.
+    if traj is None:
+        traj = generate_trajectory(
+            scene, scene_description, seed=args.seed, max_motion_plan_time=args.max_motion_plan_time,
+        )
+        with open(next_filepath, "wb") as f:
+            pickle.dump((scene_description, traj), f)
+        print(f"Dumped trajectory to {next_filepath}")
+
     video_outfile = Path("generated_trajectory.mp4")
     make_cup_manipulation_video(
         scene,
