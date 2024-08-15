@@ -22,7 +22,7 @@ from scene import (
     CupManipulationSceneIDs,
     CupManipulationSceneDescription,
 )
-from utils import make_cup_manipulation_video, CupManipulationTrajectory
+from cup_manipulation_utils import make_cup_manipulation_video, CupManipulationTrajectory
 
 import pybullet as p
 import numpy as np
