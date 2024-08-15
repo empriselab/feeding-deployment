@@ -56,7 +56,7 @@ class CupManipulationSceneDescription:
     )
 
     # Table.
-    table_pose: Pose = Pose((-0.5, 0.75, -0.5))
+    table_pose: Pose = Pose((-0.5, 0.75, -0.25))
     table_rgba: tuple[float, float, float, float] = (0.5, 0.5, 0.5, 1.0)
     table_half_extents: tuple[float, float, float] = (0.75, 0.25, 0.5)
 
@@ -64,7 +64,7 @@ class CupManipulationSceneDescription:
     cup_rgba: tuple[float, float, float, float] = (0.0, 0.0, 1.0, 1.0)
     cup_radius: float = 0.03
     cup_length: float = 0.15
-    cup_pose: Pose = Pose((0.0, 0.75, cup_length / 2))
+    cup_pose: Pose = Pose((0.0, 0.75, cup_length / 2 + 0.25))
     cup_handle_half_extents: tuple[float, float, float] = (
         cup_radius,
         cup_radius,
@@ -145,17 +145,17 @@ class CupManipulationSceneDescription:
             **pose_dict,
         )
 
-    def allclose(self, other: Any) -> bool:
+    def allclose(self, other: Any, atol=1e-5) -> bool:
         if not isinstance(other, CupManipulationSceneDescription):
             return False
         for field in fields(self):
             mine, theirs = getattr(self, field.name), getattr(other, field.name)
             if hasattr(mine, "allclose"):
-                field_close = mine.allclose(theirs)
+                field_close = mine.allclose(theirs, atol=atol)
             elif isinstance(mine, (tuple, list)):
-                field_close = np.allclose(mine, theirs)
+                field_close = np.allclose(mine, theirs, atol=atol)
             elif isinstance(mine, (float, int)):
-                field_close = np.isclose(mine, theirs)
+                field_close = np.isclose(mine, theirs, atol=atol)
             else:
                 field_close = mine == theirs
             if not field_close:
