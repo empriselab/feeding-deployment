@@ -6,7 +6,7 @@ from pybullet_helpers.inverse_kinematics import (
 )
 from pybullet_helpers.geometry import Pose, get_pose, multiply_poses, interpolate_poses
 from pybullet_helpers.link import get_relative_link_pose, get_link_pose
-from pybullet_helpers.joint import get_joint_infos, get_jointwise_difference
+from pybullet_helpers.joint import get_joint_infos, interpolate_joints
 from pybullet_helpers.motion_planning import (
     run_smooth_motion_planning_to_pose,
     smoothly_follow_end_effector_path,
@@ -20,7 +20,7 @@ from pybullet_helpers.trajectory import (
     iter_traj_with_max_distance,
 )
 
-from functools import lru_cache
+from functools import partial
 from pathlib import Path
 
 from scene import (
@@ -38,7 +38,6 @@ import numpy as np
 import pickle
 
 
-@lru_cache(maxsize=None)
 def generate_trajectory(
     scene: CupManipulationSceneIDs,
     scene_description: CupManipulationSceneDescription,
@@ -245,14 +244,8 @@ def generate_trajectory(
     #     all_joint_positions.append(state)
     #     all_held_cup_tfs.append(base_link_to_held_obj)
 
-    # TODO move out.
-    def joint_interpolate_fn(q1, q2, t):
-        dists_arr = np.array(get_jointwise_difference(joint_infos, q2, q1))
-        joint_arr = np.array(q1)
-        joint_arr_i = joint_arr + t * dists_arr
-        return list(joint_arr_i)
-
     # Create a continuous-time trajectory.
+    joint_interpolate_fn = partial(interpolate_joints, joint_infos)
     distances = []
     for pt1, pt2 in zip(all_joint_positions[:-1], all_joint_positions[1:], strict=True):
         dist = joint_distance_fn(pt1, pt2)
@@ -279,7 +272,7 @@ def generate_trajectory(
 
     # Remap the cup states.
     def cup_interpolate_fn(q1, q2, t):
-        return q2
+        return q1
 
     def cup_distance_fn(q1, q2):
         raise NotImplementedError
