@@ -246,7 +246,26 @@ def generate_trajectory(
     continuous_time_trajectory = concatenate_trajectories(segments)
     max_distance = 0.25  # TODO move out
     remapped_joint_positions = list(iter_traj_with_max_distance(continuous_time_trajectory, max_distance))
-    remapped_held_cup_tfs = [None] * len(remapped_joint_positions)  # TODO
+
+    # Remap the cup states.
+    def cup_interpolate_fn(q1, q2, t):
+        return q2
+    
+    def cup_distance_fn(q1, q2):
+        raise NotImplementedError
+    
+    cup_segments = []
+    for t in range(len(all_held_cup_tfs) - 1):
+        start = all_held_cup_tfs[t]
+        end = all_held_cup_tfs[t+1]
+        dt = distances[t]
+        seg = TrajectorySegment(start, end, dt, interpolate_fn=cup_interpolate_fn, distance_fn=cup_distance_fn)
+        cup_segments.append(seg)
+    continuous_time_cup_trajectory = concatenate_trajectories(cup_segments)
+
+    ts = np.linspace(0, continuous_time_trajectory.duration, num=len(remapped_joint_positions), endpoint=True)
+    remapped_held_cup_tfs = [continuous_time_cup_trajectory(t) for t in ts]
+
 
     return CupManipulationTrajectory(remapped_joint_positions, remapped_held_cup_tfs)
 
