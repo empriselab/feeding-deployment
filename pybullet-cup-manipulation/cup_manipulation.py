@@ -14,7 +14,11 @@ from pybullet_helpers.motion_planning import (
 )
 from pybullet_helpers.math_utils import geometric_sequence
 from pybullet_helpers.gui import visualize_pose, create_gui_connection
-from pybullet_helpers.trajectory import concatenate_trajectories, TrajectorySegment, iter_traj_with_max_distance
+from pybullet_helpers.trajectory import (
+    concatenate_trajectories,
+    TrajectorySegment,
+    iter_traj_with_max_distance,
+)
 
 from functools import lru_cache
 from pathlib import Path
@@ -24,7 +28,10 @@ from scene import (
     CupManipulationSceneIDs,
     CupManipulationSceneDescription,
 )
-from cup_manipulation_utils import make_cup_manipulation_video, CupManipulationTrajectory
+from cup_manipulation_utils import (
+    make_cup_manipulation_video,
+    CupManipulationTrajectory,
+)
 
 import pybullet as p
 import numpy as np
@@ -43,6 +50,21 @@ def generate_trajectory(
 
     physics_client_id = scene.physics_client_id
     robot = scene.robot
+
+    weights = geometric_sequence(0.9, len(robot.arm_joint_names))
+    joint_infos = get_joint_infos(
+        robot.robot_id, robot.arm_joints, robot.physics_client_id
+    )
+
+    def joint_distance_fn(pt1, pt2):
+        return get_joint_positions_distance(
+            robot,
+            joint_infos,
+            pt1,
+            pt2,
+            metric="weighted_joints",
+            weights=weights,
+        )
 
     collision_ids = {
         scene.cup_id,
@@ -97,15 +119,34 @@ def generate_trajectory(
         all_held_cup_tfs.append(None)
 
     # Move to grasp.
-    move_amt = scene_description.cup_grasp_distance / (num_grasp_waypoints - 1)
+    held_obj_id = scene.cup_id
+    new_collision_ids = collision_ids - {held_obj_id}
     tf = Pose(
-        (0.0, 0.0, move_amt),
+        (0.0, 0.0, scene_description.cup_grasp_distance),
         (0.0, 0.0, 0.0, 1.0),
     )
-    for _ in range(num_grasp_waypoints):
-        joints = end_effector_transform_to_joints(robot, tf)
-        robot.set_joints(joints)
-        all_joint_positions.append(joints)
+    current_end_effector_pose = robot.get_end_effector_pose()
+    new_end_effector_pose = multiply_poses(current_end_effector_pose, tf)
+    interpolated_poses = list(
+        interpolate_poses(
+            current_end_effector_pose,
+            new_end_effector_pose,
+            num_interp=num_grasp_waypoints,
+        )
+    )
+    plan = smoothly_follow_end_effector_path(
+        robot,
+        interpolated_poses,
+        robot.get_joint_positions(),
+        new_collision_ids,
+        joint_distance_fn,
+        max_time=max_motion_plan_time,
+    )
+
+    # Execute the plan.
+    for state in plan:
+        robot.set_joints(state)
+        all_joint_positions.append(state)
         all_held_cup_tfs.append(None)
 
     # Open the fingers to create a constraint inside the mounted holder.
@@ -114,7 +155,6 @@ def generate_trajectory(
     all_held_cup_tfs.append(None)
 
     # Simulate grasping by faking a constraint with the held object.
-    held_obj_id = scene.cup_id
     world_from_end_effector = get_link_pose(
         robot.robot_id, robot.end_effector_id, physics_client_id
     )
@@ -144,27 +184,9 @@ def generate_trajectory(
     )
     new_fingers_pose = multiply_poses(new_cup_pose, fingers_to_cup)
     visualize_pose(new_fingers_pose, physics_client_id)
-
-    new_collision_ids = collision_ids - {held_obj_id}
-
     new_end_effector_pose = multiply_poses(new_fingers_pose, finger_from_end_effector)
 
     # Prevent spilling: interpolate in end effector space and then follow.
-    weights = geometric_sequence(0.9, len(robot.arm_joint_names))
-    joint_infos = get_joint_infos(
-        robot.robot_id, robot.arm_joints, robot.physics_client_id
-    )
-
-    def joint_distance_fn(pt1, pt2):
-        return get_joint_positions_distance(
-            robot,
-            joint_infos,
-            pt1,
-            pt2,
-            metric="weighted_joints",
-            weights=weights,
-        )
-
     current_end_effector_pose = robot.get_end_effector_pose()
     interpolated_poses = list(
         interpolate_poses(
@@ -239,33 +261,51 @@ def generate_trajectory(
     segments = []
     for t in range(len(all_joint_positions) - 1):
         start = all_joint_positions[t]
-        end = all_joint_positions[t+1]
+        end = all_joint_positions[t + 1]
         dt = distances[t]
-        seg = TrajectorySegment(start, end, dt, interpolate_fn=joint_interpolate_fn, distance_fn=joint_distance_fn)
+        seg = TrajectorySegment(
+            start,
+            end,
+            dt,
+            interpolate_fn=joint_interpolate_fn,
+            distance_fn=joint_distance_fn,
+        )
         segments.append(seg)
     continuous_time_trajectory = concatenate_trajectories(segments)
-    max_distance = 0.25  # TODO move out
-    remapped_joint_positions = list(iter_traj_with_max_distance(continuous_time_trajectory, max_distance))
+    max_distance = 0.1  # TODO move out
+    remapped_joint_positions = list(
+        iter_traj_with_max_distance(continuous_time_trajectory, max_distance)
+    )
 
     # Remap the cup states.
     def cup_interpolate_fn(q1, q2, t):
         return q2
-    
+
     def cup_distance_fn(q1, q2):
         raise NotImplementedError
-    
+
     cup_segments = []
     for t in range(len(all_held_cup_tfs) - 1):
         start = all_held_cup_tfs[t]
-        end = all_held_cup_tfs[t+1]
+        end = all_held_cup_tfs[t + 1]
         dt = distances[t]
-        seg = TrajectorySegment(start, end, dt, interpolate_fn=cup_interpolate_fn, distance_fn=cup_distance_fn)
+        seg = TrajectorySegment(
+            start,
+            end,
+            dt,
+            interpolate_fn=cup_interpolate_fn,
+            distance_fn=cup_distance_fn,
+        )
         cup_segments.append(seg)
     continuous_time_cup_trajectory = concatenate_trajectories(cup_segments)
 
-    ts = np.linspace(0, continuous_time_trajectory.duration, num=len(remapped_joint_positions), endpoint=True)
+    ts = np.linspace(
+        0,
+        continuous_time_trajectory.duration,
+        num=len(remapped_joint_positions),
+        endpoint=True,
+    )
     remapped_held_cup_tfs = [continuous_time_cup_trajectory(t) for t in ts]
-
 
     return CupManipulationTrajectory(remapped_joint_positions, remapped_held_cup_tfs)
 
