@@ -10,7 +10,10 @@ from feeding_deployment.drinking.scene import (
     CupManipulationSceneDescription,
     create_cup_manipulation_scene,
 )
-from feeding_deployment.drinking.utils import get_kinova_controller_trajectory
+from feeding_deployment.drinking.utils import (
+    get_kinova_controller_trajectory,
+    make_cup_manipulation_video,
+)
 from feeding_deployment.robot_controller.kinova import KinovaArm
 
 
@@ -27,6 +30,10 @@ def _main():
     physics_client_id = create_gui_connection(camera_yaw=180)
     scene = create_cup_manipulation_scene(physics_client_id, scene_description)
     traj = generate_trajectory(scene, scene_description)
+
+    video_outfile = "last.mp4"
+    make_cup_manipulation_video(scene, scene_description, traj, video_outfile)
+    print(f"Video saved to {video_outfile}")
     p.disconnect(physics_client_id)
 
     # Execute the trajectory.
