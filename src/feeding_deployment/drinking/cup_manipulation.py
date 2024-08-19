@@ -266,9 +266,32 @@ def generate_trajectory(
     seed: int = 0,
     num_drink_transfer_end_effector_interp: int = 25,
     max_joint_space_distance: float = 0.1,
+    force_rerun: bool = False,
 ) -> CupManipulationTrajectory:
     """Run planning to create a cup manipulation trajectory."""
 
+    saved_traj_dir = Path(__file__).parent / "saved_trajs"
+    assert saved_traj_dir.exists()
+    saved_traj_files = list(saved_traj_dir.glob("*.traj"))
+    if not saved_traj_files:
+        next_file_id = 0
+    else:
+        next_file_id = len(saved_traj_files)
+    next_filepath = saved_traj_dir / f"{next_file_id}.traj"
+    assert not next_filepath.exists()
+
+    # Check if we already have saved a trajectory for this scene.
+    if not force_rerun:
+        for saved_traj_file in saved_traj_files:
+            with open(saved_traj_file, "rb") as rfp:
+                saved_scene_description, saved_traj = pickle.load(rfp)
+            if scene_description.allclose(saved_scene_description):
+                traj = saved_traj
+                print(f"Loaded saved trajectory: {saved_traj_file.name}")
+                return traj
+
+    # Need to replan.
+    print("Running planning...")
     plan = CupManipulationTrajectory()
 
     robot = scene.robot
@@ -322,9 +345,16 @@ def generate_trajectory(
     robot.set_joints(plan.joint_states[-1])
 
     # Remap the trajectory.
-    return _remap_trajectory_to_constant_distance(
+    plan = _remap_trajectory_to_constant_distance(
         plan, scene, _joint_distance_fn, max_joint_space_distance
     )
+
+    # Save the trajectory.
+    with open(next_filepath, "wb") as wfp:
+        pickle.dump((scene_description, traj), wfp)
+    print(f"Dumped trajectory to {next_filepath}")
+
+    return plan
 
 
 def _main(seed: int, max_motion_plan_time: float, force_rerun: bool) -> None:
@@ -333,38 +363,13 @@ def _main(seed: int, max_motion_plan_time: float, force_rerun: bool) -> None:
     physics_client_id = create_gui_connection(camera_yaw=180)
     scene = create_cup_manipulation_scene(physics_client_id, scene_description)
 
-    saved_traj_dir = Path(__file__).parent / "saved_trajs"
-    assert saved_traj_dir.exists()
-    saved_traj_files = list(saved_traj_dir.glob("*.traj"))
-    if not saved_traj_files:
-        next_file_id = 0
-    else:
-        next_file_id = len(saved_traj_files)
-    next_filepath = saved_traj_dir / f"{next_file_id}.traj"
-    assert not next_filepath.exists()
-
-    # Check if we already have saved a trajectory for this scene.
-    traj = None
-    if not force_rerun:
-        for saved_traj_file in saved_traj_files:
-            with open(saved_traj_file, "rb") as rfp:
-                saved_scene_description, saved_traj = pickle.load(rfp)
-            if scene_description.allclose(saved_scene_description):
-                traj = saved_traj
-                print(f"Loaded saved trajectory: {saved_traj_file.name}")
-                break
-
-    # Need to replan.
-    if traj is None:
-        traj = generate_trajectory(
-            scene,
-            scene_description,
-            seed=seed,
-            max_motion_plan_time=max_motion_plan_time,
-        )
-        with open(next_filepath, "wb") as wfp:
-            pickle.dump((scene_description, traj), wfp)
-        print(f"Dumped trajectory to {next_filepath}")
+    traj = generate_trajectory(
+        scene,
+        scene_description,
+        max_motion_plan_time=max_motion_plan_time,
+        seed=seed,
+        force_rerun=force_rerun,
+    )
 
     video_outfile = Path("generated_trajectory.mp4")
     make_cup_manipulation_video(

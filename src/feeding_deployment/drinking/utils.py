@@ -6,7 +6,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import imageio.v2 as iio
+import numpy as np
 import pybullet as p
+from numpy.typing import NDArray
 from pybullet_helpers.camera import capture_superimposed_image
 from pybullet_helpers.geometry import Pose
 from pybullet_helpers.inverse_kinematics import (
@@ -36,6 +38,20 @@ class CupManipulationTrajectory:
         """Extend this trajectory in-place."""
         self.joint_states.extend(other.joint_states)
         self.held_cup_transforms.extend(other.held_cup_transforms)
+
+
+def get_kinova_controller_trajectory(
+    traj: CupManipulationTrajectory,
+) -> list[tuple[NDArray, float]]:
+    """The Kinova controller expects arm joints and gripper values."""
+    cmds = []
+    for joint_state in traj.joint_states:
+        assert len(joint_state) == 9  # making assumptions about Kinova
+        arm = np.array(joint_state[:7])
+        assert np.isclose(joint_state[7], joint_state[8])
+        gripper = joint_state[8]
+        cmds.append((arm, gripper))
+    return cmds
 
 
 def make_cup_manipulation_video(
