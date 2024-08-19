@@ -8,8 +8,10 @@ import math
 import queue
 import threading
 import time
+
 import numpy as np
 from ruckig import InputParameter, OutputParameter, Result, Ruckig
+
 # from constants import POLICY_CONTROL_PERIOD
 POLICY_CONTROL_PERIOD = 0.1
 
@@ -25,6 +27,7 @@ K_r_inv = np.linalg.inv(K_r)
 K_r_K_l = K_r @ K_l
 DT = 0.001
 
+
 class LowPassFilter:
     def __init__(self, alpha, initial_value):
         self.alpha = alpha
@@ -33,6 +36,7 @@ class LowPassFilter:
     def filter(self, x):
         self.y = self.alpha * x + (1 - self.alpha) * self.y
         return self.y
+
 
 class JointCompliantController:
     def __init__(self, command_queue):
@@ -71,7 +75,9 @@ class JointCompliantController:
             self.otg_inp = InputParameter(arm.actuator_count)
             self.otg_out = OutputParameter(arm.actuator_count)
             self.otg_inp.max_velocity = 4 * [math.radians(80)] + 3 * [math.radians(140)]
-            self.otg_inp.max_acceleration = 4 * [math.radians(240)] + 3 * [math.radians(450)]
+            self.otg_inp.max_acceleration = 4 * [math.radians(240)] + 3 * [
+                math.radians(450)
+            ]
             self.otg_inp.current_position = arm.q.copy()
             self.otg_inp.current_velocity = arm.dq.copy()
             self.otg_inp.target_position = arm.q.copy()
@@ -79,7 +85,9 @@ class JointCompliantController:
             self.otg_res = Result.Finished
 
         # Sensor readings
-        self.q_s = self.q_s + np.mod(arm.q - self.q_s + np.pi, 2 * np.pi) - np.pi  # Unwrapped joint angle
+        self.q_s = (
+            self.q_s + np.mod(arm.q - self.q_s + np.pi, 2 * np.pi) - np.pi
+        )  # Unwrapped joint angle
         dq_s = arm.dq.copy()
         tau_s = arm.tau.copy()
         tau_s_f = self.tau_filter.filter(tau_s)
@@ -88,7 +96,9 @@ class JointCompliantController:
         if not self.command_queue.empty():
             qpos, self.gripper_pos = self.command_queue.get()
             self.last_command_time = time.time()
-            qpos = self.q_s + np.mod(qpos - self.q_s + np.pi, 2 * np.pi) - np.pi  # Unwrapped joint angle
+            qpos = (
+                self.q_s + np.mod(qpos - self.q_s + np.pi, 2 * np.pi) - np.pi
+            )  # Unwrapped joint angle
             self.otg_inp.target_position = qpos
             self.otg_res = Result.Working
 
@@ -133,18 +143,23 @@ class JointCompliantController:
 
         return tau_c, self.gripper_pos
 
+
 def command_loop_retract(command_queue, stop_event):
     # qpos = np.array([-2.771089155364116, -1.4597435746030278, -1.9011992769067048, -1.0872040897239863, 0.39878180820749237, -0.8243154690389938, 2.672235278861465])
     # qpos = np.array([-2.7611776687351686, -1.1867898028941912, -1.7014195845733209, -1.8118651360366513, 0.2697381378506211, -0.09092617856970353, 2.4944202739346184])
-    qpos = np.array([0.0, 0.26179939, 3.14159265, -2.26892803, 0.0, 0.95993109, 1.57079633])  # Home
+    qpos = np.array(
+        [0.0, 0.26179939, 3.14159265, -2.26892803, 0.0, 0.95993109, 1.57079633]
+    )  # Home
     # qpos = np.array([0.0, -0.34906585, 3.14159265, -2.54818071, 0.0, -0.87266463, 1.57079633])
     gripper_pos = 0
     while not stop_event.is_set():
         command_queue.put((qpos, gripper_pos))
         time.sleep(POLICY_CONTROL_PERIOD)
 
+
 def command_loop_circle(arm, command_queue, stop_event):
     from ik_solver import IKSolver
+
     ik_solver = IKSolver(ee_offset=0.12)
     quat = np.array([0.707, 0.707, 0.0, 0.0])  # (x, y, z, w)
     radius = 0.1

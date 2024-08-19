@@ -1,13 +1,17 @@
 """Demonstrate the full drinking pipeline."""
 
-from feeding_deployment.robot_controller.kinova import KinovaArm
-from feeding_deployment.drinking.planning import generate_trajectory
-from feeding_deployment.drinking.utils import get_kinova_controller_trajectory
-from feeding_deployment.drinking.scene import CupManipulationSceneDescription, create_cup_manipulation_scene
-from pybullet_helpers.gui import create_gui_connection
+import time
 
 import pybullet as p
-import time
+from pybullet_helpers.gui import create_gui_connection
+
+from feeding_deployment.drinking.planning import generate_trajectory
+from feeding_deployment.drinking.scene import (
+    CupManipulationSceneDescription,
+    create_cup_manipulation_scene,
+)
+from feeding_deployment.drinking.utils import get_kinova_controller_trajectory
+from feeding_deployment.robot_controller.kinova import KinovaArm
 
 
 def _main():
@@ -30,7 +34,6 @@ def _main():
     joint_cmds = [j for j, _ in cmds]
     input("Press enter to execute the plan.")
     arm.move_angular_trajectory(joint_cmds)
-
 
 
 if __name__ == "__main__":

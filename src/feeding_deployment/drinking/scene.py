@@ -9,7 +9,11 @@ from typing import Any
 import numpy as np
 import pybullet as p
 from pybullet_helpers.geometry import Pose, Pose3D, Quaternion, multiply_poses
-from pybullet_helpers.joint import JointPositions
+from pybullet_helpers.joint import (
+    JointPositions,
+    get_joint_infos,
+    get_jointwise_difference,
+)
 from pybullet_helpers.math_utils import rotate_about_point
 from pybullet_helpers.robots import create_pybullet_robot
 from pybullet_helpers.robots.single_arm import SingleArmTwoFingerGripperPyBulletRobot
@@ -147,11 +151,30 @@ class CupManipulationSceneDescription:
             **pose_dict,
         )
 
-    def allclose(self, other: Any, atol=1e-5) -> bool:
+    def allclose(self, other: Any, atol=1e-4) -> bool:
         """Compare this scene description to another."""
         if not isinstance(other, CupManipulationSceneDescription):
             return False
+
+        # Need to handle joints separately because some are continuous.
+        # This is unfortunately needed to grab joint infos.
+        physics_client_id = p.connect(p.DIRECT)
+        scene = create_cup_manipulation_scene(physics_client_id, self)
+        robot = scene.robot
+        joint_infos = get_joint_infos(
+            robot.robot_id, robot.arm_joints, robot.physics_client_id
+        )
+        diff = get_jointwise_difference(
+            joint_infos, self.initial_joints, other.initial_joints
+        )
+        close = np.allclose(diff, 0, atol=atol)
+        p.disconnect(physics_client_id)
+        if not close:
+            return False
+
         for fld in fields(self):
+            if fld.name == "initial_joints":
+                continue  # handled above
             mine, theirs = getattr(self, fld.name), getattr(other, fld.name)
             if hasattr(mine, "allclose"):
                 field_close = mine.allclose(theirs, atol=atol)
@@ -162,6 +185,9 @@ class CupManipulationSceneDescription:
             else:
                 field_close = mine == theirs
             if not field_close:
+                import ipdb
+
+                ipdb.set_trace()
                 return False
         return True
 

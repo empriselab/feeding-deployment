@@ -1,10 +1,10 @@
 """Script to develop cup manipulation skills in simulation."""
 
+import os
 import pickle
 from functools import partial
 from pathlib import Path
 from typing import Callable
-import os
 
 import numpy as np
 import pybullet as p
