@@ -13,7 +13,7 @@ from pybullet_helpers.inverse_kinematics import (
 from pybullet_helpers.joint import (
     JointPositions,
 )
-from scene import (
+from feeding_deployment.drinking.scene import (
     CupManipulationSceneDescription,
     CupManipulationSceneIDs,
 )
