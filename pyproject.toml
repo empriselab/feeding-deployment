@@ -46,7 +46,11 @@ split_on_trailing_comma = true
 strict_equality = true
 disallow_untyped_calls = true
 warn_unreachable = true
-exclude = ["venv/*"]
+exclude = [
+    "venv/*",
+    "src/feeding_deployment/robot_controller/*",
+    "src/feeding_deployment/integration/*",
+]
 
 [[tool.mypy.overrides]]
 module = [

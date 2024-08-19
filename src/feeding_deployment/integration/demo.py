@@ -17,7 +17,7 @@ from feeding_deployment.drinking.utils import (
 from feeding_deployment.robot_controller.kinova import KinovaArm
 
 
-def _main():
+def _main() -> None:
     # Initialize the robot arm and get the initial joint pose.
     arm = KinovaArm()
     arm.retract()
