@@ -1,16 +1,15 @@
-import rospy
-
 import sys
+
+import rospy
 
 sys.path.append("../../../FLAIR/bite_acquisition/scripts")
 
-from robot_controller.kinova_controller import KinovaRobotController
-from geometry_msgs.msg import Pose, Point, Quaternion
-from scipy.spatial.transform import Rotation
-from sensor_msgs.msg import JointState
 import numpy as np
 import utils
-
+from geometry_msgs.msg import Point, Pose, Quaternion
+from robot_controller.kinova_controller import KinovaRobotController
+from scipy.spatial.transform import Rotation
+from sensor_msgs.msg import JointState
 
 if __name__ == "__main__":
     rospy.init_node("robot_controller", anonymous=True)

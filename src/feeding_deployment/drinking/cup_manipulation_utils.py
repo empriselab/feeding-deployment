@@ -1,18 +1,18 @@
 """Utilities for cup manipulation."""
 
+from dataclasses import dataclass
+from pathlib import Path
+
+import imageio.v2 as iio
+import pybullet as p
+from pybullet_helpers.camera import capture_superimposed_image
+from pybullet_helpers.geometry import Pose
 from pybullet_helpers.inverse_kinematics import (
     set_robot_joints_with_held_object,
 )
-from pybullet_helpers.geometry import Pose
 from pybullet_helpers.joint import (
     JointPositions,
 )
-from dataclasses import dataclass
-from pybullet_helpers.camera import capture_superimposed_image
-import imageio.v2 as iio
-from pathlib import Path
-import pybullet as p
-
 from scene import (
     CupManipulationSceneDescription,
     CupManipulationSceneIDs,

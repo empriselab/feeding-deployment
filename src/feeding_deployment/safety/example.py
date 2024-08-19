@@ -1,6 +1,6 @@
-import rospy
-
 import sys
+
+import rospy
 
 sys.path.append("../../FLAIR/bite_acquisition/scripts")
 

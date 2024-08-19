@@ -1,9 +1,10 @@
-import pyaudio
-import rospy
+import time
 from typing import List, Optional, Tuple, Union
+
 import numpy as np
 import numpy.typing as npt
-import time
+import pyaudio
+import rospy
 from std_msgs.msg import Bool
 
 
@@ -98,11 +99,10 @@ class EStop:
         prev_data_arr: Optional[npt.NDArray],
         threshold: Union[int, float],
     ) -> bool:
-        """
-        Detects whether there is a rising edge in `curr_data_arr` that exceeds
-        `threshold`. In other words, this function returns True if there is a
-        point in `curr_data_arr` that is greater than `threshold` and the previous
-        point is less than `threshold`.
+        """Detects whether there is a rising edge in `curr_data_arr` that
+        exceeds `threshold`. In other words, this function returns True if
+        there is a point in `curr_data_arr` that is greater than `threshold`
+        and the previous point is less than `threshold`.
 
         Although this method of detecting a rising edge is suceptible to noise
         (since it only requires two points to determine an edge), in practice
@@ -147,11 +147,10 @@ class EStop:
         prev_data_arr: Optional[npt.NDArray],
         threshold: Union[int, float],
     ) -> bool:
-        """
-        Detects whether there is a falling edge in `curr_data_arr` that exceeds
-        `threshold`. In other words, this function returns True if there is a
-        point in `curr_data_arr` that is less than `threshold` and the previous
-        point is greater than `threshold`.
+        """Detects whether there is a falling edge in `curr_data_arr` that
+        exceeds `threshold`. In other words, this function returns True if
+        there is a point in `curr_data_arr` that is less than `threshold` and
+        the previous point is greater than `threshold`.
 
         Parameters
         ----------

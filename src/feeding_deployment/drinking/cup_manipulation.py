@@ -1,41 +1,39 @@
 """Script to develop cup manipulation skills in simulation."""
 
-from pybullet_helpers.inverse_kinematics import (
-    set_robot_joints_with_held_object,
-    end_effector_transform_to_joints,
-)
-from pybullet_helpers.geometry import Pose, get_pose, multiply_poses, interpolate_poses
-from pybullet_helpers.link import get_relative_link_pose, get_link_pose
-from pybullet_helpers.joint import get_joint_infos, interpolate_joints
-from pybullet_helpers.motion_planning import (
-    run_smooth_motion_planning_to_pose,
-    smoothly_follow_end_effector_path,
-    get_joint_positions_distance,
-)
-from pybullet_helpers.math_utils import geometric_sequence
-from pybullet_helpers.gui import visualize_pose, create_gui_connection
-from pybullet_helpers.trajectory import (
-    concatenate_trajectories,
-    TrajectorySegment,
-    iter_traj_with_max_distance,
-)
-
+import pickle
 from functools import partial
 from pathlib import Path
 
-from scene import (
-    create_cup_manipulation_scene,
-    CupManipulationSceneIDs,
-    CupManipulationSceneDescription,
-)
-from cup_manipulation_utils import (
-    make_cup_manipulation_video,
-    CupManipulationTrajectory,
-)
-
-import pybullet as p
 import numpy as np
-import pickle
+import pybullet as p
+from cup_manipulation_utils import (
+    CupManipulationTrajectory,
+    make_cup_manipulation_video,
+)
+from pybullet_helpers.geometry import Pose, get_pose, interpolate_poses, multiply_poses
+from pybullet_helpers.gui import create_gui_connection, visualize_pose
+from pybullet_helpers.inverse_kinematics import (
+    end_effector_transform_to_joints,
+    set_robot_joints_with_held_object,
+)
+from pybullet_helpers.joint import get_joint_infos, interpolate_joints
+from pybullet_helpers.link import get_link_pose, get_relative_link_pose
+from pybullet_helpers.math_utils import geometric_sequence
+from pybullet_helpers.motion_planning import (
+    get_joint_positions_distance,
+    run_smooth_motion_planning_to_pose,
+    smoothly_follow_end_effector_path,
+)
+from pybullet_helpers.trajectory import (
+    TrajectorySegment,
+    concatenate_trajectories,
+    iter_traj_with_max_distance,
+)
+from scene import (
+    CupManipulationSceneDescription,
+    CupManipulationSceneIDs,
+    create_cup_manipulation_scene,
+)
 
 
 def generate_trajectory(

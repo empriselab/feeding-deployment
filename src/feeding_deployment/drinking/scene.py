@@ -1,20 +1,20 @@
 """Create a cup manipulation PyBullet scene given poses for key objects."""
 
 from __future__ import annotations
-from dataclasses import dataclass, replace, fields
-from pybullet_helpers.robots import create_pybullet_robot
-from pybullet_helpers.joint import JointPositions
+
+from dataclasses import dataclass, fields, replace
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+import pybullet as p
 from pybullet_helpers.geometry import Pose, Pose3D, Quaternion, multiply_poses
+from pybullet_helpers.joint import JointPositions
+from pybullet_helpers.math_utils import rotate_about_point
+from pybullet_helpers.robots import create_pybullet_robot
 from pybullet_helpers.robots.single_arm import SingleArmTwoFingerGripperPyBulletRobot
 from pybullet_helpers.utils import create_pybullet_block
-from pybullet_helpers.math_utils import rotate_about_point
-
 from scipy.spatial.transform import Rotation
-
-from pathlib import Path
-import pybullet as p
-from typing import Any
-import numpy as np
 
 
 @dataclass(frozen=True)
