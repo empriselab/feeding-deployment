@@ -351,7 +351,7 @@ def generate_trajectory(
 
     # Save the trajectory.
     with open(next_filepath, "wb") as wfp:
-        pickle.dump((scene_description, traj), wfp)
+        pickle.dump((scene_description, plan), wfp)
     print(f"Dumped trajectory to {next_filepath}")
 
     return plan
