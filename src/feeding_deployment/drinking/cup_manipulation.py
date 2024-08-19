@@ -26,7 +26,7 @@ from pybullet_helpers.trajectory import (
     iter_traj_with_max_distance,
 )
 
-from feeding_deployment.drinking.scene import (
+from feeding_deployment.drinking.cup_manipulation_scene import (
     CupManipulationSceneDescription,
     CupManipulationSceneIDs,
     create_cup_manipulation_scene,
@@ -40,12 +40,13 @@ from feeding_deployment.drinking.utils import (
 def generate_trajectory(
     scene: CupManipulationSceneIDs,
     scene_description: CupManipulationSceneDescription,
-    max_motion_plan_time: int = 10,
+    max_motion_plan_time: float = 10.0,
     num_grasp_waypoints: int = 5,
     seed: int = 0,
     num_drink_transfer_end_effector_interp: int = 25,
     max_joint_space_distance=0.1,
 ) -> CupManipulationTrajectory:
+    """Run planning to create a cup manipulation trajectory."""
 
     physics_client_id = scene.physics_client_id
     robot = scene.robot
@@ -212,39 +213,6 @@ def generate_trajectory(
         all_joint_positions.append(state)
         all_held_cup_tfs.append(base_link_to_held_obj)
 
-    # Try to move closer to the mouth for bite transfer.
-    # transfer_relative_pose: Pose = Pose(
-    #     (-0.5, 0.1, 0.0), p.getQuaternionFromEuler((0.0, 0.0, np.pi / 2))
-    # )
-    # cup_transfer_pose = multiply_poses(scene_description.wheelchair_head_pose, transfer_relative_pose)
-    # current_end_effector_pose = robot.get_end_effector_pose()
-    # new_fingers_pose = multiply_poses(cup_transfer_pose, fingers_to_cup)
-    # visualize_pose(new_fingers_pose, physics_client_id)
-
-    # new_end_effector_pose = multiply_poses(new_fingers_pose, finger_from_end_effector)
-    # interpolated_poses = list(
-    #     interpolate_poses(
-    #         current_end_effector_pose,
-    #         new_end_effector_pose,
-    #         num_interp=10,  # NOTE
-    #     )
-    # )
-    # plan = smoothly_follow_end_effector_path(
-    #     robot,
-    #     interpolated_poses,
-    #     robot.get_joint_positions(),
-    #     new_collision_ids,
-    #     _joint_distance_fn,
-    #     max_time=max_motion_plan_time,
-    # )
-    # # Execute the plan.
-    # for state in plan:
-    #     set_robot_joints_with_held_object(
-    #         robot, physics_client_id, held_obj_id, base_link_to_held_obj, state
-    #     )
-    #     all_joint_positions.append(state)
-    #     all_held_cup_tfs.append(base_link_to_held_obj)
-
     # Create a continuous-time trajectory.
     joint_interpolate_fn = partial(interpolate_joints, joint_infos)
     distances = []
@@ -271,6 +239,7 @@ def generate_trajectory(
 
     # Remap the cup states.
     def _cup_interpolate_fn(q1: Pose | None, q2: Pose | None, t: float) -> Pose | None:
+        del q2, t  # unused
         return q1
 
     def _cup_distance_fn(q1: Pose | None, q2: Pose | None) -> float:
@@ -299,14 +268,7 @@ def generate_trajectory(
     return CupManipulationTrajectory(remapped_joint_positions, remapped_held_cup_tfs)
 
 
-if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--max_motion_plan_time", type=float, default=5.0)
-    parser.add_argument("--force_rerun", action="store_true")
-    args = parser.parse_args()
+def _main(seed: int, max_motion_plan_time: float, force_rerun: bool) -> None:
 
     scene_description = CupManipulationSceneDescription()
     physics_client_id = create_gui_connection(camera_yaw=180)
@@ -324,7 +286,7 @@ if __name__ == "__main__":
 
     # Check if we already have saved a trajectory for this scene.
     traj = None
-    if not args.force_rerun:
+    if not force_rerun:
         for saved_traj_file in saved_traj_files:
             with open(saved_traj_file, "rb") as rfp:
                 saved_scene_description, saved_traj = pickle.load(rfp)
@@ -338,8 +300,8 @@ if __name__ == "__main__":
         traj = generate_trajectory(
             scene,
             scene_description,
-            seed=args.seed,
-            max_motion_plan_time=args.max_motion_plan_time,
+            seed=seed,
+            max_motion_plan_time=max_motion_plan_time,
         )
         with open(next_filepath, "wb") as wfp:
             pickle.dump((scene_description, traj), wfp)
@@ -353,3 +315,15 @@ if __name__ == "__main__":
         video_outfile,
     )
     p.disconnect(physics_client_id)
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--max_motion_plan_time", type=float, default=5.0)
+    parser.add_argument("--force_rerun", action="store_true")
+    args = parser.parse_args()
+
+    _main(args.seed, args.max_motion_plan_time, args.force_rerun)
