@@ -1,3 +1,4 @@
+# pylint: disable=line-too-long
 """This file needs to be rewritten using new controllers."""
 
 # import sys
@@ -127,7 +128,7 @@
 # joint_state_msg = rospy.wait_for_message('/robot_joint_states', JointState)
 # closed_finger_joints = np.copy(joint_state_msg.position)
 # finger_idx = joint_state_msg.name.index("finger_joint")
-# closed_finger_joints[finger_idx] = 0.5  # TODO figure out how to get gripper joint limits
+# closed_finger_joints[finger_idx] = 0.5
 # robot_controller.set_joint_position(closed_finger_joints)
 
 # # Detect the aruco marker and transform it into the tool frame.
