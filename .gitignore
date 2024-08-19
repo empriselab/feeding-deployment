@@ -2,6 +2,7 @@
 *__pycache__
 *.traj
 .python-version
+*.mp4
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
