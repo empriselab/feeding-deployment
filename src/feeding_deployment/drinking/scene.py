@@ -62,7 +62,7 @@ class CupManipulationSceneDescription:
     )
 
     # Table.
-    table_pose: Pose = Pose((-0.5, 0.75, -0.5))
+    table_pose: Pose = Pose((-0.5, 0.75, -0.29))
     table_rgba: tuple[float, float, float, float] = (0.5, 0.5, 0.5, 1.0)
     table_half_extents: tuple[float, float, float] = (0.75, 0.25, 0.5)
 
@@ -70,7 +70,7 @@ class CupManipulationSceneDescription:
     cup_rgba: tuple[float, float, float, float] = (0.0, 0.0, 1.0, 1.0)
     cup_radius: float = 0.03
     cup_length: float = 0.15
-    cup_pose: Pose = Pose((0.0, 0.75, cup_length / 2))
+    cup_pose: Pose = Pose((0.0, 0.75, cup_length / 2 + 0.21))
     cup_handle_half_extents: tuple[float, float, float] = (
         cup_radius,
         cup_radius,

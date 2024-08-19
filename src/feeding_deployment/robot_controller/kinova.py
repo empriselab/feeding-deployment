@@ -406,7 +406,7 @@ class KinovaArm:
         if blocking:
             self.end_or_abort_event.wait(KinovaArm.ACTION_TIMEOUT_DURATION)
 
-    def _gripper_position_command(self, value, blocking=True):
+    def _gripper_position_command(self, value, blocking=True, timeout=1.0):
         assert not self.cyclic_running, "Arm must be in high-level servoing mode"
 
         # Send gripper command
@@ -420,7 +420,8 @@ class KinovaArm:
             # Wait for reported position to match value
             gripper_request = Base_pb2.GripperRequest()
             gripper_request.mode = Base_pb2.GRIPPER_POSITION
-            while True:
+            start_time = time.perf_counter()
+            while time.perf_counter() - start_time < timeout:
                 gripper_measure = self.base.GetMeasuredGripperMovement(gripper_request)
                 if abs(value - gripper_measure.finger[0].value) < 0.01:
                     break

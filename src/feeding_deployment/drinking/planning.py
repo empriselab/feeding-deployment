@@ -131,7 +131,7 @@ def _get_plan_to_grasp_cup(
     )
 
     # Move off the table so that the cup is no longer in collision with the table.
-    tf = Pose((0.0, -0.01, 0.0), (0.0, 0.0, 0.0, 1.0))
+    tf = Pose((0.0, -0.1, 0.0), (0.0, 0.0, 0.0, 1.0))
     joints = end_effector_transform_to_joints(robot, tf)
     set_robot_joints_with_held_object(
         robot, physics_client_id, scene.cup_id, base_link_to_held_obj, joints
