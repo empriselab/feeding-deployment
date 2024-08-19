@@ -11,13 +11,15 @@ from feeding_deployment.drinking.scene import (
     create_cup_manipulation_scene,
 )
 from feeding_deployment.drinking.utils import (
-    get_kinova_controller_trajectory,
     make_cup_manipulation_video,
+)
+from feeding_deployment.integration.utils import (
+    cup_manipulation_trajectory_to_kinova_commands,
 )
 from feeding_deployment.robot_controller.kinova import KinovaArm
 
 
-def _main() -> None:
+def _main():
     # Initialize the robot arm and get the initial joint pose.
     arm = KinovaArm()
     arm.retract()
@@ -37,7 +39,7 @@ def _main() -> None:
     p.disconnect(physics_client_id)
 
     # Execute the trajectory.
-    cmds = get_kinova_controller_trajectory(traj)
+    cmds = cup_manipulation_trajectory_to_kinova_commands(traj)
     joint_cmds = [j for j, _ in cmds]
     input("Press enter to execute the plan.")
     arm.move_angular_trajectory(joint_cmds)
