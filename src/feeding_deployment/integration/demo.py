@@ -40,9 +40,9 @@ def _main():
 
     # Execute the trajectory.
     cmds = cup_manipulation_trajectory_to_kinova_commands(traj)
-    joint_cmds = [j for j, _ in cmds]
     input("Press enter to execute the plan.")
-    arm.move_angular_trajectory(joint_cmds)
+    for cmd in cmds:
+        arm.execute_command(cmd)
 
 
 if __name__ == "__main__":
