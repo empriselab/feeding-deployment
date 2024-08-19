@@ -52,7 +52,7 @@ class EStop:
 
         self.stop_controller_pub = rospy.Publisher("/estop", Bool, queue_size=1)
 
-    def close(self)-> None:
+    def close(self) -> None:
         # Close the audio stream
         if self.stream is not None:
             self.stream.stop_stream()

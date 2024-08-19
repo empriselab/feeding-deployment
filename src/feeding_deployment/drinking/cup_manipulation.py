@@ -6,17 +6,13 @@ from pathlib import Path
 
 import numpy as np
 import pybullet as p
-from feeding_deployment.drinking.utils import (
-    CupManipulationTrajectory,
-    make_cup_manipulation_video,
-)
 from pybullet_helpers.geometry import Pose, get_pose, interpolate_poses, multiply_poses
 from pybullet_helpers.gui import create_gui_connection, visualize_pose
 from pybullet_helpers.inverse_kinematics import (
     end_effector_transform_to_joints,
     set_robot_joints_with_held_object,
 )
-from pybullet_helpers.joint import get_joint_infos, interpolate_joints
+from pybullet_helpers.joint import JointPositions, get_joint_infos, interpolate_joints
 from pybullet_helpers.link import get_link_pose, get_relative_link_pose
 from pybullet_helpers.math_utils import geometric_sequence
 from pybullet_helpers.motion_planning import (
@@ -29,10 +25,15 @@ from pybullet_helpers.trajectory import (
     concatenate_trajectories,
     iter_traj_with_max_distance,
 )
+
 from feeding_deployment.drinking.scene import (
     CupManipulationSceneDescription,
     CupManipulationSceneIDs,
     create_cup_manipulation_scene,
+)
+from feeding_deployment.drinking.utils import (
+    CupManipulationTrajectory,
+    make_cup_manipulation_video,
 )
 
 
@@ -54,7 +55,7 @@ def generate_trajectory(
         robot.robot_id, robot.arm_joints, robot.physics_client_id
     )
 
-    def joint_distance_fn(pt1, pt2):
+    def _joint_distance_fn(pt1: JointPositions, pt2: JointPositions) -> float:
         return get_joint_positions_distance(
             robot,
             joint_infos,
@@ -71,7 +72,7 @@ def generate_trajectory(
         scene.wheelchair_id,
     }
     all_joint_positions = [robot.get_joint_positions()]
-    all_held_cup_tfs = [None]
+    all_held_cup_tfs: list[Pose | None] = [None]
 
     # Close the fingers.
     robot.close_fingers()
@@ -109,6 +110,7 @@ def generate_trajectory(
         seed,
         max_time=max_motion_plan_time,
     )
+    assert plan is not None
 
     # Execute the motion plan.
     for state in plan:
@@ -137,7 +139,7 @@ def generate_trajectory(
         interpolated_poses,
         robot.get_joint_positions(),
         new_collision_ids,
-        joint_distance_fn,
+        _joint_distance_fn,
         max_time=max_motion_plan_time,
     )
 
@@ -198,7 +200,7 @@ def generate_trajectory(
         interpolated_poses,
         robot.get_joint_positions(),
         new_collision_ids,
-        joint_distance_fn,
+        _joint_distance_fn,
         max_time=max_motion_plan_time,
     )
 
@@ -232,7 +234,7 @@ def generate_trajectory(
     #     interpolated_poses,
     #     robot.get_joint_positions(),
     #     new_collision_ids,
-    #     joint_distance_fn,
+    #     _joint_distance_fn,
     #     max_time=max_motion_plan_time,
     # )
     # # Execute the plan.
@@ -247,23 +249,20 @@ def generate_trajectory(
     joint_interpolate_fn = partial(interpolate_joints, joint_infos)
     distances = []
     for pt1, pt2 in zip(all_joint_positions[:-1], all_joint_positions[1:], strict=True):
-        dist = joint_distance_fn(pt1, pt2)
+        dist = _joint_distance_fn(pt1, pt2)
         distances.append(dist)
     # Use distances as times.
-    segments = []
+    joint_segments = []
     for t in range(len(all_joint_positions) - 1):
-        start = all_joint_positions[t]
-        end = all_joint_positions[t + 1]
-        dt = distances[t]
-        seg = TrajectorySegment(
-            start,
-            end,
-            dt,
+        joint_seg = TrajectorySegment(
+            all_joint_positions[t],
+            all_joint_positions[t + 1],
+            distances[t],
             interpolate_fn=joint_interpolate_fn,
-            distance_fn=joint_distance_fn,
+            distance_fn=_joint_distance_fn,
         )
-        segments.append(seg)
-    continuous_time_trajectory = concatenate_trajectories(segments)
+        joint_segments.append(joint_seg)
+    continuous_time_trajectory = concatenate_trajectories(joint_segments)
     remapped_joint_positions = list(
         iter_traj_with_max_distance(
             continuous_time_trajectory, max_joint_space_distance
@@ -271,25 +270,22 @@ def generate_trajectory(
     )
 
     # Remap the cup states.
-    def cup_interpolate_fn(q1, q2, t):
+    def _cup_interpolate_fn(q1: Pose | None, q2: Pose | None, t: float) -> Pose | None:
         return q1
 
-    def cup_distance_fn(q1, q2):
+    def _cup_distance_fn(q1: Pose | None, q2: Pose | None) -> float:
         raise NotImplementedError
 
     cup_segments = []
     for t in range(len(all_held_cup_tfs) - 1):
-        start = all_held_cup_tfs[t]
-        end = all_held_cup_tfs[t + 1]
-        dt = distances[t]
-        seg = TrajectorySegment(
-            start,
-            end,
-            dt,
-            interpolate_fn=cup_interpolate_fn,
-            distance_fn=cup_distance_fn,
+        cup_seg = TrajectorySegment(
+            all_held_cup_tfs[t],
+            all_held_cup_tfs[t + 1],
+            distances[t],
+            interpolate_fn=_cup_interpolate_fn,
+            distance_fn=_cup_distance_fn,
         )
-        cup_segments.append(seg)
+        cup_segments.append(cup_seg)
     continuous_time_cup_trajectory = concatenate_trajectories(cup_segments)
 
     ts = np.linspace(
@@ -330,8 +326,8 @@ if __name__ == "__main__":
     traj = None
     if not args.force_rerun:
         for saved_traj_file in saved_traj_files:
-            with open(saved_traj_file, "rb") as f:
-                saved_scene_description, saved_traj = pickle.load(f)
+            with open(saved_traj_file, "rb") as rfp:
+                saved_scene_description, saved_traj = pickle.load(rfp)
             if scene_description.allclose(saved_scene_description):
                 traj = saved_traj
                 print(f"Loaded saved trajectory: {saved_traj_file.name}")
@@ -345,8 +341,8 @@ if __name__ == "__main__":
             seed=args.seed,
             max_motion_plan_time=args.max_motion_plan_time,
         )
-        with open(next_filepath, "wb") as f:
-            pickle.dump((scene_description, traj), f)
+        with open(next_filepath, "wb") as wfp:
+            pickle.dump((scene_description, traj), wfp)
         print(f"Dumped trajectory to {next_filepath}")
 
     video_outfile = Path("generated_trajectory.mp4")

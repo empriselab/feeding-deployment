@@ -123,34 +123,34 @@
 #     next_pos.append(joint_state_msg.position[finger_idx])
 #     robot_controller.set_joint_position(next_pos)
 
-    # # Try to close the grippers.
-    # joint_state_msg = rospy.wait_for_message('/robot_joint_states', JointState)
-    # closed_finger_joints = np.copy(joint_state_msg.position)
-    # finger_idx = joint_state_msg.name.index("finger_joint")
-    # closed_finger_joints[finger_idx] = 0.5  # TODO figure out how to get gripper joint limits
-    # robot_controller.set_joint_position(closed_finger_joints)
+# # Try to close the grippers.
+# joint_state_msg = rospy.wait_for_message('/robot_joint_states', JointState)
+# closed_finger_joints = np.copy(joint_state_msg.position)
+# finger_idx = joint_state_msg.name.index("finger_joint")
+# closed_finger_joints[finger_idx] = 0.5  # TODO figure out how to get gripper joint limits
+# robot_controller.set_joint_position(closed_finger_joints)
 
-    # # Detect the aruco marker and transform it into the tool frame.
-    # aruco_center_in_camera_msg = rospy.wait_for_message('/aruco_center', Point)
-    # aruco_center_in_camera = np.array([aruco_center_in_camera_msg.x, aruco_center_in_camera_msg.y, aruco_center_in_camera_msg.z])
+# # Detect the aruco marker and transform it into the tool frame.
+# aruco_center_in_camera_msg = rospy.wait_for_message('/aruco_center', Point)
+# aruco_center_in_camera = np.array([aruco_center_in_camera_msg.x, aruco_center_in_camera_msg.y, aruco_center_in_camera_msg.z])
 
-    # base_to_camera = tf_utils.getTransformationFromTF("base_link", "camera_color_optical_frame")
-    # base_to_tip = tf_utils.getTransformationFromTF('base_link', 'finger_tip')
+# base_to_camera = tf_utils.getTransformationFromTF("base_link", "camera_color_optical_frame")
+# base_to_tip = tf_utils.getTransformationFromTF('base_link', 'finger_tip')
 
-    # aruco_transform = np.eye(4)
-    # aruco_transform[:3,3] = aruco_center_in_camera.reshape(1,3)
-    # aruco_base = base_to_camera @ aruco_transform
+# aruco_transform = np.eye(4)
+# aruco_transform[:3,3] = aruco_center_in_camera.reshape(1,3)
+# aruco_base = base_to_camera @ aruco_transform
 
-    # tf_utils.publishTransformationToTF('base_link', 'finger_tip_target', aruco_base)
-    # tip_to_tool = tf_utils.getTransformationFromTF('finger_tip', 'tool_frame')
-    # tool_frame_target = aruco_base @ tip_to_tool
+# tf_utils.publishTransformationToTF('base_link', 'finger_tip_target', aruco_base)
+# tip_to_tool = tf_utils.getTransformationFromTF('finger_tip', 'tool_frame')
+# tool_frame_target = aruco_base @ tip_to_tool
 
-    # # Prevent any rotations.
-    # tool_frame_target[:3,:3] = default_tool_rot.as_matrix()
-    # tf_utils.publishTransformationToTF('base_link', 'tool_frame_target', tool_frame_target)
+# # Prevent any rotations.
+# tool_frame_target[:3,:3] = default_tool_rot.as_matrix()
+# tf_utils.publishTransformationToTF('base_link', 'tool_frame_target', tool_frame_target)
 
-    # # Execute movement.
-    # end_pose = tf_utils.get_pose_msg_from_transform(tool_frame_target)
-    # print("END POSE: ")
-    # print(end_pose)
-    # # robot_controller.move_to_pose(end_pose)
+# # Execute movement.
+# end_pose = tf_utils.get_pose_msg_from_transform(tool_frame_target)
+# print("END POSE: ")
+# print(end_pose)
+# # robot_controller.move_to_pose(end_pose)
