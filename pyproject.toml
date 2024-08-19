@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "feeding_deployment"
+version = "0.1.0"
+description = "Code for 2024 EmPRISE lab feeding deployment."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+   "pybullet_helpers@git+https://github.com/tomsilver/pybullet-helpers.git",
+]
+
+[project.optional-dependencies]
+develop = [
+    "black",
+    "docformatter",
+    "isort",
+    "mypy",
+    "pylint>=2.14.5",
+    "pytest-pylint>=0.18.0",
+    "pytest>=7.2.2",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+pybullet_helpers = ["py.typed"]
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.isort]
+py_version = 310
+profile = "black"
+multi_line_output = 2
+skip_glob = ["venv/*"]
+split_on_trailing_comma = true
+
+[tool.mypy]
+strict_equality = true
+disallow_untyped_calls = true
+warn_unreachable = true
+exclude = ["venv/*"]
+
+[[tool.mypy.overrides]]
+module = [
+    "pybullet.*",
+]
+ignore_missing_imports = true
