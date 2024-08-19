@@ -115,15 +115,15 @@ class CupManipulationSceneDescription:
         """Derived kwargs for taking images."""
         base_position = self.robot_base_pose.position
         head_position = self.wheelchair_head_pose.position
-        return dict(
-            outer_camera_target=base_position,
-            outer_camera_yaw=180,
-            outer_camera_distance=2.5,
-            inner_camera_target=head_position,
-            inner_camera_yaw=0,
-            inner_camera_distance=1.0,
-            inner_camera_pitch=-20,
-        )
+        return {
+            "outer_camera_target": base_position,
+            "outer_camera_yaw": 180,
+            "outer_camera_distance": 2.5,
+            "inner_camera_target": head_position,
+            "inner_camera_yaw": 0,
+            "inner_camera_distance": 1.0,
+            "inner_camera_pitch": -20,
+        }
 
     def rotate_about_point(
         self, point: Pose3D, rotation: Quaternion
@@ -146,6 +146,7 @@ class CupManipulationSceneDescription:
         )
 
     def allclose(self, other: Any, atol=1e-5) -> bool:
+        """Compare this scene description to another."""
         if not isinstance(other, CupManipulationSceneDescription):
             return False
         for field in fields(self):
