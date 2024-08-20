@@ -108,13 +108,13 @@ class Arm:
 
     def execute_command(self, cmd: KinovaCommand) -> None:
 
-        if isinstance(cmd, JointTrajectoryCommand):
+        if cmd.__class__.__name__ == "JointTrajectoryCommand":
             return self.set_joint_trajectory(cmd.traj)
 
-        if isinstance(cmd, OpenGripperCommand):
+        if cmd.__class__.__name__ == "OpenGripperCommand":
             return self.open_gripper()
 
-        if isinstance(cmd, CloseGripperCommand):
+        if cmd.__class__.__name__ == "CloseGripperCommand":
             return self.close_gripper()
 
         raise NotImplementedError(f"Unrecognized command: {cmd}")
