@@ -145,16 +145,16 @@ if __name__ == '__main__':
         arm.set_joint_position(next_pos)
 
         input("Press enter to move to inside mount pose...")
-        arm.set_ee_pose(inside_mount_pose)
+        arm.set_ee_pose(inside_mount_pose[0], inside_mount_pose[1])
 
         input("Press enter to release the utensil...")
         arm.set_gripper(1.0)
 
         input("Press enter to move up...")
-        arm.set_ee_pose(above_mount_pose)
+        arm.set_ee_pose(above_mount_pose[0], above_mount_pose[1])
 
         input("Press enter to move forward...")
-        arm.set_ee_pose(infront_mount_pose)
+        arm.set_ee_pose(infront_mount_pose[0], infront_mount_pose[1])
 
         input("Press enter to move to home joint pos...")
         next_pos = home_pos.copy()
@@ -169,13 +169,13 @@ if __name__ == '__main__':
         arm.set_joint_position(next_pos)
 
         input("Press enter to inside mount pose...")
-        arm.set_ee_pose(inside_mount_pose)
+        arm.set_ee_pose(inside_mount_pose[0], inside_mount_pose[1])
 
         input("Press enter to grab the utensil...")
         arm.set_gripper(0.5)
 
         input("Press enter to move to outside mount pose...")
-        arm.set_ee_pose(outside_mount_pose)
+        arm.set_ee_pose(outside_mount_pose[0], outside_mount_pose[1])
 
         input("Press enter to move to home joint pos...")
         next_pos = home_pos.copy()

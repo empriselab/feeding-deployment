@@ -393,9 +393,11 @@ class KinovaArm:
         if blocking:
             self.end_or_abort_event.wait(KinovaArm.ACTION_TIMEOUT_DURATION)
 
-    def move_cartesian(self, xyz, theta_xyz, blocking=True):
+    def move_cartesian(self, xyz, xyz_quat, blocking=True):
 
         assert not self.cyclic_running, "Arm must be in high-level servoing mode"
+
+        theta_xyz = R.from_quat(xyz_quat).as_euler("xyz")
 
         # Create action
         action = Base_pb2.Action()
