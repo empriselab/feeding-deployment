@@ -3,7 +3,7 @@
 import numpy as np
 
 from feeding_deployment.drinking.utils import CupManipulationTrajectory
-from feeding_deployment.robot_controller.kinova import (
+from feeding_deployment.robot_controller.arm_client import (
     CloseGripperCommand,
     JointTrajectoryCommand,
     KinovaCommand,

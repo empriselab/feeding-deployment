@@ -18,7 +18,7 @@ from numpy.typing import NDArray
 RPC_AUTHKEY = b"secret-key"
 ARM_RPC_PORT = 5000
 # from ik_solver import IKSolver
-from kinova import KinovaArm
+from feeding_deployment.robot_controller.kinova import KinovaArm
 
 NUC_HOSTNAME = "192.168.1.3"
 
