@@ -16,12 +16,20 @@ from feeding_deployment.drinking.utils import (
 from feeding_deployment.integration.utils import (
     cup_manipulation_trajectory_to_kinova_commands,
 )
-from feeding_deployment.robot_controller.kinova import KinovaArm
+from feeding_deployment.robot_controller.arm_client import (
+    ARM_RPC_PORT,
+    NUC_HOSTNAME,
+    RPC_AUTHKEY,
+    ArmManager,
+)
 
 
 def _main():
     # Initialize the robot arm and get the initial joint pose.
-    arm = KinovaArm()
+    manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
+    manager.connect()
+    arm = manager.Arm()
+
     arm.retract()
     time.sleep(1.0)  # make sure arm stabilizes
     q, _ = arm.get_state()
@@ -40,9 +48,9 @@ def _main():
 
     # Execute the trajectory.
     cmds = cup_manipulation_trajectory_to_kinova_commands(traj)
-    input("Press enter to execute the plan.")
-    for cmd in cmds:
-        arm.execute_command(cmd)
+    # input("Press enter to execute the plan.")
+    # for cmd in cmds:
+    #     arm.execute_command(cmd)
 
 
 if __name__ == "__main__":

@@ -2,14 +2,13 @@
 
 import math
 import os
+import queue
 import subprocess
 import threading
 import time
-from dataclasses import dataclass
 
 import numpy as np
 import pinocchio as pin
-import queue
 
 # Rajat ToDo: Move all ROS stuff to a separate interface
 # import rospy
@@ -31,15 +30,16 @@ from kortex_api.RouterClient import RouterClient, RouterClientSendOptions
 from kortex_api.SessionManager import SessionManager
 from kortex_api.TCPTransport import TCPTransport
 from kortex_api.UDPTransport import UDPTransport
-from numpy.typing import NDArray
 from scipy.spatial.transform import Rotation as R
-# from std_msgs.msg import Bool
 
 # for joint space compliant control
 from feeding_deployment.robot_controller.joint_compliant_controller import (
     JointCompliantController,
     command_loop_retract,
 )
+
+# from std_msgs.msg import Bool
+
 
 
 class DeviceConnection:
@@ -86,29 +86,6 @@ class DeviceConnection:
             router_options.timeout_ms = 1000
             self.session_manager.CloseSession(router_options)
         self.transport.disconnect()
-
-
-class KinovaCommand:
-    """Establish an interface for commands that can be sent to the robot."""
-
-
-@dataclass(frozen=True)
-class JointTrajectoryCommand(KinovaCommand):
-    """Command to follow an joint trajectory."""
-
-    traj: list[NDArray]
-
-    def __post_init__(self):
-        num_dof = 7
-        assert all(x.shape == (num_dof,) for x in self.traj)
-
-
-class OpenGripperCommand(KinovaCommand):
-    """Command to open the gripper."""
-
-
-class CloseGripperCommand(KinovaCommand):
-    """Command to close the gripper."""
 
 
 class KinovaArm:
@@ -797,7 +774,7 @@ class KinovaArm:
         self.init_cyclic(controller.control_callback)
         while not self.cyclic_running:
             time.sleep(0.01)
-        
+
         print("Arm is in joint compliant mode")
 
     def switch_out_of_joint_compliant_mode(self):
@@ -805,19 +782,6 @@ class KinovaArm:
             self.stop_cyclic()
         else:
             print("Not switching as arm is not in joint compliant mode")
-
-    def execute_command(self, cmd: KinovaCommand) -> None:
-
-        if isinstance(cmd, JointTrajectoryCommand):
-            return self.move_angular_trajectory(cmd.traj)
-
-        if isinstance(cmd, OpenGripperCommand):
-            return self.open_gripper()
-
-        if isinstance(cmd, CloseGripperCommand):
-            return self.close_gripper()
-
-        raise NotImplementedError(f"Unrecognized command: {cmd}")
 
 
 def main():

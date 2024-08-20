@@ -4,6 +4,9 @@
 .python-version
 *.mp4
 
+# Rajat ToDo: Remove this line
+src/feeding_deployment/head_perception/DECA/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

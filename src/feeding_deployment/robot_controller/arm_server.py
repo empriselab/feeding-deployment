@@ -7,14 +7,44 @@
 
 import queue
 import time
+from dataclasses import dataclass
 from multiprocessing.managers import BaseManager as MPBaseManager
+
 import numpy as np
+from numpy.typing import NDArray
+
 # from arm_controller import JointCompliantController
 # from constants import RPC_AUTHKEY, ARM_RPC_PORT
-RPC_AUTHKEY = b'secret-key'
+RPC_AUTHKEY = b"secret-key"
 ARM_RPC_PORT = 5000
 # from ik_solver import IKSolver
 from kinova import KinovaArm
+
+NUC_HOSTNAME = "192.168.1.3"
+
+
+class KinovaCommand:
+    """Establish an interface for commands that can be sent to the robot."""
+
+
+@dataclass(frozen=True)
+class JointTrajectoryCommand(KinovaCommand):
+    """Command to follow an joint trajectory."""
+
+    traj: list[NDArray]
+
+    def __post_init__(self):
+        num_dof = 7
+        assert all(x.shape == (num_dof,) for x in self.traj)
+
+
+class OpenGripperCommand(KinovaCommand):
+    """Command to open the gripper."""
+
+
+class CloseGripperCommand(KinovaCommand):
+    """Command to close the gripper."""
+
 
 class Arm:
     def __init__(self):
@@ -26,7 +56,7 @@ class Arm:
     def get_state(self):
         arm_pos, gripper_pos = self.arm.get_state()
         return arm_pos, gripper_pos
-    
+
     def reset(self):
         # Go to home position
         self.arm.home()
@@ -38,7 +68,7 @@ class Arm:
     def switch_out_of_joint_compliant_mode(self):
         # switch out of joint compliant mode
         self.arm.switch_out_of_joint_compliant_mode()
-    
+
     def compliant_set_joint_position(self, command_pos):
         print(f"Received compliant joint pos command: {command_pos}")
         gripper_pos = 0
@@ -47,6 +77,12 @@ class Arm:
     def set_joint_position(self, command_pos):
         print(f"Received joint pos command: {command_pos}")
         self.arm.move_angular(command_pos)
+
+    def set_joint_trajectory(self, trajectory_command):
+        print(
+            f"Received joint trajectory command with {len(trajectory_command)} waypoints"
+        )
+        self.arm.move_angular_trajectory(trajectory_command)
 
     def set_ee_pose(self, xyz, theta_xyz):
         print(f"Received cartesian pose command: {xyz}, {theta_xyz}")
@@ -67,20 +103,37 @@ class Arm:
     def close(self):
         self.arm.disconnect()
 
+    def retract(self):
+        self.arm.retract()
+
+    def execute_command(self, cmd: KinovaCommand) -> None:
+
+        if isinstance(cmd, JointTrajectoryCommand):
+            return self.set_joint_trajectory(cmd.traj)
+
+        if isinstance(cmd, OpenGripperCommand):
+            return self.open_gripper()
+
+        if isinstance(cmd, CloseGripperCommand):
+            return self.close_gripper()
+
+        raise NotImplementedError(f"Unrecognized command: {cmd}")
+
+
 class ArmManager(MPBaseManager):
     pass
 
-ArmManager.register('Arm', Arm)
 
-if __name__ == '__main__':
-    hostname = '192.168.1.3'
-    manager = ArmManager(address=(hostname, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
+ArmManager.register("Arm", Arm)
+
+if __name__ == "__main__":
+    manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
     server = manager.get_server()
-    print(f'Arm manager server started at {hostname}:{ARM_RPC_PORT}')
+    print(f"Arm manager server started at {NUC_HOSTNAME}:{ARM_RPC_PORT}")
     server.serve_forever()
     # import numpy as np
     # from constants import POLICY_CONTROL_PERIOD
-    # manager = ArmManager(address=(hostname, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
+    # manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
     # manager.connect()
     # arm = manager.Arm()
     # try:
