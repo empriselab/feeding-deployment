@@ -39,20 +39,20 @@ class Arm:
         # switch out of joint compliant mode
         self.arm.switch_out_of_joint_compliant_mode()
     
-    def compliant_joint_pos_command(self, command_pos):
+    def compliant_set_joint_position(self, command_pos):
         print(f"Received compliant joint pos command: {command_pos}")
         gripper_pos = 0
         self.command_queue.put((command_pos, gripper_pos))
 
-    def joint_pos_command(self, command_pos):
+    def set_joint_position(self, command_pos):
         print(f"Received joint pos command: {command_pos}")
         self.arm.move_angular(command_pos)
 
-    def cartesian_pose_command(self, xyz, theta_xyz):
+    def set_ee_pose(self, xyz, theta_xyz):
         print(f"Received cartesian pose command: {xyz}, {theta_xyz}")
         self.arm.move_cartesian(xyz, theta_xyz)
 
-    def gripper_pos_command(self, gripper_pos):
+    def set_gripper(self, gripper_pos):
         print(f"Received gripper pos command: {gripper_pos}")
         self.arm._gripper_position_command(gripper_pos)
 
@@ -73,7 +73,7 @@ class ArmManager(MPBaseManager):
 ArmManager.register('Arm', Arm)
 
 if __name__ == '__main__':
-    hostname = 'localhost'
+    hostname = '192.168.1.3'
     manager = ArmManager(address=(hostname, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
     server = manager.get_server()
     print(f'Arm manager server started at {hostname}:{ARM_RPC_PORT}')

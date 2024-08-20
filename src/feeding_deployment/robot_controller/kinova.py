@@ -822,9 +822,9 @@ def main():
     arm = KinovaArm()
     try:
 
-        # arm.zero_torque_offsets()
-        # arm.retract()
-        arm.home()
+        arm.zero_torque_offsets()
+        arm.retract()
+        # arm.home()
 
         # home_pos = [
         #     2.2912759438800285,
@@ -856,11 +856,11 @@ def main():
         # arm.home()
 
         # input("Press Enter to start joint compliant mode")
-        command_queue = queue.Queue(1)
-        arm.switch_to_joint_compliant_mode(command_queue)
+        # command_queue = queue.Queue(1)
+        # arm.switch_to_joint_compliant_mode(command_queue)
 
-        input("Press Enter to move to retract config")
-        arm.retract()
+        # input("Press Enter to move to retract config")
+        # arm.retract()
 
         # arm.move_angular_trajectory([])
 
