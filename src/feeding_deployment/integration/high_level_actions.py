@@ -9,6 +9,7 @@ from relational_structs import (
     Object,
     Predicate,
     Type,
+    Variable,
 )
 
 from feeding_deployment.integration.perception_interface import PerceptionInterface
@@ -51,13 +52,13 @@ class HighLevelAction(abc.ABC):
     @abc.abstractmethod
     def get_simulated_trajectory(
         self,
-        objects: tuple[Object],
+        objects: tuple[Object, ...],
     ) -> list[FeedingDeploymentSimulatorState]:
         """Update the given simulator assuming that the action was executed."""
 
     def get_robot_commands(
         self,
-        objects: tuple[Object],
+        objects: tuple[Object, ...],
         sim_traj: list[FeedingDeploymentSimulatorState],
     ) -> list[KinovaCommand]:
         """Default implementation follows sim_traj exactly, but subclasses can
@@ -70,7 +71,7 @@ class PickToolHLA(HighLevelAction):
     """Pick up a tool (utensil, drink, or wipe)."""
 
     def get_operator(self) -> LiftedOperator:
-        tool = tool_type("?tool")
+        tool = Variable("?tool", tool_type)
         return LiftedOperator(
             "PickTool",
             parameters=[tool],
@@ -81,7 +82,7 @@ class PickToolHLA(HighLevelAction):
 
     def get_simulated_trajectory(
         self,
-        objects: tuple[Object],
+        objects: tuple[Object, ...],
     ) -> list[FeedingDeploymentSimulatorState]:
         assert len(objects) == 1
         tool = objects[0]
@@ -100,7 +101,7 @@ class StowToolHLA(HighLevelAction):
     """Stow a tool (utensil, drink, or wipe)."""
 
     def get_operator(self) -> LiftedOperator:
-        tool = tool_type("?tool")
+        tool = Variable("?tool", tool_type)
         return LiftedOperator(
             "StowTool",
             parameters=[tool],
@@ -111,7 +112,7 @@ class StowToolHLA(HighLevelAction):
 
     def get_simulated_trajectory(
         self,
-        objects: tuple[Object],
+        objects: tuple[Object, ...],
     ) -> list[FeedingDeploymentSimulatorState]:
         # TODO
         assert len(objects) == 1
@@ -124,7 +125,7 @@ class TransferToolHLA(HighLevelAction):
     """Wipe, or transfer drink, or transfer bite."""
 
     def get_operator(self) -> LiftedOperator:
-        tool = tool_type("?tool")
+        tool = Variable("?tool", tool_type)
         return LiftedOperator(
             "TransferTool",
             parameters=[tool],
@@ -135,7 +136,7 @@ class TransferToolHLA(HighLevelAction):
 
     def get_simulated_trajectory(
         self,
-        objects: tuple[Object],
+        objects: tuple[Object, ...],
     ) -> list[FeedingDeploymentSimulatorState]:
         # TODO
         assert len(objects) == 1
@@ -157,7 +158,7 @@ class PrepareToolHLA(HighLevelAction):
     """Bite acquisition; other tools are always prepared."""
 
     def get_operator(self) -> LiftedOperator:
-        tool = tool_type("?tool")
+        tool = Variable("?tool", tool_type)
         return LiftedOperator(
             "PrepareTool",
             parameters=[tool],
@@ -168,7 +169,7 @@ class PrepareToolHLA(HighLevelAction):
 
     def get_simulated_trajectory(
         self,
-        objects: tuple[Object],
+        objects: tuple[Object, ...],
     ) -> list[FeedingDeploymentSimulatorState]:
         # TODO
         assert len(objects) == 1
@@ -179,11 +180,11 @@ class PrepareToolHLA(HighLevelAction):
 
 def pddl_plan_to_hla_plan(
     pddl_plan: list[GroundOperator], hlas: set[HighLevelAction]
-) -> list[tuple[HighLevelAction, tuple[Object]]]:
+) -> list[tuple[HighLevelAction, tuple[Object, ...]]]:
     """Convert a PDDL plan into a sequence of HLA and objects."""
     hla_plan = []
     op_to_hla = {hla.get_operator(): hla for hla in hlas}
     for ground_operator in pddl_plan:
         hla = op_to_hla[ground_operator.parent]
-        hla_plan.append((hla, ground_operator.parameters))
+        hla_plan.append((hla, tuple(ground_operator.parameters)))
     return hla_plan
