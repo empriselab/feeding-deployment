@@ -34,7 +34,9 @@ from feeding_deployment.simulation.video import make_simulation_video
 HLAS = {PickToolHLA, StowToolHLA, PrepareToolHLA, TransferToolHLA}
 
 
-def _main(run_on_robot: bool, make_videos: bool) -> None:
+def _main(
+    run_on_robot: bool, make_videos: bool, max_motion_planning_time: float = 10
+) -> None:
     """The main entry point for running the integrated system."""
 
     # Initialize the interface to the robot.
@@ -55,9 +57,10 @@ def _main(run_on_robot: bool, make_videos: bool) -> None:
     scene_description = SceneDescription(**kwargs)
     sim = FeedingDeploymentPyBulletSimulator(scene_description)
 
-    # Create a domain for high-level planning.
+    # Create skills for high-level planning.
+    hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
     hlas = {
-        cls(sim, robot_interface, perception_interface) for cls in HLAS  # type: ignore
+        cls(sim, robot_interface, perception_interface, hla_hyperparams) for cls in HLAS  # type: ignore
     }
     operators = {hla.get_operator() for hla in hlas}
     predicates: set[Predicate] = {ToolPrepared, GripperFree, Holding, ToolTransferDone}
@@ -131,6 +134,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--run_on_robot", action="store_true")
     parser.add_argument("--make_videos", action="store_true")
+    parser.add_argument("--max_motion_planning_time", type=float, default=10.0)
     args = parser.parse_args()
 
-    _main(args.run_on_robot, args.make_videos)
+    _main(args.run_on_robot, args.make_videos, args.max_motion_planning_time)

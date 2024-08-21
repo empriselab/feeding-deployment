@@ -1,6 +1,7 @@
 """High-level actions that we can simulate and execute."""
 
 import abc
+from typing import Any
 
 from relational_structs import (
     GroundOperator,
@@ -40,10 +41,12 @@ class HighLevelAction(abc.ABC):
         sim: FeedingDeploymentPyBulletSimulator,
         robot_interface: Arm,
         perception_interface: PerceptionInterface,
+        hla_hyperparams: dict[str, Any],
     ) -> None:
         self._sim = sim
         self._robot_interface = robot_interface
         self._perception_interface = perception_interface
+        self._hla_hyperparams = hla_hyperparams
 
     @abc.abstractmethod
     def get_operator(self) -> LiftedOperator:
@@ -87,7 +90,10 @@ class PickToolHLA(HighLevelAction):
         assert len(objects) == 1
         tool = objects[0]
         if tool.name == "cup":
-            nominal_plan = get_plan_to_grasp_cup(self._sim)
+            nominal_plan = get_plan_to_grasp_cup(
+                self._sim,
+                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+            )
             remapped_plan = remap_trajectory_to_constant_distance(
                 nominal_plan, self._sim
             )
@@ -145,7 +151,11 @@ class TransferToolHLA(HighLevelAction):
             forque_target_pose = (
                 self._perception_interface.get_head_perception_forque_target_pose()
             )
-            nominal_plan = get_bite_transfer_plan(forque_target_pose, self._sim)
+            nominal_plan = get_bite_transfer_plan(
+                forque_target_pose,
+                self._sim,
+                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+            )
             remapped_plan = remap_trajectory_to_constant_distance(
                 nominal_plan, self._sim
             )
