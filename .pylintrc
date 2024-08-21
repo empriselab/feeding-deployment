@@ -10,7 +10,7 @@ extension-pkg-whitelist=numpy,pybullet
 ignore=CVS,venv
 
 # Add paths to the blacklist.
-ignore-paths=src/feeding_deployment/robot_controller,src/feeding_deployment/head_perception
+ignore-paths=src/feeding_deployment/robot_controller,src/feeding_deployment/head_perception,src/feeding_deployment/integration/perception_interface.py
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.

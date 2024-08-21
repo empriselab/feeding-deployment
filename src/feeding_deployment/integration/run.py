@@ -41,7 +41,7 @@ def _main(run_on_robot: bool, make_videos: bool) -> None:
     if run_on_robot:
         manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
         manager.connect()
-        robot_interface = manager.Arm()  # type: ignore
+        robot_interface = manager.Arm()  # type: ignore  # pylint: disable=no-member
     else:
         robot_interface = None
 
@@ -56,7 +56,9 @@ def _main(run_on_robot: bool, make_videos: bool) -> None:
     sim = FeedingDeploymentPyBulletSimulator(scene_description)
 
     # Create a domain for high-level planning.
-    hlas = {cls(sim, robot_interface, perception_interface) for cls in HLAS}  # type: ignore
+    hlas = {
+        cls(sim, robot_interface, perception_interface) for cls in HLAS  # type: ignore
+    }
     operators = {hla.get_operator() for hla in hlas}
     predicates: set[Predicate] = {ToolPrepared, GripperFree, Holding, ToolTransferDone}
     types = {tool_type}
@@ -71,7 +73,7 @@ def _main(run_on_robot: bool, make_videos: bool) -> None:
         ToolPrepared([cup]),
     }
 
-    # TODO update this once the interface is ready.
+    # TODO update this once the user interface is ready.
     goal_queue = [
         ("Assist Drinking", {ToolTransferDone([cup])}),
         ("Assist Feeding", {ToolTransferDone([utensil])}),

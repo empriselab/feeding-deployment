@@ -5,8 +5,6 @@ from __future__ import annotations
 import logging
 from typing import Callable
 
-import numpy as np
-import pybullet as p
 from pybullet_helpers.geometry import Pose, get_pose, interpolate_poses, multiply_poses
 from pybullet_helpers.inverse_kinematics import (
     end_effector_transform_to_joints,
