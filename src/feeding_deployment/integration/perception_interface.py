@@ -3,16 +3,18 @@
 import threading
 import time
 
+import numpy as np
 from pybullet_helpers.geometry import Pose
 from scipy.spatial.transform import Rotation as R
 
 try:
     import rospy
     from sensor_msgs.msg import JointState
+
+    from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
 except ModuleNotFoundError:
     pass
 
-from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
 from feeding_deployment.robot_controller.arm_client import Arm
 
 
@@ -45,7 +47,7 @@ def publish_joint_states(arm):
 class PerceptionInterface:
     """An interface for perception (robot joints, human head poses, etc.)."""
 
-    def __init__(self, robot_interface: Arm) -> None:
+    def __init__(self, robot_interface: Arm | None) -> None:
         self._robot_interface = robot_interface
 
         # publish joint states in separate thread
@@ -55,13 +57,15 @@ class PerceptionInterface:
         joint_state_thread.start()
 
         # run head perception
-        self._head_perception = HeadPerceptionROSWrapper()
+        if robot_interface is None:
+            self._head_perception = None
+        else:
+            self._head_perception = HeadPerceptionROSWrapper()
+            # warm start head perception
+            for _ in range(10):
+                self._head_perception.run_head_perception()
 
-        # warm start head perception
-        for _ in range(10):
-            self._head_perception.run_head_perception()
-
-    def get_robot_joints(self) -> JointState:
+    def get_robot_joints(self) -> "JointState":
         """Get the current robot joint state."""
         q, gripper_position = self._robot_interface.get_state()
         joint_state = q.tolist() + [gripper_position, gripper_position]
@@ -69,7 +73,23 @@ class PerceptionInterface:
 
     def get_head_perception_forque_target_pose(self) -> Pose:
         """Get a target of the forque from head perception."""
-        forque_target_transform = self._head_perception.run_head_perception()
+        if self._head_perception is not None:
+            forque_target_transform = self._head_perception.run_head_perception()
+        else:
+            # Use a sensible default value for testing in simulation.
+            forque_target_transform = np.array(
+                [
+                    [
+                        0.05720315,
+                        -0.00795624,
+                        -0.99833086,
+                        0.02325958,
+                    ],
+                    [-0.9842066, 0.16734664, -0.05772752, 0.5556016],
+                    [0.16752662, 0.98586602, 0.00174218, 0.5478612],
+                    [0.0, 0.0, 0.0, 1.0],
+                ]
+            )
         forque_target_pose = Pose(
             (
                 forque_target_transform[0, 3],
