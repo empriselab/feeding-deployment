@@ -9,8 +9,9 @@ from tomsutils.pddl_planning import run_pyperplan_planning
 def _main() -> None:
     """The main entry point for running the integrated system."""
 
-    # Initialize the scene.
-    # scene = initialize_scene()  # TODO
+    # Initialize the simulator.
+    sim = None  # TODO
+    arm = None  # TODO
 
     # Create a domain for high-level planning.
     hlas = {PickToolHLA(), StowToolHLA(), PrepareToolHLA(), TransferToolHLA()}
@@ -35,7 +36,14 @@ def _main() -> None:
     plan_ops = parse_pddl_plan(plan_strs, domain, problem)
     plan_hlas = pddl_plan_to_hla_plan(plan_ops, hlas)
 
-    import ipdb; ipdb.set_trace()
+    for hla, objects in plan_hlas:
+        # Get commands to execute on the robot.
+        robot_commands = hla.get_robot_commands(objects, sim)
+        # Execute the commands.
+        for robot_command in robot_commands:
+            arm.execute_command(robot_command)
+        # Update the simulator.
+        hla.update_simulator(objects, sim)
 
 
 if __name__ == "__main__":
