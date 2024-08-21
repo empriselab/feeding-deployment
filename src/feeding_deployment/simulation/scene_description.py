@@ -1,4 +1,4 @@
-"""Define and create a PyBullet-simulated environment."""
+"""The description of a simulation initial state, with default values."""
 
 from __future__ import annotations
 
@@ -156,8 +156,7 @@ class SceneDescription:
         if not isinstance(other, SceneDescription):
             return False
 
-        # Need to handle joints separately because some are continuous.
-        # This is unfortunately needed to grab joint infos.
+        # TODO fix...
         physics_client_id = p.connect(p.DIRECT)
         scene = create_pybullet_scene_from_description(physics_client_id, self)
         robot = scene.robot
@@ -187,150 +186,3 @@ class SceneDescription:
             if not field_close:
                 return False
         return True
-
-
-@dataclass(frozen=True)
-class PyBulletSceneIDs:
-    """Holds the PyBullet IDs for objects in a scene."""
-
-    physics_client_id: int
-    robot: SingleArmTwoFingerGripperPyBulletRobot
-    robot_holder_id: int
-    wheelchair_id: int
-    table_id: int
-    cup_id: int
-    cup_handle_link_id: int
-
-    def get_collision_ids(self, include_cup: bool = True) -> set[int]:
-        """Return all collision IDs."""
-        collision_ids = {
-            self.table_id,
-            self.robot_holder_id,
-            self.wheelchair_id,
-        }
-        if include_cup:
-            collision_ids.add(self.cup_id)
-        return collision_ids
-
-    def reset(self, scene_description: SceneDescription):
-        """Reset the scene from a description."""
-        # Reset the robot.
-        self.robot.set_joints(scene_description.initial_joints)
-
-        # Reset the cup.
-        p.resetBasePositionAndOrientation(
-            self.cup_id,
-            scene_description.cup_pose.position,
-            scene_description.cup_pose.orientation,
-            physicsClientId=self.physics_client_id,
-        )
-
-
-def create_pybullet_scene_from_description(
-    physics_client_id: int, scene_description: SceneDescription
-) -> PyBulletSceneIDs:
-    """Build a scene in PyBullet from a description."""
-
-    # Create robot.
-    robot = create_pybullet_robot(
-        scene_description.robot_name,
-        physics_client_id,
-        base_pose=scene_description.robot_base_pose,
-        control_mode="reset",
-        home_joint_positions=scene_description.initial_joints,
-    )
-    assert isinstance(robot, SingleArmTwoFingerGripperPyBulletRobot)
-
-    # Create a holder.
-    robot_holder_id = create_pybullet_block(
-        scene_description.robot_holder_rgba,
-        half_extents=scene_description.robot_holder_half_extents,
-        physics_client_id=physics_client_id,
-    )
-    p.resetBasePositionAndOrientation(
-        robot_holder_id,
-        scene_description.robot_holder_pose.position,
-        scene_description.robot_holder_pose.orientation,
-        physicsClientId=physics_client_id,
-    )
-
-    # Create wheelchair.
-    wheelchair_id = p.loadURDF(
-        str(scene_description.wheelchair_urdf_path),
-        useFixedBase=True,
-        physicsClientId=physics_client_id,
-    )
-    p.resetBasePositionAndOrientation(
-        wheelchair_id,
-        scene_description.wheelchair_pose.position,
-        scene_description.wheelchair_pose.orientation,
-        physicsClientId=physics_client_id,
-    )
-
-    # Create cup.
-    cup_collision_id = p.createCollisionShape(
-        p.GEOM_CYLINDER,
-        radius=scene_description.cup_radius,
-        height=scene_description.cup_length,
-        physicsClientId=physics_client_id,
-    )
-    cup_visual_id = p.createVisualShape(
-        p.GEOM_CYLINDER,
-        radius=scene_description.cup_radius,
-        length=scene_description.cup_length,
-        rgbaColor=scene_description.cup_rgba,
-        physicsClientId=physics_client_id,
-    )
-    cup_handle_collision_id = p.createCollisionShape(
-        p.GEOM_BOX,
-        halfExtents=scene_description.cup_handle_half_extents,
-        physicsClientId=physics_client_id,
-    )
-    cup_handle_visual_id = p.createVisualShape(
-        p.GEOM_BOX,
-        halfExtents=scene_description.cup_handle_half_extents,
-        rgbaColor=scene_description.cup_handle_rgba,
-        physicsClientId=physics_client_id,
-    )
-    cup_id = p.createMultiBody(
-        baseMass=-1,
-        baseCollisionShapeIndex=cup_collision_id,
-        baseVisualShapeIndex=cup_visual_id,
-        basePosition=scene_description.cup_pose.position,
-        baseOrientation=scene_description.cup_pose.orientation,
-        linkMasses=[-1],
-        linkCollisionShapeIndices=[cup_handle_collision_id],
-        linkVisualShapeIndices=[cup_handle_visual_id],
-        linkPositions=[scene_description.cup_handle_relative_pose.position],
-        linkOrientations=[scene_description.cup_handle_relative_pose.orientation],
-        linkInertialFramePositions=[(0.0, 0.0, 0.0)],
-        linkInertialFrameOrientations=[(0.0, 0.0, 0.0, 1.0)],
-        linkParentIndices=[0],
-        linkJointTypes=[p.JOINT_FIXED],
-        linkJointAxis=[(0.0, 0.0, 1.0)],
-        physicsClientId=physics_client_id,
-    )
-    cup_handle_link_id = 0
-
-    # Create a table.
-    table_id = create_pybullet_block(
-        scene_description.table_rgba,
-        half_extents=scene_description.table_half_extents,
-        physics_client_id=physics_client_id,
-    )
-    p.resetBasePositionAndOrientation(
-        table_id,
-        scene_description.table_pose.position,
-        scene_description.table_pose.orientation,
-        physicsClientId=physics_client_id,
-    )
-
-    return PyBulletSceneIDs(
-        physics_client_id,
-        robot,
-        robot_holder_id,
-        wheelchair_id,
-        table_id,
-        cup_id,
-        cup_handle_link_id,
-    )

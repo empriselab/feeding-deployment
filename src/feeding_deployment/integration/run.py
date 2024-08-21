@@ -4,13 +4,16 @@ from feeding_deployment.integration.high_level_actions import tool_type, ToolPre
 from relational_structs import PDDLDomain, PDDLProblem, Predicate, LiftedAtom
 from relational_structs.utils import parse_pddl_plan
 from tomsutils.pddl_planning import run_pyperplan_planning
+from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
+from feeding_deployment.simulation.scene_description import SceneDescription
 
 
 def _main() -> None:
     """The main entry point for running the integrated system."""
 
     # Initialize the simulator.
-    sim = None  # TODO
+    scene_description = SceneDescription()
+    sim = FeedingDeploymentPyBulletSimulator(scene_description)
     arm = None  # TODO
 
     # Create a domain for high-level planning.
