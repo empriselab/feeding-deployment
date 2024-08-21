@@ -24,6 +24,7 @@ from pybullet_helpers.trajectory import (
     concatenate_trajectories,
     iter_traj_with_max_distance,
 )
+import logging
 
 
 ###############################################################################
@@ -194,6 +195,9 @@ def get_plan_to_grasp_cup(
     num_drink_transfer_end_effector_interp: int = 25,
 ) -> list[FeedingDeploymentSimulatorState]:
     """Make a plan to grasp the cup from the current simulator state."""
+
+    # Quiet IKfast warnings.
+    logging.disable(logging.ERROR)
 
     # Create joint distance function.
     weights = geometric_sequence(0.9, len(sim.robot.arm_joint_names))

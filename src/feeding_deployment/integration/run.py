@@ -7,16 +7,20 @@ from tomsutils.pddl_planning import run_pyperplan_planning
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.simulation.scene_description import SceneDescription
 from feeding_deployment.simulation.video import make_simulation_video
+from feeding_deployment.robot_controller.arm_client import Arm
 from pathlib import Path
+import logging
 
 
-def _main() -> None:
+def _main(run_on_robot: bool, make_videos: bool) -> None:
     """The main entry point for running the integrated system."""
 
     # Initialize the simulator.
     scene_description = SceneDescription()
     sim = FeedingDeploymentPyBulletSimulator(scene_description)
-    arm = None  # TODO
+    
+    if run_on_robot:
+        arm = Arm()
 
     # Create a domain for high-level planning.
     hlas = {PickToolHLA(), StowToolHLA(), PrepareToolHLA(), TransferToolHLA()}
@@ -59,17 +63,17 @@ def _main() -> None:
             sim_traj = hla.get_simulated_trajectory(object_params, sim)
 
             # Optionally make a video of the simulated trajectory.
-            # TODO add a flag for this
-            # outfile = Path(__file__).parent / "last.mp4"
-            # make_simulation_video(sim, sim_traj, outfile)
+            if make_videos:
+                outfile = Path(__file__).parent / "last.mp4"
+                make_simulation_video(sim, sim_traj, outfile)
 
             # Get commands to execute on the robot.
             robot_commands = hla.get_robot_commands(object_params, sim, sim_traj)
 
             # Execute the commands.
-            # TODO add a flag to enable
-            # for robot_command in robot_commands:
-            #     arm.execute_command(robot_command)
+            if run_on_robot:
+                for robot_command in robot_commands:
+                    arm.execute_command(robot_command)
 
             # Make sure the states are in sync.
             if sim_traj:
@@ -79,4 +83,11 @@ def _main() -> None:
 
 
 if __name__ == "__main__":
-    _main()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--run_on_robot", action="store_true")
+    parser.add_argument("--make_videos", action="store_true")
+    args = parser.parse_args()
+
+    _main(args.run_on_robot, args.make_videos)
