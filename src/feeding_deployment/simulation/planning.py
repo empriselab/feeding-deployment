@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import logging
-from functools import partial
 from typing import Callable
 
+import numpy as np
+import pybullet as p
 from pybullet_helpers.geometry import Pose, get_pose, interpolate_poses, multiply_poses
 from pybullet_helpers.inverse_kinematics import (
     end_effector_transform_to_joints,
@@ -254,6 +255,61 @@ def get_plan_to_grasp_cup(
     plan.extend(move_cup_to_staging_plan)
 
     return plan
+
+
+###############################################################################
+#                             Bite Transfer                                   #
+###############################################################################
+
+
+def get_bite_transfer_plan(
+    forque_target_pose: Pose,
+    sim: FeedingDeploymentPyBulletSimulator,
+    _joint_distance_fn: Callable[[JointPositions, JointPositions], float],
+    max_motion_plan_time: float,
+) -> list[FeedingDeploymentSimulatorState]:
+
+    robot = sim.robot
+    physics_client_id = sim.physics_client_id
+    collision_ids = sim.get_collision_ids()
+
+    finger_frame_id = robot.link_from_name("finger_tip")
+    end_effector_link_id = robot.link_from_name(robot.tool_link_name)
+    finger_from_end_effector = get_relative_link_pose(
+        robot.robot_id, end_effector_link_id, finger_frame_id, physics_client_id
+    )
+
+    # Rajat ToDo: switch to forque_target_pose orientation
+    current_end_effector_pose = robot.get_end_effector_pose()
+    current_fingers_pose = get_link_pose(
+        robot.robot_id, finger_frame_id, physics_client_id
+    )
+    bite_transfer_fingers_pose: Pose = Pose(
+        forque_target_pose.position, current_fingers_pose.orientation
+    )
+
+    new_end_effector_pose = multiply_poses(
+        bite_transfer_fingers_pose, finger_from_end_effector
+    )
+    interpolated_poses = list(
+        interpolate_poses(
+            current_end_effector_pose,
+            new_end_effector_pose,
+            num_interp=10,  # NOTE
+        )
+    )
+
+    plan = smoothly_follow_end_effector_path(
+        robot,
+        interpolated_poses,
+        robot.get_joint_positions(),
+        collision_ids,
+        _joint_distance_fn,
+        max_time=max_motion_plan_time,
+    )
+
+    # TODO update once we model the utensil in sim
+    return [FeedingDeploymentSimulatorState(joints) for joints in plan]
 
 
 ###############################################################################
