@@ -29,32 +29,53 @@ def _main() -> None:
     cup = tool_type("cup")
     wiper = tool_type("wiper")
     utensil = tool_type("utensil")
-    objects = {cup, wiper, utensil}
-    init_atoms = {LiftedAtom(GripperFree, []), ToolPrepared([wiper]), ToolPrepared([cup])}
+    all_objects = {cup, wiper, utensil}
+    current_atoms = {LiftedAtom(GripperFree, []), ToolPrepared([wiper]), ToolPrepared([cup])}
 
     # TODO update this once the interface is ready.
-    goal_atoms = {ToolTransferDone([cup])}
-    problem = PDDLProblem(domain.name, "AssistedFeeding", objects, init_atoms, goal_atoms)
+    goal_queue = [
+        {ToolTransferDone([cup])},  # drinking
+        {ToolTransferDone([utensil])},  # feeding
+        {ToolTransferDone([wiper])},  # wiping
+    ]
 
-    # Plan a sequence of high-level actions to execute.
-    plan_strs = run_pyperplan_planning(str(domain), str(problem), heuristic="lmcut", search="astar")
-    plan_ops = parse_pddl_plan(plan_strs, domain, problem)
-    plan_hlas = pddl_plan_to_hla_plan(plan_ops, hlas)
+    while goal_queue:
+        goal_atoms = goal_queue.pop(0)
+        print("Working towards new goal:", goal_atoms)
 
-    for hla, objects in plan_hlas:
-        # Turn into a low-level plan that can be simulated.
-        sim_traj = hla.get_simulated_trajectory(objects, sim)
-        # Make a video of the simulated trajectory.
-        outfile = Path(__file__).parent / "last.mp4"
-        make_simulation_video(sim, sim_traj, outfile)
-        # Get commands to execute on the robot.
-        robot_commands = hla.get_robot_commands(objects, sim, sim_traj)
-        # TODO enable
-        # Execute the commands.
-        # for robot_command in robot_commands:
-        #     arm.execute_command(robot_command)
-        # Make sure the simulator is in sync with the world.
-        sim.sync(sim_traj[-1])
+        # Plan a sequence of high-level actions to execute.
+        problem = PDDLProblem(domain.name, "AssistedFeeding", all_objects, current_atoms, goal_atoms)
+        plan_strs = run_pyperplan_planning(str(domain), str(problem), heuristic="lmcut", search="astar")
+        print("Found plan:", plan_strs)
+
+        plan_ops = parse_pddl_plan(plan_strs, domain, problem)
+        plan_hlas = pddl_plan_to_hla_plan(plan_ops, hlas)
+
+        for (hla, object_params), operator in zip(plan_hlas, plan_ops, strict=True):
+            print(f"Refining {operator.short_str}")
+
+            assert operator.preconditions.issubset(current_atoms)
+            # Turn into a low-level plan that can be simulated.
+            sim_traj = hla.get_simulated_trajectory(object_params, sim)
+
+            # Optionally make a video of the simulated trajectory.
+            # TODO add a flag for this
+            # outfile = Path(__file__).parent / "last.mp4"
+            # make_simulation_video(sim, sim_traj, outfile)
+
+            # Get commands to execute on the robot.
+            robot_commands = hla.get_robot_commands(object_params, sim, sim_traj)
+
+            # Execute the commands.
+            # TODO add a flag to enable
+            # for robot_command in robot_commands:
+            #     arm.execute_command(robot_command)
+
+            # Make sure the states are in sync.
+            if sim_traj:
+                sim.sync(sim_traj[-1])
+            current_atoms -= operator.delete_effects
+            current_atoms |= operator.add_effects
 
 
 if __name__ == "__main__":

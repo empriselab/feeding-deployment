@@ -61,7 +61,9 @@ class PickToolHLA(HighLevelAction):
             nominal_plan = get_plan_to_grasp_cup(sim, max_motion_plan_time=1.0)  # TODO
             remapped_plan = remap_trajectory_to_constant_distance(nominal_plan, sim)
             return remapped_plan
-        raise NotImplementedError("TODO")
+        # TODO
+        print(f"PickTool not yet implemented for {tool}")
+        return []
 
 
     
@@ -80,7 +82,11 @@ class StowToolHLA(HighLevelAction):
                                 delete_effects={Holding([tool])})
     
     def get_simulated_trajectory(self, objects: tuple[Object], sim: FeedingDeploymentPyBulletSimulator) -> list[FeedingDeploymentSimulatorState]:
-        import ipdb; ipdb.set_trace()
+        # TODO
+        assert len(objects) == 1
+        tool = objects[0]
+        print(f"StowTool not yet implemented for {tool}")
+        return []
 
 
 class TransferToolHLA(HighLevelAction):
@@ -98,7 +104,11 @@ class TransferToolHLA(HighLevelAction):
                                 delete_effects=set())
 
     def get_simulated_trajectory(self, objects: tuple[Object], sim: FeedingDeploymentPyBulletSimulator) -> list[FeedingDeploymentSimulatorState]:
-        import ipdb; ipdb.set_trace()
+        # TODO
+        assert len(objects) == 1
+        tool = objects[0]
+        print(f"TransferTool not yet implemented for {tool}")
+        return []
 
 
 class PrepareToolHLA(HighLevelAction):
@@ -116,7 +126,11 @@ class PrepareToolHLA(HighLevelAction):
                             delete_effects=set())
 
     def get_simulated_trajectory(self, objects: tuple[Object], sim: FeedingDeploymentPyBulletSimulator) -> list[FeedingDeploymentSimulatorState]:
-        import ipdb; ipdb.set_trace()
+        # TODO
+        assert len(objects) == 1
+        tool = objects[0]
+        print(f"PrepareTool not yet implemented for {tool}")
+        return []
 
 
 def pddl_plan_to_hla_plan(pddl_plan: list[GroundOperator], hlas: set[HighLevelAction]) -> list[tuple[HighLevelAction, tuple[Object]]]:
