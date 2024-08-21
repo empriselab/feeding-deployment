@@ -12,24 +12,24 @@ import pinocchio as pin
 
 # Rajat ToDo: Move all ROS stuff to a separate interface
 # import rospy
-from kortex_api.autogen.client_stubs.ActuatorConfigClientRpc import ActuatorConfigClient
-from kortex_api.autogen.client_stubs.BaseClientRpc import BaseClient
-from kortex_api.autogen.client_stubs.BaseCyclicClientRpc import BaseCyclicClient
-from kortex_api.autogen.client_stubs.ControlConfigClientRpc import ControlConfigClient
-from kortex_api.autogen.client_stubs.DeviceManagerClientRpc import DeviceManagerClient
-from kortex_api.autogen.messages import (
-    ActuatorConfig_pb2,
-    ActuatorCyclic_pb2,
-    Base_pb2,
-    BaseCyclic_pb2,
-    Common_pb2,
-    ControlConfig_pb2,
-    Session_pb2,
-)
-from kortex_api.RouterClient import RouterClient, RouterClientSendOptions
-from kortex_api.SessionManager import SessionManager
-from kortex_api.TCPTransport import TCPTransport
-from kortex_api.UDPTransport import UDPTransport
+# from kortex_api.autogen.client_stubs.ActuatorConfigClientRpc import ActuatorConfigClient
+# from kortex_api.autogen.client_stubs.BaseClientRpc import BaseClient
+# from kortex_api.autogen.client_stubs.BaseCyclicClientRpc import BaseCyclicClient
+# from kortex_api.autogen.client_stubs.ControlConfigClientRpc import ControlConfigClient
+# from kortex_api.autogen.client_stubs.DeviceManagerClientRpc import DeviceManagerClient
+# from kortex_api.autogen.messages import (
+#     ActuatorConfig_pb2,
+#     ActuatorCyclic_pb2,
+#     Base_pb2,
+#     BaseCyclic_pb2,
+#     Common_pb2,
+#     ControlConfig_pb2,
+#     Session_pb2,
+# )
+# from kortex_api.RouterClient import RouterClient, RouterClientSendOptions
+# from kortex_api.SessionManager import SessionManager
+# from kortex_api.TCPTransport import TCPTransport
+# from kortex_api.UDPTransport import UDPTransport
 from scipy.spatial.transform import Rotation as R
 
 # for joint space compliant control
