@@ -51,10 +51,11 @@ class PerceptionInterface:
         self._robot_interface = robot_interface
 
         # publish joint states in separate thread
-        joint_state_thread = threading.Thread(
-            target=publish_joint_states, args=(self._robot_interface,)
-        )
-        joint_state_thread.start()
+        if robot_interface is not None:
+            joint_state_thread = threading.Thread(
+                target=publish_joint_states, args=(self._robot_interface,)
+            )
+            joint_state_thread.start()
 
         # run head perception
         if robot_interface is None:
