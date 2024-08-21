@@ -18,7 +18,14 @@ from feeding_deployment.integration.high_level_actions import (
     pddl_plan_to_hla_plan,
     tool_type,
 )
-from feeding_deployment.robot_controller.arm_client import Arm
+from feeding_deployment.integration.perception_interface import PerceptionInterface
+from feeding_deployment.robot_controller.arm_client import (
+    ARM_RPC_PORT,
+    NUC_HOSTNAME,
+    RPC_AUTHKEY,
+    Arm,
+    ArmManager,
+)
 from feeding_deployment.simulation.scene_description import SceneDescription
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.simulation.video import make_simulation_video
@@ -35,10 +42,15 @@ def _main(run_on_robot: bool, make_videos: bool) -> None:
     sim = FeedingDeploymentPyBulletSimulator(scene_description)
 
     # Initialize the interface to the robot.
-    robot_interface = Arm() if run_on_robot else None
+    if run_on_robot:
+        manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
+        manager.connect()
+        robot_interface = manager.Arm()
+    else:
+        robot_interface = None
 
     # Initialize the perceiver (e.g., get joint states or human head poses).
-    perception_interface = None  # TODO
+    perception_interface = PerceptionInterface(robot_interface)
 
     # Create a domain for high-level planning.
     hlas = {cls(sim, robot_interface, perception_interface) for cls in HLAS}
@@ -46,8 +58,6 @@ def _main(run_on_robot: bool, make_videos: bool) -> None:
     predicates: set[Predicate] = {ToolPrepared, GripperFree, Holding, ToolTransferDone}
     types = {tool_type}
     domain = PDDLDomain("AssistedFeeding", operators, predicates, types)
-
-    # TODO automate?
     cup = Object("cup", tool_type)
     wiper = Object("wiper", tool_type)
     utensil = Object("utensil", tool_type)
