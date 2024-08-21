@@ -6,7 +6,7 @@ from relational_structs import LiftedOperator, Predicate, Type, Object, LiftedAt
 from feeding_deployment.robot_controller.arm_client import KinovaCommand
 from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
-from feeding_deployment.simulation.planning import get_plan_to_grasp_cup
+from feeding_deployment.simulation.planning import get_plan_to_grasp_cup, remap_trajectory_to_constant_distance
 from feeding_deployment.integration.utils import simulated_trajectory_to_kinova_commands
 
 # Define some predicates that can be used for sequencing the high-level actions.
@@ -58,7 +58,9 @@ class PickToolHLA(HighLevelAction):
         assert len(objects) == 1
         tool = objects[0]
         if tool.name == "cup":
-            return get_plan_to_grasp_cup(sim, max_motion_plan_time=1.0)  # TODO
+            nominal_plan = get_plan_to_grasp_cup(sim, max_motion_plan_time=1.0)  # TODO
+            remapped_plan = remap_trajectory_to_constant_distance(nominal_plan, sim)
+            return remapped_plan
         raise NotImplementedError("TODO")
 
 
