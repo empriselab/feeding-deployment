@@ -78,7 +78,7 @@ def _get_plan_to_move_grasp_cup_from_pregrasp_position(
     # Assumes that _get_plan_to_pregrasp_cup() was just called.
     robot = sim.robot
     physics_client_id = sim.physics_client_id
-    collision_ids = sim.get_collision_ids(include_cup=False)
+    collision_ids = sim.get_collision_ids()
     cup_pose = get_pose(sim.cup_id, physics_client_id)
 
     tf = Pose(
@@ -142,7 +142,7 @@ def _get_move_cup_to_staging_plan(
     # Assumes that _get_plan_to_grasp_cup() was just called.
     robot = sim.robot
     physics_client_id = sim.physics_client_id
-    collision_ids = sim.get_collision_ids(include_cup=False)
+    collision_ids = sim.get_collision_ids()
 
     finger_frame_id = robot.link_from_name("finger_tip")
     end_effector_link_id = robot.link_from_name(robot.tool_link_name)

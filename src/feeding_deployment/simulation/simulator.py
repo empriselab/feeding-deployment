@@ -115,18 +115,19 @@ class FeedingDeploymentPyBulletSimulator:
             physicsClientId=self.physics_client_id,
         )
 
-    def get_collision_ids(self, include_cup: bool = True) -> set[int]:
+        # Track held objects.
+        self._held_object_name: str | None = None
+
+    def get_collision_ids(self) -> set[int]:
         """Return all collision IDs."""
-
-        # TODO update to internally handle held objects, remove include_cup
-
         collision_ids = {
             self._table_id,
             self.robot_holder_id,
             self._wheelchair_id,
+            self.cup_id,
         }
-        if include_cup:
-            collision_ids.add(self.cup_id)
+        if self._held_object_name == "cup":
+            collision_ids.remove(self.cup_id)
         return collision_ids
     
     def sync(self, state: FeedingDeploymentSimulatorState) -> None:
