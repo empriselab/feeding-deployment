@@ -1,6 +1,7 @@
 """Demonstrate the full drinking pipeline."""
 
 import time
+import pickle
 
 import pybullet as p
 from pybullet_helpers.gui import create_gui_connection
@@ -22,18 +23,24 @@ from feeding_deployment.robot_controller.arm_client import (
     RPC_AUTHKEY,
     ArmManager,
 )
+OFFLINE = True
 
 
 def _main():
-    # Initialize the robot arm and get the initial joint pose.
-    manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
-    manager.connect()
-    arm = manager.Arm()
 
-    arm.retract()
-    time.sleep(1.0)  # make sure arm stabilizes
-    q, _ = arm.get_state()
-    joint_state = q.tolist() + [0.0, 0.0]
+    if not OFFLINE:
+        # Initialize the robot arm and get the initial joint pose.
+        manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
+        manager.connect()
+        arm = manager.Arm()
+
+        arm.retract()
+        time.sleep(1.0)  # make sure arm stabilizes
+        q, _ = arm.get_state()
+        joint_state = q.tolist() + [0.0, 0.0]
+        pickle.dump(joint_state, open("joint_state.pkl", "wb"))
+    else:
+        joint_state = pickle.load(open("joint_state.pkl", "rb"))
 
     # Create the scene and generate a trajectory.
     scene_description = CupManipulationSceneDescription(initial_joints=joint_state)
@@ -46,13 +53,15 @@ def _main():
     print(f"Video saved to {video_outfile}")
     p.disconnect(physics_client_id)
 
-    # Execute the trajectory.
-    cmds = cup_manipulation_trajectory_to_kinova_commands(traj)
-    # input("Press enter to execute the plan.")
-    for cmd in cmds:
-        arm.execute_command(cmd)
+    if not OFFLINE:
+        # Execute the trajectory.
+        cmds = cup_manipulation_trajectory_to_kinova_commands(traj)
+        input("Press enter to execute the plan.")
+        for cmd in cmds:
+            arm.execute_command(cmd)
+        print("Plan executed!")
 
-    arm.close()
+        arm.close()
 
 
 if __name__ == "__main__":

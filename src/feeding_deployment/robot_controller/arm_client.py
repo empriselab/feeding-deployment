@@ -142,6 +142,8 @@ if __name__ == "__main__":
     manager.connect()
     arm = manager.Arm()
     try:
+        import rospy
+        from sensor_msgs.msg import JointState
         rospy.init_node("arm_client", anonymous=True)
 
         # publish joint states

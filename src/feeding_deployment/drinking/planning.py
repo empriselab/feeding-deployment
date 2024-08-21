@@ -142,6 +142,63 @@ def _get_plan_to_grasp_cup(
 
     return CupManipulationTrajectory(plan, held_obj_tfs)
 
+def _get_move_utensil_to_transfer_plan(
+    forque_target_pose: Pose,
+    scene: CupManipulationSceneIDs,
+    scene_description: CupManipulationSceneDescription,
+    _joint_distance_fn: Callable[[JointPositions, JointPositions], float],
+    max_motion_plan_time: float,
+) -> CupManipulationTrajectory:
+
+    # Assumes that _get_plan_to_grasp_cup() was just called.
+    robot = scene.robot
+    physics_client_id = scene.physics_client_id
+    collision_ids = scene.get_collision_ids(include_cup=False)
+
+    finger_frame_id = robot.link_from_name("finger_tip")
+    end_effector_link_id = robot.link_from_name(robot.tool_link_name)
+    finger_from_end_effector = get_relative_link_pose(
+        robot.robot_id, end_effector_link_id, finger_frame_id, physics_client_id
+    )
+
+    transfer_relative_pose: Pose = Pose(
+        (0.0, 0.2, 0.0), p.getQuaternionFromEuler((0.0, 0.0, np.pi / 2))
+    )
+    # Rajat ToDo: switch to forque_target_pose orientation
+    current_end_effector_pose = robot.get_end_effector_pose()
+    current_fingers_pose = get_link_pose(robot.robot_id, finger_frame_id, physics_client_id)
+    # new_fingers_pose = multiply_poses(bite_transfer_pose, fingers_to_bite)
+    bite_transfer_fingers_pose: Pose = Pose(
+        forque_target_pose.position, current_fingers_pose.orientation
+    )
+
+    new_end_effector_pose = multiply_poses(bite_transfer_fingers_pose, finger_from_end_effector)
+    interpolated_poses = list(
+        interpolate_poses(
+            current_end_effector_pose,
+            new_end_effector_pose,
+            num_interp=10,  # NOTE
+        )
+    )
+
+    plan = smoothly_follow_end_effector_path(
+        robot,
+        interpolated_poses,
+        robot.get_joint_positions(),
+        collision_ids,
+        _joint_distance_fn,
+        max_time=max_motion_plan_time,
+    )
+
+    assert plan is not None
+    held_obj_tfs = [None] * len(plan)
+
+    # print type of plan and held_obj_tfs
+    print("type of plan: ", type(plan))
+    print("type of held_obj_tfs: ", type(held_obj_tfs))
+    input("Press enter to continue")
+
+    return CupManipulationTrajectory(plan, held_obj_tfs)
 
 def _get_move_cup_to_staging_plan(
     scene: CupManipulationSceneIDs,
@@ -355,11 +412,95 @@ def generate_trajectory(
     plan = _remap_trajectory_to_constant_distance(
         plan, scene, _joint_distance_fn, max_joint_space_distance
     )
-
+    
     # Save the trajectory.
     with open(next_filepath, "wb") as wfp:
         pickle.dump((scene_description, plan), wfp)
     print(f"Dumped trajectory to {next_filepath}")
+
+    return plan
+
+# Rajat ToDo: hacked version of the above function to generate a trajectory for bite transfer
+def generate_bite_transfer_trajectory(
+    forque_target_pose: Pose,
+    scene: CupManipulationSceneIDs,
+    scene_description: CupManipulationSceneDescription,
+    max_motion_plan_time: float = 10.0,
+    num_grasp_waypoints: int = 5,
+    seed: int = 0,
+    num_drink_transfer_end_effector_interp: int = 25,
+    max_joint_space_distance: float = 0.1,
+    force_rerun: bool = False,
+) -> CupManipulationTrajectory:
+    """Run planning to create a cup manipulation trajectory."""
+
+    saved_traj_dir = Path(__file__).parent / "saved_trajs"
+    os.makedirs(saved_traj_dir, exist_ok=True)
+    saved_traj_files = list(saved_traj_dir.glob("*.traj"))
+    if not saved_traj_files:
+        next_file_id = 0
+    else:
+        next_file_id = len(saved_traj_files)
+    next_filepath = saved_traj_dir / f"{next_file_id}.traj"
+    assert not next_filepath.exists()
+
+    # Check if we already have saved a trajectory for this scene.
+    if not force_rerun:
+        for saved_traj_file in saved_traj_files:
+            with open(saved_traj_file, "rb") as rfp:
+                saved_scene_description, saved_traj = pickle.load(rfp)
+            if scene_description.allclose(saved_scene_description):
+                traj = saved_traj
+                print(f"Loaded saved trajectory: {saved_traj_file.name}")
+                return traj
+
+    # Need to replan.
+    print("Running planning...")
+    plan = CupManipulationTrajectory()
+
+    robot = scene.robot
+    physics_client_id = scene.physics_client_id
+    assert robot.physics_client_id == physics_client_id
+
+    # Create joint distance function.
+    weights = geometric_sequence(0.9, len(robot.arm_joint_names))
+    joint_infos = get_joint_infos(
+        robot.robot_id, robot.arm_joints, robot.physics_client_id
+    )
+
+    def _joint_distance_fn(pt1: JointPositions, pt2: JointPositions) -> float:
+        return get_joint_positions_distance(
+            robot,
+            joint_infos,
+            pt1,
+            pt2,
+            metric="weighted_joints",
+            weights=weights,
+        )
+
+    bite_transfer_plan = _get_move_utensil_to_transfer_plan(
+        forque_target_pose,
+        scene,
+        scene_description,
+        _joint_distance_fn,
+        max_motion_plan_time,
+    )
+    plan.extend(bite_transfer_plan)
+    robot.set_joints(plan.joint_states[-1])
+
+    # Remap the trajectory.
+    plan = _remap_trajectory_to_constant_distance(
+        plan, scene, _joint_distance_fn, max_joint_space_distance
+    )
+
+    # Rajat ToDo: Fix error that occurs when trying to save the trajectory ('TypeError: cannot pickle 'generator' object)
+    # # Save the trajectory.
+    # with open(next_filepath, "wb") as wfp:
+    #     pickle.dump((scene_description, plan), wfp)
+    # print(f"Dumped trajectory to {next_filepath}")
+
+    print("Type of plan: ", type(plan))
+    input("Press enter to continue")
 
     return plan
 

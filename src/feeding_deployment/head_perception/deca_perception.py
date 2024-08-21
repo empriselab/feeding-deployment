@@ -8,9 +8,10 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from DECA.decalib.datasets import datasets, detectors
 
-# sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__))))
+# Rajat ToDo: pip install DECA
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__))))
+from DECA.decalib.datasets import datasets, detectors
 from DECA.decalib.deca import DECA
 from DECA.decalib.utils import util
 from DECA.decalib.utils.config import cfg as deca_cfg

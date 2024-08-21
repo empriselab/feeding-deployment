@@ -22,8 +22,10 @@ def cup_manipulation_trajectory_to_kinova_commands(
         assert len(joint_state) == 9  # making assumptions about Kinova
         arm = np.array(joint_state[:7])
         assert np.isclose(joint_state[7], joint_state[8])
-        gripper = "closed" if joint_state[8] >= 0 else "open"
-        if gripper != last_gripper:
+        gripper = "closed" if joint_state[8] == 0 else "open"
+        if last_gripper is None:
+            last_gripper = gripper
+        elif gripper != last_gripper:
             if current_trajectory:
                 cmds.append(JointTrajectoryCommand(current_trajectory))
                 current_trajectory = []

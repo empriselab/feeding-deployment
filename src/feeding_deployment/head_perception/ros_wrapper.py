@@ -12,19 +12,20 @@ import rospy
 import tf2_ros
 from cv_bridge import CvBridge, CvBridgeError
 from geometry_msgs.msg import Point, TransformStamped, WrenchStamped
-from head_perception import RECORD_GOAL_POSE, HeadPerception
 from scipy.spatial.transform import Rotation
 from sensor_msgs import point_cloud2
 from sensor_msgs.msg import CameraInfo, Image, PointCloud2, PointField
 from std_msgs.msg import Bool, Float64, Float64MultiArray, String
 from visualization_msgs.msg import Marker, MarkerArray
 
+from feeding_deployment.head_perception.deca_perception import RECORD_GOAL_POSE, HeadPerception
+
 VISUALIZE_DATA = False
 
 
 class HeadPerceptionROSWrapper:
     def __init__(self):
-        rospy.init_node("HeadPerception")
+        # rospy.init_node("HeadPerception")
 
         self.head_perception = HeadPerception()
 
@@ -73,19 +74,19 @@ class HeadPerceptionROSWrapper:
 
         queue_size = 1000
         self.color_image_sub = message_filters.Subscriber(
-            rospy.get_param("/head_perception/colorTopicName"),
+            "/camera/color/image_raw",
             Image,
             queue_size=queue_size,
             buff_size=65536 * queue_size,
         )
         self.camera_info_sub = message_filters.Subscriber(
-            rospy.get_param("/head_perception/infoTopicName"),
+            "/camera/color/camera_info",
             CameraInfo,
             queue_size=queue_size,
             buff_size=65536 * queue_size,
         )
         self.depth_image_sub = message_filters.Subscriber(
-            rospy.get_param("/head_perception/depthTopicName"),
+            "/camera/aligned_depth_to_color/image_raw",
             Image,
             queue_size=queue_size,
             buff_size=65536 * queue_size,
@@ -98,19 +99,19 @@ class HeadPerceptionROSWrapper:
         ts_top.enable_reset = True
 
         self.bottom_color_image_sub = message_filters.Subscriber(
-            rospy.get_param("/head_perception/bottomColorTopicName"),
+            "/bottom_camera/color/camera_info",
             Image,
             queue_size=queue_size,
             buff_size=65536 * queue_size,
         )
         self.bottom_camera_info_sub = message_filters.Subscriber(
-            rospy.get_param("/head_perception/bottomInfoTopicName"),
+            "/bottom_camera/color/image_raw",
             CameraInfo,
             queue_size=queue_size,
             buff_size=65536 * queue_size,
         )
         self.bottom_depth_image_sub = message_filters.Subscriber(
-            rospy.get_param("/head_perception/bottomDepthTopicName"),
+            "/bottom_camera/aligned_depth_to_color/image_raw",
             Image,
             queue_size=queue_size,
             buff_size=65536 * queue_size,
@@ -267,7 +268,7 @@ class HeadPerceptionROSWrapper:
         self.updateTF("base_link", "head_pose", neck_frame)
         self.updateTF("base_link", "reference_head_pose", reference_neck_frame)
 
-        return landmarks2d, landmarks3d, viz_image
+        return forque_target_pose
 
     def updateTF(self, source_frame, target_frame, pose):
 
@@ -307,7 +308,7 @@ class HeadPerceptionROSWrapper:
         forque_marker.ns = "forque_marker"
         forque_marker.id = 1
         forque_marker.type = forque_marker.MESH_RESOURCE  # CUBE LIST
-        forque_marker.mesh_resource = "file:///home/emprise/feeding_ws/src/ada_description/kortex_description/tools/forque/forque_tip.stl"
+        forque_marker.mesh_resource = "file:///home/isacc/deployment_ws/src/ada_description/kortex_description/tools/forque/forque_tip.stl"
         forque_marker.mesh_use_embedded_materials = True
         forque_marker.action = forque_marker.ADD  # ADD
         forque_marker.lifetime = rospy.Duration()
@@ -375,6 +376,7 @@ class HeadPerceptionROSWrapper:
 
 
 if __name__ == "__main__":
+    rospy.init_node("head_perception", anonymous=True)
     head_perception_ros_wrapper = HeadPerceptionROSWrapper()
     time.sleep(2.0)  # let the buffers fill up
     while not rospy.is_shutdown():

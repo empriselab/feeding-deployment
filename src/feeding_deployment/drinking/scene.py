@@ -42,7 +42,7 @@ class CupManipulationSceneDescription:
     )
     robot_base_pose: Pose = Pose(
         (0.0, 0.0, 0.0),
-        tuple(Rotation.from_euler("xyz", [0, 0, 90], degrees=True).as_quat()),
+        tuple(Rotation.from_euler("xyz", [0, 0, 90], degrees=True).as_quat()), # Rajat ToDo: Base sure robot-base orientation is 0,0,0
     )
 
     # Robot holder (vention stand).
