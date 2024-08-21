@@ -3,10 +3,14 @@
 import threading
 import time
 
-import rospy
-from pybullet_helpers.geometry import Pose, multiply_poses
+from pybullet_helpers.geometry import Pose
 from scipy.spatial.transform import Rotation as R
-from sensor_msgs.msg import JointState
+
+try:
+    import rospy
+    from sensor_msgs.msg import JointState
+except ModuleNotFoundError:
+    pass
 
 from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
 from feeding_deployment.robot_controller.arm_client import Arm
