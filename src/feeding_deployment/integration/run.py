@@ -23,6 +23,9 @@ from feeding_deployment.simulation.scene_description import SceneDescription
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.simulation.video import make_simulation_video
 
+# All the high level actions we want to consider.
+HLAS = {PickToolHLA, StowToolHLA, PrepareToolHLA, TransferToolHLA}
+
 
 def _main(run_on_robot: bool, make_videos: bool) -> None:
     """The main entry point for running the integrated system."""
@@ -31,11 +34,14 @@ def _main(run_on_robot: bool, make_videos: bool) -> None:
     scene_description = SceneDescription()
     sim = FeedingDeploymentPyBulletSimulator(scene_description)
 
-    if run_on_robot:
-        arm = Arm()
+    # Initialize the interface to the robot.
+    robot_interface = Arm() if run_on_robot else None
+
+    # Initialize the perceiver (e.g., get joint states or human head poses).
+    perception_interface = None  # TODO
 
     # Create a domain for high-level planning.
-    hlas = {PickToolHLA(), StowToolHLA(), PrepareToolHLA(), TransferToolHLA()}
+    hlas = {cls(sim, robot_interface, perception_interface) for cls in HLAS}
     operators = {hla.get_operator() for hla in hlas}
     predicates: set[Predicate] = {ToolPrepared, GripperFree, Holding, ToolTransferDone}
     types = {tool_type}
@@ -54,14 +60,14 @@ def _main(run_on_robot: bool, make_videos: bool) -> None:
 
     # TODO update this once the interface is ready.
     goal_queue = [
-        {ToolTransferDone([cup])},  # drinking
-        {ToolTransferDone([utensil])},  # feeding
-        {ToolTransferDone([wiper])},  # wiping
+        ("Assist Drinking", {ToolTransferDone([cup])}),
+        ("Assist Feeding", {ToolTransferDone([utensil])}),
+        ("Assist Wiping", {ToolTransferDone([wiper])}),
     ]
 
     while goal_queue:
-        goal_atoms = goal_queue.pop(0)
-        print("Working towards new goal:", goal_atoms)
+        goal_str, goal_atoms = goal_queue.pop(0)
+        print("Working towards new goal:", goal_str)
 
         # Plan a sequence of high-level actions to execute.
         problem = PDDLProblem(
@@ -71,9 +77,10 @@ def _main(run_on_robot: bool, make_videos: bool) -> None:
             str(domain), str(problem), heuristic="lmcut", search="astar"
         )
         assert plan_strs is not None
-        print("Found plan:", plan_strs)
-
         plan_ops = parse_pddl_plan(plan_strs, domain, problem)
+        print("Found plan:")
+        for i, op in enumerate(plan_ops):
+            print(f"{i}. {op.short_str}")
         plan_hlas = pddl_plan_to_hla_plan(plan_ops, hlas)
 
         for (hla, object_params), operator in zip(plan_hlas, plan_ops, strict=True):
@@ -81,7 +88,7 @@ def _main(run_on_robot: bool, make_videos: bool) -> None:
 
             assert operator.preconditions.issubset(current_atoms)
             # Turn into a low-level plan that can be simulated.
-            sim_traj = hla.get_simulated_trajectory(object_params, sim)
+            sim_traj = hla.get_simulated_trajectory(object_params)
 
             # Optionally make a video of the simulated trajectory.
             if make_videos:
@@ -89,12 +96,12 @@ def _main(run_on_robot: bool, make_videos: bool) -> None:
                 make_simulation_video(sim, sim_traj, outfile)
 
             # Get commands to execute on the robot.
-            robot_commands = hla.get_robot_commands(object_params, sim, sim_traj)
+            robot_commands = hla.get_robot_commands(object_params, sim_traj)
 
             # Execute the commands.
             if run_on_robot:
                 for robot_command in robot_commands:
-                    arm.execute_command(robot_command)
+                    robot_interface.execute_command(robot_command)
 
             # Make sure the states are in sync.
             if sim_traj:

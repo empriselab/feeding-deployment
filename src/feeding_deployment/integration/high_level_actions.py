@@ -12,7 +12,7 @@ from relational_structs import (
 )
 
 from feeding_deployment.integration.utils import simulated_trajectory_to_kinova_commands
-from feeding_deployment.robot_controller.arm_client import KinovaCommand
+from feeding_deployment.robot_controller.arm_client import Arm, KinovaCommand
 from feeding_deployment.simulation.planning import (
     get_plan_to_grasp_cup,
     remap_trajectory_to_constant_distance,
@@ -32,8 +32,15 @@ ToolPrepared = Predicate("ToolPrepared", [tool_type])  # e.g., bite acquired
 class HighLevelAction(abc.ABC):
     """Base class for high-level action."""
 
-    def __init__(self, types: tuple[Type]) -> None:
-        self._types = types
+    def __init__(
+        self,
+        sim: FeedingDeploymentPyBulletSimulator,
+        robot_interface: Arm,
+        perception_interface,
+    ) -> None:
+        self._sim = sim
+        self._robot_interface = robot_interface
+        self._perception_interface = perception_interface
 
     @abc.abstractmethod
     def get_operator(self) -> LiftedOperator:
@@ -41,27 +48,24 @@ class HighLevelAction(abc.ABC):
 
     @abc.abstractmethod
     def get_simulated_trajectory(
-        self, objects: tuple[Object], sim: FeedingDeploymentPyBulletSimulator
+        self,
+        objects: tuple[Object],
     ) -> list[FeedingDeploymentSimulatorState]:
         """Update the given simulator assuming that the action was executed."""
 
     def get_robot_commands(
         self,
         objects: tuple[Object],
-        sim: FeedingDeploymentPyBulletSimulator,
         sim_traj: list[FeedingDeploymentSimulatorState],
     ) -> list[KinovaCommand]:
         """Default implementation follows sim_traj exactly, but subclasses can
         override to modify their execution."""
-        del objects, sim  # not used
+        del objects  # not used
         return simulated_trajectory_to_kinova_commands(sim_traj)
 
 
 class PickToolHLA(HighLevelAction):
     """Pick up a tool (utensil, drink, or wipe)."""
-
-    def __init__(self) -> None:
-        super().__init__((tool_type,))
 
     def get_operator(self) -> LiftedOperator:
         tool = tool_type("?tool")
@@ -74,13 +78,16 @@ class PickToolHLA(HighLevelAction):
         )
 
     def get_simulated_trajectory(
-        self, objects: tuple[Object], sim: FeedingDeploymentPyBulletSimulator
+        self,
+        objects: tuple[Object],
     ) -> list[FeedingDeploymentSimulatorState]:
         assert len(objects) == 1
         tool = objects[0]
         if tool.name == "cup":
-            nominal_plan = get_plan_to_grasp_cup(sim, max_motion_plan_time=1.0)  # TODO
-            remapped_plan = remap_trajectory_to_constant_distance(nominal_plan, sim)
+            nominal_plan = get_plan_to_grasp_cup(self._sim)
+            remapped_plan = remap_trajectory_to_constant_distance(
+                nominal_plan, self._sim
+            )
             return remapped_plan
         # TODO
         print(f"PickTool not yet implemented for {tool}")
@@ -89,9 +96,6 @@ class PickToolHLA(HighLevelAction):
 
 class StowToolHLA(HighLevelAction):
     """Stow a tool (utensil, drink, or wipe)."""
-
-    def __init__(self) -> None:
-        super().__init__((tool_type,))
 
     def get_operator(self) -> LiftedOperator:
         tool = tool_type("?tool")
@@ -104,7 +108,8 @@ class StowToolHLA(HighLevelAction):
         )
 
     def get_simulated_trajectory(
-        self, objects: tuple[Object], sim: FeedingDeploymentPyBulletSimulator
+        self,
+        objects: tuple[Object],
     ) -> list[FeedingDeploymentSimulatorState]:
         # TODO
         assert len(objects) == 1
@@ -115,9 +120,6 @@ class StowToolHLA(HighLevelAction):
 
 class TransferToolHLA(HighLevelAction):
     """Wipe, or transfer drink, or transfer bite."""
-
-    def __init__(self) -> None:
-        super().__init__((tool_type,))
 
     def get_operator(self) -> LiftedOperator:
         tool = tool_type("?tool")
@@ -130,7 +132,8 @@ class TransferToolHLA(HighLevelAction):
         )
 
     def get_simulated_trajectory(
-        self, objects: tuple[Object], sim: FeedingDeploymentPyBulletSimulator
+        self,
+        objects: tuple[Object],
     ) -> list[FeedingDeploymentSimulatorState]:
         # TODO
         assert len(objects) == 1
@@ -141,9 +144,6 @@ class TransferToolHLA(HighLevelAction):
 
 class PrepareToolHLA(HighLevelAction):
     """Bite acquisition; other tools are always prepared."""
-
-    def __init__(self) -> None:
-        super().__init__((tool_type,))
 
     def get_operator(self) -> LiftedOperator:
         tool = tool_type("?tool")
@@ -156,7 +156,8 @@ class PrepareToolHLA(HighLevelAction):
         )
 
     def get_simulated_trajectory(
-        self, objects: tuple[Object], sim: FeedingDeploymentPyBulletSimulator
+        self,
+        objects: tuple[Object],
     ) -> list[FeedingDeploymentSimulatorState]:
         # TODO
         assert len(objects) == 1
