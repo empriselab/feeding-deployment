@@ -111,7 +111,7 @@ class Arm:
         self.arm.retract()
 
     def emergency_stop(self):
-        self.arm.emergency_stop()
+        self.arm.apply_emergency_stop()
 
     def execute_command(self, cmd: KinovaCommand) -> None:
 
@@ -180,7 +180,8 @@ if __name__ == "__main__":
         #     joint_states_pub.publish(joint_state_msg)
         #     time.sleep(0.01)
 
-        arm.reset()
+        print("Resetting arm...")
+        arm.retract()
         # print("Current Arm State:", arm.get_state())
 
         # home_pos = [
