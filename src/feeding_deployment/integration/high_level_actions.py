@@ -21,6 +21,7 @@ from feeding_deployment.integration.utils import simulated_trajectory_to_kinova_
 from feeding_deployment.robot_controller.arm_client import Arm, KinovaCommand
 from feeding_deployment.simulation.planning import (
     get_bite_transfer_plan,
+    get_plan_to_stow_cup,
     get_plan_to_grasp_cup,
     remap_trajectory_to_constant_distance,
 )
@@ -213,6 +214,15 @@ class StowToolHLA(PlanExecuteHighLevelAction):
         # TODO
         assert len(objects) == 1
         tool = objects[0]
+        if tool.name == "cup":
+            nominal_plan = get_plan_to_stow_cup(
+                self._sim,
+                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+            )
+            remapped_plan = remap_trajectory_to_constant_distance(
+                nominal_plan, self._sim
+            )
+            return remapped_plan
         print(f"StowTool not yet implemented for {tool}")
         return []
 

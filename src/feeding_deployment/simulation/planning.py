@@ -13,6 +13,7 @@ from pybullet_helpers.inverse_kinematics import (
 from pybullet_helpers.joint import JointPositions, get_joint_infos, interpolate_joints
 from pybullet_helpers.link import get_link_pose, get_relative_link_pose
 from pybullet_helpers.math_utils import geometric_sequence
+from pybullet_helpers.robots import SingleArmPyBulletRobot
 from pybullet_helpers.motion_planning import (
     get_joint_positions_distance,
     run_smooth_motion_planning_to_pose,
@@ -214,20 +215,50 @@ def get_plan_to_grasp_cup(
     logging.disable(logging.ERROR)
 
     # Create joint distance function.
-    weights = geometric_sequence(0.9, len(sim.robot.arm_joint_names))
-    joint_infos = get_joint_infos(
-        sim.robot.robot_id, sim.robot.arm_joints, sim.physics_client_id
-    )
+    _joint_distance_fn = _create_joint_distance_fn(sim.robot)
 
-    def _joint_distance_fn(pt1: JointPositions, pt2: JointPositions) -> float:
-        return get_joint_positions_distance(
-            sim.robot,
-            joint_infos,
-            pt1,
-            pt2,
-            metric="weighted_joints",
-            weights=weights,
-        )
+    plan = _get_plan_to_pregrasp_cup(sim, seed, max_motion_plan_time)
+    sim.robot.set_joints(plan[-1].robot_joints)
+
+    grasp_cup_plan = _get_plan_to_move_grasp_cup_from_pregrasp_position(
+        sim,
+        _joint_distance_fn,
+        num_grasp_waypoints,
+        max_motion_plan_time,
+    )
+    plan.extend(grasp_cup_plan)
+    sim.robot.set_joints(plan[-1].robot_joints)
+
+    base_link_to_held_obj = plan[-1].held_object_tf
+    assert isinstance(base_link_to_held_obj, Pose)
+    move_cup_to_staging_plan = _get_move_cup_to_staging_plan(
+        sim,
+        _joint_distance_fn,
+        num_drink_transfer_end_effector_interp,
+        max_motion_plan_time,
+        base_link_to_held_obj,
+    )
+    plan.extend(move_cup_to_staging_plan)
+
+    return plan
+
+
+def get_plan_to_stow_cup(
+    sim: FeedingDeploymentPyBulletSimulator,
+    seed: int = 0,
+    max_motion_plan_time: float = 10.0,
+    num_grasp_waypoints: int = 5,
+    num_drink_transfer_end_effector_interp: int = 25,
+) -> list[FeedingDeploymentSimulatorState]:
+    """Make a plan to stow the cup from the current simulator state."""
+
+    assert sim.held_object_name == "cup"
+
+    # Quiet IKfast warnings.
+    logging.disable(logging.ERROR)
+
+    # Create joint distance function.
+    _joint_distance_fn = _create_joint_distance_fn(sim.robot)
 
     plan = _get_plan_to_pregrasp_cup(sim, seed, max_motion_plan_time)
     sim.robot.set_joints(plan[-1].robot_joints)
@@ -272,21 +303,7 @@ def get_bite_transfer_plan(
     collision_ids = sim.get_collision_ids()
 
     # Create joint distance function.
-    # TODO refactor to avoid copying this function so many places
-    weights = geometric_sequence(0.9, len(sim.robot.arm_joint_names))
-    joint_infos = get_joint_infos(
-        sim.robot.robot_id, sim.robot.arm_joints, sim.physics_client_id
-    )
-
-    def _joint_distance_fn(pt1: JointPositions, pt2: JointPositions) -> float:
-        return get_joint_positions_distance(
-            sim.robot,
-            joint_infos,
-            pt1,
-            pt2,
-            metric="weighted_joints",
-            weights=weights,
-        )
+    _joint_distance_fn = _create_joint_distance_fn(sim.robot)
 
     finger_frame_id = robot.link_from_name("finger_tip")
     end_effector_link_id = robot.link_from_name(robot.tool_link_name)
@@ -331,6 +348,25 @@ def get_bite_transfer_plan(
 #                           General Functions                                 #
 ###############################################################################
 
+def _create_joint_distance_fn(robot: SingleArmPyBulletRobot) -> Callable[[JointPositions, JointPositions], float]:
+
+    weights = geometric_sequence(0.9, len(robot.arm_joint_names))
+    joint_infos = get_joint_infos(
+        robot.robot_id, robot.arm_joints, robot.physics_client_id
+    )
+
+    def _joint_distance_fn(pt1: JointPositions, pt2: JointPositions) -> float:
+        return get_joint_positions_distance(
+            robot,
+            joint_infos,
+            pt1,
+            pt2,
+            metric="weighted_joints",
+            weights=weights,
+        )
+    
+    return _joint_distance_fn
+
 
 def remap_trajectory_to_constant_distance(
     traj: list[FeedingDeploymentSimulatorState],
@@ -343,19 +379,7 @@ def remap_trajectory_to_constant_distance(
     joint_infos = get_joint_infos(
         robot.robot_id, robot.arm_joints, robot.physics_client_id
     )
-
-    # Create joint distance function.
-    weights = geometric_sequence(0.9, len(robot.arm_joint_names))
-
-    def _joint_distance_fn(pt1: JointPositions, pt2: JointPositions) -> float:
-        return get_joint_positions_distance(
-            sim.robot,
-            joint_infos,
-            pt1,
-            pt2,
-            metric="weighted_joints",
-            weights=weights,
-        )
+    _joint_distance_fn = _create_joint_distance_fn(robot)
 
     # Create a continuous-time trajectory.
     def _interpolate_fn(
