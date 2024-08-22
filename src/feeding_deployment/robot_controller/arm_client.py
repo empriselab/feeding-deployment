@@ -63,14 +63,23 @@ class Arm:
 
     def reset(self):
         # Go to home position
+        print("Moving to home position")
         self.arm.home()
 
     def switch_to_joint_compliant_mode(self):
+
+        # clear command queue
+        print("Clearing command queue")
+        while not self.command_queue.empty():
+            self.command_queue.get()
+
         # switch to joint compliant mode
+        print("Switching to joint compliant mode")
         self.arm.switch_to_joint_compliant_mode(self.command_queue)
 
     def switch_out_of_joint_compliant_mode(self):
         # switch out of joint compliant mode
+        print("Switching out of joint compliant mode")
         self.arm.switch_out_of_joint_compliant_mode()
 
     def compliant_set_joint_position(self, command_pos):
@@ -105,12 +114,14 @@ class Arm:
         self.arm.close_gripper()
 
     def close(self):
+        print("Closing arm connection")
         self.arm.disconnect()
 
     def retract(self):
         self.arm.retract()
 
     def stop(self):
+        print("Stopping arm")
         self.arm.stop()
 
     def execute_command(self, cmd: KinovaCommand) -> None:
