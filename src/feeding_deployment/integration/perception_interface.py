@@ -21,7 +21,7 @@ from feeding_deployment.robot_controller.arm_client import Arm
 def publish_joint_states(arm):
 
     # publish joint states
-    joint_states_pub = rospy.Publisher("/joint_states", JointState, queue_size=10)
+    joint_states_pub = rospy.Publisher("/robot_joint_states", JointState, queue_size=10)
 
     while not rospy.is_shutdown():
         arm_pos, gripper_pos = arm.get_state()
@@ -50,6 +50,12 @@ class PerceptionInterface:
     def __init__(self, robot_interface: Arm | None) -> None:
         self._robot_interface = robot_interface
 
+        try:
+            rospy.init_node("perception_interface", anonymous=True)
+
+        except Exception:
+            pass
+
         # publish joint states in separate thread
         if robot_interface is not None:
             joint_state_thread = threading.Thread(
@@ -71,6 +77,9 @@ class PerceptionInterface:
         q, gripper_position = self._robot_interface.get_state()
         joint_state = q.tolist() + [gripper_position, gripper_position]
         return joint_state
+    
+    def get_camera_data(self): # Rajat ToDo: Add return type
+        return self._head_perception.get_top_camera_data()  
 
     def get_head_perception_forque_target_pose(self) -> Pose:
         """Get a target of the forque from head perception."""

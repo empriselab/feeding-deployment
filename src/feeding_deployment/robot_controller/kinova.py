@@ -376,7 +376,9 @@ class KinovaArm:
         self.end_or_abort_event.clear()
         self.base.ExecuteAction(action)
         if blocking:
+            print("Waiting for angular movement to finish ...")
             self.end_or_abort_event.wait(KinovaArm.ACTION_TIMEOUT_DURATION)
+            print("Angular movement completed")
 
     def move_cartesian(self, xyz, xyz_quat, blocking=True):
 

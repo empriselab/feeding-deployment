@@ -5,6 +5,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+# Rajat ToDo: Remove this hacky addition
+FLAIR_PATH = "/home/isacc/deployment_ws/src/FLAIR/bite_acquisition/scripts"
+import sys
+sys.path.append(FLAIR_PATH)
+from skill_library import SkillLibrary
+
 from relational_structs import (
     GroundAtom,
     GroundOperator,
@@ -275,6 +281,8 @@ class PrepareToolHLA(HighLevelAction):
         super().__init__(*args, **kwargs)
 
         # Rajat todo: how do I initialize FLAIR just for the utensil tool?
+        print("Initializing Acquisition Skill Library")
+        self.acquisition_skill_library = SkillLibrary(self._robot_interface)
 
     def get_name(self) -> str:
         return "PrepareTool"
@@ -299,6 +307,21 @@ class PrepareToolHLA(HighLevelAction):
         if tool.name == "utensil":
             # Do Bite Acquisition
             print("Doing Bite Acquisition")
+            
+            self.acquisition_skill_library.reset()
+            camera_color_data, camera_info_data, camera_depth_data, _ = self._perception_interface.get_camera_data()
+            self.acquisition_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data)
+
+            # skill_library.scooping_skill(camera_color_data, camera_depth_data, camera_info_data)
+
+            # skill_library.dipping_skill(camera_color_data, camera_depth_data, camera_info_data)
+
+            # skill_library.pushing_skill(camera_color_data, camera_depth_data, camera_info_data)
+
+            # skill_library.twirling_skill(camera_color_data, camera_depth_data, camera_info_data)
+
+            # skill_library.cutting_skill(camera_color_data, camera_depth_data, camera_info_data)
+            
         else:
             # Other tools are always prepared
             pass

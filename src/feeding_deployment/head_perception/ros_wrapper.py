@@ -146,6 +146,15 @@ class HeadPerceptionROSWrapper:
             self.top_camera_depth_data = depth_image
             self.top_camera_header = rgb_image_msg.header
 
+    def get_top_camera_data(self):
+        with self.top_camera_lock:
+            return (
+                deepcopy(self.top_camera_color_data),
+                deepcopy(self.top_camera_info_data),
+                deepcopy(self.top_camera_depth_data),
+                deepcopy(self.top_camera_header),
+            )
+
     def bottomRgbdCallback(self, rgb_image_msg, camera_info_msg, depth_image_msg):
         # print("Bottom RGB Callback")
 
@@ -161,6 +170,15 @@ class HeadPerceptionROSWrapper:
             self.bottom_camera_info_data = camera_info_msg
             self.bottom_camera_depth_data = depth_image
             self.bottom_camera_header = rgb_image_msg.header
+
+    def get_bottom_camera_data(self):
+        with self.bottom_camera_lock:
+            return (
+                deepcopy(self.bottom_camera_color_data),
+                deepcopy(self.bottom_camera_info_data),
+                deepcopy(self.bottom_camera_depth_data),
+                deepcopy(self.bottom_camera_header),
+            )
 
     def get_base_to_camera_transform(self, camera_info_data, use_top_camera=True):
         if use_top_camera:
@@ -192,20 +210,14 @@ class HeadPerceptionROSWrapper:
         transform = None
         while transform is None:
             if use_top_camera:
-                with self.top_camera_lock:
-                    camera_color_data = deepcopy(self.top_camera_color_data)
-                    camera_info_data = deepcopy(self.top_camera_info_data)
-                    camera_depth_data = deepcopy(self.top_camera_depth_data)
+                camera_color_data, camera_info_data, camera_depth_data, _ = self.get_top_camera_data()
                 if camera_info_data is None:
                     continue
                 transform = self.get_base_to_camera_transform(
                     camera_info_data, use_top_camera=True
                 )
             else:
-                with self.bottom_camera_lock:
-                    camera_color_data = deepcopy(self.bottom_camera_color_data)
-                    camera_info_data = deepcopy(self.bottom_camera_info_data)
-                    camera_depth_data = deepcopy(self.bottom_camera_depth_data)
+                camera_color_data, camera_info_data, camera_depth_data, _ = self.get_bottom_camera_data()
                 if camera_info_data is None:
                     continue
                 transform = self.get_base_to_camera_transform(
