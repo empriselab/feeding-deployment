@@ -104,7 +104,7 @@ def _main(
             print(f"Refining {operator.short_str}")
 
             assert operator.preconditions.issubset(current_atoms)
-            
+
             # Execute the high-level plan in simulation
             sim_traj = hla.execute_action(run_on_robot, make_videos, object_params)
 

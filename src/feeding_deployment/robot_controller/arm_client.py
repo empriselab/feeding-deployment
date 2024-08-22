@@ -162,7 +162,7 @@ if __name__ == "__main__":
         from std_msgs.msg import Bool
 
         rospy.init_node("arm_client", anonymous=True)
-        
+
         def emergency_stop_callback(msg):
             arm.stop()
 
@@ -201,7 +201,9 @@ if __name__ == "__main__":
         arm.switch_to_joint_compliant_mode()
 
         input("Press Enter to move to joint compliant position...")
-        arm.compliant_set_joint_position([0.0, 0.26179939, 3.14159265, -2.26892803, 0.0, 0.95993109, 1.9])
+        arm.compliant_set_joint_position(
+            [0.0, 0.26179939, 3.14159265, -2.26892803, 0.0, 0.95993109, 1.9]
+        )
 
         input("Press Enter to switch out of joint compliant mode...")
         arm.switch_out_of_joint_compliant_mode()
