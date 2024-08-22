@@ -1,8 +1,8 @@
 """High-level actions that we can simulate and execute."""
 
 import abc
-from typing import Any
 from pathlib import Path
+from typing import Any
 
 from relational_structs import (
     GroundOperator,
@@ -24,7 +24,6 @@ from feeding_deployment.simulation.planning import (
 )
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
-
 from feeding_deployment.simulation.video import make_simulation_video
 
 # Define some predicates that can be used for sequencing the high-level actions.
@@ -56,27 +55,35 @@ class HighLevelAction(abc.ABC):
         """Create a planning operator for this HLA."""
 
     @abc.abstractmethod
-    def execute_action(self, run_on_robot, make_videos, objects: tuple[Object, ...]) -> None:
+    def execute_action(
+        self, run_on_robot, make_videos, objects: tuple[Object, ...]
+    ) -> None:
         """Plan and execute the action on the robot."""
+
 
 # Define a high-level action that follows a planning and then execution pipeline.
 class PlanExecuteHighLevelAction(HighLevelAction):
-    """Base class for high-level actions that follow planning and then execution pipeline"""
-    def execute_action(self, run_on_robot, make_videos, objects: tuple[Object, ...]) -> None:
-        """Default implementation uses get_simulated_trajectory, get_robot_commands, and execute_robot_commands
-        in sequence, but subclasses can override to modify their execution."""
+    """Base class for high-level actions that follow planning and then
+    execution pipeline."""
+
+    def execute_action(
+        self, run_on_robot, make_videos, objects: tuple[Object, ...]
+    ) -> None:
+        """Default implementation uses get_simulated_trajectory,
+        get_robot_commands, and execute_robot_commands in sequence, but
+        subclasses can override to modify their execution."""
         sim_traj = self.get_simulated_trajectory(objects)
 
         # Optionally make a video of the simulated trajectory.
         if make_videos:
             outfile = Path(__file__).parent / "last.mp4"
-            make_simulation_video(self.sim, sim_traj, outfile)
-        
+            make_simulation_video(self._sim, sim_traj, outfile)
+
         robot_commands = self.get_robot_commands(objects, sim_traj)
         if run_on_robot:
             self.execute_robot_commands(robot_commands)
         return sim_traj
-    
+
     @abc.abstractmethod
     def get_simulated_trajectory(
         self,
@@ -93,7 +100,7 @@ class PlanExecuteHighLevelAction(HighLevelAction):
         override to modify their execution."""
         del objects  # not used
         return simulated_trajectory_to_kinova_commands(sim_traj)
-    
+
     def execute_robot_commands(self, robot_commands: list[KinovaCommand]) -> None:
         """Execute the given commands on the robot."""
         for robot_command in robot_commands:
@@ -205,7 +212,7 @@ class PrepareToolHLA(HighLevelAction):
         hla_hyperparams: dict[str, Any],
     ) -> None:
         super().__init__(sim, robot_interface, perception_interface, hla_hyperparams)
-        
+
         # Rajat todo: how do I initialize FLAIR just for the utensil tool?
 
     def get_operator(self) -> LiftedOperator:
@@ -217,8 +224,10 @@ class PrepareToolHLA(HighLevelAction):
             add_effects={ToolPrepared([tool])},
             delete_effects=set(),
         )
-    
-    def execute_action(self, run_on_robot, make_videos, objects: tuple[Object, ...]) -> None:
+
+    def execute_action(
+        self, run_on_robot, make_videos, objects: tuple[Object, ...]
+    ) -> None:
         assert len(objects) == 1
         tool = objects[0]
         if tool.name == "utensil":
@@ -227,6 +236,7 @@ class PrepareToolHLA(HighLevelAction):
         else:
             # Other tools are always prepared
             pass
+
 
 def pddl_plan_to_hla_plan(
     pddl_plan: list[GroundOperator], hlas: set[HighLevelAction]
