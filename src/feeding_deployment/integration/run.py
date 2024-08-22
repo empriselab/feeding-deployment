@@ -28,7 +28,6 @@ from feeding_deployment.robot_controller.arm_client import (
 )
 from feeding_deployment.simulation.scene_description import SceneDescription
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
-from feeding_deployment.simulation.video import make_simulation_video
 
 # All the high level actions we want to consider.
 HLAS = {PickToolHLA, StowToolHLA, PrepareToolHLA, TransferToolHLA}
@@ -105,21 +104,9 @@ def _main(
             print(f"Refining {operator.short_str}")
 
             assert operator.preconditions.issubset(current_atoms)
-            # Turn into a low-level plan that can be simulated.
-            sim_traj = hla.get_simulated_trajectory(object_params)
-
-            # Optionally make a video of the simulated trajectory.
-            if make_videos:
-                outfile = Path(__file__).parent / "last.mp4"
-                make_simulation_video(sim, sim_traj, outfile)
-
-            # Get commands to execute on the robot.
-            robot_commands = hla.get_robot_commands(object_params, sim_traj)
-
-            # Execute the commands.
-            if run_on_robot:
-                for robot_command in robot_commands:
-                    robot_interface.execute_command(robot_command)
+            
+            # Execute the high-level plan in simulation
+            sim_traj = hla.execute_action(run_on_robot, make_videos, object_params)
 
             # Make sure the states are in sync.
             if sim_traj:
