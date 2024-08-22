@@ -34,6 +34,7 @@ from feeding_deployment.robot_controller.arm_client import Arm, KinovaCommand
 from feeding_deployment.simulation.planning import (
     get_bite_transfer_plan,
     get_plan_to_grasp_cup,
+    get_plan_to_grasp_wiper,
     get_plan_to_stow_cup,
     remap_trajectory_to_constant_distance,
 )
@@ -193,13 +194,20 @@ class PickToolHLA(PlanExecuteHighLevelAction):
                 self._sim,
                 max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
             )
-            remapped_plan = remap_trajectory_to_constant_distance(
-                nominal_plan, self._sim
+        elif tool.name == "wiper":
+            nominal_plan = get_plan_to_grasp_wiper(
+                self._sim,
+                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
             )
-            return remapped_plan
         # TODO
-        print(f"PickTool not yet implemented for {tool}")
-        return []
+        else:
+            print(f"PickTool not yet implemented for {tool}")
+            return []
+        remapped_plan = remap_trajectory_to_constant_distance(
+            nominal_plan, self._sim
+        )
+        return remapped_plan
+
 
 
 class StowToolHLA(PlanExecuteHighLevelAction):
