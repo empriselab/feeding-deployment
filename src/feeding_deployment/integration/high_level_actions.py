@@ -37,6 +37,7 @@ from feeding_deployment.simulation.planning import (
     get_plan_to_grasp_wiper,
     get_plan_to_stow_cup,
     remap_trajectory_to_constant_distance,
+    get_plan_to_stow_wiper,
 )
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
@@ -239,13 +240,18 @@ class StowToolHLA(PlanExecuteHighLevelAction):
                 self._sim,
                 max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
             )
-            remapped_plan = remap_trajectory_to_constant_distance(
-                nominal_plan, self._sim
+        elif tool.name == "wiper":
+            nominal_plan = get_plan_to_stow_wiper(
+                self._sim,
+                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
             )
-            return remapped_plan
-        print(f"StowTool not yet implemented for {tool}")
-        return []
-
+        else:
+            print(f"StowTool not yet implemented for {tool}")
+            return []
+        remapped_plan = remap_trajectory_to_constant_distance(
+            nominal_plan, self._sim
+        )
+        return remapped_plan
 
 class TransferToolHLA(PlanExecuteHighLevelAction):
     """Wipe, or transfer drink, or transfer bite."""
