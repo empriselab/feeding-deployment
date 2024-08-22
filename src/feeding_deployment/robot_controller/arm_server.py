@@ -130,20 +130,10 @@ class ArmManager(MPBaseManager):
 ArmManager.register("Arm", Arm)
 
 if __name__ == "__main__":
-    try:
-        manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
-        server = manager.get_server()
-        print(f"Arm manager server started at {NUC_HOSTNAME}:{ARM_RPC_PORT}")
-        server.serve_forever()
-    finally:
-        try:
-            arm = manager.Arm()  # Get a reference to the Arm object if possible
-            arm.close()  # Ensure the arm is disconnected properly
-        except Exception as e:
-            print(f"Error during arm shutdown: {e}")
-        finally:
-            manager.shutdown()
-            print("Arm manager server shut down")
+    manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
+    server = manager.get_server()
+    print(f"Arm manager server started at {NUC_HOSTNAME}:{ARM_RPC_PORT}")
+    server.serve_forever()
     # import numpy as np
     # from constants import POLICY_CONTROL_PERIOD
     # manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)

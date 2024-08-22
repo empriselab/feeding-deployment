@@ -500,7 +500,10 @@ class KinovaArm:
         self.base.StopAction()
 
     def stop(self):
-        self.base.Stop()
+        if self.cyclic_running:
+            self.stop_cyclic()
+        else:
+            self.base.Stop()
 
     def apply_emergency_stop(self):
         self.base.ApplyEmergencyStop()
