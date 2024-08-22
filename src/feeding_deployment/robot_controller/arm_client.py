@@ -88,9 +88,9 @@ class Arm:
         )
         self.arm.move_angular_trajectory(trajectory_command)
 
-    def set_ee_pose(self, xyz, theta_xyz):
-        print(f"Received cartesian pose command: {xyz}, {theta_xyz}")
-        self.arm.move_cartesian(xyz, theta_xyz)
+    def set_ee_pose(self, xyz, xyz_quat):
+        print(f"Received cartesian pose command: {xyz}, {xyz_quat}")
+        self.arm.move_cartesian(xyz, xyz_quat)
 
     def set_gripper(self, gripper_pos):
         print(f"Received gripper pos command: {gripper_pos}")
