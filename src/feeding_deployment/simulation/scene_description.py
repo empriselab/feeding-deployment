@@ -163,9 +163,10 @@ class SceneDescription:
         (0.0, 0.0, -0.2),
         wiper_grasp_fingers_orientation,
     )
+    utensil_corner_waypoint_transform: Pose = Pose((0.1, -0.4, -0.3))
     # This is relative to the wheelchair head.
     utensil_staging_transform: Pose = Pose(
-        (-0.1, 0.5, 0.0), p.getQuaternionFromEuler((-np.pi / 2, np.pi, np.pi / 2))
+        (0.0, 0.75, 0.0), p.getQuaternionFromEuler((-np.pi / 2, np.pi, np.pi / 2))
     )
 
     @property
@@ -275,6 +276,14 @@ class SceneDescription:
         )
 
     @property
+    def utensil_corner_waypoint_pose(self) -> Pose:
+        """Pose for the finger tip for the corner waypoint for the utensil."""
+        return multiply_poses(
+            self.utensil_pose,
+            self.utensil_corner_waypoint_transform,
+        )
+
+    @property
     def utensil_staging_pose(self) -> Pose:
         """Pose for the finger tip before utensil transfer."""
         target_utensil_pose = multiply_poses(
@@ -292,6 +301,7 @@ class SceneDescription:
             "outer_camera_target": base_position,
             "outer_camera_yaw": 180,
             "outer_camera_distance": 2.5,
+            "outer_camera_pitch": -30,
             "inner_camera_target": head_position,
             "inner_camera_yaw": 0,
             "inner_camera_distance": 1.0,
