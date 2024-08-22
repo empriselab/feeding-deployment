@@ -8,7 +8,7 @@
 import queue
 import time
 from dataclasses import dataclass
-from multiprocessing.managers import BaseManager as MPBaseManager
+from multiprocess.managers import BaseManager as MPBaseManager
 
 import numpy as np
 from numpy.typing import NDArray
