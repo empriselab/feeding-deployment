@@ -180,8 +180,21 @@ if __name__ == "__main__":
         #     joint_states_pub.publish(joint_state_msg)
         #     time.sleep(0.01)
 
-        print("Resetting arm...")
+        input("Press Enter to retract the arm...")
         arm.retract()
+
+        input("Press Enter to move to home position...")
+        arm.reset()
+
+        input("Press Enter to switch to joint compliant mode...")
+        arm.switch_to_joint_compliant_mode()
+
+        input("Press Enter to move to joint compliant position...")
+        arm.compliant_set_joint_position([0.0, 0.26179939, 3.14159265, -2.26892803, 0.0, 0.95993109, 1.9])
+
+        input("Press Enter to switch out of joint compliant mode...")
+        arm.switch_out_of_joint_compliant_mode()
+
         # print("Current Arm State:", arm.get_state())
 
         # home_pos = [
@@ -293,5 +306,12 @@ if __name__ == "__main__":
         #     state = arm.get_state()
         #     state['arm_quat'][0] = 3
         #     time.sleep(POLICY_CONTROL_PERIOD)
+    except (EOFError, ConnectionRefusedError, BrokenPipeError) as e:
+        print(f"Server connection lost: {e}")
+    except KeyboardInterrupt:
+        print("Client interrupted, shutting down...")
     finally:
-        arm.close()
+        try:
+            arm.close()  # Ensure the arm is disconnected properly
+        except Exception as e:
+            print(f"Error during client shutdown: {e}")
