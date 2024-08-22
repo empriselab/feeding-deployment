@@ -34,6 +34,7 @@ class FeedingDeploymentPyBulletSimulator:
             home_joint_positions=scene_description.initial_joints,
         )
         assert isinstance(robot, SingleArmTwoFingerGripperPyBulletRobot)
+        robot.close_fingers()
         self.robot = robot
 
         # Create a holder (vention stand).
@@ -63,50 +64,17 @@ class FeedingDeploymentPyBulletSimulator:
         )
 
         # Create cup.
-        cup_collision_id = p.createCollisionShape(
-            p.GEOM_CYLINDER,
-            radius=scene_description.cup_radius,
-            height=scene_description.cup_length,
+        self.cup_id = p.loadURDF(
+            str(scene_description.cup_urdf_path),
+            useFixedBase=True,
             physicsClientId=self.physics_client_id,
         )
-        cup_visual_id = p.createVisualShape(
-            p.GEOM_CYLINDER,
-            radius=scene_description.cup_radius,
-            length=scene_description.cup_length,
-            rgbaColor=scene_description.cup_rgba,
+        p.resetBasePositionAndOrientation(
+            self.cup_id,
+            scene_description.cup_pose.position,
+            scene_description.cup_pose.orientation,
             physicsClientId=self.physics_client_id,
         )
-        cup_handle_collision_id = p.createCollisionShape(
-            p.GEOM_BOX,
-            halfExtents=scene_description.cup_handle_half_extents,
-            physicsClientId=self.physics_client_id,
-        )
-        cup_handle_visual_id = p.createVisualShape(
-            p.GEOM_BOX,
-            halfExtents=scene_description.cup_handle_half_extents,
-            rgbaColor=scene_description.cup_handle_rgba,
-            physicsClientId=self.physics_client_id,
-        )
-        self.cup_id = p.createMultiBody(
-            baseMass=-1,
-            baseCollisionShapeIndex=cup_collision_id,
-            baseVisualShapeIndex=cup_visual_id,
-            basePosition=scene_description.cup_pose.position,
-            baseOrientation=scene_description.cup_pose.orientation,
-            linkMasses=[-1],
-            linkCollisionShapeIndices=[cup_handle_collision_id],
-            linkVisualShapeIndices=[cup_handle_visual_id],
-            linkPositions=[scene_description.cup_handle_relative_pose.position],
-            linkOrientations=[scene_description.cup_handle_relative_pose.orientation],
-            linkInertialFramePositions=[(0.0, 0.0, 0.0)],
-            linkInertialFrameOrientations=[(0.0, 0.0, 0.0, 1.0)],
-            linkParentIndices=[0],
-            linkJointTypes=[p.JOINT_FIXED],
-            linkJointAxis=[(0.0, 0.0, 1.0)],
-            physicsClientId=self.physics_client_id,
-        )
-        self.cup_handle_link_id = 0
-
         # Create a table.
         self._table_id = create_pybullet_block(
             scene_description.table_rgba,

@@ -53,7 +53,10 @@ def get_plan_to_grasp_cup(
     # Move to pregrasp.
     sim_states.extend(
         _get_motion_plan_for_robot_finger_tip(
-            sim.scene_description.cup_pregrasp_pose, sim, seed, max_motion_plan_time
+            sim.scene_description.cup_pregrasp_pose,
+            sim,
+            seed,
+            max_motion_plan_time,
         )
     )
 
@@ -64,16 +67,12 @@ def get_plan_to_grasp_cup(
             sim,
             num_grasp_waypoints,
             max_motion_plan_time,
+            exclude_collision_ids={sim.cup_id},
         )
     )
 
     # Execute the grasp.
     sim_states.extend(_get_plan_to_execute_grasp(sim, "cup"))
-
-    # Move slightly so that the cup is no longer in collision with the table.
-    tf = Pose((0.0, -0.01, 0.0), (0.0, 0.0, 0.0, 1.0))
-    joints = end_effector_transform_to_joints(sim.robot, tf)
-    sim_states.extend(_plan_to_sim_state_trajectory([joints], sim))
 
     # Move to prestow.
     sim_states.extend(
@@ -82,6 +81,7 @@ def get_plan_to_grasp_cup(
             sim,
             num_prestow_waypoints,
             max_motion_plan_time,
+            exclude_collision_ids={sim._table_id},
         )
     )
     # Move to staging.
@@ -121,7 +121,7 @@ def get_plan_to_stow_cup(
         )
     )
 
-    # Move to slightly above the release point to avoid table collisions.
+    # Move to the release point.
     tf = Pose((0.0, -0.01, 0.0), (0.0, 0.0, 0.0, 1.0))
     slightly_above_release_pose = multiply_poses(
         sim.scene_description.cup_grasp_pose, tf
@@ -132,21 +132,12 @@ def get_plan_to_stow_cup(
             sim,
             num_grasp_waypoints,
             max_motion_plan_time,
+            exclude_collision_ids={sim._table_id},
         )
     )
 
-    # Move down directly to release.
-    tf = Pose((0.0, 0.01, 0.0), (0.0, 0.0, 0.0, 1.0))
-    joints = end_effector_transform_to_joints(sim.robot, tf)
-    sim_states.extend(_plan_to_sim_state_trajectory([joints], sim))
-
     # Close to grasp.
     sim_states.extend(_get_plan_to_execute_ungrasp(sim))
-
-    # Retract to avoid collision checking issues.
-    tf = Pose((0.0, 0.0, -0.025), (0.0, 0.0, 0.0, 1.0))
-    joints = end_effector_transform_to_joints(sim.robot, tf)
-    sim_states.extend(_plan_to_sim_state_trajectory([joints], sim))
 
     # Move to pregrasp.
     sim_states.extend(
@@ -155,6 +146,7 @@ def get_plan_to_stow_cup(
             sim,
             num_grasp_waypoints,
             max_motion_plan_time,
+            exclude_collision_ids={sim.cup_id},
         )
     )
 
@@ -229,6 +221,7 @@ def _get_motion_plan_for_robot_finger_tip(
     sim: FeedingDeploymentPyBulletSimulator,
     seed: int,
     max_motion_plan_time: float,
+    exclude_collision_ids: set[int] | None = None,
 ) -> list[FeedingDeploymentSimulatorState]:
 
     # Commands will be in end effector space, but grasp planning will be in
@@ -242,10 +235,14 @@ def _get_motion_plan_for_robot_finger_tip(
     )
 
     # Run motion planning.
+    collision_ids = sim.get_collision_ids()
+    if exclude_collision_ids is not None:
+        collision_ids -= exclude_collision_ids
+
     plan = run_smooth_motion_planning_to_pose(
         target_pose,
         robot,
-        sim.get_collision_ids(),
+        collision_ids,
         finger_from_end_effector,
         seed,
         max_time=max_motion_plan_time,
@@ -256,32 +253,12 @@ def _get_motion_plan_for_robot_finger_tip(
     return _plan_to_sim_state_trajectory(plan, sim)
 
 
-def _plan_to_sim_state_trajectory(
-    plan: list[JointPositions], sim: FeedingDeploymentPyBulletSimulator
-) -> list[FeedingDeploymentSimulatorState]:
-    # Read out the simulator states from the plan.
-    cup_pose: Pose | None = None
-    if sim.held_object_name != "cup":
-        cup_pose = get_pose(sim.cup_id, sim.physics_client_id)
-    sim_states: list[FeedingDeploymentSimulatorState] = []
-    for joints in plan:
-        sim_state = FeedingDeploymentSimulatorState(
-            joints,
-            cup_pose=cup_pose,
-            held_object=sim.held_object_name,
-            held_object_tf=sim.held_object_tf,
-        )
-        sim_states.append(sim_state)
-    # Sync simulator to end of plan.
-    sim.sync(sim_states[-1])
-    return sim_states
-
-
 def _get_interpolated_plan_for_robot_finger_tip(
     target_pose: Pose,
     sim: FeedingDeploymentPyBulletSimulator,
     num_interp_waypoints: int,
     max_motion_plan_time: float,
+    exclude_collision_ids: set[int] | None = None,
 ) -> list[FeedingDeploymentSimulatorState]:
 
     # Commands will be in end effector space, but grasp planning will be in
@@ -307,17 +284,42 @@ def _get_interpolated_plan_for_robot_finger_tip(
 
     _joint_distance_fn = _create_joint_distance_fn(robot)
 
+    collision_ids = sim.get_collision_ids()
+    if exclude_collision_ids is not None:
+        collision_ids -= exclude_collision_ids
+
     plan = smoothly_follow_end_effector_path(
         robot,
         interpolated_poses,
         robot.get_joint_positions(),
-        sim.get_collision_ids(),
+        collision_ids,
         _joint_distance_fn,
         max_time=max_motion_plan_time,
         held_object=sim.held_object_id,
         base_link_to_held_obj=sim.held_object_tf,
     )
     return _plan_to_sim_state_trajectory(plan, sim)
+
+
+def _plan_to_sim_state_trajectory(
+    plan: list[JointPositions], sim: FeedingDeploymentPyBulletSimulator
+) -> list[FeedingDeploymentSimulatorState]:
+    # Read out the simulator states from the plan.
+    cup_pose: Pose | None = None
+    if sim.held_object_name != "cup":
+        cup_pose = get_pose(sim.cup_id, sim.physics_client_id)
+    sim_states: list[FeedingDeploymentSimulatorState] = []
+    for joints in plan:
+        sim_state = FeedingDeploymentSimulatorState(
+            joints,
+            cup_pose=cup_pose,
+            held_object=sim.held_object_name,
+            held_object_tf=sim.held_object_tf,
+        )
+        sim_states.append(sim_state)
+    # Sync simulator to end of plan.
+    sim.sync(sim_states[-1])
+    return sim_states
 
 
 def _get_plan_to_execute_grasp(

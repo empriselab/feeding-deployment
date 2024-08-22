@@ -66,43 +66,37 @@ class SceneDescription:
     table_half_extents: tuple[float, float, float] = (0.75, 0.25, 0.5)
 
     # Cup.
-    cup_rgba: tuple[float, float, float, float] = (0.0, 0.0, 1.0, 1.0)
-    cup_radius: float = 0.03
-    cup_length: float = 0.15
-    cup_pose: Pose = Pose((0.0, 0.75, cup_length / 2 + 0.21))
-    cup_handle_half_extents: tuple[float, float, float] = (
-        cup_radius,
-        cup_radius,
-        cup_radius,
+    cup_pose: Pose = Pose(
+        (0.0, 0.75, 0.35), p.getQuaternionFromEuler((np.pi / 2, 0.0, np.pi))
     )
-    cup_handle_rgba: tuple[float, float, float, float] = (0.7, 0.2, 0.5, 1.0)
-    cup_handle_relative_pose: Pose = Pose(
-        (
-            0.0,
-            -cup_radius - cup_handle_half_extents[1] / 2,
-            cup_length / 4,
-        )
+    cup_urdf_path: Path = (
+        Path(__file__).parent.parent
+        / "assets"
+        / "urdf"
+        / "drinking_utensil"
+        / "drinking_utensil.urdf"
     )
+
     cup_grasp_fingers_orientation: Quaternion = p.getQuaternionFromEuler(
-        (np.pi / 2, np.pi, np.pi)
+        (np.pi, np.pi, 0)
     )
     cup_pregrasp_transform: Pose = Pose(
-        (0.0, -0.075, 0.0),
+        (0.0, 0.0, -0.1),
         cup_grasp_fingers_orientation,
     )
     cup_grasp_transform: Pose = Pose(
-        (0.0, -0.025, 0.0),
+        (0.0, 0.0, -0.025),
         cup_grasp_fingers_orientation,
     )
     cup_prestow_transform: Pose = Pose(
-        (0.0, -0.025, 0.1),
+        (0.0, 0.0, -0.025),
         cup_grasp_fingers_orientation,
     )
 
     # Staging pose (where the drinking motion planning should finish).
     # This is relative to the wheelchair head.
     staging_relative_pose: Pose = Pose(
-        (-0.1, 0.5, 0.0), p.getQuaternionFromEuler((0.0, 0.0, np.pi / 2))
+        (-0.1, 0.5, 0.0), p.getQuaternionFromEuler((-np.pi / 2, np.pi, np.pi / 2))
     )
 
     @property
