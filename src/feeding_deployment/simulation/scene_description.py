@@ -108,9 +108,7 @@ class SceneDescription:
         / "wiping_utensil"
         / "wiping_utensil.urdf"
     )
-    wiper_grasp_fingers_orientation: Quaternion = p.getQuaternionFromEuler(
-        (0, 0, 0)
-    )
+    wiper_grasp_fingers_orientation: Quaternion = p.getQuaternionFromEuler((0, 0, 0))
     wiper_pregrasp_transform: Pose = Pose(
         (0.0, 0.0, -0.1),
         wiper_grasp_fingers_orientation,
@@ -127,8 +125,6 @@ class SceneDescription:
     wiper_staging_transform: Pose = Pose(
         (-0.1, 0.5, 0.0), p.getQuaternionFromEuler((-np.pi / 2, np.pi, np.pi / 2))
     )
-    
-    
 
     # Utensil.
     utensil_pose: Pose = Pose(
@@ -140,6 +136,23 @@ class SceneDescription:
         / "urdf"
         / "feeding_utensil"
         / "feeding_utensil.urdf"
+    )
+    utensil_grasp_fingers_orientation: Quaternion = p.getQuaternionFromEuler((0, 0, 0))
+    utensil_pregrasp_transform: Pose = Pose(
+        (0.0, 0.0, -0.1),
+        utensil_grasp_fingers_orientation,
+    )
+    utensil_grasp_transform: Pose = Pose(
+        (0.0, 0.0, -0.025),
+        wiper_grasp_fingers_orientation,
+    )
+    utensil_prestow_transform: Pose = Pose(
+        (0.0, 0.0, -0.2),
+        wiper_grasp_fingers_orientation,
+    )
+    # This is relative to the wheelchair head.
+    utensil_staging_transform: Pose = Pose(
+        (-0.1, 0.5, 0.0), p.getQuaternionFromEuler((-np.pi / 2, np.pi, np.pi / 2))
     )
 
     @property
@@ -183,7 +196,7 @@ class SceneDescription:
         )
         fingers_to_cup = self.cup_grasp_transform
         return multiply_poses(target_cup_pose, fingers_to_cup)
-    
+
     @property
     def wiper_pregrasp_pose(self) -> Pose:
         """Pose for the finger tip to pregrasp the wiper."""
@@ -201,7 +214,7 @@ class SceneDescription:
             self.wiper_pose,
             self.wiper_prestow_transform,
         )
-    
+
     @property
     def wiper_staging_pose(self) -> Pose:
         """Pose for the finger tip before wiper transfer."""
@@ -210,7 +223,33 @@ class SceneDescription:
         )
         fingers_to_wiper = self.wiper_grasp_transform
         return multiply_poses(target_wiper_pose, fingers_to_wiper)
-    
+
+    @property
+    def utensil_pregrasp_pose(self) -> Pose:
+        """Pose for the finger tip to pregrasp the utensil."""
+        return multiply_poses(self.utensil_pose, self.utensil_pregrasp_transform)
+
+    @property
+    def utensil_grasp_pose(self) -> Pose:
+        """Pose for the finger tip to grasp the utensil."""
+        return multiply_poses(self.utensil_pose, self.utensil_grasp_transform)
+
+    @property
+    def utensil_prestow_pose(self) -> Pose:
+        """Pose for the finger tip to prestow the utensil."""
+        return multiply_poses(
+            self.utensil_pose,
+            self.utensil_prestow_transform,
+        )
+
+    @property
+    def utensil_staging_pose(self) -> Pose:
+        """Pose for the finger tip before utensil transfer."""
+        target_utensil_pose = multiply_poses(
+            self.wheelchair_head_pose, self.utensil_staging_transform
+        )
+        fingers_to_utensil = self.utensil_grasp_transform
+        return multiply_poses(target_utensil_pose, fingers_to_utensil)
 
     @property
     def camera_kwargs(self) -> dict[str, Any]:

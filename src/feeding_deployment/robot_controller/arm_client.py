@@ -9,9 +9,8 @@ import queue
 import time
 from dataclasses import dataclass
 
-from multiprocess.managers import BaseManager as MPBaseManager
-
 import numpy as np
+from multiprocess.managers import BaseManager as MPBaseManager
 from numpy.typing import NDArray
 
 # from arm_controller import JointCompliantController
@@ -191,17 +190,41 @@ if __name__ == "__main__":
         #     joint_state_msg.effort = [0.0] * 8
         #     joint_states_pub.publish(joint_state_msg)
         #     time.sleep(0.01)
-        
-        above_plate_pos = [4.119619921793763, 5.927367810785151, 4.797271913808785, 4.641709217686205, 4.980350922946283, 5.268199221999715, 4.814377930122582]
+
+        above_plate_pos = [
+            4.119619921793763,
+            5.927367810785151,
+            4.797271913808785,
+            4.641709217686205,
+            4.980350922946283,
+            5.268199221999715,
+            4.814377930122582,
+        ]
         input("Press Enter to move to above plate position...")
         arm.set_joint_position(above_plate_pos)
 
-        retract_pos = [3.935171204564965e-05, -0.34908768831980463, -3.1415034376932756, -2.548253944841698, -2.1837920938239108e-05, -0.8726928555047193, 1.570765833600415]
+        retract_pos = [
+            3.935171204564965e-05,
+            -0.34908768831980463,
+            -3.1415034376932756,
+            -2.548253944841698,
+            -2.1837920938239108e-05,
+            -0.8726928555047193,
+            1.570765833600415,
+        ]
         input("Press Enter to retract the arm...")
         arm.set_joint_position(retract_pos)
         # arm.retract()
 
-        home_pose = [0.0, 0.26179939, 3.14159265, -2.26892803, 0.0, 0.95993109, 1.57079633]
+        home_pose = [
+            0.0,
+            0.26179939,
+            3.14159265,
+            -2.26892803,
+            0.0,
+            0.95993109,
+            1.57079633,
+        ]
         input("Press Enter to move to home position...")
         arm.set_joint_position(home_pose)
         # arm.reset()

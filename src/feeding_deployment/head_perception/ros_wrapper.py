@@ -210,14 +210,18 @@ class HeadPerceptionROSWrapper:
         transform = None
         while transform is None:
             if use_top_camera:
-                camera_color_data, camera_info_data, camera_depth_data, _ = self.get_top_camera_data()
+                camera_color_data, camera_info_data, camera_depth_data, _ = (
+                    self.get_top_camera_data()
+                )
                 if camera_info_data is None:
                     continue
                 transform = self.get_base_to_camera_transform(
                     camera_info_data, use_top_camera=True
                 )
             else:
-                camera_color_data, camera_info_data, camera_depth_data, _ = self.get_bottom_camera_data()
+                camera_color_data, camera_info_data, camera_depth_data, _ = (
+                    self.get_bottom_camera_data()
+                )
                 if camera_info_data is None:
                     continue
                 transform = self.get_base_to_camera_transform(

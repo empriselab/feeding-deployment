@@ -8,9 +8,11 @@ from typing import Any
 # Rajat ToDo: Remove this hacky addition
 FLAIR_PATH = "/home/isacc/deployment_ws/src/FLAIR/bite_acquisition/scripts"
 import sys
+
 sys.path.append(FLAIR_PATH)
 try:
     from skill_library import SkillLibrary
+
     FLAIR_IMPORTED = True
 except ModuleNotFoundError:
     FLAIR_IMPORTED = False
@@ -34,10 +36,12 @@ from feeding_deployment.robot_controller.arm_client import Arm, KinovaCommand
 from feeding_deployment.simulation.planning import (
     get_bite_transfer_plan,
     get_plan_to_grasp_cup,
+    get_plan_to_grasp_utensil,
     get_plan_to_grasp_wiper,
     get_plan_to_stow_cup,
-    remap_trajectory_to_constant_distance,
+    get_plan_to_stow_utensil,
     get_plan_to_stow_wiper,
+    remap_trajectory_to_constant_distance,
 )
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
@@ -200,15 +204,16 @@ class PickToolHLA(PlanExecuteHighLevelAction):
                 self._sim,
                 max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
             )
-        # TODO
+        elif tool.name == "utensil":
+            nominal_plan = get_plan_to_grasp_utensil(
+                self._sim,
+                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+            )
         else:
             print(f"PickTool not yet implemented for {tool}")
             return []
-        remapped_plan = remap_trajectory_to_constant_distance(
-            nominal_plan, self._sim
-        )
+        remapped_plan = remap_trajectory_to_constant_distance(nominal_plan, self._sim)
         return remapped_plan
-
 
 
 class StowToolHLA(PlanExecuteHighLevelAction):
@@ -245,13 +250,17 @@ class StowToolHLA(PlanExecuteHighLevelAction):
                 self._sim,
                 max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
             )
+        elif tool.name == "utensil":
+            nominal_plan = get_plan_to_stow_utensil(
+                self._sim,
+                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+            )
         else:
             print(f"StowTool not yet implemented for {tool}")
             return []
-        remapped_plan = remap_trajectory_to_constant_distance(
-            nominal_plan, self._sim
-        )
+        remapped_plan = remap_trajectory_to_constant_distance(nominal_plan, self._sim)
         return remapped_plan
+
 
 class TransferToolHLA(PlanExecuteHighLevelAction):
     """Wipe, or transfer drink, or transfer bite."""
@@ -329,8 +338,12 @@ class PrepareToolHLA(HighLevelAction):
             # Do Bite Acquisition
             print("Doing Bite Acquisition")
             self.acquisition_skill_library.reset()
-            camera_color_data, camera_info_data, camera_depth_data, _ = self._perception_interface.get_camera_data()
-            self.acquisition_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data)
+            camera_color_data, camera_info_data, camera_depth_data, _ = (
+                self._perception_interface.get_camera_data()
+            )
+            self.acquisition_skill_library.skewering_skill(
+                camera_color_data, camera_depth_data, camera_info_data
+            )
 
             # skill_library.scooping_skill(camera_color_data, camera_depth_data, camera_info_data)
 
@@ -341,7 +354,7 @@ class PrepareToolHLA(HighLevelAction):
             # skill_library.twirling_skill(camera_color_data, camera_depth_data, camera_info_data)
 
             # skill_library.cutting_skill(camera_color_data, camera_depth_data, camera_info_data)
-            
+
         else:
             # Other tools are always prepared
             pass

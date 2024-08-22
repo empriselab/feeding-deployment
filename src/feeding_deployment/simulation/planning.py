@@ -161,7 +161,7 @@ def get_plan_to_grasp_wiper(
     num_prestow_waypoints: int = 3,
     num_staging_interp: int = 25,
 ) -> list[FeedingDeploymentSimulatorState]:
-    """Make a plan to grasp the cup from the current simulator state."""
+    """Make a plan to grasp the wiper from the current simulator state."""
 
     assert sim.held_object_name is None
 
@@ -223,7 +223,7 @@ def get_plan_to_stow_wiper(
     num_grasp_waypoints: int = 5,
     num_prestow_waypoints: int = 25,
 ) -> list[FeedingDeploymentSimulatorState]:
-    """Make a plan to stow the cup from the current simulator state."""
+    """Make a plan to stow the wiper from the current simulator state."""
 
     # Quiet IKfast warnings.
     logging.disable(logging.ERROR)
@@ -265,6 +265,133 @@ def get_plan_to_stow_wiper(
     )
 
     return sim_states
+
+
+###############################################################################
+#                            Assisted Feeding                                 #
+###############################################################################
+
+
+def get_plan_to_grasp_utensil(
+    sim: FeedingDeploymentPyBulletSimulator,
+    seed: int = 0,
+    max_motion_plan_time: float = 10.0,
+    num_grasp_waypoints: int = 5,
+    num_prestow_waypoints: int = 3,
+    num_staging_interp: int = 25,
+) -> list[FeedingDeploymentSimulatorState]:
+    """Make a plan to grasp the utensil from the current simulator state."""
+
+    assert sim.held_object_name is None
+
+    # Quiet IKfast warnings.
+    logging.disable(logging.ERROR)
+
+    sim_states: list[FeedingDeploymentSimulatorState] = []
+
+    # TODO remove
+    # import pybullet as p
+    # from pybullet_helpers.gui import visualize_pose
+    # visualize_pose(sim.scene_description.utensil_pregrasp_pose, sim.physics_client_id)
+    # while True:
+    #     p.stepSimulation(sim.physics_client_id)
+
+    # Move to pregrasp.
+    sim_states.extend(
+        _get_motion_plan_for_robot_finger_tip(
+            sim.scene_description.utensil_pregrasp_pose,
+            sim,
+            seed,
+            max_motion_plan_time,
+        )
+    )
+
+    # Move to grasp.
+    sim_states.extend(
+        _get_interpolated_plan_for_robot_finger_tip(
+            sim.scene_description.utensil_grasp_pose,
+            sim,
+            num_grasp_waypoints,
+            max_motion_plan_time,
+            exclude_collision_ids={sim.utensil_id},
+        )
+    )
+
+    # Execute the grasp.
+    sim_states.extend(_get_plan_to_execute_grasp(sim, "utensil"))
+
+    # Move to prestow.
+    sim_states.extend(
+        _get_interpolated_plan_for_robot_finger_tip(
+            sim.scene_description.utensil_prestow_pose,
+            sim,
+            num_prestow_waypoints,
+            max_motion_plan_time,
+        )
+    )
+
+    # Move to staging.
+    sim_states.extend(
+        _get_interpolated_plan_for_robot_finger_tip(
+            sim.scene_description.utensil_staging_pose,
+            sim,
+            num_staging_interp,
+            max_motion_plan_time,
+        )
+    )
+
+    return sim_states
+
+
+def get_plan_to_stow_utensil(
+    sim: FeedingDeploymentPyBulletSimulator,
+    max_motion_plan_time: float = 10.0,
+    num_grasp_waypoints: int = 5,
+    num_prestow_waypoints: int = 25,
+) -> list[FeedingDeploymentSimulatorState]:
+    """Make a plan to stow the utensil from the current simulator state."""
+
+    # Quiet IKfast warnings.
+    logging.disable(logging.ERROR)
+
+    sim_states: list[FeedingDeploymentSimulatorState] = []
+
+    # Move to prestow.
+    sim_states.extend(
+        _get_interpolated_plan_for_robot_finger_tip(
+            sim.scene_description.utensil_prestow_pose,
+            sim,
+            num_prestow_waypoints,
+            max_motion_plan_time,
+        )
+    )
+
+    # Move to the release point.
+    sim_states.extend(
+        _get_interpolated_plan_for_robot_finger_tip(
+            sim.scene_description.utensil_grasp_pose,
+            sim,
+            num_grasp_waypoints,
+            max_motion_plan_time,
+        )
+    )
+
+    # Close to grasp.
+    sim_states.extend(_get_plan_to_execute_ungrasp(sim))
+
+    # Move to pregrasp.
+    sim_states.extend(
+        _get_interpolated_plan_for_robot_finger_tip(
+            sim.scene_description.utensil_pregrasp_pose,
+            sim,
+            num_grasp_waypoints,
+            max_motion_plan_time,
+            exclude_collision_ids={sim.utensil_id},
+        )
+    )
+
+    return sim_states
+
 
 ###############################################################################
 #                             Bite Transfer                                   #

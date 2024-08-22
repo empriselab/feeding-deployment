@@ -8,9 +8,9 @@
 import queue
 import time
 from dataclasses import dataclass
-from multiprocess.managers import BaseManager as MPBaseManager
 
 import numpy as np
+from multiprocess.managers import BaseManager as MPBaseManager
 from numpy.typing import NDArray
 
 # from arm_controller import JointCompliantController
