@@ -84,9 +84,9 @@ def _main(
     # TODO update this once the user interface is ready.
     TransferTool = hla_name_to_hla["TransferTool"]
     user_command_queue = [
+        GroundHighLevelAction(TransferTool, (cup,)),
         GroundHighLevelAction(TransferTool, (utensil,), {"mask": "TODO"}),
         GroundHighLevelAction(TransferTool, (wiper,)),
-        GroundHighLevelAction(TransferTool, (cup,)),
     ]
 
     full_simulated_traj: list[FeedingDeploymentSimulatorState] = []
@@ -127,6 +127,8 @@ def _main(
                 sim.sync(sim_traj[-1])
             current_atoms -= operator.delete_effects
             current_atoms |= operator.add_effects
+
+        input("User command accomplished, press enter to continue")
 
     if make_videos:
         outfile = Path(__file__).parent / "full.mp4"

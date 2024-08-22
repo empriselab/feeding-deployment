@@ -101,6 +101,10 @@ class SceneDescription:
     cup_staging_transform: Pose = Pose(
         (-0.1, 0.5, 0.0), p.getQuaternionFromEuler((-np.pi / 2, np.pi, np.pi / 2))
     )
+    cup_transfer_transform: Pose = Pose(
+        (-0.1, 0.35, 0.0),
+        p.getQuaternionFromEuler((-np.pi / 2, np.pi - np.pi / 8, np.pi / 2)),
+    )
 
     # Wiper.
     wiper_pose: Pose = Pose(
@@ -198,6 +202,16 @@ class SceneDescription:
         """Pose for the finger tip before cup transfer."""
         target_cup_pose = multiply_poses(
             self.wheelchair_head_pose, self.cup_staging_transform
+        )
+        fingers_to_cup = self.cup_grasp_transform
+        return multiply_poses(target_cup_pose, fingers_to_cup)
+
+    @property
+    def cup_transfer_pose(self) -> Pose:
+        """Pose for the finger tip for cup transfer."""
+        target_cup_pose = multiply_poses(
+            self.wheelchair_head_pose,
+            self.cup_transfer_transform,
         )
         fingers_to_cup = self.cup_grasp_transform
         return multiply_poses(target_cup_pose, fingers_to_cup)

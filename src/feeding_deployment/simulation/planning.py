@@ -148,6 +148,34 @@ def get_plan_to_stow_cup(
     return sim_states
 
 
+def get_plan_to_transfer_cup(
+    sim: FeedingDeploymentPyBulletSimulator,
+    max_motion_plan_time: float = 10.0,
+    num_grasp_waypoints: int = 5,
+) -> list[FeedingDeploymentSimulatorState]:
+    """Make a plan to transfer the cup, assuming it's near staging."""
+
+    assert sim.held_object_name == "cup"
+
+    # Quiet IKfast warnings.
+    logging.disable(logging.ERROR)
+
+    sim_states: list[FeedingDeploymentSimulatorState] = []
+
+    # Move to transfer.
+    sim_states.extend(
+        _get_interpolated_plan_for_robot_finger_tip(
+            sim.scene_description.cup_transfer_pose,
+            sim,
+            num_grasp_waypoints,
+            max_motion_plan_time,
+            exclude_collision_ids={sim.cup_id},
+        )
+    )
+
+    return sim_states
+
+
 ###############################################################################
 #                             Assisted Wiping                                 #
 ###############################################################################
@@ -591,6 +619,7 @@ def _get_plan_to_execute_grasp(
     world_from_end_effector = get_link_pose(
         robot.robot_id, robot.end_effector_id, physics_client_id
     )
+    assert sim.held_object_id is not None
     world_from_held_object = get_pose(sim.held_object_id, physics_client_id)
     base_link_to_held_obj = multiply_poses(
         world_from_end_effector.invert(), world_from_held_object

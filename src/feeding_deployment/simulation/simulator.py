@@ -176,6 +176,7 @@ class FeedingDeploymentPyBulletSimulator:
                     state.robot_joints,
                 )
             else:
+                assert state_pose is not None
                 p.resetBasePositionAndOrientation(
                     obj_id,
                     state_pose.position,

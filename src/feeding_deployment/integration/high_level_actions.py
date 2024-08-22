@@ -41,6 +41,7 @@ from feeding_deployment.simulation.planning import (
     get_plan_to_stow_cup,
     get_plan_to_stow_utensil,
     get_plan_to_stow_wiper,
+    get_plan_to_transfer_cup,
     remap_trajectory_to_constant_distance,
 )
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
@@ -277,6 +278,11 @@ class TransferToolHLA(PlanExecuteHighLevelAction):
         # TODO
         assert len(objects) == 1
         tool = objects[0]
+        if tool.name == "cup":
+            nominal_plan = get_plan_to_transfer_cup(
+                self._sim,
+                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+            )
         # if tool.name == "utensil":
         #     forque_target_pose = (
         #         self._perception_interface.get_head_perception_forque_target_pose()
@@ -290,8 +296,11 @@ class TransferToolHLA(PlanExecuteHighLevelAction):
         #         nominal_plan, self._sim
         #     )
         #     return remapped_plan
-        print(f"TransferTool not yet implemented for {tool}")
-        return []
+        else:
+            print(f"TransferTool not yet implemented for {tool}")
+            return []
+        remapped_plan = remap_trajectory_to_constant_distance(nominal_plan, self._sim)
+        return remapped_plan
 
 
 class PrepareToolHLA(HighLevelAction):
