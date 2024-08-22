@@ -81,7 +81,7 @@ def get_plan_to_grasp_cup(
             sim,
             num_prestow_waypoints,
             max_motion_plan_time,
-            exclude_collision_ids={sim._table_id},
+            exclude_collision_ids={sim.table_id},
         )
     )
     # Move to staging.
@@ -122,17 +122,13 @@ def get_plan_to_stow_cup(
     )
 
     # Move to the release point.
-    tf = Pose((0.0, -0.01, 0.0), (0.0, 0.0, 0.0, 1.0))
-    slightly_above_release_pose = multiply_poses(
-        sim.scene_description.cup_grasp_pose, tf
-    )
     sim_states.extend(
         _get_interpolated_plan_for_robot_finger_tip(
-            slightly_above_release_pose,
+            sim.scene_description.cup_grasp_pose,
             sim,
             num_grasp_waypoints,
             max_motion_plan_time,
-            exclude_collision_ids={sim._table_id},
+            exclude_collision_ids={sim.table_id},
         )
     )
 
@@ -308,11 +304,20 @@ def _plan_to_sim_state_trajectory(
     cup_pose: Pose | None = None
     if sim.held_object_name != "cup":
         cup_pose = get_pose(sim.cup_id, sim.physics_client_id)
+    wiper_pose: Pose | None = None
+    if sim.held_object_name != "wiper":
+        wiper_pose = get_pose(sim.wiper_id, sim.physics_client_id)
+    utensil_pose: Pose | None = None
+    if sim.held_object_name != "utensil":
+        utensil_pose = get_pose(sim.utensil_id, sim.physics_client_id)
+
     sim_states: list[FeedingDeploymentSimulatorState] = []
     for joints in plan:
         sim_state = FeedingDeploymentSimulatorState(
             joints,
             cup_pose=cup_pose,
+            wiper_pose=wiper_pose,
+            utensil_pose=utensil_pose,
             held_object=sim.held_object_name,
             held_object_tf=sim.held_object_tf,
         )
@@ -330,19 +335,23 @@ def _get_plan_to_execute_grasp(
     robot = sim.robot
     physics_client_id = sim.physics_client_id
     robot.open_fingers()
+    sim.held_object_name = object_name
+    if object_name == "cup":
+        sim.held_object_id = sim.cup_id
+    elif object_name == "wiper":
+        sim.held_object_id = sim.wiper_id
+    elif object_name == "utensil":
+        sim.held_object_id = sim.utensil_id
+    else:
+        raise NotImplementedError("TODO")
     world_from_end_effector = get_link_pose(
         robot.robot_id, robot.end_effector_id, physics_client_id
     )
-    world_from_held_object = get_pose(sim.cup_id, physics_client_id)
+    world_from_held_object = get_pose(sim.held_object_id, physics_client_id)
     base_link_to_held_obj = multiply_poses(
         world_from_end_effector.invert(), world_from_held_object
     )
-    sim.held_object_name = object_name
     sim.held_object_tf = base_link_to_held_obj
-    if object_name == "cup":
-        sim.held_object_id = sim.cup_id
-    else:
-        raise NotImplementedError("TODO")
     return _plan_to_sim_state_trajectory([robot.get_joint_positions()], sim)
 
 
@@ -402,12 +411,13 @@ def remap_trajectory_to_constant_distance(
         robot_joints = interpolate_joints(
             joint_infos, s0.robot_joints, s1.robot_joints, t
         )
-        # Interpolate the cup poses. # TODO need to refactor interpolate_poses
-        cup_pose = s0.cup_pose
-        # Snap the other quantities to s0.
+        # Interpolate the movable object poses.
+        # TODO need to refactor interpolate_poses.
         return FeedingDeploymentSimulatorState(
             robot_joints,
-            cup_pose,
+            cup_pose=s0.cup_pose,
+            wiper_pose=s0.wiper_pose,
+            utensil_pose=s0.utensil_pose,
             held_object=s0.held_object,
             held_object_tf=s0.held_object_tf,
         )

@@ -75,16 +75,43 @@ class FeedingDeploymentPyBulletSimulator:
             scene_description.cup_pose.orientation,
             physicsClientId=self.physics_client_id,
         )
-        # Create a table.
-        self._table_id = create_pybullet_block(
+
+        # Create table.
+        self.table_id = create_pybullet_block(
             scene_description.table_rgba,
             half_extents=scene_description.table_half_extents,
             physics_client_id=self.physics_client_id,
         )
         p.resetBasePositionAndOrientation(
-            self._table_id,
+            self.table_id,
             scene_description.table_pose.position,
             scene_description.table_pose.orientation,
+            physicsClientId=self.physics_client_id,
+        )
+
+        # Create wiper.
+        self.wiper_id = p.loadURDF(
+            str(scene_description.wiper_urdf_path),
+            useFixedBase=True,
+            physicsClientId=self.physics_client_id,
+        )
+        p.resetBasePositionAndOrientation(
+            self.wiper_id,
+            scene_description.wiper_pose.position,
+            scene_description.wiper_pose.orientation,
+            physicsClientId=self.physics_client_id,
+        )
+
+        # Create feeding utensil.
+        self.utensil_id = p.loadURDF(
+            str(scene_description.utensil_urdf_path),
+            useFixedBase=True,
+            physicsClientId=self.physics_client_id,
+        )
+        p.resetBasePositionAndOrientation(
+            self.utensil_id,
+            scene_description.utensil_pose.position,
+            scene_description.utensil_pose.orientation,
             physicsClientId=self.physics_client_id,
         )
 
@@ -96,37 +123,48 @@ class FeedingDeploymentPyBulletSimulator:
     def get_collision_ids(self) -> set[int]:
         """Return all collision IDs."""
         collision_ids = {
-            self._table_id,
+            self.table_id,
             self.robot_holder_id,
             self._wheelchair_id,
             self.cup_id,
+            self.wiper_id,
+            self.utensil_id,
         }
         if self.held_object_name == "cup":
             collision_ids.remove(self.cup_id)
+        if self.held_object_name == "wiper":
+            collision_ids.remove(self.wiper_id)
+        if self.held_object_name == "utensil":
+            collision_ids.remove(self.utensil_id)
         return collision_ids
 
     def sync(self, state: FeedingDeploymentSimulatorState) -> None:
         """Sync the simulator to a given state."""
         self.robot.set_joints(state.robot_joints)
-        if state.cup_pose is not None:
-            p.resetBasePositionAndOrientation(
-                self.cup_id,
-                state.cup_pose.position,
-                state.cup_pose.orientation,
-                physicsClientId=self.physics_client_id,
-            )
+
+        some_object_held = False
+        for obj_id, name, state_pose in [(self.cup_id, "cup", state.cup_pose), (self.wiper_id, "wiper", state.wiper_pose), (self.utensil_id, "utensil", state.utensil_pose)]:
+            if state.held_object == name:
+                assert not some_object_held
+                some_object_held = True
+                self.held_object_name = name
+                self.held_object_id = obj_id
+                self.held_object_tf = state.held_object_tf
+                set_robot_joints_with_held_object(
+                    self.robot,
+                    self.physics_client_id,
+                    obj_id,
+                    state.held_object_tf,
+                    state.robot_joints,
+                )
+            else:
+                p.resetBasePositionAndOrientation(
+                    obj_id,
+                    state_pose.position,
+                    state_pose.orientation,
+                    physicsClientId=self.physics_client_id,
+                )
+        if not some_object_held:
             self.held_object_name = None
             self.held_object_id = None
             self.held_object_tf = None
-        else:
-            assert state.held_object == "cup"
-            self.held_object_name = state.held_object
-            self.held_object_id = self.cup_id
-            self.held_object_tf = state.held_object_tf
-            set_robot_joints_with_held_object(
-                self.robot,
-                self.physics_client_id,
-                self.cup_id,
-                state.held_object_tf,
-                state.robot_joints,
-            )

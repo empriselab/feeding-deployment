@@ -45,7 +45,7 @@ class SceneDescription:
     )
 
     # Robot holder (vention stand).
-    robot_holder_pose: Pose = Pose((0.0, 0.0, -0.5 - 0.05))
+    robot_holder_pose: Pose = Pose((0.0, 0.0, -0.55))
     robot_holder_rgba: tuple[float, float, float, float] = (0.5, 0.5, 0.5, 1.0)
     robot_holder_half_extents: tuple[float, float, float] = (0.25, 0.25, 0.5)
 
@@ -92,11 +92,33 @@ class SceneDescription:
         (0.0, 0.0, -0.025),
         cup_grasp_fingers_orientation,
     )
-
-    # Staging pose (where the drinking motion planning should finish).
     # This is relative to the wheelchair head.
-    staging_relative_pose: Pose = Pose(
+    cup_staging_transform: Pose = Pose(
         (-0.1, 0.5, 0.0), p.getQuaternionFromEuler((-np.pi / 2, np.pi, np.pi / 2))
+    )
+
+    # Wiper.
+    wiper_pose: Pose = Pose(
+        (0.35, 0.15, -0.05), p.getQuaternionFromEuler((0.0, np.pi, np.pi))
+    )
+    wiper_urdf_path: Path = (
+        Path(__file__).parent.parent
+        / "assets"
+        / "urdf"
+        / "wiping_utensil"
+        / "wiping_utensil.urdf"
+    )
+
+    # Utensil.
+    utensil_pose: Pose = Pose(
+        (0.35, -0.15, -0.05), p.getQuaternionFromEuler((0.0, np.pi, np.pi))
+    )
+    utensil_urdf_path: Path = (
+        Path(__file__).parent.parent
+        / "assets"
+        / "urdf"
+        / "feeding_utensil"
+        / "feeding_utensil.urdf"
     )
 
     @property
@@ -136,7 +158,7 @@ class SceneDescription:
     def cup_staging_pose(self) -> Pose:
         """Pose for the finger tip before cup transfer."""
         target_cup_pose = multiply_poses(
-            self.wheelchair_head_pose, self.staging_relative_pose
+            self.wheelchair_head_pose, self.cup_staging_transform
         )
         fingers_to_cup = self.cup_grasp_transform
         return multiply_poses(target_cup_pose, fingers_to_cup)
@@ -166,6 +188,8 @@ class SceneDescription:
             "wheelchair_pose",
             "table_pose",
             "cup_pose",
+            "wiper_pose",
+            "utensil_pose",
         }
         pose_dict: dict[str, Any] = {
             k: rotate_about_point(point, rotation, getattr(self, k))
