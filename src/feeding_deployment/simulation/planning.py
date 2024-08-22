@@ -70,7 +70,7 @@ def get_plan_to_grasp_cup(
     # Execute the grasp.
     sim_states.extend(_get_plan_to_execute_grasp(sim, "cup"))
 
-    # Move slightly off the table so that the cup is no longer in collision with the table.
+    # Move slightly so that the cup is no longer in collision with the table.
     tf = Pose((0.0, -0.01, 0.0), (0.0, 0.0, 0.0, 1.0))
     joints = end_effector_transform_to_joints(sim.robot, tf)
     sim_states.extend(_plan_to_sim_state_trajectory([joints], sim))
@@ -102,59 +102,63 @@ def get_plan_to_stow_cup(
     seed: int = 0,
     max_motion_plan_time: float = 10.0,
     num_grasp_waypoints: int = 5,
-    num_drink_transfer_end_effector_interp: int = 25,
+    num_prestow_waypoints: int = 25,
 ) -> list[FeedingDeploymentSimulatorState]:
     """Make a plan to stow the cup from the current simulator state."""
-
-    import ipdb
-
-    ipdb.set_trace()
-
-    assert sim.held_object_name == "cup"
-    base_link_to_held_obj = sim.held_object_tf
 
     # Quiet IKfast warnings.
     logging.disable(logging.ERROR)
 
-    # Create joint distance function.
-    _joint_distance_fn = _create_joint_distance_fn(sim.robot)
+    sim_states: list[FeedingDeploymentSimulatorState] = []
 
-    plan = _get_move_cup_to_prestow_plan(
-        sim,
-        _joint_distance_fn,
-        num_drink_transfer_end_effector_interp,
-        max_motion_plan_time,
-        base_link_to_held_obj,
-    )
-    set_robot_joints_with_held_object(
-        sim.robot,
-        sim.physics_client_id,
-        sim.cup_id,
-        base_link_to_held_obj,
-        plan[-1].robot_joints,
+    # Move to prestow.
+    sim_states.extend(
+        _get_interpolated_plan_for_robot_finger_tip(
+            sim.scene_description.cup_prestow_pose,
+            sim,
+            num_prestow_waypoints,
+            max_motion_plan_time,
+        )
     )
 
-    grasp_cup_plan = _get_plan_to_move_grasp_cup_from_pregrasp_position(
-        sim,
-        _joint_distance_fn,
-        num_grasp_waypoints,
-        max_motion_plan_time,
+    # Move to slightly above the release point to avoid table collisions.
+    tf = Pose((0.0, -0.01, 0.0), (0.0, 0.0, 0.0, 1.0))
+    slightly_above_release_pose = multiply_poses(
+        sim.scene_description.cup_grasp_pose, tf
     )
-    plan.extend(grasp_cup_plan)
-    sim.robot.set_joints(plan[-1].robot_joints)
-
-    base_link_to_held_obj = plan[-1].held_object_tf
-    assert isinstance(base_link_to_held_obj, Pose)
-    move_cup_to_staging_plan = _get_move_cup_to_staging_plan(
-        sim,
-        _joint_distance_fn,
-        num_drink_transfer_end_effector_interp,
-        max_motion_plan_time,
-        base_link_to_held_obj,
+    sim_states.extend(
+        _get_interpolated_plan_for_robot_finger_tip(
+            slightly_above_release_pose,
+            sim,
+            num_grasp_waypoints,
+            max_motion_plan_time,
+        )
     )
-    plan.extend(move_cup_to_staging_plan)
 
-    return plan
+    # Move down directly to release.
+    tf = Pose((0.0, 0.01, 0.0), (0.0, 0.0, 0.0, 1.0))
+    joints = end_effector_transform_to_joints(sim.robot, tf)
+    sim_states.extend(_plan_to_sim_state_trajectory([joints], sim))
+
+    # Close to grasp.
+    sim_states.extend(_get_plan_to_execute_ungrasp(sim))
+
+    # Retract to avoid collision checking issues.
+    tf = Pose((0.0, 0.0, -0.025), (0.0, 0.0, 0.0, 1.0))
+    joints = end_effector_transform_to_joints(sim.robot, tf)
+    sim_states.extend(_plan_to_sim_state_trajectory([joints], sim))
+
+    # Move to pregrasp.
+    sim_states.extend(
+        _get_interpolated_plan_for_robot_finger_tip(
+            sim.scene_description.cup_pregrasp_pose,
+            sim,
+            num_grasp_waypoints,
+            max_motion_plan_time,
+        )
+    )
+
+    return sim_states
 
 
 ###############################################################################
@@ -318,7 +322,7 @@ def _get_interpolated_plan_for_robot_finger_tip(
 
 def _get_plan_to_execute_grasp(
     sim: FeedingDeploymentPyBulletSimulator, object_name: str
-) -> list[FeedingDeploymentPyBulletSimulator]:
+) -> list[FeedingDeploymentSimulatorState]:
 
     # Simulate grasping by faking a constraint with the held object.
     robot = sim.robot
@@ -337,6 +341,17 @@ def _get_plan_to_execute_grasp(
         sim.held_object_id = sim.cup_id
     else:
         raise NotImplementedError("TODO")
+    return _plan_to_sim_state_trajectory([robot.get_joint_positions()], sim)
+
+
+def _get_plan_to_execute_ungrasp(
+    sim: FeedingDeploymentPyBulletSimulator,
+) -> list[FeedingDeploymentSimulatorState]:
+    robot = sim.robot
+    robot.close_fingers()
+    sim.held_object_name = None
+    sim.held_object_tf = None
+    sim.held_object_id = None
     return _plan_to_sim_state_trajectory([robot.get_joint_positions()], sim)
 
 
