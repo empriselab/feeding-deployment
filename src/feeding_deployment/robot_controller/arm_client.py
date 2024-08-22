@@ -110,6 +110,9 @@ class Arm:
     def retract(self):
         self.arm.retract()
 
+    def emergency_stop(self):
+        self.arm.emergency_stop()
+
     def execute_command(self, cmd: KinovaCommand) -> None:
 
         if cmd.__class__.__name__ == "JointTrajectoryCommand":
@@ -145,33 +148,39 @@ if __name__ == "__main__":
     try:
         import rospy
         from sensor_msgs.msg import JointState
+        from std_msgs.msg import Bool
 
         rospy.init_node("arm_client", anonymous=True)
+        
+        def emergency_stop_callback(msg):
+            arm.emergency_stop()
 
-        # publish joint states
-        joint_states_pub = rospy.Publisher("/joint_states", JointState, queue_size=10)
+        rospy.Subscriber("/estop", Bool, emergency_stop_callback)
 
-        while not rospy.is_shutdown():
-            arm_pos, gripper_pos = arm.get_state()
-            joint_state_msg = JointState()
-            joint_state_msg.header.stamp = rospy.Time.now()
-            joint_state_msg.name = [
-                "joint_1",
-                "joint_2",
-                "joint_3",
-                "joint_4",
-                "joint_5",
-                "joint_6",
-                "joint_7",
-                "finger_joint",
-            ]
-            joint_state_msg.position = arm_pos.tolist() + [gripper_pos]
-            joint_state_msg.velocity = [0.0] * 8
-            joint_state_msg.effort = [0.0] * 8
-            joint_states_pub.publish(joint_state_msg)
-            time.sleep(0.01)
+        # # publish joint states
+        # joint_states_pub = rospy.Publisher("/joint_states", JointState, queue_size=10)
 
-        # arm.reset()
+        # while not rospy.is_shutdown():
+        #     arm_pos, gripper_pos = arm.get_state()
+        #     joint_state_msg = JointState()
+        #     joint_state_msg.header.stamp = rospy.Time.now()
+        #     joint_state_msg.name = [
+        #         "joint_1",
+        #         "joint_2",
+        #         "joint_3",
+        #         "joint_4",
+        #         "joint_5",
+        #         "joint_6",
+        #         "joint_7",
+        #         "finger_joint",
+        #     ]
+        #     joint_state_msg.position = arm_pos.tolist() + [gripper_pos]
+        #     joint_state_msg.velocity = [0.0] * 8
+        #     joint_state_msg.effort = [0.0] * 8
+        #     joint_states_pub.publish(joint_state_msg)
+        #     time.sleep(0.01)
+
+        arm.reset()
         # print("Current Arm State:", arm.get_state())
 
         # home_pos = [

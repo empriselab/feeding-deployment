@@ -1,5 +1,14 @@
 <launch>
+
     <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/gen3_robotiq_2f_85.xacro dof:=7 sim:=false vision:=false feeding_utensil:=true" />
+
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+        <param name="use_gui" value="false"/>
+        <rosparam param="source_list">["robot_joint_states", "wrist_joint_states"]</rosparam>
+        <param name="rate" value="100"/>
+    </node>
+
+    <!-- TF Setup -->
     <node pkg="robot_state_publisher" type="robot_state_publisher" name="rob_st_pub">
         <param name="ignore_timestamp" value="true" />
     </node>
@@ -13,4 +22,5 @@
 
     <node pkg="tf2_ros" type="static_transform_publisher" name="camera_link_broadcaster"
       args="-0.04611404 0.0837761 0.0729979 -0.70180948 -0.00506307 -0.000348 0.71234662 end_effector_link camera_link" />
-</launch>
+
+</launch> 
