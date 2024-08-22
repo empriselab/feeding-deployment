@@ -98,10 +98,12 @@ def _main(
         )
         assert plan_strs is not None
         plan_ops = parse_pddl_plan(plan_strs, domain, problem)
-        print("Found plan:")
+        print("Found plan to the preconditions of the command:")
         for i, op in enumerate(plan_ops):
             print(f"{i}. {op.short_str}")
         plan_hlas = pddl_plan_to_hla_plan(plan_ops, hlas)
+        # Append the user command to the plan.
+        plan_hlas.append(user_command)
 
         for ground_hla in plan_hlas:
             print(f"Refining {ground_hla}")

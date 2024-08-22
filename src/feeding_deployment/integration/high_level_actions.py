@@ -87,7 +87,8 @@ class GroundHighLevelAction:
     params: dict = field(default_factory=lambda: {})  # see docstring
 
     def __str__(self) -> str:
-        return f"{self.hla.get_name()}[{self.objects}]"
+        obj_str = ", ".join([o.name for o in self.objects])
+        return f"{self.hla.get_name()}({obj_str})"
 
     def get_operator(self) -> GroundOperator:
         """Get the operator for this ground HLA."""
@@ -240,19 +241,19 @@ class TransferToolHLA(PlanExecuteHighLevelAction):
         # TODO
         assert len(objects) == 1
         tool = objects[0]
-        if tool.name == "utensil":
-            forque_target_pose = (
-                self._perception_interface.get_head_perception_forque_target_pose()
-            )
-            nominal_plan = get_bite_transfer_plan(
-                forque_target_pose,
-                self._sim,
-                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
-            )
-            remapped_plan = remap_trajectory_to_constant_distance(
-                nominal_plan, self._sim
-            )
-            return remapped_plan
+        # if tool.name == "utensil":
+        #     forque_target_pose = (
+        #         self._perception_interface.get_head_perception_forque_target_pose()
+        #     )
+        #     nominal_plan = get_bite_transfer_plan(
+        #         forque_target_pose,
+        #         self._sim,
+        #         max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+        #     )
+        #     remapped_plan = remap_trajectory_to_constant_distance(
+        #         nominal_plan, self._sim
+        #     )
+        #     return remapped_plan
         print(f"TransferTool not yet implemented for {tool}")
         return []
 
