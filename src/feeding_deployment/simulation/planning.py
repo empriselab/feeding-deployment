@@ -384,6 +384,17 @@ def get_plan_to_grasp_utensil(
         )
     )
 
+    # Move to a special intermediate waypoint to avoid self-collisions that
+    # tend to arise with the utensil (because it is in the back).
+    sim_states.extend(
+        _get_interpolated_plan_for_robot_finger_tip(
+            sim.scene_description.utensil_corner_waypoint_pose,
+            sim,
+            num_prestow_waypoints,
+            max_motion_plan_time,
+        )
+    )
+
     # Move to staging.
     sim_states.extend(
         _get_interpolated_plan_for_robot_finger_tip(

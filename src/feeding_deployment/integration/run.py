@@ -94,7 +94,7 @@ def _main(
         GroundHighLevelAction(TransferTool, (cup,)),
         GroundHighLevelAction(TransferTool, (utensil,), {"mask": "TODO"}),
         GroundHighLevelAction(TransferTool, (wiper,)),
-        {LiftedAtom(GripperFree, [])},  # reset at the end
+        {GroundAtom(GripperFree, [])},  # reset at the end
     ]
 
     full_simulated_traj: list[FeedingDeploymentSimulatorState] = []
