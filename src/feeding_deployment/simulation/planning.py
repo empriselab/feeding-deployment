@@ -421,6 +421,17 @@ def get_plan_to_stow_utensil(
 
     sim_states: list[FeedingDeploymentSimulatorState] = []
 
+    # Move to a special intermediate waypoint to avoid self-collisions that
+    # tend to arise with the utensil (because it is in the back).
+    sim_states.extend(
+        _get_interpolated_plan_for_robot_finger_tip(
+            sim.scene_description.utensil_corner_waypoint_pose,
+            sim,
+            num_prestow_waypoints,
+            max_motion_plan_time,
+        )
+    )
+
     # Move to prestow.
     sim_states.extend(
         _get_interpolated_plan_for_robot_finger_tip(
