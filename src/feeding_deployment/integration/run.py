@@ -85,8 +85,10 @@ def _main(
     TransferTool = hla_name_to_hla["TransferTool"]
     user_command_queue = [
         # GroundHighLevelAction(TransferTool, (utensil,), {"mask": "TODO"}),
-        # GroundHighLevelAction(TransferTool, (cup,)),
         GroundHighLevelAction(TransferTool, (wiper,)),
+        GroundHighLevelAction(TransferTool, (cup,)),
+        GroundHighLevelAction(TransferTool, (wiper,)),
+        GroundHighLevelAction(TransferTool, (cup,)),
     ]
 
     full_simulated_traj: list[FeedingDeploymentSimulatorState] = []

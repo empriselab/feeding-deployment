@@ -99,7 +99,6 @@ def get_plan_to_grasp_cup(
 
 def get_plan_to_stow_cup(
     sim: FeedingDeploymentPyBulletSimulator,
-    seed: int = 0,
     max_motion_plan_time: float = 10.0,
     num_grasp_waypoints: int = 5,
     num_prestow_waypoints: int = 25,
@@ -215,11 +214,55 @@ def get_plan_to_grasp_wiper(
         )
     )
 
-    # import pybullet as p
-    # from pybullet_helpers.gui import visualize_pose
-    # visualize_pose(sim.scene_description.wiper_staging_pose, sim.physics_client_id)
-    # while True:
-    #     p.stepSimulation(physicsClientId=sim.physics_client_id)
+    return sim_states
+
+
+def get_plan_to_stow_wiper(
+    sim: FeedingDeploymentPyBulletSimulator,
+    max_motion_plan_time: float = 10.0,
+    num_grasp_waypoints: int = 5,
+    num_prestow_waypoints: int = 25,
+) -> list[FeedingDeploymentSimulatorState]:
+    """Make a plan to stow the cup from the current simulator state."""
+
+    # Quiet IKfast warnings.
+    logging.disable(logging.ERROR)
+
+    sim_states: list[FeedingDeploymentSimulatorState] = []
+
+    # Move to prestow.
+    sim_states.extend(
+        _get_interpolated_plan_for_robot_finger_tip(
+            sim.scene_description.wiper_prestow_pose,
+            sim,
+            num_prestow_waypoints,
+            max_motion_plan_time,
+        )
+    )
+
+    # Move to the release point.
+    sim_states.extend(
+        _get_interpolated_plan_for_robot_finger_tip(
+            sim.scene_description.wiper_grasp_pose,
+            sim,
+            num_grasp_waypoints,
+            max_motion_plan_time,
+        )
+    )
+
+    # Close to grasp.
+    sim_states.extend(_get_plan_to_execute_ungrasp(sim))
+
+    # Move to pregrasp.
+    sim_states.extend(
+        _get_interpolated_plan_for_robot_finger_tip(
+            sim.scene_description.wiper_pregrasp_pose,
+            sim,
+            num_grasp_waypoints,
+            max_motion_plan_time,
+            exclude_collision_ids={sim.wiper_id},
+        )
+    )
 
     return sim_states
 
