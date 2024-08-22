@@ -143,7 +143,11 @@ class FeedingDeploymentPyBulletSimulator:
         self.robot.set_joints(state.robot_joints)
 
         some_object_held = False
-        for obj_id, name, state_pose in [(self.cup_id, "cup", state.cup_pose), (self.wiper_id, "wiper", state.wiper_pose), (self.utensil_id, "utensil", state.utensil_pose)]:
+        for obj_id, name, state_pose in [
+            (self.cup_id, "cup", state.cup_pose),
+            (self.wiper_id, "wiper", state.wiper_pose),
+            (self.utensil_id, "utensil", state.utensil_pose),
+        ]:
             if state.held_object == name:
                 assert not some_object_held
                 some_object_held = True

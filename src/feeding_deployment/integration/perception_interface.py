@@ -77,9 +77,9 @@ class PerceptionInterface:
         q, gripper_position = self._robot_interface.get_state()
         joint_state = q.tolist() + [gripper_position, gripper_position]
         return joint_state
-    
-    def get_camera_data(self): # Rajat ToDo: Add return type
-        return self._head_perception.get_top_camera_data()  
+
+    def get_camera_data(self):  # Rajat ToDo: Add return type
+        return self._head_perception.get_top_camera_data()
 
     def get_head_perception_forque_target_pose(self) -> Pose:
         """Get a target of the forque from head perception."""
