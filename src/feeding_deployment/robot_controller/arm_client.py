@@ -110,8 +110,8 @@ class Arm:
     def retract(self):
         self.arm.retract()
 
-    def emergency_stop(self):
-        self.arm.apply_emergency_stop()
+    def stop(self):
+        self.arm.stop()
 
     def execute_command(self, cmd: KinovaCommand) -> None:
 
@@ -153,7 +153,7 @@ if __name__ == "__main__":
         rospy.init_node("arm_client", anonymous=True)
         
         def emergency_stop_callback(msg):
-            arm.emergency_stop()
+            arm.stop()
 
         rospy.Subscriber("/estop", Bool, emergency_stop_callback)
 
