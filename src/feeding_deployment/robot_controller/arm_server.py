@@ -107,7 +107,7 @@ class Arm:
         self.arm.retract()
 
     def emergency_stop(self):
-        self.arm.emergency_stop()
+        self.arm.apply_emergency_stop()
 
     def execute_command(self, cmd: KinovaCommand) -> None:
 
