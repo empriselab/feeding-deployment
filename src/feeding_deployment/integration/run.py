@@ -1,5 +1,6 @@
 """The main entry point for running the integrated system."""
 
+from pathlib import Path
 from typing import Any
 
 from relational_structs import LiftedAtom, Object, PDDLDomain, PDDLProblem, Predicate
@@ -27,7 +28,11 @@ from feeding_deployment.robot_controller.arm_client import (
     ArmManager,
 )
 from feeding_deployment.simulation.scene_description import SceneDescription
-from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
+from feeding_deployment.simulation.simulator import (
+    FeedingDeploymentPyBulletSimulator,
+    FeedingDeploymentSimulatorState,
+)
+from feeding_deployment.simulation.video import make_simulation_video
 
 # All the high level actions we want to consider.
 HLAS = {PickToolHLA, StowToolHLA, PrepareToolHLA, TransferToolHLA}
@@ -84,6 +89,8 @@ def _main(
         GroundHighLevelAction(TransferTool, (wiper,)),
     ]
 
+    full_simulated_traj: list[FeedingDeploymentSimulatorState] = []
+
     while user_command_queue:
         user_command = user_command_queue.pop(0)
         print(f"Working towards new command: {user_command}")
@@ -113,12 +120,18 @@ def _main(
 
             # Execute the high-level plan in simulation
             sim_traj = ground_hla.execute_action()
+            full_simulated_traj.extend(sim_traj)
 
             # Make sure the states are in sync.
             if sim_traj:
                 sim.sync(sim_traj[-1])
             current_atoms -= operator.delete_effects
             current_atoms |= operator.add_effects
+
+    if make_videos:
+        outfile = Path(__file__).parent / "full.mp4"
+        make_simulation_video(sim, full_simulated_traj, outfile)
+        print(f"Wrote out to {outfile}")
 
 
 if __name__ == "__main__":
