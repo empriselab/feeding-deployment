@@ -63,6 +63,19 @@ class FeedingDeploymentPyBulletSimulator:
             physicsClientId=self.physics_client_id,
         )
 
+        # Create a conservative collision boundary around the wheelchair.
+        self.conservative_bb_id = create_pybullet_block(
+            scene_description.conservative_bb_rgba,
+            half_extents=scene_description.conservative_bb_half_extents,
+            physics_client_id=self.physics_client_id,
+        )
+        p.resetBasePositionAndOrientation(
+            self.conservative_bb_id,
+            scene_description.conservative_bb_pose.position,
+            scene_description.conservative_bb_pose.orientation,
+            physicsClientId=self.physics_client_id,
+        )
+
         # Create cup.
         self.cup_id = p.loadURDF(
             str(scene_description.cup_urdf_path),
@@ -124,6 +137,7 @@ class FeedingDeploymentPyBulletSimulator:
         """Return all collision IDs."""
         collision_ids = {
             self.table_id,
+            self.conservative_bb_id,
             self.robot_holder_id,
             self._wheelchair_id,
             self.cup_id,

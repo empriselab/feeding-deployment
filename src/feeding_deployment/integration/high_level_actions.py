@@ -45,7 +45,6 @@ from feeding_deployment.simulation.planning import (
 )
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
-from feeding_deployment.simulation.video import make_simulation_video
 
 # Define some predicates that can be used for sequencing the high-level actions.
 tool_type = Type("tool")  # utensil, cup, or wiping tool
@@ -66,14 +65,12 @@ class HighLevelAction(abc.ABC):
         perception_interface: PerceptionInterface,
         hla_hyperparams: dict[str, Any],
         run_on_robot: bool,
-        make_videos: bool,
     ) -> None:
         self._sim = sim
         self._robot_interface = robot_interface
         self._perception_interface = perception_interface
         self._hla_hyperparams = hla_hyperparams
         self._run_on_robot = run_on_robot
-        self._make_videos = make_videos
 
     @abc.abstractmethod
     def get_name(self) -> str:
@@ -135,12 +132,6 @@ class PlanExecuteHighLevelAction(HighLevelAction):
         get_robot_commands, and execute_robot_commands in sequence, but
         subclasses can override to modify their execution."""
         sim_traj = self.get_simulated_trajectory(objects, params)
-
-        # Optionally make a video of the simulated trajectory.
-        if self._make_videos:
-            outfile = Path(__file__).parent / "last.mp4"
-            make_simulation_video(self._sim, sim_traj, outfile)
-
         robot_commands = self.get_robot_commands(objects, params, sim_traj)
         if self._run_on_robot:
             self.execute_robot_commands(robot_commands)

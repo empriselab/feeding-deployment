@@ -64,7 +64,7 @@ def _main(
     # Create skills for high-level planning.
     hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
     hlas = {
-        cls(sim, robot_interface, perception_interface, hla_hyperparams, run_on_robot, make_videos) for cls in HLAS  # type: ignore
+        cls(sim, robot_interface, perception_interface, hla_hyperparams, run_on_robot) for cls in HLAS  # type: ignore
     }
     hla_name_to_hla = {hla.get_name(): hla for hla in hlas}
     operators = {hla.get_operator() for hla in hlas}
@@ -87,14 +87,6 @@ def _main(
         GroundHighLevelAction(TransferTool, (utensil,), {"mask": "TODO"}),
         GroundHighLevelAction(TransferTool, (wiper,)),
         GroundHighLevelAction(TransferTool, (cup,)),
-        GroundHighLevelAction(TransferTool, (utensil,), {"mask": "TODO"}),
-        GroundHighLevelAction(TransferTool, (cup,)),
-        GroundHighLevelAction(TransferTool, (wiper,)),
-        GroundHighLevelAction(TransferTool, (utensil,), {"mask": "TODO"}),
-        GroundHighLevelAction(TransferTool, (utensil,), {"mask": "TODO"}),
-        GroundHighLevelAction(TransferTool, (utensil,), {"mask": "TODO"}),
-        GroundHighLevelAction(TransferTool, (utensil,), {"mask": "TODO"}),
-        GroundHighLevelAction(TransferTool, (utensil,), {"mask": "TODO"}),
     ]
 
     full_simulated_traj: list[FeedingDeploymentSimulatorState] = []

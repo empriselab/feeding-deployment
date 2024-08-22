@@ -26,7 +26,7 @@ class SceneDescription:
     robot_name: str = "kinova-gen3"
     initial_joints: JointPositions = field(
         default_factory=lambda: [
-            np.pi / 2,
+            0,
             -np.pi / 4,
             -np.pi / 2,
             0.0,
@@ -59,6 +59,11 @@ class SceneDescription:
         / "wheelchair"
         / "wheelchair.urdf"
     )
+
+    # Conservative bounding box around the wheel chair.
+    conservative_bb_pose: Pose = Pose((-0.75, -0.5, -0.25))
+    conservative_bb_rgba: tuple[float, float, float, float] = (0.9, 0.1, 0.1, 0.5)
+    conservative_bb_half_extents: tuple[float, float, float] = (0.4, 0.4, 1.0)
 
     # Table.
     table_pose: Pose = Pose((-0.5, 0.75, -0.29))
@@ -275,6 +280,7 @@ class SceneDescription:
             "robot_holder_pose",
             "wheelchair_pose",
             "table_pose",
+            "conservative_bb_pose",
             "cup_pose",
             "wiper_pose",
             "utensil_pose",
