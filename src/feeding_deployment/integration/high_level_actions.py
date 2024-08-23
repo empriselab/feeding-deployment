@@ -198,6 +198,23 @@ class PickToolHLA(PlanExecuteHighLevelAction):
                 max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
             )
         elif tool.name == "utensil":
+            grasp_utensil_plan= 
+
+            collision_ids = sim.get_collision_ids()
+            if exclude_collision_ids is not None:
+                collision_ids -= exclude_collision_ids
+
+            plan = run_smooth_motion_planning_to_pose(
+                target_pose,
+                robot,
+                collision_ids,
+                finger_from_end_effector,
+                seed,
+                max_time=max_motion_plan_time,
+                held_object=sim.held_object_id,
+                base_link_to_held_obj=sim.held_object_tf,
+            )
+
             nominal_plan = get_plan_to_grasp_utensil(
                 self._sim,
                 max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],

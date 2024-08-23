@@ -170,7 +170,7 @@ class HeadPerception:
         codedict, tform, images, src_pts = get_deca_codedict(image)
 
         if codedict is None:
-            return None, None
+            return (None, None, None, None, None, None, None, None, None)
 
         # original_images = torch.tensor(image/255).float().to(self.device)[None,...]
 
@@ -211,7 +211,7 @@ class HeadPerception:
 
         if len(valid_landmarks_selected_world) < 4:
             print("Not enough landmarks to fit model.")
-            return None, None, None
+            return (None, None, None, None, None, None, None, None, None)
 
         valid_landmarks_selected_model = np.array(valid_landmarks_selected_model)
         valid_landmarks_selected_world = np.array(valid_landmarks_selected_world)
