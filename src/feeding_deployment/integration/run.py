@@ -66,12 +66,8 @@ def _main(
     if run_on_robot:
         kwargs["initial_joints"] = perception_interface.get_robot_joints()
         print(f"Initial joint state: {kwargs['initial_joints']}")
-    kwargs += create_scene_description_from_config("config/poses.yaml")
     scene_description = SceneDescription(**kwargs)
     sim = FeedingDeploymentPyBulletSimulator(scene_description)
-
-    input("Created scene description. Press enter to continue.")
-    exit()
 
     # Create skills for high-level planning.
     hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
