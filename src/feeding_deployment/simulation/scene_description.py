@@ -16,11 +16,28 @@ from pybullet_helpers.joint import (
 )
 from pybullet_helpers.math_utils import rotate_about_point
 from scipy.spatial.transform import Rotation
+import json
 
+def create_scene_description_from_config(config_file_path: str) -> SceneDescription:
+    # Read the config file
+    with open(config_file_path, 'r') as file:
+        config = json.load(file)
+
+    # convert lists containting 6 elements to Pose objects
+    for key in config:
+        if isinstance(config[key], list):
+            config[key] = Pose(config[key][:3], config[key][3:])
+    
+    # Create an instance of SceneDescription using the config
+    return SceneDescription(**config)
 
 @dataclass(frozen=True)
 class SceneDescription:
     """Scene description."""
+
+    utensil_inside_mount: Pose
+    utensil_outside_mount: Pose
+    utensil_above_mount: Pose
 
     # Robot.
     robot_name: str = "kinova-gen3"

@@ -34,7 +34,7 @@ from feeding_deployment.robot_controller.arm_client import (
     RPC_AUTHKEY,
     ArmManager,
 )
-from feeding_deployment.simulation.scene_description import SceneDescription
+from feeding_deployment.simulation.scene_description import SceneDescription, create_scene_description_from_config
 from feeding_deployment.simulation.simulator import (
     FeedingDeploymentPyBulletSimulator,
     FeedingDeploymentSimulatorState,
@@ -65,8 +65,13 @@ def _main(
     kwargs: dict[str, Any] = {}
     if run_on_robot:
         kwargs["initial_joints"] = perception_interface.get_robot_joints()
+        print(f"Initial joint state: {kwargs['initial_joints']}")
+    kwargs += create_scene_description_from_config("config/poses.yaml")
     scene_description = SceneDescription(**kwargs)
     sim = FeedingDeploymentPyBulletSimulator(scene_description)
+
+    input("Created scene description. Press enter to continue.")
+    exit()
 
     # Create skills for high-level planning.
     hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
@@ -86,14 +91,14 @@ def _main(
         LiftedAtom(GripperFree, []),
         ToolPrepared([wiper]),
         ToolPrepared([cup]),
-    }
+    }   
 
     # TODO update this once the user interface is ready.
     TransferTool = hla_name_to_hla["TransferTool"]
     user_command_queue: list[GroundHighLevelAction | set[GroundAtom]] = [
-        # GroundHighLevelAction(TransferTool, (cup,)),
         GroundHighLevelAction(TransferTool, (utensil,), {"mask": "TODO"}),
-        # GroundHighLevelAction(TransferTool, (wiper,)),
+        GroundHighLevelAction(TransferTool, (wiper,)),
+        GroundHighLevelAction(TransferTool, (cup,)),
         {GroundAtom(GripperFree, [])},  # reset at the end
     ]
 

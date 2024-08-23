@@ -270,22 +270,23 @@ class HeadPerceptionROSWrapper:
         run_deca_end_time = time.time()
         print("Run DECA time: ", run_deca_end_time - run_deca_start_time)
 
-        self.mouth_state_publisher.publish(mouth_state)
+        if landmarks2d is not None:
+            self.mouth_state_publisher.publish(mouth_state)
 
-        head_distance_msg = Float64MultiArray()
-        head_distance_msg.data = [
-            average_head_point[0],
-            average_head_point[1],
-            average_head_point[2],
-        ]
-        self.head_distance_publisher.publish(head_distance_msg)
+            head_distance_msg = Float64MultiArray()
+            head_distance_msg.data = [
+                average_head_point[0],
+                average_head_point[1],
+                average_head_point[2],
+            ]
+            self.head_distance_publisher.publish(head_distance_msg)
 
-        self.visualizeForque(forque_target_pose)
-        self.visualizeVoxels(visualization_points_world_frame)
+            self.visualizeForque(forque_target_pose)
+            self.visualizeVoxels(visualization_points_world_frame)
 
-        self.updateTF("base_link", "forque_end_effector_target", forque_target_pose)
-        self.updateTF("base_link", "head_pose", neck_frame)
-        self.updateTF("base_link", "reference_head_pose", reference_neck_frame)
+            self.updateTF("base_link", "forque_end_effector_target", forque_target_pose)
+            self.updateTF("base_link", "head_pose", neck_frame)
+            self.updateTF("base_link", "reference_head_pose", reference_neck_frame)
 
         return forque_target_pose
 

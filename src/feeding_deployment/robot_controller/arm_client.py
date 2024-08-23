@@ -168,6 +168,9 @@ if __name__ == "__main__":
 
         rospy.Subscriber("/estop", Bool, emergency_stop_callback)
 
+        print("Current Arm State:", arm.get_state())
+        exit()
+
         # # publish joint states
         # joint_states_pub = rospy.Publisher("/robot_joint_states", JointState, queue_size=10)
 
@@ -191,149 +194,153 @@ if __name__ == "__main__":
         #     joint_states_pub.publish(joint_state_msg)
         #     time.sleep(0.01)
 
-        above_plate_pos = [
-            4.119619921793763,
-            5.927367810785151,
-            4.797271913808785,
-            4.641709217686205,
-            4.980350922946283,
-            5.268199221999715,
-            4.814377930122582,
-        ]
-        input("Press Enter to move to above plate position...")
-        arm.set_joint_position(above_plate_pos)
+        # above_plate_pos = [
+        #     4.119619921793763,
+        #     5.927367810785151,
+        #     4.797271913808785,
+        #     4.641709217686205,
+        #     4.980350922946283,
+        #     5.268199221999715,
+        #     4.814377930122582,
+        # ]
+        # input("Press Enter to move to above plate position...")
+        # arm.set_joint_position(above_plate_pos)
 
-        retract_pos = [
-            3.935171204564965e-05,
-            -0.34908768831980463,
-            -3.1415034376932756,
-            -2.548253944841698,
-            -2.1837920938239108e-05,
-            -0.8726928555047193,
-            1.570765833600415,
-        ]
-        input("Press Enter to retract the arm...")
-        arm.set_joint_position(retract_pos)
-        # arm.retract()
+        # retract_pos = [
+        #     3.935171204564965e-05,
+        #     -0.34908768831980463,
+        #     -3.1415034376932756,
+        #     -2.548253944841698,
+        #     -2.1837920938239108e-05,
+        #     -0.8726928555047193,
+        #     1.570765833600415,
+        # ]
+        # input("Press Enter to retract the arm...")
+        # arm.set_joint_position(retract_pos)
+        # # arm.retract()
 
-        home_pose = [
-            0.0,
-            0.26179939,
-            3.14159265,
-            -2.26892803,
-            0.0,
-            0.95993109,
-            1.57079633,
-        ]
-        input("Press Enter to move to home position...")
-        arm.set_joint_position(home_pose)
-        # arm.reset()
+        # home_pose = [
+        #     0.0,
+        #     0.26179939,
+        #     3.14159265,
+        #     -2.26892803,
+        #     0.0,
+        #     0.95993109,
+        #     1.57079633,
+        # ]
+        # input("Press Enter to move to home position...")
+        # arm.set_joint_position(home_pose)
+        # # arm.reset()
 
-        input("Press Enter to switch to joint compliant mode...")
-        arm.switch_to_joint_compliant_mode()
+        # input("Press Enter to switch to joint compliant mode...")
+        # arm.switch_to_joint_compliant_mode()
 
-        input("Press Enter to move to joint compliant position...")
-        arm.compliant_set_joint_position(
-            [0.0, 0.26179939, 3.14159265, -2.26892803, 0.0, 0.95993109, 1.9]
-        )
+        # input("Press Enter to move to joint compliant position...")
+        # arm.compliant_set_joint_position(
+        #     [0.0, 0.26179939, 3.14159265, -2.26892803, 0.0, 0.95993109, 1.9]
+        # )
 
-        input("Press Enter to switch out of joint compliant mode...")
-        arm.switch_out_of_joint_compliant_mode()
+        # input("Press Enter to switch out of joint compliant mode...")
+        # arm.switch_out_of_joint_compliant_mode()
 
         # print("Current Arm State:", arm.get_state())
 
-        # home_pos = [
-        #     2.2912759438800285,
-        #     0.7308686750765581,
-        #     2.082994642398784,
-        #     4.109475142253324,
-        #     0.2853091081120964,
-        #     5.818345985240578,
-        #     5.988186420599291,
-        # ]
+        # transfer_pose = [-2.76117261, -1.18670831, -1.7014329 , -1.81186993,  0.26973719, -0.09092458,  2.4944019]
+        # input("Press Enter to set the arm to transfer pose")
+        # arm.set_joint_position(transfer_pose)
 
-        # inside_mount_pose = (np.array([-0.147, -0.17, 0.07]), np.array([0.7071068, -0.7071068, 0, 0]))
+        home_pos = [
+            2.2912759438800285,
+            0.7308686750765581,
+            2.082994642398784,
+            4.109475142253324,
+            0.2853091081120964,
+            5.818345985240578,
+            5.988186420599291,
+        ]
 
-        # outside_mount_pose = (np.array([-0.147, -0.29, 0.07]), np.array([0.7071068, -0.7071068, 0, 0]))
+        inside_mount_pose = (np.array([-0.147, -0.17, 0.07]), np.array([0.7071068, -0.7071068, 0, 0]))
 
-        # outside_mount_joint_states = [
-        #     2.6266411620509817,
-        #     0.6992626121546339,
-        #     2.306749708761716,
-        #     4.053362604401464,
-        #     0.9559379448584164,
-        #     5.655628973165609,
-        #     5.80065247559031,
-        # ]
+        outside_mount_pose = (np.array([-0.147, -0.29, 0.07]), np.array([0.7071068, -0.7071068, 0, 0]))
 
-        # above_mount_pose = (np.array([-0.147, -0.17, 0.15]), np.array([0.7071068, -0.7071068, 0, 0]))
+        outside_mount_joint_states = [
+            2.6266411620509817,
+            0.6992626121546339,
+            2.306749708761716,
+            4.053362604401464,
+            0.9559379448584164,
+            5.655628973165609,
+            5.80065247559031,
+        ]
 
-        # above_mount_joint_states = [
-        #     3.300153003835367,
-        #     0.39120874346320217,
-        #     1.8613410764520344,
-        #     3.862447510072517,
-        #     0.6143839397882825,
-        #     5.583536137192727,
-        #     6.276739392077158,
-        # ]
+        above_mount_pose = (np.array([-0.147, -0.17, 0.15]), np.array([0.7071068, -0.7071068, 0, 0]))
 
-        # infront_mount_pose = (np.array([0.0, -0.17, 0.15]), np.array([0.7071068, -0.7071068, 0, 0]))
+        above_mount_joint_states = [
+            3.300153003835367,
+            0.39120874346320217,
+            1.8613410764520344,
+            3.862447510072517,
+            0.6143839397882825,
+            5.583536137192727,
+            6.276739392077158,
+        ]
 
-        # infront_mount_joint_states = [
-        #     2.835106221647441,
-        #     0.18716812654374576,
-        #     1.7554270267415284,
-        #     -2.5582927305707517,
-        #     0.3492644556371586,
-        #     -0.5794207625752312,
-        #     -0.3984099643402903,
-        # ]
+        infront_mount_pose = (np.array([0.0, -0.17, 0.15]), np.array([0.7071068, -0.7071068, 0, 0]))
 
-        # input("Press enter to move to home joint pos...")
-        # next_pos = home_pos.copy()
-        # arm.set_joint_position(next_pos)
+        infront_mount_joint_states = [
+            2.835106221647441,
+            0.18716812654374576,
+            1.7554270267415284,
+            -2.5582927305707517,
+            0.3492644556371586,
+            -0.5794207625752312,
+            -0.3984099643402903,
+        ]
 
-        # input("Press enter to move to outside mount joint pos...")
-        # next_pos = outside_mount_joint_states.copy()
-        # arm.set_joint_position(next_pos)
+        input("Press enter to move to home joint pos...")
+        next_pos = home_pos.copy()
+        arm.set_joint_position(next_pos)
 
-        # input("Press enter to move to inside mount pose...")
-        # arm.set_ee_pose(inside_mount_pose[0], inside_mount_pose[1])
+        input("Press enter to move to outside mount joint pos...")
+        next_pos = outside_mount_joint_states.copy()
+        arm.set_joint_position(next_pos)
 
-        # input("Press enter to release the utensil...")
-        # arm.set_gripper(1.0)
+        input("Press enter to move to inside mount pose...")
+        arm.set_ee_pose(inside_mount_pose[0], inside_mount_pose[1])
 
-        # input("Press enter to move up...")
-        # arm.set_ee_pose(above_mount_pose[0], above_mount_pose[1])
+        input("Press enter to release the utensil...")
+        arm.set_gripper(1.0)
 
-        # input("Press enter to move forward...")
-        # arm.set_ee_pose(infront_mount_pose[0], infront_mount_pose[1])
+        input("Press enter to move up...")
+        arm.set_ee_pose(above_mount_pose[0], above_mount_pose[1])
 
-        # input("Press enter to move to home joint pos...")
-        # next_pos = home_pos.copy()
-        # arm.set_joint_position(next_pos)
+        input("Press enter to move forward...")
+        arm.set_ee_pose(infront_mount_pose[0], infront_mount_pose[1])
 
-        # input("Press enter to move to infront mount joint pos...")
-        # next_pos = infront_mount_joint_states.copy()
-        # arm.set_joint_position(next_pos)
+        input("Press enter to move to home joint pos...")
+        next_pos = home_pos.copy()
+        arm.set_joint_position(next_pos)
 
-        # input("Press enter to move to above mount joint states...")
-        # next_pos = above_mount_joint_states.copy()
-        # arm.set_joint_position(next_pos)
+        input("Press enter to move to infront mount joint pos...")
+        next_pos = infront_mount_joint_states.copy()
+        arm.set_joint_position(next_pos)
 
-        # input("Press enter to inside mount pose...")
-        # arm.set_ee_pose(inside_mount_pose[0], inside_mount_pose[1])
+        input("Press enter to move to above mount joint states...")
+        next_pos = above_mount_joint_states.copy()
+        arm.set_joint_position(next_pos)
 
-        # input("Press enter to grab the utensil...")
-        # arm.set_gripper(0.5)
+        input("Press enter to inside mount pose...")
+        arm.set_ee_pose(inside_mount_pose[0], inside_mount_pose[1])
 
-        # input("Press enter to move to outside mount pose...")
-        # arm.set_ee_pose(outside_mount_pose[0], outside_mount_pose[1])
+        input("Press enter to grab the utensil...")
+        arm.set_gripper(0.5)
 
-        # input("Press enter to move to home joint pos...")
-        # next_pos = home_pos.copy()
-        # arm.set_joint_position(next_pos)
+        input("Press enter to move to outside mount pose...")
+        arm.set_ee_pose(outside_mount_pose[0], outside_mount_pose[1])
+
+        input("Press enter to move to home joint pos...")
+        next_pos = home_pos.copy()
+        arm.set_joint_position(next_pos)
 
         # input("Press Enter to set arm pos...")
         # next_pos = [0.0, 0.26179939, 3.14159265, -2.26892803, 0.0, 0.95993109, 1.8]
