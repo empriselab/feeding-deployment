@@ -16,6 +16,7 @@ dependencies = [
    "ruckig",
    "relational_structs@git+https://github.com/tomsilver/relational-structs.git",
    "opencv-python",
+   "multiprocess",
 ]
 
 [project.optional-dependencies]

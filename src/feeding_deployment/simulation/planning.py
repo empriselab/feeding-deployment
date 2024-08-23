@@ -5,9 +5,11 @@ from __future__ import annotations
 import logging
 from typing import Callable
 
-import pybullet as p
 from pybullet_helpers.geometry import Pose, get_pose, interpolate_poses, multiply_poses
-from pybullet_helpers.gui import visualize_pose
+from pybullet_helpers.inverse_kinematics import (
+    end_effector_transform_to_joints,
+    set_robot_joints_with_held_object,
+)
 from pybullet_helpers.joint import JointPositions, get_joint_infos, interpolate_joints
 from pybullet_helpers.link import get_link_pose, get_relative_link_pose
 from pybullet_helpers.math_utils import geometric_sequence
@@ -82,7 +84,6 @@ def get_plan_to_grasp_cup(
             exclude_collision_ids={sim.table_id},
         )
     )
-
     # Move to staging.
     sim_states.extend(
         _get_interpolated_plan_for_robot_finger_tip(
@@ -92,16 +93,6 @@ def get_plan_to_grasp_cup(
             max_motion_plan_time,
         )
     )
-
-    # # Visualize the cup tip for debugging.
-    # cup_tip_pose = multiply_poses(
-    #     get_pose(sim.cup_id, sim.physics_client_id),
-    #     sim.scene_description.cup_tip_transform,
-    # )
-    # p.removeAllUserDebugItems(physicsClientId=sim.physics_client_id)
-    # visualize_pose(cup_tip_pose, sim.physics_client_id)
-    # while True:
-    #     p.stepSimulation()
 
     return sim_states
 
@@ -178,29 +169,8 @@ def get_plan_to_transfer_cup(
             sim,
             num_grasp_waypoints,
             max_motion_plan_time,
-            exclude_collision_ids={sim.conservative_bb_id},
         )
     )
-
-    # Move to back to finish transfer.
-    sim_states.extend(
-        _get_interpolated_plan_for_robot_finger_tip(
-            sim.scene_description.cup_staging_pose,
-            sim,
-            num_grasp_waypoints,
-            max_motion_plan_time,
-            exclude_collision_ids={sim.conservative_bb_id},
-        )
-    )
-
-    # Visualize the cup tip for debugging.
-    cup_tip_pose = multiply_poses(
-        get_pose(sim.cup_id, sim.physics_client_id),
-        sim.scene_description.cup_tip_transform,
-    )
-    p.removeAllUserDebugItems(physicsClientId=sim.physics_client_id)
-    visualize_pose(cup_tip_pose, sim.physics_client_id)
-    input("Visualizing the tip, press enter to continue")
 
     return sim_states
 
@@ -270,16 +240,6 @@ def get_plan_to_grasp_wiper(
             max_motion_plan_time,
         )
     )
-
-    # Visualize the wiper tip for debugging.
-    # wiper_tip_pose = multiply_poses(
-    #     get_pose(sim.wiper_id, sim.physics_client_id),
-    #     sim.scene_description.wiper_tip_transform,
-    # )
-    # p.removeAllUserDebugItems(physicsClientId=sim.physics_client_id)
-    # visualize_pose(wiper_tip_pose, sim.physics_client_id)
-    # while True:
-    #     p.stepSimulation()
 
     return sim_states
 
@@ -383,6 +343,13 @@ def get_plan_to_grasp_utensil(
 
     sim_states: list[FeedingDeploymentSimulatorState] = []
 
+    # TODO remove
+    # import pybullet as p
+    # from pybullet_helpers.gui import visualize_pose
+    # visualize_pose(sim.scene_description.utensil_pregrasp_pose, sim.physics_client_id)
+    # while True:
+    #     p.stepSimulation(sim.physics_client_id)
+
     # Move to pregrasp.
     sim_states.extend(
         _get_motion_plan_for_robot_finger_tip(
@@ -437,16 +404,6 @@ def get_plan_to_grasp_utensil(
             max_motion_plan_time,
         )
     )
-
-    # # Visualize the utensil tip for debugging.
-    # utensil_tip_pose = multiply_poses(
-    #     get_pose(sim.utensil_id, sim.physics_client_id),
-    #     sim.scene_description.utensil_tip_transform,
-    # )
-    # p.removeAllUserDebugItems(physicsClientId=sim.physics_client_id)
-    # visualize_pose(utensil_tip_pose, sim.physics_client_id)
-    # while True:
-    #     p.stepSimulation()
 
     return sim_states
 
