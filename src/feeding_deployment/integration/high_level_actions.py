@@ -12,6 +12,7 @@ import sys
 
 sys.path.append(FLAIR_PATH)
 try:
+    raise ModuleNotFoundError # Just to skip this block
     from skill_library import SkillLibrary
 
     FLAIR_IMPORTED = True

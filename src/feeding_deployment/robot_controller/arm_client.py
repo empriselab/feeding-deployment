@@ -10,6 +10,7 @@ import time
 
 import numpy as np
 from multiprocess.managers import BaseManager as MPBaseManager
+import threading
 
 # from arm_controller import JointCompliantController
 # from constants import RPC_AUTHKEY, ARM_RPC_PORT
@@ -19,7 +20,7 @@ ARM_RPC_PORT = 5000
 
 # from ik_solver import IKSolver
 from feeding_deployment.robot_controller.command_interface import KinovaCommand
-# from feeding_deployment.robot_controller.kinova import KinovaArm
+from feeding_deployment.robot_controller.kinova import KinovaArm
 
 # from sensor_msgs.msg import JointState
 
@@ -137,6 +138,7 @@ if __name__ == "__main__":
     manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
     manager.connect()
     arm = manager.Arm()
+    joint_state_thread = None
     try:
         import rospy
         from sensor_msgs.msg import JointState
@@ -149,31 +151,35 @@ if __name__ == "__main__":
 
         rospy.Subscriber("/estop", Bool, emergency_stop_callback)
 
-        print("Current Arm State:", arm.get_state())
-        exit()
+        def publish_joint_states(arm):
 
-        # # publish joint states
-        # joint_states_pub = rospy.Publisher("/robot_joint_states", JointState, queue_size=10)
+            # publish joint states
+            joint_states_pub = rospy.Publisher("/robot_joint_states", JointState, queue_size=10)
 
-        # while not rospy.is_shutdown():
-        #     arm_pos, gripper_pos = arm.get_state()
-        #     joint_state_msg = JointState()
-        #     joint_state_msg.header.stamp = rospy.Time.now()
-        #     joint_state_msg.name = [
-        #         "joint_1",
-        #         "joint_2",
-        #         "joint_3",
-        #         "joint_4",
-        #         "joint_5",
-        #         "joint_6",
-        #         "joint_7",
-        #         "finger_joint",
-        #     ]
-        #     joint_state_msg.position = arm_pos.tolist() + [gripper_pos]
-        #     joint_state_msg.velocity = [0.0] * 8
-        #     joint_state_msg.effort = [0.0] * 8
-        #     joint_states_pub.publish(joint_state_msg)
-        #     time.sleep(0.01)
+            while not rospy.is_shutdown():
+                arm_pos, gripper_pos = arm.get_state()
+                joint_state_msg = JointState()
+                joint_state_msg.header.stamp = rospy.Time.now()
+                joint_state_msg.name = [
+                    "joint_1",
+                    "joint_2",
+                    "joint_3",
+                    "joint_4",
+                    "joint_5",
+                    "joint_6",
+                    "joint_7",
+                    "finger_joint",
+                ]
+                joint_state_msg.position = arm_pos.tolist() + [gripper_pos]
+                joint_state_msg.velocity = [0.0] * 8
+                joint_state_msg.effort = [0.0] * 8
+                joint_states_pub.publish(joint_state_msg)
+                time.sleep(0.01)
+
+        joint_state_thread = threading.Thread(
+                target=publish_joint_states, args=(arm,)
+            )
+        joint_state_thread.start()
 
         # above_plate_pos = [
         #     4.119619921793763,
@@ -345,6 +351,8 @@ if __name__ == "__main__":
         print("Client interrupted, shutting down...")
     finally:
         try:
+            if joint_state_thread is not None:
+                joint_state_thread.join()
             arm.close()  # Ensure the arm is disconnected properly
         except Exception as e:
             print(f"Error during client shutdown: {e}")
