@@ -188,8 +188,6 @@ class HeadPerceptionROSWrapper:
         stamp = camera_info_data.header.stamp
         try:
             with self.tf_buffer_lock:
-                # transform = self.tfBuffer.lookup_transform('base_link', 'camera_color_optical_frame', rospy.Time())
-                # Rajat ToDo: The one down should be used, but it is not working for some reason
                 transform = self.tfBuffer.lookup_transform(
                     "base_link",
                     target_frame,

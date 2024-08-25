@@ -57,6 +57,10 @@ from pybullet_helpers.motion_planning import (
     run_smooth_motion_planning_to_pose,
     smoothly_follow_end_effector_path,
 )
+from feeding_deployment.integration.low_level_actions import (
+    move_to_joint_positions,
+    teleport_to_ee_pose,
+)
 from pybullet_helpers.geometry import Pose
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
@@ -173,87 +177,31 @@ class PickToolHLA(HighLevelAction):
             sim_states: list[FeedingDeploymentSimulatorState] = []
             robot_commands = []
 
-            # - Pick up utensil:  ->  ->  ->  -> move_joint(above plate)
-            # input("Press Enter to continue...")
-            
-            # plan_to_pose(outside mount)
-            plan = run_smooth_motion_planning_to_pose(
-                target_pose = self._sim.scene_description.utensil_outside_mount,
-                robot = self._sim.robot,
-                collision_ids = self._sim.get_collision_ids(),
-                plan_frame_from_end_effector_frame = Pose.identity(),
-                seed = 0,
-                held_object = self._sim.held_object_id,
-                base_link_to_held_obj = self._sim.held_object_tf,
-                max_time = self._hla_hyperparams["max_motion_planning_time"],
-            )
-            plan_to_outside_mount_pos = _plan_to_sim_state_trajectory(plan, self._sim)
-            remapped_plan = remap_trajectory_to_constant_distance(plan_to_outside_mount_pos, self._sim)
-            sim_states.extend(remapped_plan)
-            robot_commands.extend(simulated_trajectory_to_kinova_commands(remapped_plan))
+            plan, commands = move_to_joint_positions(self._sim, self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0])
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
 
-            # input("Press Enter to continue...")
+            plan, commands = move_to_joint_positions(self._sim, self._sim.scene_description.utensil_outside_mount_pos + [0.0, 0.0])
+            sim_states.extend(plan)
+            robot_commands.extend(commands) 
 
-            # move_ee(inside mount)
-            robot_commands.append(CartesianCommand(
-                pos=self._sim.scene_description.utensil_inside_mount[0],
-                quat=self._sim.scene_description.utensil_inside_mount[1]
-            ))
-
-            # only for sim: teleport to inside mount position
-            sim_states.append(FeedingDeploymentSimulatorState(robot_joints=(self._sim.scene_description.utensil_inside_mount_pos + [0.0, 0.0]),
-                cup_pose=self._sim.scene_description.cup_pose,
-                wiper_pose=self._sim.scene_description.wiper_pose,
-                utensil_pose=self._sim.scene_description.utensil_inside_mount))
-            self._sim.sync(sim_states[-1])
-            
-            # input("Press Enter to continue...")
+            plan, commands = teleport_to_ee_pose(self._sim, self._sim.scene_description.utensil_inside_mount, self._sim.scene_description.utensil_inside_mount_pos + [0.0, 0.0])
+            sim_states.extend(plan)
+            robot_commands.extend(commands) 
 
             # open grippers
             robot_commands.append(OpenGripperCommand())
-
             # only for sim: set held object
             sim_states.extend(_get_plan_to_execute_grasp(self._sim, "utensil"))
             # input("Press Enter to continue...")
-
-            # move_ee(outside mount)
-            robot_commands.append(CartesianCommand(
-                pos=self._sim.scene_description.utensil_outside_mount[0],
-                quat=self._sim.scene_description.utensil_outside_mount[1]
-            ))
-
-            # only for sim: teleport to outside mount position
-            sim_states.append(FeedingDeploymentSimulatorState(robot_joints=(self._sim.scene_description.utensil_outside_mount_pos + [0.0, 0.0]),
-                cup_pose=self._sim.scene_description.cup_pose,
-                wiper_pose=self._sim.scene_description.wiper_pose,
-                held_object="utensil",
-                held_object_tf=sim_states[-1].held_object_tf))
-            self._sim.sync(sim_states[-1])
-            # input("Press Enter to continue...")
             
-            # move_joint(utensil neutral)
-            robot_commands.append(JointCommand(
-                pos=self._sim.scene_description.utensil_neutral_pos
-            ))
-            
-            # only for sim: teleport to utensil neutral position
-            plan = run_motion_planning(robot = self._sim.robot,
-                initial_positions = sim_states[-1].robot_joints,
-                target_positions = self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0],
-                collision_bodies = self._sim.get_collision_ids(),
-                seed = 0,
-                physics_client_id = self._sim.physics_client_id
-            )
-            sim_states.extend(_plan_to_sim_state_trajectory(plan, self._sim))
-            
+            plan, commands = teleport_to_ee_pose(self._sim, self._sim.scene_description.utensil_outside_mount, self._sim.scene_description.utensil_outside_mount_pos + [0.0, 0.0])
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
 
-            # sim_states.append(FeedingDeploymentSimulatorState(robot_joints=(self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0]),
-            #     cup_pose=self._sim.scene_description.cup_pose,
-            #     wiper_pose=self._sim.scene_description.wiper_pose,
-            #     held_object="utensil",
-            #     held_object_tf=sim_states[-1].held_object_tf))
-            # self._sim.sync(sim_states[-1])
-            # input("Press Enter to continue...")
+            plan, commands = move_to_joint_positions(self._sim, self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0])
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
             
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
