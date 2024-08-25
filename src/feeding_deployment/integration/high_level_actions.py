@@ -115,6 +115,7 @@ class HighLevelAction(abc.ABC):
     def execute_robot_commands(self, robot_commands: list[KinovaCommand]) -> None:
         """Execute the given commands on the robot."""
         for robot_command in robot_commands:
+            input("Execute next command?")
             self._robot_interface.execute_command(robot_command)
 
 
@@ -177,6 +178,84 @@ class PickToolHLA(HighLevelAction):
             sim_states: list[FeedingDeploymentSimulatorState] = []
             robot_commands = []
 
+            # plan, commands = move_to_joint_positions(self._sim, self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0])
+            # sim_states.extend(plan)
+            # robot_commands.extend(commands)
+
+            plan, commands = move_to_joint_positions(self._sim, self._sim.scene_description.utensil_infront_mount_pos + [0.0, 0.0])
+            sim_states.extend(plan)
+            robot_commands.extend(commands) 
+
+            plan, commands = move_to_joint_positions(self._sim, self._sim.scene_description.utensil_above_mount_pos + [0.0, 0.0])
+            sim_states.extend(plan)
+            robot_commands.extend(commands) 
+
+            plan, commands = teleport_to_ee_pose(self._sim, self._sim.scene_description.utensil_inside_mount, self._sim.scene_description.utensil_inside_mount_pos + [0.0, 0.0])
+            sim_states.extend(plan)
+            robot_commands.extend(commands) 
+
+            # open grippers
+            robot_commands.append(OpenGripperCommand())
+            # only for sim: set held object
+            sim_states.extend(_get_plan_to_execute_grasp(self._sim, "utensil"))
+            # input("Press Enter to continue...")
+            
+            plan, commands = teleport_to_ee_pose(self._sim, self._sim.scene_description.utensil_outside_mount, self._sim.scene_description.utensil_outside_mount_pos + [0.0, 0.0])
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
+
+            plan, commands = move_to_joint_positions(self._sim, self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0])
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
+
+            print("Robot Commands: ")
+            for command in robot_commands:
+                print(command)
+            input("Doest this look good?")
+            
+            if self._run_on_robot:
+                # print("Checking before running on robot")
+                self.execute_robot_commands(robot_commands)
+
+            return sim_states
+
+        else:
+            print(f"PickTool not yet implemented for {tool}")
+            return []
+
+class StowToolHLA(HighLevelAction):
+    """Stow a tool (utensil, drink, or wipe)."""
+
+    def get_name(self) -> str:
+        return "StowTool"
+
+    def get_operator(self) -> LiftedOperator:
+        tool = Variable("?tool", tool_type)
+        return LiftedOperator(
+            self.get_name(),
+            parameters=[tool],
+            preconditions={Holding([tool])},
+            add_effects={LiftedAtom(GripperFree, [])},
+            delete_effects={Holding([tool])},
+        )
+    
+    def execute_action(
+        self,
+        objects: tuple[Object, ...],
+        params: dict[str, Any],
+    ) -> list[FeedingDeploymentSimulatorState]:
+        assert len(objects) == 1
+        tool = objects[0]
+
+        assert len(objects) == 1
+        tool = objects[0]
+
+        if tool.name == "utensil":
+            
+            assert self._sim.held_object_name is None
+            sim_states: list[FeedingDeploymentSimulatorState] = []
+            robot_commands = []
+
             plan, commands = move_to_joint_positions(self._sim, self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0])
             sim_states.extend(plan)
             robot_commands.extend(commands)
@@ -202,70 +281,21 @@ class PickToolHLA(HighLevelAction):
             plan, commands = move_to_joint_positions(self._sim, self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0])
             sim_states.extend(plan)
             robot_commands.extend(commands)
+
+            print("Robot Commands: ")
+            for command in robot_commands:
+                print(command)
+            input("Doest this look good?")
             
             if self._run_on_robot:
+                # print("Checking before running on robot")
                 self.execute_robot_commands(robot_commands)
 
             return sim_states
 
         else:
-            print(f"PickTool not yet implemented for {tool}")
-            return []
-
-class StowToolHLA(HighLevelAction):
-    """Stow a tool (utensil, drink, or wipe)."""
-
-    def get_name(self) -> str:
-        return "StowTool"
-
-    def get_operator(self) -> LiftedOperator:
-        tool = Variable("?tool", tool_type)
-        return LiftedOperator(
-            self.get_name(),
-            parameters=[tool],
-            preconditions={Holding([tool])},
-            add_effects={LiftedAtom(GripperFree, [])},
-            delete_effects={Holding([tool])},
-        )
-
-    def get_simulated_trajectory(
-        self,
-        objects: tuple[Object, ...],
-        params: dict[str, Any],
-    ) -> list[FeedingDeploymentSimulatorState]:
-        # TODO
-        assert len(objects) == 1
-        tool = objects[0]
-        if tool.name == "cup":
-            nominal_plan = get_plan_to_stow_cup(
-                self._sim,
-                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
-            )
-        elif tool.name == "wiper":
-            nominal_plan = get_plan_to_stow_wiper(
-                self._sim,
-                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
-            )
-        elif tool.name == "utensil":
-            nominal_plan = get_plan_to_stow_utensil(
-                self._sim,
-                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
-            )
-        else:
             print(f"StowTool not yet implemented for {tool}")
             return []
-        remapped_plan = remap_trajectory_to_constant_distance(nominal_plan, self._sim)
-        return remapped_plan
-    
-    def execute_action(
-        self,
-        objects: tuple[Object, ...],
-        params: dict[str, Any],
-    ) -> list[FeedingDeploymentSimulatorState]:
-        assert len(objects) == 1
-        tool = objects[0]
-
-        print("Not implemented yet")
 
 
 class TransferToolHLA(HighLevelAction):

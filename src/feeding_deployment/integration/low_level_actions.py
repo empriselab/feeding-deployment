@@ -58,8 +58,9 @@ def move_to_joint_positions(
     )
 
     if direct_path:
-        return _plan_to_sim_state_trajectory(direct_path, sim), [JointCommand(pos=sim.scene_description.utensil_neutral_pos)]
-
+        # Rajat ToDo: Discuss arm / robot dissociation with Tom
+        return _plan_to_sim_state_trajectory(direct_path, sim), [JointCommand(pos=joint_positions[:7])]
+                                                                 
     print("No direct path found. Running motion planning.")
     plan = run_motion_planning(robot = sim.robot,
         initial_positions = initial_joint_positions,

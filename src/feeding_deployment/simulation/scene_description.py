@@ -41,7 +41,7 @@ class SceneDescription:
         (0.7071068, -0.7071068, 0.0, 0.0),
     )
     utensil_inside_mount_pos: JointPositions = field(
-        default_factory=lambda: [2.854928662273119, 0.5484296235490069, 2.3664516551307853, -2.5354838210986594, 1.1181978253322737, -0.4196300319060411, -0.4776571162655596] # Rajat ToDo: Add the joint positions for the utensil inside mount
+        default_factory=lambda: [2.854928662273119, 0.5484296235490069, 2.3664516551307853, -2.5354838210986594, 1.1181978253322737, -0.4196300319060411, -0.4776571162655596]
     )
 
     utensil_outside_mount: Pose = Pose(
@@ -49,7 +49,7 @@ class SceneDescription:
         (0.7071068, -0.7071068, 0.0, 0.0),
     )
     utensil_outside_mount_pos: JointPositions = field(
-        default_factory=lambda: [2.6263072016502855, 0.6990732614011294, 2.3072804767669686, -2.22978328799399, 0.9554788158864868, -0.6272143841300117, -0.4820587889152428] # Rajat ToDo: Add the joint positions for the utensil outside mount
+        default_factory=lambda: [2.6263072016502855, 0.6990732614011294, 2.3072804767669686, -2.22978328799399, 0.9554788158864868, -0.6272143841300117, -0.4820587889152428]
     )
 
     utensil_above_mount: Pose = Pose(
@@ -57,7 +57,15 @@ class SceneDescription:
         (0.7071068, -0.7071068, 0.0, 0.0),
     )
     utensil_above_mount_pos: JointPositions = field(
-        default_factory=lambda: [-2.9830267107059303, 0.39129809251777437, 1.8614008644185065, -2.4207417918487044, 0.614389066373381, -0.6996630184245269, -0.006409696111602692] # Rajat ToDo: Add the joint positions for the utensil above mount
+        default_factory=lambda: [-2.9830267107059303, 0.39129809251777437, 1.8614008644185065, -2.4207417918487044, 0.614389066373381, -0.6996630184245269, -0.006409696111602692]
+    )
+
+    utensil_infront_mount: Pose = Pose(
+        (0.0, -0.17, 0.15),
+        (0.7071068, -0.7071068, 0.0, 0.0),
+    )
+    utensil_infront_mount_pos: JointPositions = field(
+        default_factory=lambda: [2.835106221647441, 0.18716812654374576, 1.7554270267415284, -2.5582927305707517, 0.3492644556371586, -0.5794207625752312, -0.3984099643402903]
     )
 
     utensil_neutral_pos: JointPositions = field(
