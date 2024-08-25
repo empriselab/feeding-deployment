@@ -49,6 +49,7 @@ from feeding_deployment.simulation.planning import (
     _get_motion_plan_for_robot_finger_tip,
     remap_trajectory_to_constant_distance,
     _get_plan_to_execute_grasp,
+    _get_plan_to_execute_ungrasp,
     _plan_to_sim_state_trajectory,
 )
 from pybullet_helpers.motion_planning import (
@@ -178,9 +179,9 @@ class PickToolHLA(HighLevelAction):
             sim_states: list[FeedingDeploymentSimulatorState] = []
             robot_commands = []
 
-            # plan, commands = move_to_joint_positions(self._sim, self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0])
-            # sim_states.extend(plan)
-            # robot_commands.extend(commands)
+            plan, commands = move_to_joint_positions(self._sim, self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0])
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
 
             plan, commands = move_to_joint_positions(self._sim, self._sim.scene_description.utensil_infront_mount_pos + [0.0, 0.0])
             sim_states.extend(plan)
@@ -207,14 +208,8 @@ class PickToolHLA(HighLevelAction):
             plan, commands = move_to_joint_positions(self._sim, self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0])
             sim_states.extend(plan)
             robot_commands.extend(commands)
-
-            print("Robot Commands: ")
-            for command in robot_commands:
-                print(command)
-            input("Doest this look good?")
             
             if self._run_on_robot:
-                # print("Checking before running on robot")
                 self.execute_robot_commands(robot_commands)
 
             return sim_states
@@ -252,13 +247,9 @@ class StowToolHLA(HighLevelAction):
 
         if tool.name == "utensil":
             
-            assert self._sim.held_object_name is None
+            assert self._sim.held_object_name == "utensil"
             sim_states: list[FeedingDeploymentSimulatorState] = []
             robot_commands = []
-
-            plan, commands = move_to_joint_positions(self._sim, self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0])
-            sim_states.extend(plan)
-            robot_commands.extend(commands)
 
             plan, commands = move_to_joint_positions(self._sim, self._sim.scene_description.utensil_outside_mount_pos + [0.0, 0.0])
             sim_states.extend(plan)
@@ -268,27 +259,25 @@ class StowToolHLA(HighLevelAction):
             sim_states.extend(plan)
             robot_commands.extend(commands) 
 
-            # open grippers
-            robot_commands.append(OpenGripperCommand())
-            # only for sim: set held object
-            sim_states.extend(_get_plan_to_execute_grasp(self._sim, "utensil"))
+            # close grippers
+            robot_commands.append(CloseGripperCommand())
+            # only for sim: unset held object
+            sim_states.extend(_get_plan_to_execute_ungrasp(self._sim))
             # input("Press Enter to continue...")
             
-            plan, commands = teleport_to_ee_pose(self._sim, self._sim.scene_description.utensil_outside_mount, self._sim.scene_description.utensil_outside_mount_pos + [0.0, 0.0])
+            plan, commands = teleport_to_ee_pose(self._sim, self._sim.scene_description.utensil_above_mount, self._sim.scene_description.utensil_above_mount_pos + [0.0, 0.0])
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
+
+            plan, commands = teleport_to_ee_pose(self._sim, self._sim.scene_description.utensil_infront_mount, self._sim.scene_description.utensil_infront_mount_pos + [0.0, 0.0])
             sim_states.extend(plan)
             robot_commands.extend(commands)
 
             plan, commands = move_to_joint_positions(self._sim, self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0])
             sim_states.extend(plan)
             robot_commands.extend(commands)
-
-            print("Robot Commands: ")
-            for command in robot_commands:
-                print(command)
-            input("Doest this look good?")
             
             if self._run_on_robot:
-                # print("Checking before running on robot")
                 self.execute_robot_commands(robot_commands)
 
             return sim_states
