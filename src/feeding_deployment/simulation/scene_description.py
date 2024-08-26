@@ -202,9 +202,9 @@ class SceneDescription:
     table_half_extents: tuple[float, float, float] = (0.25, 0.4, 0.345)
 
     # Cup.
-    cup_pose: Pose = Pose(
-        (0.53, 0.66, 0.32), p.getQuaternionFromEuler((np.pi / 2, 0.0, np.pi))
-    )
+    # cup_pose: Pose = Pose(
+    #     (0.53, 0.66, 0.32), p.getQuaternionFromEuler((np.pi / 2, 0.0, np.pi))
+    # )
     cup_urdf_path: Path = (
         Path(__file__).parent.parent
         / "assets"
@@ -251,6 +251,10 @@ class SceneDescription:
     # )
     # above_cup_pos = [3.0622933037071576, -0.9648787092700299, -0.5952463310369183, -1.2963117700914815, -1.4352504820575698, -0.9462605500892867, -3.085153612188289]
 
+    cup_pose: Pose = Pose(
+        (0.545, 0.518, 0.270), 
+        (-0.2126311, -0.6743797, -0.6743797, 0.2126311)
+    )
 
     cup_outside_mount: Pose = Pose(
         (0.545, 0.45, 0.270),
