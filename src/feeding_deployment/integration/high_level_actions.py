@@ -210,22 +210,15 @@ class PickToolHLA(HighLevelAction):
                 robot_commands,
             )
 
-            # open grippers
+            # open gripperscup_inside_mount_pos
             robot_commands.append(OpenGripperCommand())
             # only for sim: set held object
             sim_states.extend(_get_plan_to_execute_grasp(self._sim, "cup"))
 
             teleport_to_ee_pose(
                 self._sim,
-                self._sim.scene_description.cup_outside_mount,
-                self._sim.scene_description.cup_outside_mount_pos + [0.0, 0.0],
-                sim_states,
-                robot_commands,
-            )
-
-            move_to_joint_positions(
-                self._sim,
-                self._sim.scene_description.retract_pos + [0.0, 0.0],
+                self._sim.scene_description.cup_above_mount,
+                self._sim.scene_description.cup_above_mount_pos + [0.0, 0.0],
                 sim_states,
                 robot_commands,
             )
@@ -337,13 +330,6 @@ class StowToolHLA(HighLevelAction):
             assert self._sim.held_object_name == "cup"
             sim_states: list[FeedingDeploymentSimulatorState] = []
             robot_commands = []
-
-            move_to_joint_positions(
-                self._sim,
-                self._sim.scene_description.retract_pos + [0.0, 0.0],
-                sim_states,
-                robot_commands,
-            )
 
             move_to_joint_positions(
                 self._sim,
@@ -536,6 +522,24 @@ class TransferToolHLA(HighLevelAction):
                 self.execute_robot_commands(robot_commands)
 
             # Rajat ToDo: Implement the rest of bite transfer
+
+            return sim_states
+        elif tool.name == "cup":
+            assert self._sim.held_object_name == "cup"
+            sim_states: list[FeedingDeploymentSimulatorState] = []
+            robot_commands = []
+
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.before_transfer_pos + [0.0, 0.0],
+                sim_states,
+                robot_commands,
+            )
+
+            if self._run_on_robot:
+                self.execute_robot_commands(robot_commands)
+
+            # Rajat ToDo: Implement the rest of cup transfer
 
             return sim_states
 
