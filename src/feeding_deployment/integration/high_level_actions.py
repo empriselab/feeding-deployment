@@ -189,7 +189,7 @@ class PickToolHLA(HighLevelAction):
             robot_commands = []
 
             move_to_joint_positions(
-                self._sim, 
+                self._sim,
                 self._sim.scene_description.retract_pos + [0.0, 0.0],
                 sim_states,
                 robot_commands,
@@ -224,7 +224,7 @@ class PickToolHLA(HighLevelAction):
             )
 
             move_to_joint_positions(
-                self._sim, 
+                self._sim,
                 self._sim.scene_description.retract_pos + [0.0, 0.0],
                 sim_states,
                 robot_commands,
@@ -242,7 +242,7 @@ class PickToolHLA(HighLevelAction):
             robot_commands = []
 
             move_to_joint_positions(
-                self._sim, 
+                self._sim,
                 self._sim.scene_description.retract_pos + [0.0, 0.0],
                 sim_states,
                 robot_commands,
@@ -285,14 +285,14 @@ class PickToolHLA(HighLevelAction):
             )
 
             move_to_joint_positions(
-                self._sim, 
+                self._sim,
                 self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0],
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
-                self._sim, 
+                self._sim,
                 self._sim.scene_description.retract_pos + [0.0, 0.0],
                 sim_states,
                 robot_commands,
@@ -339,14 +339,14 @@ class StowToolHLA(HighLevelAction):
             robot_commands = []
 
             move_to_joint_positions(
-                self._sim, 
+                self._sim,
                 self._sim.scene_description.retract_pos + [0.0, 0.0],
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
-                self._sim, 
+                self._sim,
                 self._sim.scene_description.cup_above_mount_pos + [0.0, 0.0],
                 sim_states,
                 robot_commands,
@@ -372,9 +372,9 @@ class StowToolHLA(HighLevelAction):
                 sim_states,
                 robot_commands,
             )
-        
+
             move_to_joint_positions(
-                self._sim, 
+                self._sim,
                 self._sim.scene_description.retract_pos + [0.0, 0.0],
                 sim_states,
                 robot_commands,
@@ -384,7 +384,7 @@ class StowToolHLA(HighLevelAction):
                 self.execute_robot_commands(robot_commands)
 
             return sim_states
-        
+
         if tool.name == "utensil":
 
             assert self._sim.held_object_name == "utensil"
@@ -392,14 +392,14 @@ class StowToolHLA(HighLevelAction):
             robot_commands = []
 
             move_to_joint_positions(
-                self._sim, 
+                self._sim,
                 self._sim.scene_description.retract_pos + [0.0, 0.0],
                 sim_states,
                 robot_commands,
             )
-            
+
             move_to_joint_positions(
-                self._sim, 
+                self._sim,
                 self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0],
                 sim_states,
                 robot_commands,
@@ -443,7 +443,7 @@ class StowToolHLA(HighLevelAction):
             )
 
             move_to_joint_positions(
-                self._sim, 
+                self._sim,
                 self._sim.scene_description.retract_pos + [0.0, 0.0],
                 sim_states,
                 robot_commands,
@@ -526,12 +526,12 @@ class TransferToolHLA(HighLevelAction):
             robot_commands = []
 
             move_to_joint_positions(
-                self._sim, 
+                self._sim,
                 self._sim.scene_description.before_transfer_pos + [0.0, 0.0],
                 sim_states,
                 robot_commands,
             )
-            
+
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
 
@@ -581,7 +581,7 @@ class PrepareToolHLA(HighLevelAction):
             robot_commands = []
 
             move_to_joint_positions(
-                self._sim, 
+                self._sim,
                 self._sim.scene_description.above_plate_pos + [0.0, 0.0],
                 sim_states,
                 robot_commands,
