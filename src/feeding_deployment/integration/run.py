@@ -98,9 +98,9 @@ def _main(
     # TODO update this once the user interface is ready.
     TransferTool = hla_name_to_hla["TransferTool"]
     user_command_queue: list[GroundHighLevelAction | set[GroundAtom]] = [
+        GroundHighLevelAction(TransferTool, (cup,)),
         GroundHighLevelAction(TransferTool, (utensil,), {"mask": "TODO"}),
         GroundHighLevelAction(TransferTool, (wiper,)),
-        GroundHighLevelAction(TransferTool, (cup,)),
         {GroundAtom(GripperFree, [])},  # reset at the end
     ]
 

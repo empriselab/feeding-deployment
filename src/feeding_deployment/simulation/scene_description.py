@@ -111,7 +111,7 @@ class SceneDescription:
             0.28532185799581516,
             -0.4648462461578422,
             -0.29495787389950756,
-        ]  # Rajat ToDo: Add the joint positions for the utensil neutral position
+        ] 
     )
 
     above_plate_pos: JointPositions = field(
@@ -154,15 +154,15 @@ class SceneDescription:
     robot_name: str = "kinova-gen3"
     initial_joints: JointPositions = field(
         default_factory=lambda: [
-            0,
-            -np.pi / 4,
-            -np.pi / 2,
             0.0,
-            np.pi / 2,
-            -np.pi / 2,
-            np.pi / 2,
+            -0.34903602299465675,
+            -3.141591055693139,
+            -2.5482592711638783,
             0.0,
-            0.0,
+            -0.872688061814757,
+            1.57075917569769,
+            1.0,
+            1.0,
         ]
     )
     robot_base_pose: Pose = Pose(
@@ -203,7 +203,7 @@ class SceneDescription:
 
     # Cup.
     cup_pose: Pose = Pose(
-        (0.0, 0.75, 0.35), p.getQuaternionFromEuler((np.pi / 2, 0.0, np.pi))
+        (0.9, 0.9, 0.38), p.getQuaternionFromEuler((np.pi / 2, 0.0, np.pi))
     )
     cup_urdf_path: Path = (
         Path(__file__).parent.parent
@@ -211,6 +211,73 @@ class SceneDescription:
         / "urdf"
         / "drinking_utensil"
         / "drinking_utensil.urdf"
+    )
+
+    # outside_cup_pose = (
+    #         np.array([0.54, 0.5, 0.3158]),
+    #         np.array([0, 0.7071068, 0.7071068, 0]),
+    # )
+    # outside_cup_pos = [-2.9471131844578844, -1.6206821277020431, -1.724364315261008, -1.3886978935707663, 0.38836691755349223, -0.42193579677783166, 2.813355918708655]
+
+    # cup_inside_mount = (
+    #     np.array([0.54, 0.58, 0.3158]),
+    #     np.array([0, 0.7071068, 0.7071068, 0]),
+    # )
+
+    # above_cup_pose = (
+    #     np.array([0.54, 0.58, 0.4158]),
+    #     np.array([0, 0.7071068, 0.7071068, 0]),
+    # )
+    # above_cup_pos = [3.141430200763298, -1.4221115105035542, -1.7185037629661792, -1.1659074241546614, 0.34054286938325806, -0.440465006378167, 2.692516315826855]
+
+    # before_transfer_pos = [-2.86554642, -1.61951779, -2.60986085, -1.37302839, 1.11779249, -1.18028264, 2.05515862]
+
+    cup_outside_mount: Pose = Pose(
+        (0.54, 0.5, 0.3158),
+        (0.0, 0.7071068, 0.7071068, 0.0),
+    )
+    cup_outside_mount_pos: JointPositions = field(
+        default_factory=lambda: [
+            -2.9471131844578844,
+            -1.6206821277020431,
+            -1.724364315261008,
+            -1.3886978935707663,
+            0.38836691755349223,
+            -0.42193579677783166,
+            2.813355918708655,
+        ]
+    )
+
+    cup_inside_mount: Pose = Pose(
+        (0.54, 0.58, 0.3158),
+        (0.0, 0.7071068, 0.7071068, 0.0),
+    )
+    cup_inside_mount_pos: JointPositions = field(
+        default_factory=lambda: [
+            -3.129183920806678, 
+            -1.611078236178999, 
+            -1.7225949110327594, 
+            -1.2312683215240403, 
+            0.3936723339190936, 
+            -0.3945457175985849, 
+            2.8234245318419178, 
+        ]
+    )
+
+    cup_above_mount: Pose = Pose(
+        (0.54, 0.58, 0.4158),
+        (0.0, 0.7071068, 0.7071068, 0.0),
+    )
+    cup_above_mount_pos: JointPositions = field(
+        default_factory=lambda: [
+            3.141430200763298,
+            -1.4221115105035542,
+            -1.7185037629661792,
+            -1.1659074241546614,
+            0.34054286938325806,
+            -0.440465006378167,
+            2.692516315826855,
+        ]
     )
 
     cup_grasp_fingers_orientation: Quaternion = p.getQuaternionFromEuler(

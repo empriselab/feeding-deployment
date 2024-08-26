@@ -182,6 +182,69 @@ class PickToolHLA(HighLevelAction):
         assert len(objects) == 1
         tool = objects[0]
 
+        if tool.name == "cup":
+
+            assert self._sim.held_object_name is None
+            sim_states: list[FeedingDeploymentSimulatorState] = []
+            robot_commands = []
+
+            plan, commands = move_to_joint_positions(
+                self._sim, self._sim.scene_description.retract_pos + [0.0, 0.0]
+            )
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
+
+            input("Press Enter to continue...")
+
+            plan, commands = move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.cup_outside_mount_pos + [0.0, 0.0],
+            )
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
+
+            input("Press Enter to continue...")
+
+            plan, commands = teleport_to_ee_pose(
+                self._sim,
+                self._sim.scene_description.cup_inside_mount,
+                self._sim.scene_description.cup_inside_mount_pos + [0.0, 0.0],
+            )
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
+
+            input("Press Enter to continue...")
+
+            # open grippers
+            robot_commands.append(OpenGripperCommand())
+            # only for sim: set held object
+            sim_states.extend(_get_plan_to_execute_grasp(self._sim, "cup"))
+
+            input("Press Enter to continue...")
+
+            plan, commands = teleport_to_ee_pose(
+                self._sim,
+                self._sim.scene_description.cup_outside_mount,
+                self._sim.scene_description.cup_outside_mount_pos + [0.0, 0.0],
+            )
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
+
+            input("Press Enter to continue...")
+
+            plan, commands = move_to_joint_positions(
+                self._sim, self._sim.scene_description.retract_pos + [0.0, 0.0]
+            )
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
+
+            input("Press Enter to continue...")
+
+            if self._run_on_robot:
+                self.execute_robot_commands(robot_commands)
+
+            return sim_states
+
         if tool.name == "utensil":
 
             assert self._sim.held_object_name is None
@@ -276,6 +339,54 @@ class StowToolHLA(HighLevelAction):
         assert len(objects) == 1
         tool = objects[0]
 
+        if tool.name == "cup":
+
+            assert self._sim.held_object_name == "cup"
+            sim_states: list[FeedingDeploymentSimulatorState] = []
+            robot_commands = []
+
+            plan, commands = move_to_joint_positions(
+                self._sim, self._sim.scene_description.retract_pos + [0.0, 0.0]
+            )
+
+            plan, commands = move_to_joint_positions(
+                self._sim, self._sim.scene_description.cup_above_mount_pos + [0.0, 0.0]
+            )
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
+
+            plan, commands = teleport_to_ee_pose(
+                self._sim,
+                self._sim.scene_description.cup_inside_mount,
+                self._sim.scene_description.cup_inside_mount_pos + [0.0, 0.0],
+            )
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
+
+            # close grippers
+            robot_commands.append(CloseGripperCommand())
+            # only for sim: unset held object
+            sim_states.extend(_get_plan_to_execute_ungrasp(self._sim))
+
+            plan, commands = teleport_to_ee_pose(
+                self._sim,
+                self._sim.scene_description.cup_above_mount,
+                self._sim.scene_description.cup_above_mount_pos + [0.0, 0.0],
+            )
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
+
+            plan, commands = move_to_joint_positions(
+                self._sim, self._sim.scene_description.retract_pos + [0.0, 0.0]
+            )
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
+
+            if self._run_on_robot:
+                self.execute_robot_commands(robot_commands)
+
+            return sim_states
+        
         if tool.name == "utensil":
 
             assert self._sim.held_object_name == "utensil"
