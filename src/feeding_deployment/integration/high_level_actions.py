@@ -231,6 +231,12 @@ class PickToolHLA(HighLevelAction):
             robot_commands.extend(commands)
 
             plan, commands = move_to_joint_positions(
+                self._sim, self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0]
+            )
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
+
+            plan, commands = move_to_joint_positions(
                 self._sim, self._sim.scene_description.retract_pos + [0.0, 0.0]
             )
             sim_states.extend(plan)
@@ -278,6 +284,12 @@ class StowToolHLA(HighLevelAction):
 
             plan, commands = move_to_joint_positions(
                 self._sim, self._sim.scene_description.retract_pos + [0.0, 0.0]
+            )
+            sim_states.extend(plan)
+            robot_commands.extend(commands)
+
+            plan, commands = move_to_joint_positions(
+                self._sim, self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0]
             )
             sim_states.extend(plan)
             robot_commands.extend(commands)
