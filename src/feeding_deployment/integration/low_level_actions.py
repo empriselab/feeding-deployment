@@ -45,11 +45,12 @@ from feeding_deployment.simulation.planning import (
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
 
-
 def move_to_joint_positions(
     sim: FeedingDeploymentPyBulletSimulator,
     joint_positions: list[float],
-) -> tuple[list[FeedingDeploymentSimulatorState], list[KinovaCommand]]:
+    sim_states: list[FeedingDeploymentSimulatorState],
+    robot_commands: list[KinovaCommand],
+) -> None:
     """Move the robot to the specified joint positions."""
 
     initial_joint_positions = sim.robot.get_joint_positions().copy()
@@ -60,7 +61,6 @@ def move_to_joint_positions(
         initial_positions=initial_joint_positions,
         target_positions=joint_positions,
         collision_bodies=sim.get_collision_ids(),
-        seed=0,
         physics_client_id=sim.physics_client_id,
         held_object=sim.held_object_id,
         base_link_to_held_obj=sim.held_object_tf,
@@ -68,9 +68,9 @@ def move_to_joint_positions(
 
     if direct_path:
         # Rajat ToDo: Discuss arm / robot dissociation with Tom
-        return _plan_to_sim_state_trajectory(direct_path, sim), [
-            JointCommand(pos=joint_positions[:7])
-        ]
+        sim_states.extend(_plan_to_sim_state_trajectory(direct_path, sim))
+        robot_commands.append(JointCommand(pos=joint_positions[:7]))
+        return
 
     print("No direct path found. Running motion planning.")
     plan = run_motion_planning(
@@ -86,14 +86,17 @@ def move_to_joint_positions(
     plan = _plan_to_sim_state_trajectory(plan, sim)
     remapped_plan = remap_trajectory_to_constant_distance(plan, sim)
 
-    return remapped_plan, simulated_trajectory_to_kinova_commands(remapped_plan)
+    sim_states.extend(remapped_plan)
+    robot_commands.extend(simulated_trajectory_to_kinova_commands(remapped_plan))
 
 
 def teleport_to_ee_pose(
     sim: FeedingDeploymentPyBulletSimulator,
     pose: Pose,
     expected_joint_positions: list[float],
-) -> tuple[list[FeedingDeploymentSimulatorState], list[KinovaCommand]]:
+    sim_states: list[FeedingDeploymentSimulatorState],
+    robot_commands: list[KinovaCommand],
+) -> None:
     """Call Kinova's move_to_ee_pose to move the robot to the specified pose.
 
     We do not yet know the implementation of move_to_ee_pose, so we we
@@ -124,4 +127,5 @@ def teleport_to_ee_pose(
     )
     sim.sync(sim_state)
 
-    return [sim_state], [command]
+    sim_states.append(sim_state)
+    robot_commands.append(command)

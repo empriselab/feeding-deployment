@@ -203,7 +203,7 @@ class SceneDescription:
 
     # Cup.
     cup_pose: Pose = Pose(
-        (0.9, 0.9, 0.38), p.getQuaternionFromEuler((np.pi / 2, 0.0, np.pi))
+        (0.53, 0.66, 0.32), p.getQuaternionFromEuler((np.pi / 2, 0.0, np.pi))
     )
     cup_urdf_path: Path = (
         Path(__file__).parent.parent
