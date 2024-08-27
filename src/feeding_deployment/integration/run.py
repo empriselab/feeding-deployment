@@ -1,8 +1,10 @@
 """The main entry point for running the integrated system."""
 
+import json
 from pathlib import Path
 from typing import Any
 
+import rospy
 from relational_structs import (
     GroundAtom,
     LiftedAtom,
@@ -12,6 +14,7 @@ from relational_structs import (
     Predicate,
 )
 from relational_structs.utils import parse_pddl_plan
+from std_msgs.msg import String
 from tomsutils.pddl_planning import run_pyperplan_planning
 
 from feeding_deployment.integration.high_level_actions import (
@@ -48,66 +51,97 @@ from feeding_deployment.simulation.video import make_simulation_video
 HLAS = {PickToolHLA, StowToolHLA, PrepareToolHLA, TransferToolHLA}
 
 
-def _main(
-    run_on_robot: bool, make_videos: bool, max_motion_planning_time: float = 10
-) -> None:
-    """The main entry point for running the integrated system."""
+class _Runner:
+    """A class for running the integrated system."""
 
-    # Initialize the interface to the robot.
-    if run_on_robot:
-        manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
-        manager.connect()
-        robot_interface = manager.Arm()  # type: ignore  # pylint: disable=no-member
-    else:
-        robot_interface = None
+    def __init__(self, run_on_robot: bool, max_motion_planning_time: float):
+        self.run_on_robot = run_on_robot
+        self.max_motion_planning_time = max_motion_planning_time
 
-    # Initialize the perceiver (e.g., get joint states or human head poses).
-    perception_interface = PerceptionInterface(robot_interface)
+        # Subscribe to the web interface topics.
+        self.web_interface_sub = rospy.Subscriber(
+            "WebAppComm", String, self.web_interface_callback
+        )
 
-    # Initialize the simulator.
-    kwargs: dict[str, Any] = {}
-    if run_on_robot:
-        kwargs["initial_joints"] = perception_interface.get_robot_joints()
-        print(f"Initial joint state: {kwargs['initial_joints']}")
-    else:
-        print("Running in simulation mode.")
-    scene_description = SceneDescription(**kwargs)
-    sim = FeedingDeploymentPyBulletSimulator(scene_description)
+        # Initialize the interface to the robot.
+        if run_on_robot:
+            manager = ArmManager(
+                address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY
+            )
+            manager.connect()
+            self.robot_interface = manager.Arm()  # type: ignore  # pylint: disable=no-member
+        else:
+            self.robot_interface = None
 
-    # Create skills for high-level planning.
-    hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
-    hlas = {
-        cls(sim, robot_interface, perception_interface, hla_hyperparams, run_on_robot) for cls in HLAS  # type: ignore
-    }
-    hla_name_to_hla = {hla.get_name(): hla for hla in hlas}
-    operators = {hla.get_operator() for hla in hlas}
-    predicates: set[Predicate] = {ToolPrepared, GripperFree, Holding, ToolTransferDone}
-    types = {tool_type}
-    domain = PDDLDomain("AssistedFeeding", operators, predicates, types)
-    cup = Object("cup", tool_type)
-    wiper = Object("wiper", tool_type)
-    utensil = Object("utensil", tool_type)
-    all_objects = {cup, wiper, utensil}
-    current_atoms = {
-        LiftedAtom(GripperFree, []),
-        ToolPrepared([wiper]),
-        ToolPrepared([cup]),
-    }
+        # Initialize the perceiver (e.g., get joint states or human head poses).
+        self.perception_interface = PerceptionInterface(self.robot_interface)
 
-    # TODO update this once the user interface is ready.
-    TransferTool = hla_name_to_hla["TransferTool"]
-    user_command_queue: list[GroundHighLevelAction | set[GroundAtom]] = [
-        GroundHighLevelAction(TransferTool, (utensil,), {"mask": "TODO"}),
-        GroundHighLevelAction(TransferTool, (cup,)),
-        GroundHighLevelAction(TransferTool, (wiper,)),
-        {GroundAtom(GripperFree, [])},  # reset at the end
-    ]
+        # Initialize the simulator.
+        kwargs: dict[str, Any] = {}
+        if run_on_robot:
+            kwargs["initial_joints"] = self.perception_interface.get_robot_joints()
+            print(f"Initial joint state: {kwargs['initial_joints']}")
+        else:
+            print("Running in simulation mode.")
+        self.scene_description = SceneDescription(**kwargs)
+        self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description)
 
-    full_simulated_traj: list[FeedingDeploymentSimulatorState] = []
+        # Create skills for high-level planning.
+        hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
+        self.hlas = {
+            cls(self.sim, self.robot_interface, self.perception_interface, hla_hyperparams, run_on_robot) for cls in HLAS  # type: ignore
+        }
+        self.hla_name_to_hla = {hla.get_name(): hla for hla in self.hlas}
+        self.operators = {hla.get_operator() for hla in self.hlas}
+        self.predicates: set[Predicate] = {
+            ToolPrepared,
+            GripperFree,
+            Holding,
+            ToolTransferDone,
+        }
+        self.types = {tool_type}
+        self.domain = PDDLDomain(
+            "AssistedFeeding", self.operators, self.predicates, self.types
+        )
+        self.cup = Object("cup", tool_type)
+        self.wiper = Object("wiper", tool_type)
+        self.utensil = Object("utensil", tool_type)
+        self.all_objects = {self.cup, self.wiper, self.utensil}
 
-    while user_command_queue:
-        user_command = user_command_queue.pop(0)
-        print(f"Working towards new command: {user_command}")
+        # Track the current high-level state.
+        self.current_atoms = {
+            LiftedAtom(GripperFree, []),
+            ToolPrepared([self.wiper]),
+            ToolPrepared([self.cup]),
+        }
+
+        # Record the full simulated trajectory for viz and debug.
+        self.full_simulated_traj: list[FeedingDeploymentSimulatorState] = []
+
+    def web_interface_callback(self, msg: String) -> None:
+        """Callback for the web interface."""
+        msg_dict = json.loads(msg.data)
+        print("RECEIVED MESSAGE FROM WEB INTERFACE:")
+        print(msg_dict)
+        if msg_dict["status"] == "drink_pickup":
+            user_cmd = GroundHighLevelAction(
+                self.hla_name_to_hla["PickTool"], (self.cup,)
+            )
+        elif msg_dict["status"] == "drink_transfer":
+            user_cmd = GroundHighLevelAction(
+                self.hla_name_to_hla["TransferTool"], (self.cup,)
+            )
+        else:
+            print("WARNING: Unrecognized message from web interface.")
+            return
+        self.process_user_command(user_cmd)
+
+    def process_user_command(
+        self, user_command: GroundHighLevelAction | set[GroundAtom]
+    ) -> None:
+        """Process a user command."""
+
+        print(f"Working towards user command: {user_command}")
 
         # Plan to the preconditions of the HLA.
         if isinstance(user_command, GroundHighLevelAction):
@@ -115,17 +149,21 @@ def _main(
         else:
             goal_atoms = user_command
         problem = PDDLProblem(
-            domain.name, "AssistedFeeding", all_objects, current_atoms, goal_atoms
+            self.domain.name,
+            "AssistedFeeding",
+            self.all_objects,
+            self.current_atoms,
+            goal_atoms,
         )
         plan_strs = run_pyperplan_planning(
-            str(domain), str(problem), heuristic="lmcut", search="astar"
+            str(self.domain), str(problem), heuristic="lmcut", search="astar"
         )
         assert plan_strs is not None
-        plan_ops = parse_pddl_plan(plan_strs, domain, problem)
+        plan_ops = parse_pddl_plan(plan_strs, self.domain, problem)
         print("Found plan to the preconditions of the command:")
         for i, op in enumerate(plan_ops):
             print(f"{i}. {op.short_str}")
-        plan_hlas = pddl_plan_to_hla_plan(plan_ops, hlas)
+        plan_hlas = pddl_plan_to_hla_plan(plan_ops, self.hlas)
         # Append the user command to the plan if it's an action.
         if isinstance(user_command, GroundHighLevelAction):
             plan_hlas.append(user_command)
@@ -134,23 +172,25 @@ def _main(
             print(f"Refining {ground_hla}")
             operator = ground_hla.get_operator()
 
-            assert operator.preconditions.issubset(current_atoms)
+            assert operator.preconditions.issubset(self.current_atoms)
 
             # Execute the high-level plan in simulation
             sim_traj = ground_hla.execute_action()
 
             if sim_traj:
-                full_simulated_traj.extend(sim_traj)
+                self.full_simulated_traj.extend(sim_traj)
 
             # Make sure the states are in sync.
             if sim_traj:
-                sim.sync(sim_traj[-1])
-            current_atoms -= operator.delete_effects
-            current_atoms |= operator.add_effects
+                self.sim.sync(sim_traj[-1])
+            self.current_atoms -= operator.delete_effects
+            self.current_atoms |= operator.add_effects
 
-    if make_videos:
-        outfile = Path(__file__).parent / "full.mp4"
-        make_simulation_video(sim, full_simulated_traj, outfile)
+        # TODO: send a message back to the web interface upon completion!
+
+    def make_video(self, outfile: Path) -> None:
+        """Create a video of the simulated trajectory."""
+        make_simulation_video(self.sim, self.full_simulated_traj, outfile)
         print(f"Saved video to {outfile}")
 
 
@@ -163,4 +203,8 @@ if __name__ == "__main__":
     parser.add_argument("--max_motion_planning_time", type=float, default=10.0)
     args = parser.parse_args()
 
-    _main(args.run_on_robot, args.make_videos, args.max_motion_planning_time)
+    rospy.init_node("feeding_deployment_integration")
+    runner = _Runner(args.run_on_robot, args.max_motion_planning_time)
+    if args.make_videos:
+        runner.make_video(Path("full.mp4"))
+    rospy.spin()
