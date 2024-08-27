@@ -22,7 +22,7 @@ except ModuleNotFoundError:
     pass
 
 
-from pybullet_helpers.geometry import Pose
+from pybullet_helpers.geometry import Pose, multiply_poses
 from pybullet_helpers.motion_planning import (
     get_joint_positions_distance,
     run_motion_planning,
@@ -462,43 +462,6 @@ class TransferToolHLA(HighLevelAction):
             delete_effects=set(),
         )
 
-    def get_simulated_trajectory(
-        self,
-        objects: tuple[Object, ...],
-        params: dict[str, Any],
-    ) -> list[FeedingDeploymentSimulatorState]:
-        # TODO
-        assert len(objects) == 1
-        tool = objects[0]
-        if tool.name == "cup":
-            nominal_plan = get_plan_to_transfer_cup(
-                self._sim,
-                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
-            )
-        elif tool.name == "wiper":
-            nominal_plan = get_plan_to_transfer_wiper(
-                self._sim,
-                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
-            )
-        # if tool.name == "utensil":
-        #     forque_target_pose = (
-        #         self._perception_interface.get_head_perception_forque_target_pose()
-        #     )
-        #     nominal_plan = get_bite_transfer_plan(
-        #         forque_target_pose,
-        #         self._sim,
-        #         max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
-        #     )
-        #     remapped_plan = remap_trajectory_to_constant_distance(
-        #         nominal_plan, self._sim
-        #     )
-        #     return remapped_plan
-        else:
-            print(f"TransferTool not yet implemented for {tool}")
-            return []
-        remapped_plan = remap_trajectory_to_constant_distance(nominal_plan, self._sim)
-        return remapped_plan
-
     def execute_action(
         self,
         objects: tuple[Object, ...],
@@ -519,13 +482,26 @@ class TransferToolHLA(HighLevelAction):
                 robot_commands,
             )
 
-            # move_to_ee_pose(sim=self._sim,
-            #                 target_pose=self._perception_interface.get_head_perception_forque_target_pose(),
-            #                 exclude_collision_ids=None,
-            #                 tip_from_end_effector=self._sim.scene_description.drink_tip_from_end_effector,
-            #                 max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
-            #                 sim_states=sim_states,
-            #                 robot_commands=robot_commands)
+            target_pose = self._perception_interface.get_head_perception_forque_target_pose()
+            intermediate_pose = multiply_poses(
+                target_pose, Pose(position=[0.0, 0.0, -0.1], orientation=[0.0, 0.0, 0.0, 1.0])
+            ) # 10 cms away from the mouth
+
+            move_to_ee_pose(sim=self._sim,
+                target_pose=intermediate_pose,
+                exclude_collision_ids=None,
+                tip_from_end_effector=self._sim.scene_description.utensil_tip_from_end_effector,
+                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+                sim_states=sim_states,
+                robot_commands=robot_commands)
+
+            move_to_ee_pose(sim=self._sim,
+                target_pose=target_pose,
+                exclude_collision_ids=None,
+                tip_from_end_effector=self._sim.scene_description.utensil_tip_from_end_effector,
+                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+                sim_states=sim_states,
+                robot_commands=robot_commands)
 
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
@@ -544,6 +520,27 @@ class TransferToolHLA(HighLevelAction):
                 sim_states,
                 robot_commands,
             )
+
+            target_pose = self._perception_interface.get_head_perception_forque_target_pose()
+            intermediate_pose = multiply_poses(
+                target_pose, Pose(position=[0.0, 0.0, -0.05], orientation=[0.0, 0.0, 0.0, 1.0])
+            ) # 10 cms away from the mouth
+
+            move_to_ee_pose(sim=self._sim,
+                target_pose=intermediate_pose,
+                exclude_collision_ids=None,
+                tip_from_end_effector=self._sim.scene_description.drink_tip_from_end_effector,
+                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+                sim_states=sim_states,
+                robot_commands=robot_commands)
+
+            move_to_ee_pose(sim=self._sim,
+                target_pose=target_pose,
+                exclude_collision_ids=None,
+                tip_from_end_effector=self._sim.scene_description.drink_tip_from_end_effector,
+                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+                sim_states=sim_states,
+                robot_commands=robot_commands)
 
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)

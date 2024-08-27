@@ -16,6 +16,7 @@ from pybullet_helpers.motion_planning import (
     smoothly_follow_end_effector_path,
     try_direct_path,
 )
+from pybullet_helpers.gui import visualize_pose
 
 from feeding_deployment.integration.perception_interface import PerceptionInterface
 from feeding_deployment.integration.utils import simulated_trajectory_to_kinova_commands
@@ -145,6 +146,7 @@ def move_to_ee_pose(
 ) -> None:
     """Plan ee pose trajectory to desired pose."""
 
+    input("In move_to_ee_pose")
     # Commands will be in end effector space, but grasp planning will be in
     # tip space.
     robot = sim.robot
