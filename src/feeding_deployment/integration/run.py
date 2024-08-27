@@ -187,6 +187,8 @@ class _Runner:
             self.current_atoms -= operator.delete_effects
             self.current_atoms |= operator.add_effects
 
+        # TODO: send a message back to the web interface upon completion!
+
     def make_video(self, outfile: Path) -> None:
         """Create a video of the simulated trajectory."""
         make_simulation_video(self.sim, self.full_simulated_traj, outfile)
