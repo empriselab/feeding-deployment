@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import time
 
 # Rajat ToDo: Remove this hacky addition
 FLAIR_PATH = "/home/isacc/deployment_ws/src/FLAIR/bite_acquisition/scripts"
@@ -39,6 +40,7 @@ from relational_structs import (
     Type,
     Variable,
 )
+from pybullet_helpers.gui import visualize_pose
 
 from feeding_deployment.integration.low_level_actions import (
     move_to_joint_positions,
@@ -487,6 +489,11 @@ class TransferToolHLA(HighLevelAction):
                 target_pose, Pose(position=[0.0, 0.0, -0.1], orientation=[0.0, 0.0, 0.0, 1.0])
             ) # 10 cms away from the mouth
 
+            visualize_pose(target_pose, self._sim.physics_client_id)
+            input("Visualizing target pose. Press Enter to continue...")
+            visualize_pose(intermediate_pose, self._sim.physics_client_id)
+            input("Visualizing intermediate pose. Press Enter to continue...")
+
             move_to_ee_pose(sim=self._sim,
                 target_pose=intermediate_pose,
                 exclude_collision_ids=None,
@@ -504,7 +511,17 @@ class TransferToolHLA(HighLevelAction):
                 robot_commands=robot_commands)
 
             if self._run_on_robot:
-                self.execute_robot_commands(robot_commands)
+                # Replay the trajectory before running on real robot
+                input("Replaying the trajectory before running on real robot. Press Enter to continue...")
+
+                for state in sim_states:
+                    self._sim.sync(state)
+
+                y = input("Does the trajectory look good? Press 'y' to execute on robot")
+                if y == "y":
+                    self.execute_robot_commands(robot_commands)
+                else:
+                    print("Trajectory not executed on robot")
 
             # Rajat ToDo: Implement the rest of bite transfer
 
@@ -522,9 +539,16 @@ class TransferToolHLA(HighLevelAction):
             )
 
             target_pose = self._perception_interface.get_head_perception_forque_target_pose()
+            print("target_pose", target_pose)
+
             intermediate_pose = multiply_poses(
                 target_pose, Pose(position=[0.0, 0.0, -0.05], orientation=[0.0, 0.0, 0.0, 1.0])
             ) # 10 cms away from the mouth
+
+            visualize_pose(target_pose, self._sim.physics_client_id)
+            input("Visualizing target pose. Press Enter to continue...")
+            visualize_pose(intermediate_pose, self._sim.physics_client_id)
+            input("Visualizing intermediate pose. Press Enter to continue...")
 
             move_to_ee_pose(sim=self._sim,
                 target_pose=intermediate_pose,
@@ -543,7 +567,18 @@ class TransferToolHLA(HighLevelAction):
                 robot_commands=robot_commands)
 
             if self._run_on_robot:
-                self.execute_robot_commands(robot_commands)
+                # Replay the trajectory before running on real robot
+                input("Replaying the trajectory before running on real robot. Press Enter to continue...")
+                
+                for state in sim_states:
+                    self._sim.sync(state)
+                    time.sleep(0.1)
+
+                y = input("Does the trajectory look good? Press 'y' to execute on robot")
+                if y == "y":
+                    self.execute_robot_commands(robot_commands)
+                else:
+                    print("Trajectory not executed on robot")
 
             # Rajat ToDo: Implement the rest of cup transfer
 
