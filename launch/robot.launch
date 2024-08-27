@@ -1,6 +1,6 @@
 <launch>
 
-    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/gen3_robotiq_2f_85.xacro dof:=7 sim:=false vision:=false feeding_utensil:=true" />
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/gen3_robotiq_2f_85.xacro dof:=7 sim:=false vision:=false drinking_utensil:=true" />
 
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
         <param name="use_gui" value="false"/>

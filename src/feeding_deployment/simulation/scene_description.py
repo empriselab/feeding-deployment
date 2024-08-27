@@ -37,6 +37,8 @@ def create_scene_description_from_config(config_file_path: str) -> SceneDescript
 class SceneDescription:
     """Scene description."""
 
+    tool_grasp_fingers_value: float = 0.44
+
     # robot base frame
     utensil_inside_mount: Pose = Pose(
         (-0.147, -0.17, 0.07),
@@ -155,18 +157,19 @@ class SceneDescription:
     initial_joints: JointPositions = field(
         default_factory=lambda: [
             0.0,
-            -0.34903602299465675,
-            -3.141591055693139,
-            -2.5482592711638783,
             0.0,
-            -0.872688061814757,
-            1.57075917569769,
-            0.8,
-            0.8,
-            0.8,
-            0.8,
-            -0.8,
-            -0.8,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+
         ]
     )
     robot_base_pose: Pose = Pose(
@@ -206,9 +209,9 @@ class SceneDescription:
     table_half_extents: tuple[float, float, float] = (0.25, 0.4, 0.345)
 
     # Cup.
-    cup_pose: Pose = Pose(
-        (0.53, 0.66, 0.32), p.getQuaternionFromEuler((np.pi / 2, 0.0, np.pi))
-    )
+    # cup_pose: Pose = Pose(
+    #     (0.53, 0.66, 0.32), p.getQuaternionFromEuler((np.pi / 2, 0.0, np.pi))
+    # )
     cup_urdf_path: Path = (
         Path(__file__).parent.parent
         / "assets"
@@ -217,43 +220,21 @@ class SceneDescription:
         / "drinking_utensil.urdf"
     )
 
-    # outside_cup_pose = (
-    #         np.array([0.54, 0.5, 0.3158]),
-    #         np.array([0, 0.7071068, 0.7071068, 0]),
-    # )
-    # outside_cup_pos = [-2.9471131844578844, -1.6206821277020431, -1.724364315261008, -1.3886978935707663, 0.38836691755349223, -0.42193579677783166, 2.813355918708655]
+    # Rajat ToDo: Fix with correct values, copied from drinking utensil
+    utensil_tip_from_end_effector: Pose = Pose(
+        (0.270, 0.095, -0.002),
+        (-0.000, 0.707, 0.000, 0.707),
+    )
 
-    # cup_inside_mount = (
-    #     np.array([0.54, 0.58, 0.3158]),
-    #     np.array([0, 0.7071068, 0.7071068, 0]),
-    # )
+    drink_tip_from_end_effector: Pose = Pose(
+        (0.270, 0.095, -0.002),
+        (-0.000, 0.707, 0.000, 0.707),
+    )
 
-    # above_cup_pose = (
-    #     np.array([0.54, 0.58, 0.4158]),
-    #     np.array([0, 0.7071068, 0.7071068, 0]),
-    # )
-    # above_cup_pos = [3.141430200763298, -1.4221115105035542, -1.7185037629661792, -1.1659074241546614, 0.34054286938325806, -0.440465006378167, 2.692516315826855]
-
-    # before_transfer_pos = [-2.86554642, -1.61951779, -2.60986085, -1.37302839, 1.11779249, -1.18028264, 2.05515862]
-
-    # new values
-    # outside_cup_pose = (
-    #     np.array([0.545, 0.45, 0.270]),
-    #     np.array([-0.2126311, -0.6743797, -0.6743797, 0.2126311]),
-    # )
-    # outside_cup_pos = [-3.100185292329023, -1.0924888665911388, -0.5706994426374399, -1.424560020809773, -1.4250553687725285, -1.041275746196697, -2.8561579774322996]
-
-    # cup_inside_mount = (
-    #     np.array([0.545, 0.518, 0.270]),
-    #     np.array([-0.2126311, -0.6743797, -0.6743797, 0.2126311]),
-    # )
-    # cup_inside_mount_pos = [3.042634381172411, -1.168988168903665, -0.5663478374162505, -1.2153447487342381, -1.3638740364179194, -1.0536210957458687, -2.9810178882956833]
-
-    # above_cup_pose = (
-    #     np.array([0.545, 0.518, 0.370]),
-    #     np.array([-0.2126311, -0.6743797, -0.6743797, 0.2126311]),
-    # )
-    # above_cup_pos = [3.0622933037071576, -0.9648787092700299, -0.5952463310369183, -1.2963117700914815, -1.4352504820575698, -0.9462605500892867, -3.085153612188289]
+    cup_pose: Pose = Pose(
+        (0.545, 0.65, 0.270), 
+        (-0.2126311, -0.6743797, -0.6743797, 0.2126311)
+    )
 
     cup_outside_mount: Pose = Pose(
         (0.545, 0.45, 0.270),

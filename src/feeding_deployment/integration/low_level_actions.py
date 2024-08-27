@@ -16,6 +16,7 @@ from pybullet_helpers.motion_planning import (
     run_smooth_motion_planning_to_pose,
     smoothly_follow_end_effector_path,
 )
+from pybullet_helpers.gui import visualize_pose
 
 from feeding_deployment.integration.perception_interface import PerceptionInterface
 from feeding_deployment.integration.utils import simulated_trajectory_to_kinova_commands
@@ -75,14 +76,14 @@ def move_to_joint_positions(
     if direct_path:
         # Rajat ToDo: Discuss arm / robot dissociation with Tom
         sim_states.extend(_plan_to_sim_state_trajectory(direct_path, sim))
-        robot_commands.append(JointCommand(pos=joint_positions[:7]))
+        robot_commands.append(JointCommand(pos=target_joint_positions[:7]))
         return
 
     print("No direct path found. Running motion planning.")
     plan = run_motion_planning(
         robot=sim.robot,
         initial_positions=initial_joint_positions,
-        target_positions=joint_positions,
+        target_positions=target_joint_positions,
         collision_bodies=sim.get_collision_ids(),
         seed=0,
         physics_client_id=sim.physics_client_id,
@@ -110,7 +111,6 @@ def teleport_to_ee_pose(
 
     NOTE: expected_joint_positions does NOT include finger joints.
     """
-
     command = CartesianCommand(pos=pose.position, quat=pose.orientation)
 
     cup_pose = sim.scene_description.cup_pose
@@ -140,3 +140,44 @@ def teleport_to_ee_pose(
 
     sim_states.append(sim_state)
     robot_commands.append(command)
+
+def move_to_ee_pose(
+    sim: FeedingDeploymentPyBulletSimulator,
+    target_pose: Pose,
+    exclude_collision_ids: set[int] | None,
+    tip_from_end_effector: Pose,
+    max_motion_plan_time: float,
+    sim_states: list[FeedingDeploymentSimulatorState],
+    robot_commands: list[KinovaCommand],
+) -> None:
+    """Plan ee pose trajectory to desired pose."""
+
+    input("In move_to_ee_pose")
+    # Commands will be in end effector space, but grasp planning will be in
+    # tip space.
+    robot = sim.robot
+    physics_client_id = sim.physics_client_id
+
+    # Run motion planning.
+    collision_ids = sim.get_collision_ids()
+    if exclude_collision_ids is not None:
+        collision_ids -= exclude_collision_ids
+
+    plan = run_smooth_motion_planning_to_pose(
+        target_pose,
+        robot,
+        collision_ids,
+        tip_from_end_effector,
+        seed=0,
+        max_time=max_motion_plan_time,
+        held_object=sim.held_object_id,
+        base_link_to_held_obj=sim.held_object_tf,
+    )
+    assert plan is not None
+
+    plan = _plan_to_sim_state_trajectory(plan, sim)
+    remapped_plan = remap_trajectory_to_constant_distance(plan, sim)
+
+    sim_states.extend(remapped_plan)
+    robot_commands.extend(simulated_trajectory_to_kinova_commands(remapped_plan))
+

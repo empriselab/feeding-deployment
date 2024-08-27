@@ -654,7 +654,7 @@ def _get_plan_to_execute_grasp(
     # Simulate grasping by faking a constraint with the held object.
     robot = sim.robot
     physics_client_id = sim.physics_client_id
-    robot.open_fingers()
+    robot.set_finger_state(sim.scene_description.tool_grasp_fingers_value)
     sim.held_object_name = object_name
     if object_name == "cup":
         sim.held_object_id = sim.cup_id

@@ -11,7 +11,7 @@
       <geometry>
         <mesh filename="utensil_base.stl"/>
       </geometry>
-      <material name="">
+      <material name="bluish">
         <color rgba="0.75294 1 0.75294 1"/>
       </material>
     </visual>
