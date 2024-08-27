@@ -568,6 +568,47 @@ def _get_motion_plan_for_robot_finger_tip(
     assert plan is not None
     return _plan_to_sim_state_trajectory(plan, sim)
 
+def run_smooth_ee_interpolated_planning_to_pose(
+    target_pose: Pose,
+    end_effector_from_tip: Pose,
+    sim: FeedingDeploymentPyBulletSimulator,
+    num_interp_waypoints: int,
+    max_motion_plan_time: float,
+    exclude_collision_ids: set[int] | None = None,
+) -> list[FeedingDeploymentSimulatorState]:
+
+    # Commands will be in end effector space, but grasp planning will be in
+    # finger frame space.
+    robot = sim.robot
+
+    target_end_effector_pose = multiply_poses(target_pose, end_effector_from_tip)
+    current_end_effector_pose = robot.get_end_effector_pose()
+
+    interpolated_poses = list(
+        interpolate_poses(
+            current_end_effector_pose,
+            target_end_effector_pose,
+            num_interp=num_interp_waypoints,
+        )
+    )
+
+    _joint_distance_fn = _create_joint_distance_fn(robot)
+
+    collision_ids = sim.get_collision_ids()
+    if exclude_collision_ids is not None:
+        collision_ids -= exclude_collision_ids
+
+    plan = smoothly_follow_end_effector_path(
+        robot,
+        interpolated_poses,
+        robot.get_joint_positions(),
+        collision_ids,
+        _joint_distance_fn,
+        max_time=max_motion_plan_time,
+        held_object=sim.held_object_id,
+        base_link_to_held_obj=sim.held_object_tf,
+    )
+    return _plan_to_sim_state_trajectory(plan, sim)
 
 def _get_interpolated_plan_for_robot_finger_tip(
     target_pose: Pose,

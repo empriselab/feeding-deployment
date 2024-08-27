@@ -42,6 +42,7 @@ from feeding_deployment.simulation.planning import (
     get_plan_to_transfer_cup,
     get_plan_to_transfer_wiper,
     remap_trajectory_to_constant_distance,
+    run_smooth_ee_interpolated_planning_to_pose
 )
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
@@ -163,19 +164,17 @@ def move_to_ee_pose(
     if exclude_collision_ids is not None:
         collision_ids -= exclude_collision_ids
 
-    plan = run_smooth_motion_planning_to_pose(
+    plan = run_smooth_ee_interpolated_planning_to_pose(
         target_pose,
-        robot,
-        collision_ids,
         tip_from_end_effector.invert(),
-        seed=0,
-        max_time=max_motion_plan_time,
-        held_object=sim.held_object_id,
-        base_link_to_held_obj=sim.held_object_tf,
+        sim,
+        num_interp_waypoints=10,
+        max_motion_plan_time=max_motion_plan_time,
     )
+
     assert plan is not None
 
-    plan = _plan_to_sim_state_trajectory(plan, sim)
+    # plan = _plan_to_sim_state_trajectory(plan, sim)
     remapped_plan = remap_trajectory_to_constant_distance(plan, sim)
 
     sim_states.extend(remapped_plan)

@@ -541,7 +541,7 @@ class TransferToolHLA(HighLevelAction):
             )
 
             # target_pose = self._perception_interface.get_head_perception_forque_target_pose()
-            target_pose = Pose(position=(0.17272330207928777, 0.5, 0.7), 
+            target_pose = Pose(position=(-0.17272330207928777, 0.6273752674813526, 0.5572539925006535), 
                 orientation=(-0.42030807,  0.56739361,  0.47188225, -0.52795148))
             print("target_pose", target_pose)
 
