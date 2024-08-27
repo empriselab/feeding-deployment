@@ -21,7 +21,7 @@ def simulated_trajectory_to_kinova_commands(
     current_trajectory: list[NDArray] = []
     for state in traj:
         joint_state = state.robot_joints
-        assert len(joint_state) == 8  # making assumptions about Kinova
+        assert len(joint_state) == 13  # making assumptions about Kinova
         arm = np.array(joint_state[:7])
         gripper = "closed" if joint_state[7] == 0 else "open"
         if last_gripper is None:

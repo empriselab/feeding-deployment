@@ -559,7 +559,7 @@ def _get_motion_plan_for_robot_finger_tip(
         target_pose,
         robot,
         collision_ids,
-        finger_from_end_effector,
+        finger_from_end_effector.invert(),
         seed,
         max_time=max_motion_plan_time,
         held_object=sim.held_object_id,
@@ -654,7 +654,7 @@ def _get_plan_to_execute_grasp(
     # Simulate grasping by faking a constraint with the held object.
     robot = sim.robot
     physics_client_id = sim.physics_client_id
-    robot.tool_grasp()
+    robot.set_finger_state(sim.scene_description.tool_grasp_fingers_value)
     sim.held_object_name = object_name
     if object_name == "cup":
         sim.held_object_id = sim.cup_id

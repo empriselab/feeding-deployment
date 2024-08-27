@@ -81,7 +81,7 @@ def _main(
 
     sim.held_object_name = "cup"
     sim.held_object_id = sim.cup_id
-    sim.robot.tool_grasp()
+    sim.robot.set_finger_state(scene_description.tool_grasp_fingers_value)
     finger_frame_id = sim.robot.link_from_name("finger_tip")
     end_effector_link_id = sim.robot.link_from_name(sim.robot.tool_link_name)
     cup_from_end_effector = get_relative_link_pose(
