@@ -535,6 +535,7 @@ class TransferToolHLA(HighLevelAction):
             # input("Visualizing intermediate pose. Press Enter to continue...")
 
             sim_length = len(sim_states)
+            robot_command_length = len(robot_commands)
 
             # NOTE: disabling collision checking here between held object and
             # conservative bounding box.
@@ -553,8 +554,8 @@ class TransferToolHLA(HighLevelAction):
             #     time.sleep(0.1)
                 # input("Press Enter to continue...")
 
-            sim_length = len(sim_states)
-            robot_command_length = len(robot_commands)
+            # sim_length = len(sim_states)
+            # robot_command_length = len(robot_commands)
 
             # NOTE: disabling collision checking here between held object and
             # conservative bounding box.
