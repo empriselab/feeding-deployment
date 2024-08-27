@@ -29,18 +29,7 @@ from feeding_deployment.robot_controller.command_interface import (
     OpenGripperCommand,
 )
 from feeding_deployment.simulation.planning import (
-    _get_motion_plan_for_robot_finger_tip,
-    _get_plan_to_execute_grasp,
     _plan_to_sim_state_trajectory,
-    get_bite_transfer_plan,
-    get_plan_to_grasp_cup,
-    get_plan_to_grasp_utensil,
-    get_plan_to_grasp_wiper,
-    get_plan_to_stow_cup,
-    get_plan_to_stow_utensil,
-    get_plan_to_stow_wiper,
-    get_plan_to_transfer_cup,
-    get_plan_to_transfer_wiper,
     remap_trajectory_to_constant_distance,
     run_smooth_ee_interpolated_planning_to_pose
 )
