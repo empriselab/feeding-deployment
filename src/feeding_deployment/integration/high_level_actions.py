@@ -484,7 +484,9 @@ class TransferToolHLA(HighLevelAction):
                 robot_commands,
             )
 
-            target_pose = self._perception_interface.get_head_perception_forque_target_pose()
+            # target_pose = self._perception_interface.get_head_perception_forque_target_pose()
+            target_pose = Pose(position=(-0.17272330207928777, 0.6273752674813526, 0.5572539925006535), 
+                orientation=(-0.42030807,  0.56739361,  0.47188225, -0.52795148))
             intermediate_pose = multiply_poses(
                 target_pose, Pose(position=[0.0, 0.0, -0.1], orientation=[0.0, 0.0, 0.0, 1.0])
             ) # 10 cms away from the mouth
@@ -538,7 +540,9 @@ class TransferToolHLA(HighLevelAction):
                 robot_commands,
             )
 
-            target_pose = self._perception_interface.get_head_perception_forque_target_pose()
+            # target_pose = self._perception_interface.get_head_perception_forque_target_pose()
+            target_pose = Pose(position=(-0.17272330207928777, 0.6273752674813526, 0.5572539925006535), 
+                orientation=(-0.42030807,  0.56739361,  0.47188225, -0.52795148))
             print("target_pose", target_pose)
 
             intermediate_pose = multiply_poses(
@@ -550,6 +554,8 @@ class TransferToolHLA(HighLevelAction):
             visualize_pose(intermediate_pose, self._sim.physics_client_id)
             input("Visualizing intermediate pose. Press Enter to continue...")
 
+            sim_length = len(sim_states)
+
             move_to_ee_pose(sim=self._sim,
                 target_pose=intermediate_pose,
                 exclude_collision_ids=None,
@@ -557,6 +563,14 @@ class TransferToolHLA(HighLevelAction):
                 max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
                 sim_states=sim_states,
                 robot_commands=robot_commands)
+            
+            input("Replaying the trajectory to check. Press Enter to continue...")
+            for i in range(sim_length, len(sim_states)):
+                self._sim.sync(sim_states[i])
+                time.sleep(0.1)
+                # input("Press Enter to continue...")
+
+            sim_length = len(sim_states)
 
             move_to_ee_pose(sim=self._sim,
                 target_pose=target_pose,
@@ -565,6 +579,12 @@ class TransferToolHLA(HighLevelAction):
                 max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
                 sim_states=sim_states,
                 robot_commands=robot_commands)
+            
+            input("Replaying the trajectory to check. Press Enter to continue...")
+            for i in range(sim_length, len(sim_states)):
+                self._sim.sync(sim_states[i])
+                time.sleep(0.1)
+                # input("Press Enter to continue...")
 
             if self._run_on_robot:
                 # Replay the trajectory before running on real robot
