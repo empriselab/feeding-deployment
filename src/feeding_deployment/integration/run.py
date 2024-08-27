@@ -1,10 +1,18 @@
 """The main entry point for running the integrated system."""
 
 import json
+from collections import namedtuple
 from pathlib import Path
 from typing import Any
 
-import rospy
+try:
+    import rospy
+    from std_msgs.msg import String
+
+    ROSPY_IMPORTED = True
+except ModuleNotFoundError:
+    ROSPY_IMPORTED = False
+
 from relational_structs import (
     GroundAtom,
     LiftedAtom,
@@ -14,7 +22,6 @@ from relational_structs import (
     Predicate,
 )
 from relational_structs.utils import parse_pddl_plan
-from std_msgs.msg import String
 from tomsutils.pddl_planning import run_pyperplan_planning
 
 from feeding_deployment.integration.high_level_actions import (
@@ -59,9 +66,10 @@ class _Runner:
         self.max_motion_planning_time = max_motion_planning_time
 
         # Subscribe to the web interface topics.
-        self.web_interface_sub = rospy.Subscriber(
-            "WebAppComm", String, self.web_interface_callback
-        )
+        if ROSPY_IMPORTED:
+            self.web_interface_sub = rospy.Subscriber(
+                "WebAppComm", String, self.web_interface_callback
+            )
 
         # Initialize the interface to the robot.
         if run_on_robot:
@@ -82,7 +90,6 @@ class _Runner:
             kwargs["initial_joints"] = self.perception_interface.get_robot_joints()
             print(f"Initial joint state: {kwargs['initial_joints']}")
         else:
-            kwargs["initial_joints"] = [0.0] * 9
             print("Running in simulation mode.")
         self.scene_description = SceneDescription(**kwargs)
         self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description)
@@ -119,7 +126,7 @@ class _Runner:
         # Record the full simulated trajectory for viz and debug.
         self.full_simulated_traj: list[FeedingDeploymentSimulatorState] = []
 
-    def web_interface_callback(self, msg: String) -> None:
+    def web_interface_callback(self, msg: "String") -> None:
         """Callback for the web interface."""
         msg_dict = json.loads(msg.data)
         print("RECEIVED MESSAGE FROM WEB INTERFACE:")
@@ -204,8 +211,20 @@ if __name__ == "__main__":
     parser.add_argument("--max_motion_planning_time", type=float, default=10.0)
     args = parser.parse_args()
 
-    rospy.init_node("feeding_deployment_integration")
+    if ROSPY_IMPORTED:
+        rospy.init_node("feeding_deployment_integration")
+    else:
+        assert not args.run_on_robot, "Need ROS to run on robot"
+
     runner = _Runner(args.run_on_robot, args.max_motion_planning_time)
+
+    # Uncomment to test commands.
+    msg = namedtuple("String", ["data"])
+    runner.web_interface_callback(msg(json.dumps({"status": "drink_pickup"})))
+    runner.web_interface_callback(msg(json.dumps({"status": "drink_transfer"})))
+
     if args.make_videos:
         runner.make_video(Path("full.mp4"))
-    rospy.spin()
+
+    if ROSPY_IMPORTED:
+        rospy.spin()

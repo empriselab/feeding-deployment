@@ -190,14 +190,14 @@ class PickToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.retract_pos + [0.0, 0.0],
+                self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.cup_outside_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.cup_outside_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -205,7 +205,7 @@ class PickToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.cup_inside_mount,
-                self._sim.scene_description.cup_inside_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.cup_inside_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -218,7 +218,7 @@ class PickToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.cup_above_mount,
-                self._sim.scene_description.cup_above_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.cup_above_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -236,21 +236,21 @@ class PickToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.retract_pos + [0.0, 0.0],
+                self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.utensil_infront_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_infront_mount_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.utensil_above_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_above_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -258,7 +258,7 @@ class PickToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.utensil_inside_mount,
-                self._sim.scene_description.utensil_inside_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_inside_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -272,21 +272,21 @@ class PickToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.utensil_outside_mount,
-                self._sim.scene_description.utensil_outside_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_outside_mount_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_neutral_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.retract_pos + [0.0, 0.0],
+                self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
             )
@@ -333,7 +333,7 @@ class StowToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.cup_above_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.cup_above_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -341,7 +341,7 @@ class StowToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.cup_inside_mount,
-                self._sim.scene_description.cup_inside_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.cup_inside_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -354,14 +354,14 @@ class StowToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.cup_outside_mount,
-                self._sim.scene_description.cup_outside_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.cup_outside_mount_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.retract_pos + [0.0, 0.0],
+                self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
             )
@@ -379,21 +379,21 @@ class StowToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.retract_pos + [0.0, 0.0],
+                self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_neutral_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.utensil_outside_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_outside_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -401,7 +401,7 @@ class StowToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.utensil_inside_mount,
-                self._sim.scene_description.utensil_inside_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_inside_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -415,7 +415,7 @@ class StowToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.utensil_above_mount,
-                self._sim.scene_description.utensil_above_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_above_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -423,14 +423,14 @@ class StowToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.utensil_infront_mount,
-                self._sim.scene_description.utensil_infront_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_infront_mount_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.retract_pos + [0.0, 0.0],
+                self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
             )
@@ -513,7 +513,7 @@ class TransferToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.before_transfer_pos + [0.0, 0.0],
+                self._sim.scene_description.before_transfer_pos,
                 sim_states,
                 robot_commands,
             )
@@ -531,7 +531,7 @@ class TransferToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.before_transfer_pos + [0.0, 0.0],
+                self._sim.scene_description.before_transfer_pos,
                 sim_states,
                 robot_commands,
             )
@@ -586,7 +586,7 @@ class PrepareToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.above_plate_pos + [0.0, 0.0],
+                self._sim.scene_description.above_plate_pos,
                 sim_states,
                 robot_commands,
             )

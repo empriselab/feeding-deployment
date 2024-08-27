@@ -559,7 +559,7 @@ def _get_motion_plan_for_robot_finger_tip(
         target_pose,
         robot,
         collision_ids,
-        finger_from_end_effector,
+        finger_from_end_effector.invert(),
         seed,
         max_time=max_motion_plan_time,
         held_object=sim.held_object_id,

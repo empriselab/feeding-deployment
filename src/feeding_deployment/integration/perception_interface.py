@@ -75,7 +75,14 @@ class PerceptionInterface:
     def get_robot_joints(self) -> "JointState":
         """Get the current robot joint state."""
         q, gripper_position = self._robot_interface.get_state()
-        joint_state = q.tolist() + [gripper_position, gripper_position]
+        joint_state = q.tolist() + [
+            gripper_position,
+            gripper_position,
+            gripper_position,
+            gripper_position,
+            -gripper_position,
+            -gripper_position,
+        ]
         return joint_state
 
     def get_camera_data(self):  # Rajat ToDo: Add return type
