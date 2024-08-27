@@ -143,7 +143,7 @@ def move_to_ee_pose(
 ) -> None:
     """Plan ee pose trajectory to desired pose."""
 
-    input("In move_to_ee_pose")
+    # input("In move_to_ee_pose")
 
     # Run motion planning.
     plan = run_smooth_ee_interpolated_planning_to_pose(

@@ -529,10 +529,10 @@ class TransferToolHLA(HighLevelAction):
                 target_pose, Pose(position=[0.0, 0.0, -0.05], orientation=[0.0, 0.0, 0.0, 1.0])
             ) # 10 cms away from the mouth
 
-            visualize_pose(target_pose, self._sim.physics_client_id)
-            input("Visualizing target pose. Press Enter to continue...")
-            visualize_pose(intermediate_pose, self._sim.physics_client_id)
-            input("Visualizing intermediate pose. Press Enter to continue...")
+            # visualize_pose(target_pose, self._sim.physics_client_id)
+            # input("Visualizing target pose. Press Enter to continue...")
+            # visualize_pose(intermediate_pose, self._sim.physics_client_id)
+            # input("Visualizing intermediate pose. Press Enter to continue...")
 
             sim_length = len(sim_states)
 
@@ -547,13 +547,14 @@ class TransferToolHLA(HighLevelAction):
                 robot_commands=robot_commands,
                 check_held_object_collisions=False)
             
-            input("Replaying the trajectory to check. Press Enter to continue...")
-            for i in range(sim_length, len(sim_states)):
-                self._sim.sync(sim_states[i])
-                time.sleep(0.1)
+            # input("Replaying the trajectory to check. Press Enter to continue...")
+            # for i in range(sim_length, len(sim_states)):
+            #     self._sim.sync(sim_states[i])
+            #     time.sleep(0.1)
                 # input("Press Enter to continue...")
 
             sim_length = len(sim_states)
+            robot_command_length = len(robot_commands)
 
             # NOTE: disabling collision checking here between held object and
             # conservative bounding box.
@@ -566,27 +567,34 @@ class TransferToolHLA(HighLevelAction):
                 robot_commands=robot_commands,
                 check_held_object_collisions=False)
             
-            input("Replaying the trajectory to check. Press Enter to continue...")
-            for i in range(sim_length, len(sim_states)):
-                self._sim.sync(sim_states[i])
-                time.sleep(0.1)
+            # input("Replaying the trajectory to check. Press Enter to continue...")
+            # for i in range(sim_length, len(sim_states)):
+            #     self._sim.sync(sim_states[i])
+            #     time.sleep(0.1)
                 # input("Press Enter to continue...")
 
-            if self._run_on_robot:
-                # Replay the trajectory before running on real robot
-                input("Replaying the trajectory before running on real robot. Press Enter to continue...")
-                
-                for state in sim_states:
-                    self._sim.sync(state)
-                    time.sleep(0.1)
+            # Rajat ToDo: Replace this wait with a ROS listener for button.
+            input("Press enter when drinking is finished")
+            
+            # Reverse the transfer plan.
+            transfer_sim_states = sim_states[sim_length:]
+            transfer_robot_commands = robot_commands[robot_command_length:]
+            sim_states.extend(transfer_sim_states[::-1])
+            robot_commands.extend(transfer_robot_commands[::-1])
 
+            # Replay the trajectory before running on real robot
+            print("Replaying the trajectory before running on real robot..")
+
+            for state in sim_states:
+                self._sim.sync(state)
+                time.sleep(0.1)
+
+            if self._run_on_robot:
                 y = input("Does the trajectory look good? Press 'y' to execute on robot")
                 if y == "y":
                     self.execute_robot_commands(robot_commands)
                 else:
                     print("Trajectory not executed on robot")
-
-            # Rajat ToDo: Implement the rest of cup transfer
 
             return sim_states
 
