@@ -84,6 +84,7 @@ def run_smooth_ee_interpolated_planning_to_pose(
     num_interp_waypoints: int,
     max_motion_plan_time: float,
     exclude_collision_ids: set[int] | None = None,
+    check_held_object_collisions: bool = True,
 ) -> list[FeedingDeploymentSimulatorState]:
 
     # Commands will be in end effector space, but grasp planning will be in
@@ -107,6 +108,13 @@ def run_smooth_ee_interpolated_planning_to_pose(
     if exclude_collision_ids is not None:
         collision_ids -= exclude_collision_ids
 
+    if check_held_object_collisions:
+        held_object = sim.held_object_id
+        base_link_to_held_obj = sim.held_object_tf
+    else:
+        held_object = None
+        base_link_to_held_obj = None
+
     plan = smoothly_follow_end_effector_path(
         robot,
         interpolated_poses,
@@ -114,8 +122,8 @@ def run_smooth_ee_interpolated_planning_to_pose(
         collision_ids,
         _joint_distance_fn,
         max_time=max_motion_plan_time,
-        held_object=sim.held_object_id,
-        base_link_to_held_obj=sim.held_object_tf,
+        held_object=held_object,
+        base_link_to_held_obj=base_link_to_held_obj,
     )
     return _plan_to_sim_state_trajectory(plan, sim)
 

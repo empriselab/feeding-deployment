@@ -470,21 +470,27 @@ class TransferToolHLA(HighLevelAction):
             visualize_pose(intermediate_pose, self._sim.physics_client_id)
             input("Visualizing intermediate pose. Press Enter to continue...")
 
+            # NOTE: disabling collision checking here between held object and
+            # conservative bounding box.
             move_to_ee_pose(sim=self._sim,
                 target_pose=intermediate_pose,
                 exclude_collision_ids=None,
                 tip_from_end_effector=self._sim.scene_description.utensil_tip_from_end_effector,
                 max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
                 sim_states=sim_states,
-                robot_commands=robot_commands)
+                robot_commands=robot_commands,
+                check_held_object_collisions=False)
 
+            # NOTE: disabling collision checking here between held object and
+            # conservative bounding box.
             move_to_ee_pose(sim=self._sim,
                 target_pose=target_pose,
                 exclude_collision_ids=None,
                 tip_from_end_effector=self._sim.scene_description.utensil_tip_from_end_effector,
                 max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
                 sim_states=sim_states,
-                robot_commands=robot_commands)
+                robot_commands=robot_commands,
+                check_held_object_collisions=False)
 
             if self._run_on_robot:
                 # Replay the trajectory before running on real robot
@@ -530,13 +536,16 @@ class TransferToolHLA(HighLevelAction):
 
             sim_length = len(sim_states)
 
+            # NOTE: disabling collision checking here between held object and
+            # conservative bounding box.
             move_to_ee_pose(sim=self._sim,
                 target_pose=intermediate_pose,
                 exclude_collision_ids=None,
                 tip_from_end_effector=self._sim.scene_description.drink_tip_from_end_effector,
                 max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
                 sim_states=sim_states,
-                robot_commands=robot_commands)
+                robot_commands=robot_commands,
+                check_held_object_collisions=False)
             
             input("Replaying the trajectory to check. Press Enter to continue...")
             for i in range(sim_length, len(sim_states)):
@@ -546,13 +555,16 @@ class TransferToolHLA(HighLevelAction):
 
             sim_length = len(sim_states)
 
+            # NOTE: disabling collision checking here between held object and
+            # conservative bounding box.
             move_to_ee_pose(sim=self._sim,
                 target_pose=target_pose,
                 exclude_collision_ids=None,
                 tip_from_end_effector=self._sim.scene_description.drink_tip_from_end_effector,
                 max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
                 sim_states=sim_states,
-                robot_commands=robot_commands)
+                robot_commands=robot_commands,
+                check_held_object_collisions=False)
             
             input("Replaying the trajectory to check. Press Enter to continue...")
             for i in range(sim_length, len(sim_states)):

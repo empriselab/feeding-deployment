@@ -139,31 +139,25 @@ def move_to_ee_pose(
     max_motion_plan_time: float,
     sim_states: list[FeedingDeploymentSimulatorState],
     robot_commands: list[KinovaCommand],
+    check_held_object_collisions: bool = True,
 ) -> None:
     """Plan ee pose trajectory to desired pose."""
 
     input("In move_to_ee_pose")
-    # Commands will be in end effector space, but grasp planning will be in
-    # tip space.
-    robot = sim.robot
-    physics_client_id = sim.physics_client_id
 
     # Run motion planning.
-    collision_ids = sim.get_collision_ids()
-    if exclude_collision_ids is not None:
-        collision_ids -= exclude_collision_ids
-
     plan = run_smooth_ee_interpolated_planning_to_pose(
         target_pose,
         tip_from_end_effector.invert(),
         sim,
         num_interp_waypoints=10,
         max_motion_plan_time=max_motion_plan_time,
+        exclude_collision_ids=exclude_collision_ids,
+        check_held_object_collisions=check_held_object_collisions,
     )
 
     assert plan is not None
 
-    # plan = _plan_to_sim_state_trajectory(plan, sim)
     remapped_plan = remap_trajectory_to_constant_distance(plan, sim)
 
     sim_states.extend(remapped_plan)
