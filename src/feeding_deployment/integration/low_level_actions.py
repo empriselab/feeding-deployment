@@ -167,7 +167,7 @@ def move_to_ee_pose(
         target_pose,
         robot,
         collision_ids,
-        tip_from_end_effector,
+        tip_from_end_effector.invert(),
         seed=0,
         max_time=max_motion_plan_time,
         held_object=sim.held_object_id,
