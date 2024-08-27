@@ -24,12 +24,6 @@ except ModuleNotFoundError:
 
 
 from pybullet_helpers.geometry import Pose, multiply_poses
-from pybullet_helpers.motion_planning import (
-    get_joint_positions_distance,
-    run_motion_planning,
-    run_smooth_motion_planning_to_pose,
-    smoothly_follow_end_effector_path,
-)
 from relational_structs import (
     GroundAtom,
     GroundOperator,
@@ -51,27 +45,13 @@ from feeding_deployment.integration.perception_interface import PerceptionInterf
 from feeding_deployment.integration.utils import simulated_trajectory_to_kinova_commands
 from feeding_deployment.robot_controller.arm_client import Arm
 from feeding_deployment.robot_controller.command_interface import (
-    CartesianCommand,
     CloseGripperCommand,
-    JointCommand,
     KinovaCommand,
     OpenGripperCommand,
 )
 from feeding_deployment.simulation.planning import (
-    _get_motion_plan_for_robot_finger_tip,
     _get_plan_to_execute_grasp,
     _get_plan_to_execute_ungrasp,
-    _plan_to_sim_state_trajectory,
-    get_bite_transfer_plan,
-    get_plan_to_grasp_cup,
-    get_plan_to_grasp_utensil,
-    get_plan_to_grasp_wiper,
-    get_plan_to_stow_cup,
-    get_plan_to_stow_utensil,
-    get_plan_to_stow_wiper,
-    get_plan_to_transfer_cup,
-    get_plan_to_transfer_wiper,
-    remap_trajectory_to_constant_distance,
 )
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
@@ -82,12 +62,6 @@ GripperFree = Predicate("GripperFree", [])  # not holding any tool
 Holding = Predicate("Holding", [tool_type])  # holding tool
 ToolTransferDone = Predicate("ToolTransferDone", [tool_type])  # wiped, drank, or ate
 ToolPrepared = Predicate("ToolPrepared", [tool_type])  # e.g., bite acquired
-
-# Feeding:
-# - Bite acquisition: move_joint(above_plate) -> move_ee(pickup food) -> move_joint(above plate)
-# - Bite transfer: move_joint(transfer_pos) -> plan_to_pose(infront_mouth) -> plan_to_pose(inside_mouth) -> plan_to_pose(infront_mouth) -> plan_to_pose(transfer_pos)
-# - Stow utensil: move_joint(utensil neutral) -> move_joint(outside mount) -> move_ee(inside mount) -> move_ee(above mount)
-
 
 # Define high-level actions.
 class HighLevelAction(abc.ABC):
