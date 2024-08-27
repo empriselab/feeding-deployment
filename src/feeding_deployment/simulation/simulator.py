@@ -9,7 +9,7 @@ from pybullet_helpers.inverse_kinematics import (
     set_robot_joints_with_held_object,
 )
 from pybullet_helpers.robots import create_pybullet_robot
-from pybullet_helpers.robots.single_arm import SingleArmTwoFingerGripperPyBulletRobot
+from pybullet_helpers.robots.kinova import KinovaGen3RobotiqGripperPyBulletRobot
 from pybullet_helpers.utils import create_pybullet_block
 
 from feeding_deployment.simulation.scene_description import SceneDescription
@@ -33,7 +33,7 @@ class FeedingDeploymentPyBulletSimulator:
             control_mode="reset",
             home_joint_positions=scene_description.initial_joints,
         )
-        assert isinstance(robot, SingleArmTwoFingerGripperPyBulletRobot)
+        assert isinstance(robot, KinovaGen3RobotiqGripperPyBulletRobot)
         robot.close_fingers()
         self.robot = robot
 

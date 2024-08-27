@@ -70,7 +70,6 @@ def _main(
         kwargs["initial_joints"] = perception_interface.get_robot_joints()
         print(f"Initial joint state: {kwargs['initial_joints']}")
     else:
-        kwargs["initial_joints"] = [0.0] * 9
         print("Running in simulation mode.")
     scene_description = SceneDescription(**kwargs)
     sim = FeedingDeploymentPyBulletSimulator(scene_description)
@@ -98,7 +97,7 @@ def _main(
     # TODO update this once the user interface is ready.
     TransferTool = hla_name_to_hla["TransferTool"]
     user_command_queue: list[GroundHighLevelAction | set[GroundAtom]] = [
-        # GroundHighLevelAction(TransferTool, (utensil,), {"mask": "TODO"}),
+        GroundHighLevelAction(TransferTool, (utensil,), {"mask": "TODO"}),
         GroundHighLevelAction(TransferTool, (cup,)),
         GroundHighLevelAction(TransferTool, (wiper,)),
         {GroundAtom(GripperFree, [])},  # reset at the end
