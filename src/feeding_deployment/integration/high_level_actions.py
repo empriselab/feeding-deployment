@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import time
 
 # Rajat ToDo: Remove this hacky addition
 FLAIR_PATH = "/home/isacc/deployment_ws/src/FLAIR/bite_acquisition/scripts"
@@ -22,7 +23,7 @@ except ModuleNotFoundError:
     pass
 
 
-from pybullet_helpers.geometry import Pose
+from pybullet_helpers.geometry import Pose, multiply_poses
 from pybullet_helpers.motion_planning import (
     get_joint_positions_distance,
     run_motion_planning,
@@ -39,10 +40,12 @@ from relational_structs import (
     Type,
     Variable,
 )
+from pybullet_helpers.gui import visualize_pose
 
 from feeding_deployment.integration.low_level_actions import (
     move_to_joint_positions,
     teleport_to_ee_pose,
+    move_to_ee_pose,
 )
 from feeding_deployment.integration.perception_interface import PerceptionInterface
 from feeding_deployment.integration.utils import simulated_trajectory_to_kinova_commands
@@ -190,14 +193,14 @@ class PickToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.retract_pos + [0.0, 0.0],
+                self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.cup_outside_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.cup_outside_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -205,7 +208,7 @@ class PickToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.cup_inside_mount,
-                self._sim.scene_description.cup_inside_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.cup_inside_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -218,7 +221,7 @@ class PickToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.cup_above_mount,
-                self._sim.scene_description.cup_above_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.cup_above_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -236,21 +239,21 @@ class PickToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.retract_pos + [0.0, 0.0],
+                self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.utensil_infront_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_infront_mount_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.utensil_above_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_above_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -258,7 +261,7 @@ class PickToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.utensil_inside_mount,
-                self._sim.scene_description.utensil_inside_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_inside_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -272,21 +275,21 @@ class PickToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.utensil_outside_mount,
-                self._sim.scene_description.utensil_outside_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_outside_mount_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_neutral_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.retract_pos + [0.0, 0.0],
+                self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
             )
@@ -333,7 +336,7 @@ class StowToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.cup_above_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.cup_above_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -341,7 +344,7 @@ class StowToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.cup_inside_mount,
-                self._sim.scene_description.cup_inside_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.cup_inside_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -354,14 +357,14 @@ class StowToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.cup_outside_mount,
-                self._sim.scene_description.cup_outside_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.cup_outside_mount_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.retract_pos + [0.0, 0.0],
+                self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
             )
@@ -379,21 +382,21 @@ class StowToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.retract_pos + [0.0, 0.0],
+                self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.utensil_neutral_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_neutral_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.utensil_outside_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_outside_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -401,7 +404,7 @@ class StowToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.utensil_inside_mount,
-                self._sim.scene_description.utensil_inside_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_inside_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -415,7 +418,7 @@ class StowToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.utensil_above_mount,
-                self._sim.scene_description.utensil_above_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_above_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -423,14 +426,14 @@ class StowToolHLA(HighLevelAction):
             teleport_to_ee_pose(
                 self._sim,
                 self._sim.scene_description.utensil_infront_mount,
-                self._sim.scene_description.utensil_infront_mount_pos + [0.0, 0.0],
+                self._sim.scene_description.utensil_infront_mount_pos,
                 sim_states,
                 robot_commands,
             )
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.retract_pos + [0.0, 0.0],
+                self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
             )
@@ -461,43 +464,6 @@ class TransferToolHLA(HighLevelAction):
             delete_effects=set(),
         )
 
-    def get_simulated_trajectory(
-        self,
-        objects: tuple[Object, ...],
-        params: dict[str, Any],
-    ) -> list[FeedingDeploymentSimulatorState]:
-        # TODO
-        assert len(objects) == 1
-        tool = objects[0]
-        if tool.name == "cup":
-            nominal_plan = get_plan_to_transfer_cup(
-                self._sim,
-                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
-            )
-        elif tool.name == "wiper":
-            nominal_plan = get_plan_to_transfer_wiper(
-                self._sim,
-                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
-            )
-        # if tool.name == "utensil":
-        #     forque_target_pose = (
-        #         self._perception_interface.get_head_perception_forque_target_pose()
-        #     )
-        #     nominal_plan = get_bite_transfer_plan(
-        #         forque_target_pose,
-        #         self._sim,
-        #         max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
-        #     )
-        #     remapped_plan = remap_trajectory_to_constant_distance(
-        #         nominal_plan, self._sim
-        #     )
-        #     return remapped_plan
-        else:
-            print(f"TransferTool not yet implemented for {tool}")
-            return []
-        remapped_plan = remap_trajectory_to_constant_distance(nominal_plan, self._sim)
-        return remapped_plan
-
     def execute_action(
         self,
         objects: tuple[Object, ...],
@@ -513,13 +479,51 @@ class TransferToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.before_transfer_pos + [0.0, 0.0],
+                self._sim.scene_description.before_transfer_pos,
                 sim_states,
                 robot_commands,
             )
 
+            # target_pose = self._perception_interface.get_head_perception_forque_target_pose()
+            target_pose = Pose(position=(-0.17272330207928777, 0.6273752674813526, 0.5572539925006535), 
+                orientation=(-0.42030807,  0.56739361,  0.47188225, -0.52795148))
+            intermediate_pose = multiply_poses(
+                target_pose, Pose(position=[0.0, 0.0, -0.1], orientation=[0.0, 0.0, 0.0, 1.0])
+            ) # 10 cms away from the mouth
+
+            visualize_pose(target_pose, self._sim.physics_client_id)
+            input("Visualizing target pose. Press Enter to continue...")
+            visualize_pose(intermediate_pose, self._sim.physics_client_id)
+            input("Visualizing intermediate pose. Press Enter to continue...")
+
+            move_to_ee_pose(sim=self._sim,
+                target_pose=intermediate_pose,
+                exclude_collision_ids=None,
+                tip_from_end_effector=self._sim.scene_description.utensil_tip_from_end_effector,
+                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+                sim_states=sim_states,
+                robot_commands=robot_commands)
+
+            move_to_ee_pose(sim=self._sim,
+                target_pose=target_pose,
+                exclude_collision_ids=None,
+                tip_from_end_effector=self._sim.scene_description.utensil_tip_from_end_effector,
+                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+                sim_states=sim_states,
+                robot_commands=robot_commands)
+
             if self._run_on_robot:
-                self.execute_robot_commands(robot_commands)
+                # Replay the trajectory before running on real robot
+                input("Replaying the trajectory before running on real robot. Press Enter to continue...")
+
+                for state in sim_states:
+                    self._sim.sync(state)
+
+                y = input("Does the trajectory look good? Press 'y' to execute on robot")
+                if y == "y":
+                    self.execute_robot_commands(robot_commands)
+                else:
+                    print("Trajectory not executed on robot")
 
             # Rajat ToDo: Implement the rest of bite transfer
 
@@ -531,13 +535,70 @@ class TransferToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.before_transfer_pos + [0.0, 0.0],
+                self._sim.scene_description.before_transfer_pos,
                 sim_states,
                 robot_commands,
             )
 
+            # target_pose = self._perception_interface.get_head_perception_forque_target_pose()
+            target_pose = Pose(position=(-0.17272330207928777, 0.6273752674813526, 0.5572539925006535), 
+                orientation=(-0.42030807,  0.56739361,  0.47188225, -0.52795148))
+            print("target_pose", target_pose)
+
+            intermediate_pose = multiply_poses(
+                target_pose, Pose(position=[0.0, 0.0, -0.05], orientation=[0.0, 0.0, 0.0, 1.0])
+            ) # 10 cms away from the mouth
+
+            visualize_pose(target_pose, self._sim.physics_client_id)
+            input("Visualizing target pose. Press Enter to continue...")
+            visualize_pose(intermediate_pose, self._sim.physics_client_id)
+            input("Visualizing intermediate pose. Press Enter to continue...")
+
+            sim_length = len(sim_states)
+
+            move_to_ee_pose(sim=self._sim,
+                target_pose=intermediate_pose,
+                exclude_collision_ids=None,
+                tip_from_end_effector=self._sim.scene_description.drink_tip_from_end_effector,
+                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+                sim_states=sim_states,
+                robot_commands=robot_commands)
+            
+            input("Replaying the trajectory to check. Press Enter to continue...")
+            for i in range(sim_length, len(sim_states)):
+                self._sim.sync(sim_states[i])
+                time.sleep(0.1)
+                # input("Press Enter to continue...")
+
+            sim_length = len(sim_states)
+
+            move_to_ee_pose(sim=self._sim,
+                target_pose=target_pose,
+                exclude_collision_ids=None,
+                tip_from_end_effector=self._sim.scene_description.drink_tip_from_end_effector,
+                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+                sim_states=sim_states,
+                robot_commands=robot_commands)
+            
+            input("Replaying the trajectory to check. Press Enter to continue...")
+            for i in range(sim_length, len(sim_states)):
+                self._sim.sync(sim_states[i])
+                time.sleep(0.1)
+                # input("Press Enter to continue...")
+
             if self._run_on_robot:
-                self.execute_robot_commands(robot_commands)
+                # Replay the trajectory before running on real robot
+                input("Replaying the trajectory before running on real robot. Press Enter to continue...")
+                
+                for state in sim_states:
+                    self._sim.sync(state)
+                    time.sleep(0.1)
+
+                y = input("Does the trajectory look good? Press 'y' to execute on robot")
+                if y == "y":
+                    self.execute_robot_commands(robot_commands)
+                else:
+                    print("Trajectory not executed on robot")
 
             # Rajat ToDo: Implement the rest of cup transfer
 
@@ -586,7 +647,7 @@ class PrepareToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.above_plate_pos + [0.0, 0.0],
+                self._sim.scene_description.above_plate_pos,
                 sim_states,
                 robot_commands,
             )
