@@ -164,6 +164,12 @@ class SceneDescription:
             0.0,
             0.0,
             0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+
         ]
     )
     robot_base_pose: Pose = Pose(

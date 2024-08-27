@@ -9,12 +9,12 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 from pybullet_helpers.geometry import Pose
+from pybullet_helpers.inverse_kinematics import _add_fingers_to_joint_positions
 from pybullet_helpers.motion_planning import (
     get_joint_positions_distance,
     run_motion_planning,
     run_smooth_motion_planning_to_pose,
     smoothly_follow_end_effector_path,
-    try_direct_path,
 )
 from pybullet_helpers.gui import visualize_pose
 
@@ -53,23 +53,24 @@ def move_to_joint_positions(
     sim_states: list[FeedingDeploymentSimulatorState],
     robot_commands: list[KinovaCommand],
 ) -> None:
-    """Move the robot to the specified joint positions."""
+    """Move the robot to the specified joint positions.
+
+    NOTE: joint_positions does NOT include finger joints.
+    """
 
     initial_joint_positions = sim.robot.get_joint_positions().copy()
-    target_joint_positions = joint_positions.copy()
-    
-    # Add current gripper joint positions to the target joint positions
-    target_joint_positions.append(initial_joint_positions[-1])
+    target_joint_positions = _add_fingers_to_joint_positions(sim.robot, joint_positions)
 
-    # Rajat ToDo: Check if I need to collsion check initial and target positions before calling this function
-    direct_path = try_direct_path(
+    direct_path = run_motion_planning(
         robot=sim.robot,
         initial_positions=initial_joint_positions,
         target_positions=target_joint_positions,
         collision_bodies=sim.get_collision_ids(),
+        seed=0,  # not used
         physics_client_id=sim.physics_client_id,
         held_object=sim.held_object_id,
         base_link_to_held_obj=sim.held_object_tf,
+        direct_path_only=True,
     )
 
     if direct_path:
@@ -107,6 +108,8 @@ def teleport_to_ee_pose(
 
     We do not yet know the implementation of move_to_ee_pose, so we we
     teleport in simulation.
+
+    NOTE: expected_joint_positions does NOT include finger joints.
     """
     command = CartesianCommand(pos=pose.position, quat=pose.orientation)
 
@@ -122,8 +125,11 @@ def teleport_to_ee_pose(
         elif sim.held_object_name == "utensil":
             utensil_pose = None
 
+    target_joint_positions = _add_fingers_to_joint_positions(
+        sim.robot, expected_joint_positions
+    )
     sim_state = FeedingDeploymentSimulatorState(
-        robot_joints=expected_joint_positions + [sim.robot.get_joint_positions()[-1]], # add gripper joint
+        robot_joints=target_joint_positions,
         cup_pose=cup_pose,
         wiper_pose=wiper_pose,
         utensil_pose=utensil_pose,
@@ -161,7 +167,7 @@ def move_to_ee_pose(
         target_pose,
         robot,
         collision_ids,
-        tip_from_end_effector,
+        tip_from_end_effector.invert(),
         seed=0,
         max_time=max_motion_plan_time,
         held_object=sim.held_object_id,
