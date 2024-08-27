@@ -214,6 +214,12 @@ class SceneDescription:
         / "drinking_utensil.urdf"
     )
 
+    # Rajat ToDo: Fix with correct values, copied from drinking utensil
+    utensil_tip_from_end_effector: Pose = Pose(
+        (0.270, 0.095, -0.002),
+        (-0.000, 0.707, 0.000, 0.707),
+    )
+
     drink_tip_from_end_effector: Pose = Pose(
         (0.270, 0.095, -0.002),
         (-0.000, 0.707, 0.000, 0.707),
