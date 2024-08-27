@@ -37,6 +37,8 @@ def create_scene_description_from_config(config_file_path: str) -> SceneDescript
 class SceneDescription:
     """Scene description."""
 
+    tool_grasp_fingers_value: float = 0.44
+
     # robot base frame
     utensil_inside_mount: Pose = Pose(
         (-0.147, -0.17, 0.07),
@@ -155,14 +157,13 @@ class SceneDescription:
     initial_joints: JointPositions = field(
         default_factory=lambda: [
             0.0,
-            -0.34903602299465675,
-            -3.141591055693139,
-            -2.5482592711638783,
             0.0,
-            -0.872688061814757,
-            1.57075917569769,
-            1.0,
-            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
         ]
     )
     robot_base_pose: Pose = Pose(
@@ -213,13 +214,13 @@ class SceneDescription:
         / "drinking_utensil.urdf"
     )
 
-    cup_tip_pose: Pose = Pose(
+    drink_tip_from_end_effector: Pose = Pose(
         (0.270, 0.095, -0.002),
         (-0.000, 0.707, 0.000, 0.707),
     )
 
     cup_pose: Pose = Pose(
-        (0.545, 0.518, 0.270), 
+        (0.545, 0.65, 0.270), 
         (-0.2126311, -0.6743797, -0.6743797, 0.2126311)
     )
 

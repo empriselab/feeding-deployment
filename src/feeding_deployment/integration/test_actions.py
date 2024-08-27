@@ -14,6 +14,7 @@ from relational_structs import (
 from relational_structs.utils import parse_pddl_plan
 from tomsutils.pddl_planning import run_pyperplan_planning
 from pybullet_helpers.geometry import Pose
+from pybullet_helpers.link import get_link_pose, get_relative_link_pose
 
 from feeding_deployment.integration.high_level_actions import (
     GripperFree,
@@ -68,7 +69,6 @@ def _main(
         kwargs["initial_joints"] = perception_interface.get_robot_joints()
         print(f"Initial joint state: {kwargs['initial_joints']}")
     else:
-        kwargs["initial_joints"] = [0.0] * 9
         print("Running in simulation mode.")
     scene_description = SceneDescription(**kwargs)
     sim = FeedingDeploymentPyBulletSimulator(scene_description)
@@ -82,7 +82,13 @@ def _main(
     sim.held_object_name = "cup"
     sim.held_object_id = sim.cup_id
     # Rajat ToDo: Set this correctly!
-    sim.held_object_tf = Pose([0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 1.0])    
+    finger_frame_id = sim.robot.link_from_name("finger_tip")
+    end_effector_link_id = sim.robot.link_from_name(sim.robot.tool_link_name)
+    cup_from_end_effector = get_relative_link_pose(
+        sim.robot.robot_id, finger_frame_id, end_effector_link_id, sim.physics_client_id
+    )
+    sim.held_object_tf = cup_from_end_effector
+    print(f"cup_from_end_effector: {cup_from_end_effector}")
     sim_traj = high_level_action.execute_action(objects=[cup], params={})
 
     if make_videos:

@@ -55,12 +55,16 @@ def move_to_joint_positions(
     """Move the robot to the specified joint positions."""
 
     initial_joint_positions = sim.robot.get_joint_positions().copy()
+    target_joint_positions = joint_positions.copy()
+    
+    # Add current gripper joint positions to the target joint positions
+    target_joint_positions.append(initial_joint_positions[-1])
 
     # Rajat ToDo: Check if I need to collsion check initial and target positions before calling this function
     direct_path = try_direct_path(
         robot=sim.robot,
         initial_positions=initial_joint_positions,
-        target_positions=joint_positions,
+        target_positions=target_joint_positions,
         collision_bodies=sim.get_collision_ids(),
         physics_client_id=sim.physics_client_id,
         held_object=sim.held_object_id,
@@ -70,14 +74,14 @@ def move_to_joint_positions(
     if direct_path:
         # Rajat ToDo: Discuss arm / robot dissociation with Tom
         sim_states.extend(_plan_to_sim_state_trajectory(direct_path, sim))
-        robot_commands.append(JointCommand(pos=joint_positions[:7]))
+        robot_commands.append(JointCommand(pos=target_joint_positions[:7]))
         return
 
     print("No direct path found. Running motion planning.")
     plan = run_motion_planning(
         robot=sim.robot,
         initial_positions=initial_joint_positions,
-        target_positions=joint_positions,
+        target_positions=target_joint_positions,
         collision_bodies=sim.get_collision_ids(),
         seed=0,
         physics_client_id=sim.physics_client_id,
@@ -103,7 +107,6 @@ def teleport_to_ee_pose(
     We do not yet know the implementation of move_to_ee_pose, so we we
     teleport in simulation.
     """
-
     command = CartesianCommand(pos=pose.position, quat=pose.orientation)
 
     cup_pose = sim.scene_description.cup_pose
@@ -119,7 +122,7 @@ def teleport_to_ee_pose(
             utensil_pose = None
 
     sim_state = FeedingDeploymentSimulatorState(
-        robot_joints=expected_joint_positions,
+        robot_joints=expected_joint_positions + [sim.robot.get_joint_positions()[-1]], # add gripper joint
         cup_pose=cup_pose,
         wiper_pose=wiper_pose,
         utensil_pose=utensil_pose,
@@ -130,3 +133,43 @@ def teleport_to_ee_pose(
 
     sim_states.append(sim_state)
     robot_commands.append(command)
+
+def move_to_ee_pose(
+    sim: FeedingDeploymentPyBulletSimulator,
+    target_pose: Pose,
+    exclude_collision_ids: set[int] | None,
+    tip_from_end_effector: Pose,
+    max_motion_plan_time: float,
+    sim_states: list[FeedingDeploymentSimulatorState],
+    robot_commands: list[KinovaCommand],
+) -> None:
+    """Plan ee pose trajectory to desired pose."""
+
+    # Commands will be in end effector space, but grasp planning will be in
+    # tip space.
+    robot = sim.robot
+    physics_client_id = sim.physics_client_id
+
+    # Run motion planning.
+    collision_ids = sim.get_collision_ids()
+    if exclude_collision_ids is not None:
+        collision_ids -= exclude_collision_ids
+
+    plan = run_smooth_motion_planning_to_pose(
+        target_pose,
+        robot,
+        collision_ids,
+        tip_from_end_effector,
+        seed=0,
+        max_time=max_motion_plan_time,
+        held_object=sim.held_object_id,
+        base_link_to_held_obj=sim.held_object_tf,
+    )
+    assert plan is not None
+
+    plan = _plan_to_sim_state_trajectory(plan, sim)
+    remapped_plan = remap_trajectory_to_constant_distance(plan, sim)
+
+    sim_states.extend(remapped_plan)
+    robot_commands.extend(simulated_trajectory_to_kinova_commands(remapped_plan))
+
