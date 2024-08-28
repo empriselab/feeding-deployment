@@ -46,6 +46,7 @@ from feeding_deployment.robot_controller.arm_interface import ArmInterface
 from feeding_deployment.robot_controller.command_interface import (
     CloseGripperCommand,
     KinovaCommand,
+    JointTrajectoryCommand,
     OpenGripperCommand,
 )
 from feeding_deployment.simulation.planning import (
@@ -525,7 +526,7 @@ class TransferToolHLA(HighLevelAction):
 
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
-            robot_commands.clear()
+            robot_commands = []
 
             sim_length = len(sim_states)
 
@@ -585,9 +586,19 @@ class TransferToolHLA(HighLevelAction):
             
             # Reverse the transfer plan.
             transfer_sim_states = sim_states[sim_length:]
-            transfer_robot_commands = robot_commands[:]
             sim_states.extend(transfer_sim_states[::-1])
-            robot_commands.extend(transfer_robot_commands[::-1])
+            
+            transfer_robot_commands = robot_commands.copy()
+            reversed_robot_commands = []
+            for command in transfer_robot_commands[::-1]:
+                assert isinstance(command, JointTrajectoryCommand), "Command not a joint trajectory command"
+                reversed_robot_commands.append(JointTrajectoryCommand(command.traj[::-1]))
+            
+            robot_commands.extend(reversed_robot_commands)
+
+            for i in range(len(robot_commands)):
+                assert isinstance(robot_commands[i], JointTrajectoryCommand), "Command not a joint trajectory command"
+                assert np.allclose(robot_commands[i].traj, robot_commands[-(i+1)].traj[::-1]), "Robot commands not a palindrome"
 
             # Replay the trajectory before running on real robot
             print("Replaying the trajectory before running on real robot..")
