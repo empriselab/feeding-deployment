@@ -548,6 +548,10 @@ class TransferToolHLA(HighLevelAction):
                 robot_commands=robot_commands,
                 check_held_object_collisions=False)
             
+            print("ROBOT COMMANDS:")
+            print(robot_commands)
+            input("Copy the above commands to the robot controller. Press Enter to continue...")
+            
             # input("Replaying the trajectory to check. Press Enter to continue...")
             # for i in range(sim_length, len(sim_states)):
             #     self._sim.sync(sim_states[i])

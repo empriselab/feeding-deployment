@@ -220,7 +220,7 @@ if __name__ == "__main__":
 
     # Uncomment to test commands.
     msg = namedtuple("String", ["data"])
-    runner.web_interface_callback(msg(json.dumps({"status": "drink_pickup"})))
+    # runner.web_interface_callback(msg(json.dumps({"status": "drink_pickup"})))
     runner.web_interface_callback(msg(json.dumps({"status": "drink_transfer"})))
 
     if args.make_videos:
