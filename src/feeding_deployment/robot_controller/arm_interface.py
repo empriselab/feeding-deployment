@@ -104,10 +104,14 @@ class ArmInterface:
                 if command_pos[i] < -np.pi:
                     command_pos[i] += 2 * np.pi
 
+        assert self.command_queue.empty(), "Before trajectory execution - command queue not empty"
+
         gripper_pos = 0
         for command_pos in trajectory_command:
             self.command_queue.put((command_pos, gripper_pos))
             time.sleep(0.1)
+
+        assert self.command_queue.empty(), "After trajectory execution - command queue not empty"
 
     def set_joint_position(self, command_pos):
         print(f"Received joint pos command: {command_pos}")
