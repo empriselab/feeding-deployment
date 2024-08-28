@@ -43,6 +43,10 @@ class Arm:
     def get_state(self):
         arm_pos, gripper_pos = self.arm.get_state()
         return arm_pos, gripper_pos
+    
+    def get_update_state(self):
+        arm_pos, arm_vel, gripper_pos = self.arm.get_update_state()
+        return arm_pos, arm_vel, gripper_pos
 
     def reset(self):
         # Go to home position
@@ -69,6 +73,24 @@ class Arm:
         print(f"Received compliant joint pos command: {command_pos}")
         gripper_pos = 0
         self.command_queue.put((command_pos, gripper_pos))
+
+    # def compliant_set_joint_trajectory(self, trajectory_command):
+    #     print(
+    #         f"Received compliant joint trajectory command with {len(trajectory_command)} waypoints"
+    #     )
+    #     gripper_pos = 0
+    #     for command_pos in trajectory_command:
+    #         while True:
+    #             time.sleep(0.01)
+    #             q, _, _ = self.arm.get_update_state()
+    #             error = np.linalg.norm(np.array(command_pos) - np.array(q))
+    #             # threshold = 0.03*np.sqrt(7)
+    #             threshold = 0.2
+    #             print(f"Error: {error}, Threshold: {threshold}")
+    #             # When near (distance < threshold) next waypoint, update to next waypoint
+    #             if error < threshold:
+    #                 self.command_queue.put((command_pos, gripper_pos))
+    #                 break
 
     def compliant_set_joint_trajectory(self, trajectory_command):
         print(
@@ -257,11 +279,33 @@ if __name__ == "__main__":
 
         # input("Press Enter to move to joint compliant position...")
         # arm.compliant_set_joint_position(
-        #     [0.0, 0.26179939, 3.14159265, -2.26892803, 0.0, 0.95993109, 1.9]
+            # [-2.86554642, -1.61951779, -2.60986085, -1.37302839,  1.11779249, -1.18028264,  2.05515862]
         # )
+
+        # def error_from_goal(arm):
+        #     goal = [-2.86554642, -1.61951779, -2.60986085, -1.37302839,  1.11779249, -1.18028264,  2.05515862]
+        #     # print upto 4 decimal places
+        #     np.set_printoptions(precision=4, suppress=True)
+
+        #     while True:
+        #         current, _, _ = arm.get_update_state()
+        #         current = np.array(current)
+        #         goal = np.array(goal)
+        #         # print("Current: ", current)
+        #         # print("Goal: ", goal)
+        #         error = goal - current
+        #         norm = np.linalg.norm(error)
+        #         # print("Error: ", error)
+        #         print(f"Norm: {norm} Error: {error}")
+
+        # # start thread to print error from goal
+        # error_thread = threading.Thread(target=error_from_goal, args=(arm,))
+        # error_thread.start()
 
         input("Press Enter to switch out of joint compliant mode...")
         arm.switch_out_of_joint_compliant_mode()
+
+        # error_thread.join()
 
         input("Press Enter to move to before transfer pose...")
         arm.set_joint_position(before_transfer_pos)
