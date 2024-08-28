@@ -9,7 +9,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 from pybullet_helpers.geometry import Pose
-from pybullet_helpers.inverse_kinematics import _add_fingers_to_joint_positions
+from pybullet_helpers.inverse_kinematics import add_fingers_to_joint_positions
 from pybullet_helpers.motion_planning import (
     get_joint_positions_distance,
     run_motion_planning,
@@ -49,7 +49,7 @@ def move_to_joint_positions(
     """
 
     initial_joint_positions = sim.robot.get_joint_positions().copy()
-    target_joint_positions = _add_fingers_to_joint_positions(sim.robot, joint_positions)
+    target_joint_positions = add_fingers_to_joint_positions(sim.robot, joint_positions)
 
     direct_path = run_motion_planning(
         robot=sim.robot,
@@ -115,7 +115,7 @@ def teleport_to_ee_pose(
         elif sim.held_object_name == "utensil":
             utensil_pose = None
 
-    target_joint_positions = _add_fingers_to_joint_positions(
+    target_joint_positions = add_fingers_to_joint_positions(
         sim.robot, expected_joint_positions
     )
     sim_state = FeedingDeploymentSimulatorState(
