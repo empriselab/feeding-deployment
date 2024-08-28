@@ -56,7 +56,7 @@ def _main(
     if run_on_robot:
         manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
         manager.connect()
-        robot_interface = manager.Arm()  # type: ignore  # pylint: disable=no-member
+        robot_interface = manager.ArmInterface()  # type: ignore  # pylint: disable=no-member
     else:
         robot_interface = None
 

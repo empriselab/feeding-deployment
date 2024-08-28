@@ -20,7 +20,6 @@ from pybullet_helpers.gui import visualize_pose
 
 from feeding_deployment.integration.perception_interface import PerceptionInterface
 from feeding_deployment.integration.utils import simulated_trajectory_to_kinova_commands
-from feeding_deployment.robot_controller.arm_client import Arm
 from feeding_deployment.robot_controller.command_interface import (
     CartesianCommand,
     CloseGripperCommand,

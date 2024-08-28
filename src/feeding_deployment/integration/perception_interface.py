@@ -15,7 +15,7 @@ try:
 except ModuleNotFoundError:
     pass
 
-from feeding_deployment.robot_controller.arm_client import Arm
+from feeding_deployment.robot_controller.arm_interface import ArmInterface
 
 
 def publish_joint_states(arm):
@@ -24,7 +24,7 @@ def publish_joint_states(arm):
     joint_states_pub = rospy.Publisher("/robot_joint_states", JointState, queue_size=10)
 
     while not rospy.is_shutdown():
-        arm_pos, gripper_pos = arm.get_state()
+        arm_pos, ee_pose, gripper_pos = arm.get_state()
         joint_state_msg = JointState()
         joint_state_msg.header.stamp = rospy.Time.now()
         joint_state_msg.name = [
@@ -47,7 +47,7 @@ def publish_joint_states(arm):
 class PerceptionInterface:
     """An interface for perception (robot joints, human head poses, etc.)."""
 
-    def __init__(self, robot_interface: Arm | None) -> None:
+    def __init__(self, robot_interface: ArmInterface | None) -> None:
         self._robot_interface = robot_interface
 
         try:
@@ -74,7 +74,8 @@ class PerceptionInterface:
 
     def get_robot_joints(self) -> "JointState":
         """Get the current robot joint state."""
-        q, gripper_position = self._robot_interface.get_state()
+        q, x, gripper_position = self._robot_interface.get_state()
+        gripper_position *= 0.8 # sim + joint_lims consider closed gripper as 0.8 
         joint_state = q.tolist() + [
             gripper_position,
             gripper_position,

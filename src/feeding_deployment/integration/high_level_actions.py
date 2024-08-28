@@ -42,8 +42,7 @@ from feeding_deployment.integration.low_level_actions import (
     move_to_ee_pose,
 )
 from feeding_deployment.integration.perception_interface import PerceptionInterface
-from feeding_deployment.integration.utils import simulated_trajectory_to_kinova_commands
-from feeding_deployment.robot_controller.arm_client import Arm
+from feeding_deployment.robot_controller.arm_interface import ArmInterface
 from feeding_deployment.robot_controller.command_interface import (
     CloseGripperCommand,
     KinovaCommand,
@@ -70,7 +69,7 @@ class HighLevelAction(abc.ABC):
     def __init__(
         self,
         sim: FeedingDeploymentPyBulletSimulator,
-        robot_interface: Arm,
+        robot_interface: ArmInterface,
         perception_interface: PerceptionInterface,
         hla_hyperparams: dict[str, Any],
         run_on_robot: bool,

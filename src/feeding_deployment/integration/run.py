@@ -38,7 +38,7 @@ from feeding_deployment.integration.high_level_actions import (
     tool_type,
 )
 from feeding_deployment.integration.perception_interface import PerceptionInterface
-from feeding_deployment.robot_controller.arm_client import (
+from feeding_deployment.robot_controller.arm_interface import (
     ARM_RPC_PORT,
     NUC_HOSTNAME,
     RPC_AUTHKEY,
@@ -77,7 +77,7 @@ class _Runner:
                 address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY
             )
             manager.connect()
-            self.robot_interface = manager.Arm()  # type: ignore  # pylint: disable=no-member
+            self.robot_interface = manager.ArmInterface()  # type: ignore  # pylint: disable=no-member
         else:
             self.robot_interface = None
 
@@ -220,7 +220,7 @@ if __name__ == "__main__":
 
     # Uncomment to test commands.
     msg = namedtuple("String", ["data"])
-    # runner.web_interface_callback(msg(json.dumps({"status": "drink_pickup"})))
+    runner.web_interface_callback(msg(json.dumps({"status": "drink_pickup"})))
     runner.web_interface_callback(msg(json.dumps({"status": "drink_transfer"})))
 
     if args.make_videos:
