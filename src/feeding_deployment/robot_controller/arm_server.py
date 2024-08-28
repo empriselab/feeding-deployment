@@ -41,8 +41,8 @@ class Arm:
         self.controller = None
 
     def get_state(self):
-        arm_pos, gripper_pos = self.arm.get_state()
-        return arm_pos, gripper_pos
+        arm_pos, ee_pose, gripper_pos = self.arm.get_state()
+        return arm_pos, ee_pose, gripper_pos
     
     def get_update_state(self):
         arm_pos, arm_vel, gripper_pos = self.arm.get_update_state()
@@ -74,32 +74,32 @@ class Arm:
         gripper_pos = 0
         self.command_queue.put((command_pos, gripper_pos))
 
-    # def compliant_set_joint_trajectory(self, trajectory_command):
-    #     print(
-    #         f"Received compliant joint trajectory command with {len(trajectory_command)} waypoints"
-    #     )
-    #     gripper_pos = 0
-    #     for command_pos in trajectory_command:
-    #         while True:
-    #             time.sleep(0.01)
-    #             q, _, _ = self.arm.get_update_state()
-    #             error = np.linalg.norm(np.array(command_pos) - np.array(q))
-    #             # threshold = 0.03*np.sqrt(7)
-    #             threshold = 0.2
-    #             print(f"Error: {error}, Threshold: {threshold}")
-    #             # When near (distance < threshold) next waypoint, update to next waypoint
-    #             if error < threshold:
-    #                 self.command_queue.put((command_pos, gripper_pos))
-    #                 break
-
     def compliant_set_joint_trajectory(self, trajectory_command):
         print(
             f"Received compliant joint trajectory command with {len(trajectory_command)} waypoints"
         )
         gripper_pos = 0
         for command_pos in trajectory_command:
-            self.command_queue.put((command_pos, gripper_pos))
-            time.sleep(0.1)
+            while True:
+                time.sleep(0.01)
+                q, _, _ = self.arm.get_update_state()
+                error = np.linalg.norm(np.array(command_pos) - np.array(q))
+                # threshold = 0.03*np.sqrt(7)
+                threshold = 0.3
+                print(f"Error: {error}, Threshold: {threshold}")
+                # When near (distance < threshold) next waypoint, update to next waypoint
+                if error < threshold:
+                    self.command_queue.put((command_pos, gripper_pos))
+                    break
+
+    # def compliant_set_joint_trajectory(self, trajectory_command):
+    #     print(
+    #         f"Received compliant joint trajectory command with {len(trajectory_command)} waypoints"
+    #     )
+    #     gripper_pos = 0
+    #     for command_pos in trajectory_command:
+    #         self.command_queue.put((command_pos, gripper_pos))
+    #         time.sleep(0.1)
 
     def set_joint_position(self, command_pos):
         print(f"Received joint pos command: {command_pos}")
@@ -160,6 +160,9 @@ class Arm:
 
 class ArmManager(MPBaseManager):
     pass
+
+
+ArmManager.register("Arm", Arm)
 
 
 ArmManager.register("Arm", Arm)

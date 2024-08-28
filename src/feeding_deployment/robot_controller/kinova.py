@@ -300,7 +300,14 @@ class KinovaArm:
             np.zeros(self.actuator_count),
             np.zeros(self.actuator_count),
         )
-        # Robot state
+
+        ee_pos, ee_vel, ee_force = (
+            np.zeros(7),
+            np.zeros(7),
+            np.zeros(6),
+        )
+
+        # Robot joint state
         for i in range(self.actuator_count):
             q[i] = math.radians(base_feedback.actuators[i].position)
             if q[i] > np.pi:
@@ -308,12 +315,23 @@ class KinovaArm:
             dq[i] = math.radians(base_feedback.actuators[i].velocity)
             tau[i] = -base_feedback.actuators[i].torque
 
+        # Robot cartesian state
+        ee_pos[:3] = (base_feedback.base.tool_pose_x, base_feedback.base.tool_pose_y, base_feedback.base.tool_pose_z)
+        tool_rot = np.array([base_feedback.base.tool_pose_theta_x, base_feedback.base.tool_pose_theta_y, base_feedback.base.tool_pose_theta_z])
+        ee_pos[3:] = R.from_euler("xyz", np.deg2rad(tool_rot)).as_quat()
+
+        ee_vel[:3] = (base_feedback.base.tool_twist_linear_x, base_feedback.base.tool_twist_linear_y, base_feedback.base.tool_twist_linear_z)
+        tool_rot_vel = np.array([base_feedback.base.tool_twist_angular_x, base_feedback.base.tool_twist_angular_y, base_feedback.base.tool_twist_angular_z])
+        ee_vel[3:] = R.from_euler("xyz", np.deg2rad(tool_rot_vel)).as_quat()
+
+        ee_force[:3] = (base_feedback.base.tool_external_wrench_force_x, base_feedback.base.tool_external_wrench_force_y, base_feedback.base.tool_external_wrench_force_z)
+
         gripper_pos = (
             base_feedback.interconnect.gripper_feedback.motor[0].position / 100.0
         )
 
-        # return q, dq, tau, gripper_pos
-        return q, gripper_pos
+        # return q, dq, tau, ee_pos, ee_vel, ee_force, gripper_pos
+        return q, ee_pos, gripper_pos
 
     def move_angular_trajectory(self, trajectory_joint_angles, blocking=True):
 
