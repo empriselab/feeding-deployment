@@ -523,6 +523,12 @@ class TransferToolHLA(HighLevelAction):
                 robot_commands,
             )
 
+            if self._run_on_robot:
+                self.execute_robot_commands(robot_commands)
+            robot_commands.clear()
+
+            sim_length = len(sim_states)
+
             # target_pose = self._perception_interface.get_head_perception_forque_target_pose()
             target_pose = Pose(position=(-0.17272330207928777, 0.6273752674813526, 0.5572539925006535), 
                 orientation=(-0.42030807,  0.56739361,  0.47188225, -0.52795148))
@@ -537,9 +543,6 @@ class TransferToolHLA(HighLevelAction):
             # visualize_pose(intermediate_pose, self._sim.physics_client_id)
             # input("Visualizing intermediate pose. Press Enter to continue...")
 
-            sim_length = len(sim_states)
-            robot_command_length = len(robot_commands)
-
             # NOTE: disabling collision checking here between held object and
             # conservative bounding box.
             move_to_ee_pose(sim=self._sim,
@@ -550,10 +553,6 @@ class TransferToolHLA(HighLevelAction):
                 sim_states=sim_states,
                 robot_commands=robot_commands,
                 check_held_object_collisions=False)
-            
-            print("ROBOT COMMANDS:")
-            print(robot_commands)
-            input("Copy the above commands to the robot controller. Press Enter to continue...")
             
             # input("Replaying the trajectory to check. Press Enter to continue...")
             # for i in range(sim_length, len(sim_states)):
@@ -586,7 +585,7 @@ class TransferToolHLA(HighLevelAction):
             
             # Reverse the transfer plan.
             transfer_sim_states = sim_states[sim_length:]
-            transfer_robot_commands = robot_commands[robot_command_length:]
+            transfer_robot_commands = robot_commands[:]
             sim_states.extend(transfer_sim_states[::-1])
             robot_commands.extend(transfer_robot_commands[::-1])
 
@@ -600,7 +599,11 @@ class TransferToolHLA(HighLevelAction):
             if self._run_on_robot:
                 y = input("Does the trajectory look good? Press 'y' to execute on robot")
                 if y == "y":
+                    input("Press enter to switch to joint compliant mode")
+                    self._robot_interface.switch_to_joint_compliant_mode()
                     self.execute_robot_commands(robot_commands)
+                    input("Press enter to switch out of joint compliant mode")
+                    self._robot_interface.switch_out_of_joint_compliant_mode()
                 else:
                     print("Trajectory not executed on robot")
 
