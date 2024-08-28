@@ -800,8 +800,13 @@ class KinovaArm:
 def main():
     arm = KinovaArm()
     try:
+        input("Press Enter to move to retract pos")
+        arm.retract()
 
+        input("Press Enter to zero torque offsets")
         arm.zero_torque_offsets()
+
+        input("Press Enter to move to retract pos")
         arm.retract()
         # arm.home()
 

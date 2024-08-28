@@ -74,10 +74,10 @@ class Arm:
         print(
             f"Received compliant joint trajectory command with {len(trajectory_command)} waypoints"
         )
-        _, gripper_pos = self.arm.get_state()
+        gripper_pos = 0
         for command_pos in trajectory_command:
             self.command_queue.put((command_pos, gripper_pos))
-            time.sleep(0.2)
+            time.sleep(0.1)
 
     def set_joint_position(self, command_pos):
         print(f"Received joint pos command: {command_pos}")
