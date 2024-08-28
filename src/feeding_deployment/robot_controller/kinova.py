@@ -754,6 +754,17 @@ class KinovaArm:
                 math.sin(self.q[6]),
             ]
         )
+    
+    def get_update_state(self):
+        q = self.q.copy()
+        dq = self.dq.copy()
+        tau = self.tau.copy()
+
+        # normalize q
+        for pos in range(len(q)):
+            if q[pos] > np.pi:
+                q[pos] -= 2 * np.pi
+        return q, dq, tau
 
     def gravity(self):
         assert self.cyclic_running, "Arm must be in low-level servoing mode"
