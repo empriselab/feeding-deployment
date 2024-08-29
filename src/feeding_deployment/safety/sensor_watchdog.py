@@ -89,7 +89,7 @@ class SensorWatchDog:
                 collision_count = self.collision_count
                 self.collision_count = 0
             
-            print("Frequencies: ", top_camera_count, bottom_camera_count, ft_sensor_count)
+            print("Frequencies: ", top_camera_count, bottom_camera_count, ft_sensor_count, collision_count)
             if top_camera_count < 20:
                 self.engine.say("Top camera not streaming correctly.")
                 self.engine.runAndWait()
@@ -108,7 +108,7 @@ class SensorWatchDog:
                 print("Press [ENTER] to continue:")
                 inp = input()
 
-            if collision_count < 20:
+            if collision_count < 10:
                 self.engine.say("Collision detection not streaming correctly.")
                 self.engine.runAndWait()
                 print("Press [ENTER] to continue:")
