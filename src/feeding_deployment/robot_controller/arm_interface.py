@@ -15,9 +15,6 @@ RPC_AUTHKEY = b"secret-key"
 NUC_HOSTNAME = "192.168.1.3"
 ARM_RPC_PORT = 5000
 
-# from ik_solver import IKSolver
-from feeding_deployment.robot_controller.command_interface import KinovaCommand
-
 try:
     from feeding_deployment.robot_controller.kinova import KinovaArm
 except ImportError:
@@ -29,7 +26,6 @@ class ArmInterface:
     def __init__(self):
         self.arm = KinovaArm()
         # self.arm.set_joint_limits(speed_limits=(7 * (30,)), acceleration_limits=(7 * (80,)))
-        self.in_compliant_mode = False
         self.command_queue = queue.Queue(1)
         self.controller = None
 
@@ -48,8 +44,6 @@ class ArmInterface:
 
     def switch_to_joint_compliant_mode(self):
 
-        assert not self.in_compliant_mode, "Already in compliant mode"
-
         # clear command queue
         print("Clearing command queue")
         while not self.command_queue.empty():
@@ -61,8 +55,6 @@ class ArmInterface:
         self.in_compliant_mode = True
 
     def switch_out_of_joint_compliant_mode(self):
-
-        assert self.in_compliant_mode, "Not in compliant mode"
 
         # switch out of joint compliant mode
         print("Switching out of joint compliant mode")
@@ -149,29 +141,6 @@ class ArmInterface:
     def stop(self):
         print("Stopping arm")
         self.arm.stop()
-
-    def execute_command(self, cmd: KinovaCommand) -> None:
-
-        if cmd.__class__.__name__ == "JointTrajectoryCommand":
-            if self.in_compliant_mode:
-                return self.compliant_set_joint_trajectory(cmd.traj)
-            else:
-                return self.set_joint_trajectory(cmd.traj)
-
-        if cmd.__class__.__name__ == "JointCommand":
-            return self.set_joint_position(cmd.pos)
-
-        if cmd.__class__.__name__ == "CartesianCommand":
-            return self.set_ee_pose(cmd.pos, cmd.quat)
-
-        if cmd.__class__.__name__ == "OpenGripperCommand":
-            return self.open_gripper()
-
-        if cmd.__class__.__name__ == "CloseGripperCommand":
-            return self.close_gripper()
-
-        raise NotImplementedError(f"Unrecognized command: {cmd}")
-
 
 class ArmManager(MPBaseManager):
     pass

@@ -1,3 +1,9 @@
+'''
+Entrypoint for controlling the robot arm on compute machine. Additionally runs two important threads:
+1. A thread that checks no safety anomalies have occurred using the watchdog
+2. A thread that publishes joint states to ROS
+'''
+
 import threading
 import time
 import numpy as np
@@ -8,358 +14,176 @@ from std_msgs.msg import Bool
 from geometry_msgs.msg import Pose
 
 from feeding_deployment.robot_controller.arm_interface import ArmInterface, ArmManager, NUC_HOSTNAME, ARM_RPC_PORT, RPC_AUTHKEY
+from feeding_deployment.robot_controller.command_interface import KinovaCommand, JointTrajectoryCommand, JointCommand, CartesianCommand, OpenGripperCommand, CloseGripperCommand
+from feeding_deployment.safety.watchdog import Watchdog, AnomalyStatus, WATCHDOG_MONITOR_FREQUENCY
+
+class ArmInterfaceClient:
+    def __init__(self):
+
+        rospy.init_node("arm_interface_client", anonymous=True)
+
+        self.manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
+        self.manager.connect()
+        self._arm_interface = self.manager.ArmInterface()
+        self.in_compliant_mode = False
+
+        # create joint/cartesian states publishers
+        self.joint_states_pub = rospy.Publisher("/robot_joint_states", JointState, queue_size=10)
+        self.cartesian_states_pub = rospy.Publisher("/robot_cartesian_states", Pose, queue_size=10)
+
+        # spin joint states thread
+        self.joint_state_thread = threading.Thread(target=self.publish_joint_states)
+        self.joint_state_thread.start()
+
+        # create watchdog
+        self.watchdog = Watchdog()
+
+        # spin watchdog monitor thread
+        self.watchdog_thread = threading.Thread(target=self.monitor_watchdog)
+        self.watchdog_thread.start()
+
+    def publish_joint_states(self):
+
+        while not rospy.is_shutdown():
+            arm_pos, ee_pose, gripper_pos = self._arm_interface.get_state()
+            joint_state_msg = JointState()
+            joint_state_msg.header.stamp = rospy.Time.now()
+            joint_state_msg.name = [
+                "joint_1",
+                "joint_2",
+                "joint_3",
+                "joint_4",
+                "joint_5",
+                "joint_6",
+                "joint_7",
+                "finger_joint",
+            ]
+            joint_state_msg.position = arm_pos.tolist() + [gripper_pos]
+            joint_state_msg.velocity = [0.0] * 8
+            joint_state_msg.effort = [0.0] * 8
+            self.joint_states_pub.publish(joint_state_msg)
+
+            cartesian_state_msg = Pose()
+            cartesian_state_msg.position.x = ee_pose[0]
+            cartesian_state_msg.position.y = ee_pose[1]
+            cartesian_state_msg.position.z = ee_pose[2]
+            cartesian_state_msg.orientation.x = ee_pose[3]
+            cartesian_state_msg.orientation.y = ee_pose[4]
+            cartesian_state_msg.orientation.z = ee_pose[5]
+            cartesian_state_msg.orientation.w = ee_pose[6]
+            self.cartesian_states_pub.publish(cartesian_state_msg)
+
+            time.sleep(0.01) 
+
+    def monitor_watchdog(self):
+        while True:
+            start_time = time.time()
+            anomaly_status = self.watchdog.run()
+
+            if anomaly_status != AnomalyStatus.NO_ANOMALY:
+                self._arm_interface.stop()
+                raise Exception(f"Anomaly detected: {anomaly_status}")
+            
+            end_time = time.time()
+            time.sleep(max(0, 1.0/WATCHDOG_MONITOR_FREQUENCY - (end_time - start_time)))
+
+    def switch_to_joint_compliant_mode(self):
+        assert not self.in_compliant_mode, "Already in compliant mode"
+        self._arm_interface.switch_to_joint_compliant_mode()
+
+    def switch_out_of_joint_compliant_mode(self):
+        assert self.in_compliant_mode, "Not in compliant mode"
+        self._arm_interface.switch_out_of_joint_compliant_mode()
+
+    def execute_command(self, cmd: KinovaCommand) -> None:
+
+        if cmd.__class__.__name__ == "JointTrajectoryCommand":
+            if self.in_compliant_mode:
+                return self._arm_interface.compliant_set_joint_trajectory(cmd.traj)
+            else:
+                return self._arm_interface.set_joint_trajectory(cmd.traj)
+
+        if cmd.__class__.__name__ == "JointCommand":
+            return self._arm_interface.set_joint_position(cmd.pos)
+
+        if cmd.__class__.__name__ == "CartesianCommand":
+            return self._arm_interface.set_ee_pose(cmd.pos, cmd.quat)
+
+        if cmd.__class__.__name__ == "OpenGripperCommand":
+            return self._arm_interface.open_gripper()
+
+        if cmd.__class__.__name__ == "CloseGripperCommand":
+            return self._arm_interface.close_gripper()
+
+        raise NotImplementedError(f"Unrecognized command: {cmd}")
 
 if __name__ == "__main__":
+    arm_client_interface = ArmInterfaceClient()
 
-    # from constants import POLICY_CONTROL_PERIOD
-    POLICY_CONTROL_PERIOD = 0.1
-    manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
-    manager.connect()
-    arm = manager.ArmInterface()
-    joint_state_thread = None
-    try:
-        rospy.init_node("arm_client", anonymous=True)
+    run_commands = input("Press 'y' to run commands")
 
-        def emergency_stop_callback(msg):
-            arm.stop()
+    if run_commands != "y":
+        exit()
 
-        rospy.Subscriber("/estop", Bool, emergency_stop_callback)
+    cup_inside_mount = (
+        np.array([0.55, 0.52, 0.305]),
+        np.array([-0.2126311, -0.6743797, -0.6743797, 0.2126311]),
+    )
 
-        def publish_joint_states(arm):
+    cup_outside_mount = (
+        cup_inside_mount[0].copy(),
+        cup_inside_mount[1].copy(),
+    )
+    cup_outside_mount[0][1] -= 0.06
 
-            # publish joint states
-            joint_states_pub = rospy.Publisher(
-                "/robot_joint_states", JointState, queue_size=10
-            )
+    cup_above_mount = (
+        cup_inside_mount[0].copy(),
+        cup_inside_mount[1].copy(),
+    )
+    cup_above_mount[0][2] += 0.1
 
-            # publish cartesian states
-            cartesian_states_pub = rospy.Publisher(
-                "/robot_cartesian_states", Pose, queue_size=10
-            )
+    cup_inside_mount_pos = [-3.0706449768856463, -1.233024942579057, -1.0107718990709298, -1.3064307169693468, -1.0801286033398636, -0.6790118020676168, -3.0605814237584545]
 
-            while not rospy.is_shutdown():
-                arm_pos, ee_pose, gripper_pos = arm.get_state()
-                joint_state_msg = JointState()
-                joint_state_msg.header.stamp = rospy.Time.now()
-                joint_state_msg.name = [
-                    "joint_1",
-                    "joint_2",
-                    "joint_3",
-                    "joint_4",
-                    "joint_5",
-                    "joint_6",
-                    "joint_7",
-                    "finger_joint",
-                ]
-                joint_state_msg.position = arm_pos.tolist() + [gripper_pos]
-                joint_state_msg.velocity = [0.0] * 8
-                joint_state_msg.effort = [0.0] * 8
-                joint_states_pub.publish(joint_state_msg)
+    # depend on the offsets set above
+    cup_above_mount_pos = [-3.0822113518159693, -1.0554986243143745, -0.9943061066831875, -1.2514305815048123, -1.0634620086059297, -0.7145069457084112, 3.0023889570952424]
+    cup_outside_mount_pos = [-2.9457621628368873, -1.206488672845289, -1.0073524002312677, -1.3997867637176382, -1.0606635589324744, -0.7359768177844117, -3.048252585808042]
 
-                cartesian_state_msg = Pose()
-                cartesian_state_msg.position.x = ee_pose[0]
-                cartesian_state_msg.position.y = ee_pose[1]
-                cartesian_state_msg.position.z = ee_pose[2]
-                cartesian_state_msg.orientation.x = ee_pose[3]
-                cartesian_state_msg.orientation.y = ee_pose[4]
-                cartesian_state_msg.orientation.z = ee_pose[5]
-                cartesian_state_msg.orientation.w = ee_pose[6]
-                cartesian_states_pub.publish(cartesian_state_msg)
+    before_transfer_pos = [
+        -2.86554642,
+        -1.61951779,
+        -2.60986085,
+        -1.37302839,
+        1.11779249,
+        -1.18028264,
+        2.05515862,
+    ]
 
-                time.sleep(0.01)
+    input("Press enter to move to outside cup pose...")
+    arm_client_interface.execute_command(JointCommand(cup_outside_mount_pos))
 
-        joint_state_thread = threading.Thread(target=publish_joint_states, args=(arm,))
-        joint_state_thread.start()
+    # input("Press enter to move to outside cup mount pose...")
+    # arm_client_interface.set_ee_pose(outside_cup_pose[0], outside_cup_pose[1])
 
-        # before_transfer_pos = [-2.86554642, -1.61951779, -2.60986085, -1.37302839,  1.11779249, -1.18028264,  2.05515862]
-        
-        # input("Press enter to move to before transfer pose...")
-        # arm.set_joint_position(before_transfer_pos)
+    input("Press enter to move to inside cup mount pose...")
+    arm_client_interface.execute_command(CartesianCommand(cup_inside_mount[0], cup_inside_mount[1]))
 
-        # input("Press Enter to switch to joint compliant mode...")
-        # arm.switch_to_joint_compliant_mode()
+    input("Press enter to grasp the cup...")
+    arm_client_interface.execute_command(OpenGripperCommand())
 
-        # compliant_trajectory = \
-        # [[ 3.41763889, -1.61951779, -2.60986085, -1.37302839,  1.11779249, -1.18028264, -4.22802669], \
-        # [-2.86177592, -1.61810199, -2.59101636, -1.41315263,  1.13104346, -1.15088751,  2.01918406], \
-        # [-2.85938399, -1.61746006, -2.57356532, -1.45686722,  1.14847337, -1.12112886,  1.97867146], \
-        # [-2.85699205, -1.61681813, -2.55611428, -1.5005818 ,  1.16590328, -1.09137022,  1.93815887], \
-        # [-2.85979598, -1.61647689, -2.54476893, -1.54186077,  1.1921008 , -1.06885054,  1.89284936], \
-        # [-2.86853489, -1.61647909, -2.54039782, -1.58035766,  1.22831315, -1.05459958,  1.84206055], \
-        # [-2.8772738 , -1.6164813 , -2.53602671, -1.61885454,  1.26452549, -1.04034862,  1.79127174], \
-        # [-2.88672904, -1.61644742, -2.53217158, -1.65680369,  1.30144078, -1.0273325 ,  1.74020177], \
-        # [-2.90328911, -1.61605558, -2.53343407, -1.68932024,  1.34532813, -1.02656399,  1.68634301], \
-        # [-2.91984918, -1.61566374, -2.53469656, -1.72183679,  1.38921548, -1.02579548,  1.63248426], \
-        # [-2.93640926, -1.6152719 , -2.53595905, -1.75435334,  1.43310283, -1.02502697,  1.57862551], \
-        # [-2.95091056, -1.61056262, -2.53082475, -1.78301695,  1.47261615, -1.02237995,  1.52686039], \
-        # [-2.96429599, -1.60351324, -2.5222233 , -1.80959223,  1.5097587 , -1.01871475,  1.47623006], \
-        # [-2.97768142, -1.59646386, -2.51362185, -1.8361675 ,  1.54690125, -1.01504955,  1.42559973], \
-        # [-2.99135705, -1.58946825, -2.5052373 , -1.86250795,  1.58409559, -1.01192551,  1.37512468], \
-        # [-3.01231347, -1.58382185, -2.50229433, -1.88295666,  1.62258906, -1.02237821,  1.32854554], \
-        # [-3.0332699 , -1.57817545, -2.49935137, -1.90340537,  1.66108253, -1.03283091,  1.2819664 ], \
-        # [-3.05422633, -1.57252904, -2.49640841, -1.92385408,  1.699576  , -1.04328362,  1.23538726], \
-        # [-3.07484656, -1.56581272, -2.49182133, -1.94333075,  1.73700034, -1.05321743,  1.18926345], \
-        # [-3.09418075, -1.55500373, -2.48094514, -1.95908914,  1.77033499, -1.06116636,  1.1448814 ], \
-        # [-3.11351495, -1.54419474, -2.47006895, -1.97484754,  1.80366965, -1.06911529,  1.10049935], \
-        # [-3.13284914, -1.53338575, -2.45919276, -1.99060593,  1.8370043 , -1.07706422,  1.05611729], \
-        # [ 3.12668153, -1.5248626 , -2.45171954, -2.00457495,  1.87018345, -1.09165458,  1.01553995], \
-        # [ 3.09451769, -1.52084146, -2.45094859, -2.01501973,  1.9030563 , -1.11932541,  0.98245608], \
-        # [ 3.06235385, -1.51682032, -2.45017764, -2.02546452,  1.93592916, -1.14699625,  0.94937221], \
-        # [ 3.03019002, -1.51279918, -2.44940669, -2.03590931,  1.96880201, -1.17466709,  0.91628833], \
-        # [ 2.99663442, -1.50842462, -2.44688751, -2.0443399 ,  2.0004814 , -1.20287614,  0.88544804], \
-        # [ 2.96116052, -1.50356293, -2.4419587 , -2.04999427,  2.0305158 , -1.23182704,  0.85770013], \
-        # [ 2.92568662, -1.49870124, -2.43702988, -2.05564863,  2.0605502 , -1.26077794,  0.82995223], \
-        # [ 2.89021272, -1.49383955, -2.43210107, -2.06130299,  2.0905846 , -1.28972884,  0.80220433], \
-        # [ 2.84880974, -1.49147307, -2.42777859, -2.06286484,  2.12114659, -1.32327376,  0.78068953], \
-        # [ 2.80508202, -1.49008493, -2.42369386, -2.06282204,  2.15191545, -1.35861997,  0.76161868], \
-        # [ 2.76135429, -1.4886968 , -2.41960912, -2.06277924,  2.18268431, -1.39396618,  0.74254784], \
-        # [ 2.71934301, -1.48619572, -2.41247589, -2.06068723,  2.21212124, -1.4254812 ,  0.72368812], \
-        # [ 2.68073937, -1.48148513, -2.39929054, -2.05452696,  2.23891391, -1.44939028,  0.70524755], \
-        # [ 2.64213573, -1.47677455, -2.3861052 , -2.04836669,  2.26570658, -1.47329935,  0.68680699], \
-        # [ 2.60353209, -1.47206397, -2.37291986, -2.04220642,  2.29249926, -1.49720842,  0.66836642]]
+    input("Press enter to pickup the cup...")
+    arm_client_interface.execute_command(CartesianCommand(cup_above_mount[0], cup_above_mount[1]))
 
-        # # normalize compliant trajectory
-        # for pos in compliant_trajectory:
-        #     for i in range(7):
-        #         if pos[i] > np.pi:
-        #             pos[i] -= 2 * np.pi
-        #         if pos[i] < -np.pi:
-        #             pos[i] += 2 * np.pi
-    
-        # input("Press Enter to move to compliant trajectory...")
-        # arm.compliant_set_joint_trajectory(compliant_trajectory)
+    input("Press enter to move to before transfer pose...")
+    arm_client_interface.execute_command(JointCommand(before_transfer_pos))
 
-        # input("Press Enter to move to joint compliant position...")
-        # arm.compliant_set_joint_position(
-            # [-2.86554642, -1.61951779, -2.60986085, -1.37302839,  1.11779249, -1.18028264,  2.05515862]
-        # )
+    input("Press enter to move above the mount...")
+    arm_client_interface.execute_command(CartesianCommand(cup_above_mount[0], cup_above_mount[1]))
 
-        # def error_from_goal(arm):
-        #     goal = [-2.86554642, -1.61951779, -2.60986085, -1.37302839,  1.11779249, -1.18028264,  2.05515862]
-        #     # print upto 4 decimal places
-        #     np.set_printoptions(precision=4, suppress=True)
+    input("Press enter to move to inside cup mount pose...")
+    arm_client_interface.execute_command(CartesianCommand(cup_inside_mount[0], cup_inside_mount[1]))
 
-        #     while True:
-        #         current, _, _ = arm.get_update_state()
-        #         current = np.array(current)
-        #         goal = np.array(goal)
-        #         # print("Current: ", current)
-        #         # print("Goal: ", goal)
-        #         error = goal - current
-        #         norm = np.linalg.norm(error)
-        #         # print("Error: ", error)
-        #         print(f"Norm: {norm} Error: {error}")
+    input("Press enter to release the cup...")
+    arm_client_interface.execute_command(CloseGripperCommand())
 
-        # # start thread to print error from goal
-        # error_thread = threading.Thread(target=error_from_goal, args=(arm,))
-        # error_thread.start()
-
-        # input("Press Enter to switch out of joint compliant mode...")
-        # arm.switch_out_of_joint_compliant_mode()
-
-        # error_thread.join()
-
-        # input("Press Enter to move to before transfer pose...")
-        # arm.set_joint_position(before_transfer_pos)
-
-        # print("Current ArmInterface State:", arm.get_state())
-
-        # transfer_pose = [-2.76117261, -1.18670831, -1.7014329 , -1.81186993,  0.26973719, -0.09092458,  2.4944019]
-        # input("Press Enter to set the arm to transfer pose")
-        # arm.set_joint_position(transfer_pose)
-
-        cup_inside_mount = (
-            np.array([0.55, 0.52, 0.305]),
-            np.array([-0.2126311, -0.6743797, -0.6743797, 0.2126311]),
-        )
-
-        cup_outside_mount = (
-            cup_inside_mount[0].copy(),
-            cup_inside_mount[1].copy(),
-        )
-        cup_outside_mount[0][1] -= 0.06
-
-        cup_above_mount = (
-            cup_inside_mount[0].copy(),
-            cup_inside_mount[1].copy(),
-        )
-        cup_above_mount[0][2] += 0.1
-
-        cup_inside_mount_pos = [-3.0706449768856463, -1.233024942579057, -1.0107718990709298, -1.3064307169693468, -1.0801286033398636, -0.6790118020676168, -3.0605814237584545]
-
-        # depend on the offsets set above
-        cup_above_mount_pos = [-3.0822113518159693, -1.0554986243143745, -0.9943061066831875, -1.2514305815048123, -1.0634620086059297, -0.7145069457084112, 3.0023889570952424]
-        cup_outside_mount_pos = [-2.9457621628368873, -1.206488672845289, -1.0073524002312677, -1.3997867637176382, -1.0606635589324744, -0.7359768177844117, -3.048252585808042]
-
-        before_transfer_pos = [
-            -2.86554642,
-            -1.61951779,
-            -2.60986085,
-            -1.37302839,
-            1.11779249,
-            -1.18028264,
-            2.05515862,
-        ]
-
-        input("Press enter to move to outside cup pose...")
-        arm.set_joint_position(cup_outside_mount_pos)
-
-        # input("Press enter to move to outside cup mount pose...")
-        # arm.set_ee_pose(outside_cup_pose[0], outside_cup_pose[1])
-
-        input("Press enter to move to inside cup mount pose...")
-        arm.set_ee_pose(cup_inside_mount[0], cup_inside_mount[1])
-
-        input("Press enter to grasp the cup...")
-        arm.set_gripper(0.5)
-
-        input("Press enter to pickup the cup...")
-        arm.set_ee_pose(cup_above_mount[0], cup_above_mount[1])
-
-        input("Press enter to move to before transfer pose...")
-        arm.set_joint_position(before_transfer_pos)
-
-        input("Press enter to move above the mount...")
-        arm.set_joint_position(cup_above_mount_pos)
-
-        input("Press enter to move to inside cup mount pose...")
-        arm.set_ee_pose(cup_inside_mount[0], cup_inside_mount[1])
-
-        input("Press enter to release the cup...")
-        arm.set_gripper(1.0)
-
-        input("Press enter to move to outside cup pose...")
-        arm.set_ee_pose(cup_outside_mount[0], cup_outside_mount[1])
-
-        # home_pos = [
-        #     2.2912759438800285,
-        #     0.7308686750765581,
-        #     2.082994642398784,
-        #     4.109475142253324,
-        #     0.2853091081120964,
-        #     5.818345985240578,
-        #     5.988186420599291,
-        # ]
-
-        # inside_mount_pose = (
-        #     np.array([-0.147, -0.17, 0.07]),
-        #     np.array([0.7071068, -0.7071068, 0, 0]),
-        # )
-
-        # outside_mount_pose = (
-        #     np.array([-0.147, -0.29, 0.07]),
-        #     np.array([0.7071068, -0.7071068, 0, 0]),
-        # )
-
-        # outside_mount_joint_states = [
-        #     2.6266411620509817,
-        #     0.6992626121546339,
-        #     2.306749708761716,
-        #     4.053362604401464,
-        #     0.9559379448584164,
-        #     5.655628973165609,
-        #     5.80065247559031,
-        # ]
-
-        # above_mount_pose = (
-        #     np.array([-0.147, -0.17, 0.15]),
-        #     np.array([0.7071068, -0.7071068, 0, 0]),
-        # )
-
-        # above_mount_joint_states = [
-        #     3.300153003835367,
-        #     0.39120874346320217,
-        #     1.8613410764520344,
-        #     3.862447510072517,
-        #     0.6143839397882825,
-        #     5.583536137192727,
-        #     6.276739392077158,
-        # ]
-
-        # infront_mount_pose = (
-        #     np.array([0.0, -0.17, 0.15]),
-        #     np.array([0.7071068, -0.7071068, 0, 0]),
-        # )
-
-        # infront_mount_joint_states = [
-        #     2.835106221647441,
-        #     0.18716812654374576,
-        #     1.7554270267415284,
-        #     -2.5582927305707517,
-        #     0.3492644556371586,
-        #     -0.5794207625752312,
-        #     -0.3984099643402903,
-        # ]
-
-        # input("Press enter to move to home joint pos...")
-        # next_pos = home_pos.copy()
-        # arm.set_joint_position(next_pos)
-
-        # input("Press enter to move to outside mount joint pos...")
-        # next_pos = outside_mount_joint_states.copy()
-        # arm.set_joint_position(next_pos)
-
-        # input("Press enter to move to inside mount pose...")
-        # arm.set_ee_pose(inside_mount_pose[0], inside_mount_pose[1])
-
-        # input("Press enter to release the utensil...")
-        # arm.set_gripper(1.0)
-
-        # input("Press enter to move up...")
-        # arm.set_ee_pose(above_mount_pose[0], above_mount_pose[1])
-
-        # input("Press enter to move forward...")
-        # arm.set_ee_pose(infront_mount_pose[0], infront_mount_pose[1])
-
-        # input("Press enter to move to home joint pos...")
-        # next_pos = home_pos.copy()
-        # arm.set_joint_position(next_pos)
-
-        # input("Press enter to move to infront mount joint pos...")
-        # next_pos = infront_mount_joint_states.copy()
-        # arm.set_joint_position(next_pos)
-
-        # input("Press enter to move to above mount joint states...")
-        # next_pos = above_mount_joint_states.copy()
-        # arm.set_joint_position(next_pos)
-
-        # input("Press enter to inside mount pose...")
-        # arm.set_ee_pose(inside_mount_pose[0], inside_mount_pose[1])
-
-        # input("Press enter to grab the utensil...")
-        # arm.set_gripper(0.5)
-
-        # input("Press enter to move to outside mount pose...")
-        # arm.set_ee_pose(outside_mount_pose[0], outside_mount_pose[1])
-
-        # input("Press enter to move to home joint pos...")
-        # next_pos = home_pos.copy()
-        # arm.set_joint_position(next_pos)
-
-        # input("Press Enter to set arm pos...")
-        # next_pos = [0.0, 0.26179939, 3.14159265, -2.26892803, 0.0, 0.95993109, 1.8]
-        # arm.execute_action(next_pos)
-        # input("Press Enter to exit...")
-        # while True:
-        # time.sleep(1)
-        # for i in range(50):
-        #     arm.execute_action({
-        #         'arm_pos': np.array([0.135, 0.002, 0.211]),
-        #         'arm_quat': np.array([0.706, 0.707, 0.029, 0.029]),
-        #         'gripper_pos': np.zeros(1),
-        #     })
-        #     print(arm.get_state())
-        #     state = arm.get_state()
-        #     state['arm_quat'][0] = 3
-        #     time.sleep(POLICY_CONTROL_PERIOD)
-    except (EOFError, ConnectionRefusedError, BrokenPipeError) as e:
-        print(f"Server connection lost: {e}")
-    except KeyboardInterrupt:
-        print("Client interrupted, shutting down...")
-    finally:
-        try:
-            if joint_state_thread is not None:
-                joint_state_thread.join()
-            arm.close()  # Ensure the arm is disconnected properly
-        except Exception as e:
-            print(f"Error during client shutdown: {e}")
+    input("Press enter to move to outside cup pose...")
+    arm_client_interface.execute_command(CartesianCommand(cup_outside_mount[0], cup_outside_mount[1]))

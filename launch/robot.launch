@@ -15,6 +15,7 @@
 
     <node name="st_map2world" pkg="tf" type="static_transform_publisher" respawn="false" output="screen" args="0 0 0 0 0 0 1 map world 10"/>
 
+    <!-- Realsense camera -->
     <include file="$(find realsense2_camera)/launch/rs_rgbd.launch">
         <arg name="filters" value="pointcloud"/>
         <arg name="align_depth" value="true"/>
@@ -22,5 +23,12 @@
 
     <node pkg="tf2_ros" type="static_transform_publisher" name="camera_link_broadcaster"
       args="-0.04611404 0.0837761 0.0729979 -0.70180948 -0.00506307 -0.000348 0.71234662 end_effector_link camera_link" />
+
+    <!-- FT sensor -->
+    <include file="$(find netft_rdt_driver)/launch/ft_sensor.launch">
+        <arg name="ip_address" value="192.168.1.23"/>
+        <arg name="rate" value="1000"/>
+    </include>
+    
 
 </launch> 
