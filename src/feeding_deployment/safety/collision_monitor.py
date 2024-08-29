@@ -32,6 +32,7 @@ class CollisionMonitor:
             self._joint_state_sub = rospy.Subscriber(
                 "/robot_joint_states", JointState, self._joint_state_callback
             )
+            self._stop_controller_pub = rospy.Publisher("/estop", Bool, queue_size=1)
         self._use_ros = use_ros
         self._scene_description = SceneDescription()
         self._sim = FeedingDeploymentPyBulletSimulator(self._scene_description)
@@ -57,6 +58,9 @@ class CollisionMonitor:
                                                             finger_state)
         # Run collision checking.
         has_collision = self.check_collisions(combined_joint_state)
+        # If there is a collision, e-stop immediately.
+        if has_collision:
+            self._stop_controller_pub.publish(Bool(data=True))
         # Publish the result.
         self._collision_pub.publish(Bool(data=has_collision))
 

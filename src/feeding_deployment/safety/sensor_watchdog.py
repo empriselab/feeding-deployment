@@ -39,6 +39,8 @@ class SensorWatchDog:
         self.ft_sensor_count_lock = threading.Lock()
         self.ft_sensor_count = 0
 
+        # NOTE: this just makes sure that the collision monitor is running. If a collision is detected,
+        # the collision monitor itself will immediately e-stop the robot.
         self.collisions_sub = rospy.Subscriber('/collision_detected', Bool, self.collisionCallback)
         self.collision_count_lock = threading.Lock()
         self.collision_count = 0
@@ -62,13 +64,6 @@ class SensorWatchDog:
             self.ft_sensor_count += 1
 
     def collisionCallback(self, msg):
-
-        # Wait if collision detected.
-        if msg.data:
-            self.engine.say("Collision detected!")
-            self.engine.runAndWait()
-            print("Press [ENTER] to continue:")
-            inp = input()
 
         with self.collision_count_lock:
             self.collision_count += 1
