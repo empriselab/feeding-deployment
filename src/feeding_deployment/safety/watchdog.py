@@ -52,7 +52,6 @@ class PeekableQueue(queue.Queue):
 
 class WatchDog:
     def __init__(self):
-        rospy.init_node('WatchDog', anonymous=True)
 
         self.camera_info_sub = rospy.Subscriber("/camera/color/camera_info", CameraInfo, self.cameraCallback)
         self.camera_timestamps = PeekableQueue()

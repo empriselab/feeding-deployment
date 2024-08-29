@@ -40,12 +40,12 @@ class ArmInterfaceClient:
         bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
         bias('bias')
 
-        # # create watchdog
-        # self.watchdog = WatchDog()
+        # create watchdog
+        self.watchdog = WatchDog()
 
-        # # spin watchdog monitor thread
-        # self.watchdog_thread = threading.Thread(target=self.monitor_watchdog)
-        # self.watchdog_thread.start()
+        # spin watchdog monitor thread
+        self.watchdog_thread = threading.Thread(target=self.monitor_watchdog)
+        self.watchdog_thread.start()
 
     def publish_joint_states(self):
 
@@ -85,6 +85,7 @@ class ArmInterfaceClient:
 
             if anomaly_status != AnomalyStatus.NO_ANOMALY:
                 self._arm_interface.stop()
+                self._arm_interface.close()
                 raise Exception(f"Anomaly detected: {anomaly_status}")
             
             end_time = time.time()
