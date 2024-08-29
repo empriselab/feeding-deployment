@@ -28,7 +28,11 @@
    - Launch: `roslaunch robot.launch`
 3. Run the feeding demo:
    - Navigate to integration scripts: `cd src/feeding_deployment/integration`
-   - Run demo: `python demo.py --run_on_robot` 
+   - Run demo: `python demo.py --run_on_robot`
+  
+## Simulate E-Stop Buttons
+- User E-Stop: `rostopic pub -r 1000 user_estop std_msgs/Bool False`
+- Experimentor E-Stop: `rostopic pub -r 1000 experimentor_estop std_msgs/Bool False`
 
 ## Check Installation
 
