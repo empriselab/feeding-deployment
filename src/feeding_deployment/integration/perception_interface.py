@@ -15,66 +15,30 @@ try:
 except ModuleNotFoundError:
     pass
 
-from feeding_deployment.robot_controller.arm_client import Arm
-
-
-def publish_joint_states(arm):
-
-    # publish joint states
-    joint_states_pub = rospy.Publisher("/robot_joint_states", JointState, queue_size=10)
-
-    while not rospy.is_shutdown():
-        arm_pos, gripper_pos = arm.get_state()
-        joint_state_msg = JointState()
-        joint_state_msg.header.stamp = rospy.Time.now()
-        joint_state_msg.name = [
-            "joint_1",
-            "joint_2",
-            "joint_3",
-            "joint_4",
-            "joint_5",
-            "joint_6",
-            "joint_7",
-            "finger_joint",
-        ]
-        joint_state_msg.position = arm_pos.tolist() + [gripper_pos]
-        joint_state_msg.velocity = [0.0] * 8
-        joint_state_msg.effort = [0.0] * 8
-        joint_states_pub.publish(joint_state_msg)
-        time.sleep(0.01)
-
+from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 
 class PerceptionInterface:
     """An interface for perception (robot joints, human head poses, etc.)."""
 
-    def __init__(self, robot_interface: Arm | None) -> None:
+    def __init__(self, robot_interface: ArmInterfaceClient | None) -> None:
         self._robot_interface = robot_interface
-
-        try:
-            rospy.init_node("perception_interface", anonymous=True)
-
-        except Exception:
-            pass
-
-        # publish joint states in separate thread
-        if robot_interface is not None:
-            joint_state_thread = threading.Thread(
-                target=publish_joint_states, args=(self._robot_interface,)
-            )
-            joint_state_thread.start()
 
         # run head perception
         if robot_interface is None:
             self._head_perception = None
         else:
-            self._head_perception = HeadPerceptionROSWrapper()
-            # warm start head perception
-            for _ in range(10):
-                self._head_perception.run_head_perception()
+            self._head_perception = None
+            # self._head_perception = HeadPerceptionROSWrapper()
+            # # warm start head perception
+            # for _ in range(10):
+            #     self._head_perception.run_head_perception()
 
     def get_robot_joints(self) -> "JointState":
         """Get the current robot joint state."""
-        q, gripper_position = self._robot_interface.get_state()
+        joint_state_msg = rospy.wait_for_message("/robot_joint_states", JointState)
+        q = np.array(joint_state_msg.position[:7])
+        gripper_position = joint_state_msg.position[7]
+        
         joint_state = q.tolist() + [
             gripper_position,
             gripper_position,

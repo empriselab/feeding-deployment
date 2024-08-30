@@ -38,12 +38,7 @@ from feeding_deployment.integration.high_level_actions import (
     tool_type,
 )
 from feeding_deployment.integration.perception_interface import PerceptionInterface
-from feeding_deployment.robot_controller.arm_client import (
-    ARM_RPC_PORT,
-    NUC_HOSTNAME,
-    RPC_AUTHKEY,
-    ArmManager,
-)
+from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 from feeding_deployment.simulation.scene_description import (
     SceneDescription,
     create_scene_description_from_config,
@@ -73,11 +68,7 @@ class _Runner:
 
         # Initialize the interface to the robot.
         if run_on_robot:
-            manager = ArmManager(
-                address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY
-            )
-            manager.connect()
-            self.robot_interface = manager.Arm()  # type: ignore  # pylint: disable=no-member
+            self.robot_interface = ArmInterfaceClient()  # type: ignore  # pylint: disable=no-member
         else:
             self.robot_interface = None
 
@@ -91,9 +82,15 @@ class _Runner:
             print(f"Initial joint state: {kwargs['initial_joints']}")
         else:
             print("Running in simulation mode.")
-        self.scene_description = SceneDescription(**kwargs)
-        self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description)
 
+        input("Press enter to populate the scene description.")
+        self.scene_description = SceneDescription(**kwargs)
+
+        input("Press enter to create the simulator.")
+        self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description)
+        # self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description, use_gui=False)
+
+        input("Press enter to create the high-level actions.")
         # Create skills for high-level planning.
         hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
         self.hlas = {
@@ -218,10 +215,16 @@ if __name__ == "__main__":
 
     runner = _Runner(args.run_on_robot, args.max_motion_planning_time)
 
-    # Uncomment to test commands.
-    msg = namedtuple("String", ["data"])
-    runner.web_interface_callback(msg(json.dumps({"status": "drink_pickup"})))
-    runner.web_interface_callback(msg(json.dumps({"status": "drink_transfer"})))
+    # # Uncomment to test commands.
+    # msg = namedtuple("String", ["data"])
+    # runner.web_interface_callback(msg(json.dumps({"status": "drink_pickup"})))
+    # runner.web_interface_callback(msg(json.dumps({"status": "drink_transfer"})))
+    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.cup,)))
+    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.cup,)))
+    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.cup,)))
 
     if args.make_videos:
         runner.make_video(Path("full.mp4"))

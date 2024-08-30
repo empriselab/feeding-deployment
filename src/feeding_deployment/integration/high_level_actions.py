@@ -42,11 +42,11 @@ from feeding_deployment.integration.low_level_actions import (
     move_to_ee_pose,
 )
 from feeding_deployment.integration.perception_interface import PerceptionInterface
-from feeding_deployment.integration.utils import simulated_trajectory_to_kinova_commands
-from feeding_deployment.robot_controller.arm_client import Arm
+from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 from feeding_deployment.robot_controller.command_interface import (
     CloseGripperCommand,
     KinovaCommand,
+    JointTrajectoryCommand,
     OpenGripperCommand,
 )
 from feeding_deployment.simulation.planning import (
@@ -70,7 +70,7 @@ class HighLevelAction(abc.ABC):
     def __init__(
         self,
         sim: FeedingDeploymentPyBulletSimulator,
-        robot_interface: Arm,
+        robot_interface: ArmInterfaceClient,
         perception_interface: PerceptionInterface,
         hla_hyperparams: dict[str, Any],
         run_on_robot: bool,
@@ -458,39 +458,39 @@ class TransferToolHLA(HighLevelAction):
                 robot_commands,
             )
 
-            # target_pose = self._perception_interface.get_head_perception_forque_target_pose()
-            target_pose = Pose(position=(-0.17272330207928777, 0.6273752674813526, 0.5572539925006535), 
-                orientation=(-0.42030807,  0.56739361,  0.47188225, -0.52795148))
-            intermediate_pose = multiply_poses(
-                target_pose, Pose(position=[0.0, 0.0, -0.1], orientation=[0.0, 0.0, 0.0, 1.0])
-            ) # 10 cms away from the mouth
+            # # target_pose = self._perception_interface.get_head_perception_forque_target_pose()
+            # target_pose = Pose(position=(-0.17272330207928777, 0.6273752674813526, 0.5572539925006535), 
+            #     orientation=(-0.42030807,  0.56739361,  0.47188225, -0.52795148))
+            # intermediate_pose = multiply_poses(
+            #     target_pose, Pose(position=[0.0, 0.0, -0.1], orientation=[0.0, 0.0, 0.0, 1.0])
+            # ) # 10 cms away from the mouth
 
-            visualize_pose(target_pose, self._sim.physics_client_id)
-            input("Visualizing target pose. Press Enter to continue...")
-            visualize_pose(intermediate_pose, self._sim.physics_client_id)
-            input("Visualizing intermediate pose. Press Enter to continue...")
+            # visualize_pose(target_pose, self._sim.physics_client_id)
+            # input("Visualizing target pose. Press Enter to continue...")
+            # visualize_pose(intermediate_pose, self._sim.physics_client_id)
+            # input("Visualizing intermediate pose. Press Enter to continue...")
 
-            # NOTE: disabling collision checking here between held object and
-            # conservative bounding box.
-            move_to_ee_pose(sim=self._sim,
-                target_pose=intermediate_pose,
-                exclude_collision_ids=None,
-                tip_from_end_effector=self._sim.scene_description.utensil_tip_from_end_effector,
-                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
-                sim_states=sim_states,
-                robot_commands=robot_commands,
-                check_held_object_collisions=False)
+            # # NOTE: disabling collision checking here between held object and
+            # # conservative bounding box.
+            # move_to_ee_pose(sim=self._sim,
+            #     target_pose=intermediate_pose,
+            #     exclude_collision_ids=None,
+            #     tip_from_end_effector=self._sim.scene_description.utensil_tip_from_end_effector,
+            #     max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+            #     sim_states=sim_states,
+            #     robot_commands=robot_commands,
+            #     check_held_object_collisions=False)
 
-            # NOTE: disabling collision checking here between held object and
-            # conservative bounding box.
-            move_to_ee_pose(sim=self._sim,
-                target_pose=target_pose,
-                exclude_collision_ids=None,
-                tip_from_end_effector=self._sim.scene_description.utensil_tip_from_end_effector,
-                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
-                sim_states=sim_states,
-                robot_commands=robot_commands,
-                check_held_object_collisions=False)
+            # # NOTE: disabling collision checking here between held object and
+            # # conservative bounding box.
+            # move_to_ee_pose(sim=self._sim,
+            #     target_pose=target_pose,
+            #     exclude_collision_ids=None,
+            #     tip_from_end_effector=self._sim.scene_description.utensil_tip_from_end_effector,
+            #     max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+            #     sim_states=sim_states,
+            #     robot_commands=robot_commands,
+            #     check_held_object_collisions=False)
 
             if self._run_on_robot:
                 # Replay the trajectory before running on real robot
@@ -501,7 +501,11 @@ class TransferToolHLA(HighLevelAction):
 
                 y = input("Does the trajectory look good? Press 'y' to execute on robot")
                 if y == "y":
+                    # input("Press enter to switch to joint compliant mode")
+                    # self._robot_interface.switch_to_joint_compliant_mode()
                     self.execute_robot_commands(robot_commands)
+                    # input("Press enter to switch out of joint compliant mode")
+                    # self._robot_interface.switch_out_of_joint_compliant_mode()
                 else:
                     print("Trajectory not executed on robot")
 
@@ -520,82 +524,100 @@ class TransferToolHLA(HighLevelAction):
                 robot_commands,
             )
 
-            # target_pose = self._perception_interface.get_head_perception_forque_target_pose()
-            target_pose = Pose(position=(-0.17272330207928777, 0.6273752674813526, 0.5572539925006535), 
-                orientation=(-0.42030807,  0.56739361,  0.47188225, -0.52795148))
-            print("target_pose", target_pose)
+            if self._run_on_robot:
+                self.execute_robot_commands(robot_commands)
+            # robot_commands = []
 
-            intermediate_pose = multiply_poses(
-                target_pose, Pose(position=[0.0, 0.0, -0.05], orientation=[0.0, 0.0, 0.0, 1.0])
-            ) # 10 cms away from the mouth
+            # sim_length = len(sim_states)
+
+            # input("Press enter to perceive the target pose")
+            # # target_pose = self._perception_interface.get_head_perception_forque_target_pose()
+            # target_pose = Pose(position=(-0.17272330207928777, 0.6273752674813526, 0.5572539925006535), 
+            #     orientation=(-0.42030807,  0.56739361,  0.47188225, -0.52795148))
+            # print("target_pose", target_pose)
+
+            # intermediate_pose = multiply_poses(
+            #     target_pose, Pose(position=[0.0, 0.0, -0.10], orientation=[0.0, 0.0, 0.0, 1.0])
+            # ) # 10 cms away from the mouth
 
             # visualize_pose(target_pose, self._sim.physics_client_id)
             # input("Visualizing target pose. Press Enter to continue...")
             # visualize_pose(intermediate_pose, self._sim.physics_client_id)
             # input("Visualizing intermediate pose. Press Enter to continue...")
 
-            sim_length = len(sim_states)
-            robot_command_length = len(robot_commands)
-
-            # NOTE: disabling collision checking here between held object and
-            # conservative bounding box.
-            move_to_ee_pose(sim=self._sim,
-                target_pose=intermediate_pose,
-                exclude_collision_ids=None,
-                tip_from_end_effector=self._sim.scene_description.drink_tip_from_end_effector,
-                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
-                sim_states=sim_states,
-                robot_commands=robot_commands,
-                check_held_object_collisions=False)
+            # # NOTE: disabling collision checking here between held object and
+            # # conservative bounding box.
+            # move_to_ee_pose(sim=self._sim,
+            #     target_pose=intermediate_pose,
+            #     exclude_collision_ids=None,
+            #     tip_from_end_effector=self._sim.scene_description.drink_tip_from_end_effector,
+            #     max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+            #     sim_states=sim_states,
+            #     robot_commands=robot_commands,
+            #     check_held_object_collisions=False)
             
-            # input("Replaying the trajectory to check. Press Enter to continue...")
-            # for i in range(sim_length, len(sim_states)):
-            #     self._sim.sync(sim_states[i])
+            # # input("Replaying the trajectory to check. Press Enter to continue...")
+            # # for i in range(sim_length, len(sim_states)):
+            # #     self._sim.sync(sim_states[i])
+            # #     time.sleep(0.1)
+            #     # input("Press Enter to continue...")
+
+            # # sim_length = len(sim_states)
+            # # robot_command_length = len(robot_commands)
+
+            # # NOTE: disabling collision checking here between held object and
+            # # conservative bounding box.
+            # # move_to_ee_pose(sim=self._sim,
+            # #     target_pose=target_pose,
+            # #     exclude_collision_ids=None,
+            # #     tip_from_end_effector=self._sim.scene_description.drink_tip_from_end_effector,
+            # #     max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+            # #     sim_states=sim_states,
+            # #     robot_commands=robot_commands,
+            # #     check_held_object_collisions=False)
+            
+            # # input("Replaying the trajectory to check. Press Enter to continue...")
+            # # for i in range(sim_length, len(sim_states)):
+            # #     self._sim.sync(sim_states[i])
+            # #     time.sleep(0.1)
+            #     # input("Press Enter to continue...")
+
+            # # Rajat ToDo: Replace this wait with a ROS listener for button.
+            # input("Press enter when drinking is finished")
+            
+            # # Reverse the transfer plan.
+            # transfer_sim_states = sim_states[sim_length:]
+            # sim_states.extend(transfer_sim_states[::-1])
+            
+            # transfer_robot_commands = robot_commands.copy()
+            # reversed_robot_commands = []
+            # for command in transfer_robot_commands[::-1]:
+            #     assert isinstance(command, JointTrajectoryCommand), "Command not a joint trajectory command"
+            #     reversed_robot_commands.append(JointTrajectoryCommand(command.traj[::-1]))
+            
+            # robot_commands.extend(reversed_robot_commands)
+
+            # for i in range(len(robot_commands)):
+            #     assert isinstance(robot_commands[i], JointTrajectoryCommand), "Command not a joint trajectory command"
+            #     assert np.allclose(robot_commands[i].traj, robot_commands[-(i+1)].traj[::-1]), "Robot commands not a palindrome"
+
+            # # Replay the trajectory before running on real robot
+            # print("Replaying the trajectory before running on real robot..")
+
+            # for state in sim_states:
+            #     self._sim.sync(state)
             #     time.sleep(0.1)
-                # input("Press Enter to continue...")
 
-            # sim_length = len(sim_states)
-            # robot_command_length = len(robot_commands)
-
-            # NOTE: disabling collision checking here between held object and
-            # conservative bounding box.
-            move_to_ee_pose(sim=self._sim,
-                target_pose=target_pose,
-                exclude_collision_ids=None,
-                tip_from_end_effector=self._sim.scene_description.drink_tip_from_end_effector,
-                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
-                sim_states=sim_states,
-                robot_commands=robot_commands,
-                check_held_object_collisions=False)
-            
-            # input("Replaying the trajectory to check. Press Enter to continue...")
-            # for i in range(sim_length, len(sim_states)):
-            #     self._sim.sync(sim_states[i])
-            #     time.sleep(0.1)
-                # input("Press Enter to continue...")
-
-            # Rajat ToDo: Replace this wait with a ROS listener for button.
-            input("Press enter when drinking is finished")
-            
-            # Reverse the transfer plan.
-            transfer_sim_states = sim_states[sim_length:]
-            transfer_robot_commands = robot_commands[robot_command_length:]
-            sim_states.extend(transfer_sim_states[::-1])
-            robot_commands.extend(transfer_robot_commands[::-1])
-
-            # Replay the trajectory before running on real robot
-            print("Replaying the trajectory before running on real robot..")
-
-            for state in sim_states:
-                self._sim.sync(state)
-                time.sleep(0.1)
-
-            if self._run_on_robot:
-                y = input("Does the trajectory look good? Press 'y' to execute on robot")
-                if y == "y":
-                    self.execute_robot_commands(robot_commands)
-                else:
-                    print("Trajectory not executed on robot")
+            # if self._run_on_robot:
+            #     y = input("Does the trajectory look good? Press 'y' to execute on robot")
+            #     if y == "y":
+            #         # input("Press enter to switch to joint compliant mode")
+            #         # self._robot_interface.switch_to_joint_compliant_mode()
+            #         self.execute_robot_commands(robot_commands)
+            #         # input("Press enter to switch out of joint compliant mode")
+            #         # self._robot_interface.switch_out_of_joint_compliant_mode()
+            #     else:
+            #         print("Trajectory not executed on robot")
 
             return sim_states
 

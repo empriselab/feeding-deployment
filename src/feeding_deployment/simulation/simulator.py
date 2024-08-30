@@ -19,11 +19,14 @@ from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
 class FeedingDeploymentPyBulletSimulator:
     """A PyBullet-based simulator for the feeding deployment environment."""
 
-    def __init__(self, scene_description: SceneDescription) -> None:
+    def __init__(self, scene_description: SceneDescription, use_gui: bool = True) -> None:
         self.scene_description = scene_description
 
         # Create the PyBullet client.
-        self.physics_client_id = create_gui_connection(camera_yaw=180)
+        if use_gui:
+            self.physics_client_id = create_gui_connection(camera_yaw=180)
+        else:
+            self.physics_client_id = p.connect(p.DIRECT)
 
         # Create robot.
         robot = create_pybullet_robot(
