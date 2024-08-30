@@ -68,42 +68,30 @@ def move_to_joint_positions(
 
     if direct_path:
         # Rajat ToDo: Discuss arm / robot dissociation with Tom
-        sim_states.extend(_plan_to_sim_state_trajectory(direct_path, sim))
+        plan = _plan_to_sim_state_trajectory(direct_path, sim)
         robot_commands.append(JointCommand(pos=target_joint_positions[:7]))
-
-        # Visualize the final state in RViz.
-        if rviz_publisher is not None:
-            rviz_publisher.publish(
-                JointState(
-                    name=[
-                        "joint_1", "joint_2", "joint_3", 
-                        "joint_4", "joint_5", "joint_6", 
-                        "joint_7", "finger_joint"
-                    ],
-                    position=target_joint_positions[:7] + [0.0]  # Assuming you want to add 0.0 for the finger_joint
-                )
-            )
-            time.sleep(0.1)
  
-        return
+    else:
 
-    print("No direct path found. Running motion planning.")
-    plan = run_motion_planning(
-        robot=sim.robot,
-        initial_positions=initial_joint_positions,
-        target_positions=target_joint_positions,
-        collision_bodies=sim.get_collision_ids(),
-        seed=0,
-        physics_client_id=sim.physics_client_id,
-        held_object=sim.held_object_id,
-        base_link_to_held_obj=sim.held_object_tf,
-    )
-    plan = _plan_to_sim_state_trajectory(plan, sim)
-    remapped_plan = remap_trajectory_to_constant_distance(plan, sim)
+        print("No direct path found. Running motion planning.")
+        plan = run_motion_planning(
+            robot=sim.robot,
+            initial_positions=initial_joint_positions,
+            target_positions=target_joint_positions,
+            collision_bodies=sim.get_collision_ids(),
+            seed=0,
+            physics_client_id=sim.physics_client_id,
+            held_object=sim.held_object_id,
+            base_link_to_held_obj=sim.held_object_tf,
+        )
+        robot_commands.extend(simulated_trajectory_to_kinova_commands(remapped_plan))
+        plan = remap_trajectory_to_constant_distance(plan, sim)
+    
+    sim_states.extend(plan)
 
     # Visualize the plan in RViz.
     if rviz_publisher is not None:
-        for sim_state in remapped_plan:
+        for sim_state in plan:
             rviz_publisher.publish(
                 JointState(
                     name=[
@@ -111,13 +99,10 @@ def move_to_joint_positions(
                         "joint_4", "joint_5", "joint_6", 
                         "joint_7", "finger_joint"
                     ],
-                    position=target_joint_positions[:7] + [0.0]  # Assuming you want to add 0.0 for the finger_joint
+                    position=sim_state.robot_joints[:7] + [0.0]  # Assuming you want to add 0.0 for the finger_joint
                 )
             )
             time.sleep(0.1)
-
-    sim_states.extend(remapped_plan)
-    robot_commands.extend(simulated_trajectory_to_kinova_commands(remapped_plan))
 
 
 def teleport_to_ee_pose(
