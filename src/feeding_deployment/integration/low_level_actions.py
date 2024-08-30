@@ -5,6 +5,9 @@ from copy import copy, deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+import rospy
+from sensor_msgs.msg import JointState
+import time
 
 import numpy as np
 from numpy.typing import NDArray
@@ -41,6 +44,7 @@ def move_to_joint_positions(
     joint_positions: list[float],
     sim_states: list[FeedingDeploymentSimulatorState],
     robot_commands: list[KinovaCommand],
+    rviz_publisher: rospy.Publisher | None = None,
 ) -> None:
     """Move the robot to the specified joint positions.
 
@@ -66,6 +70,12 @@ def move_to_joint_positions(
         # Rajat ToDo: Discuss arm / robot dissociation with Tom
         sim_states.extend(_plan_to_sim_state_trajectory(direct_path, sim))
         robot_commands.append(JointCommand(pos=target_joint_positions[:7]))
+
+        # Visualize the final state in RViz.
+        if rviz_publisher is not None:
+            rviz_publisher.publish(JointState(position=target_joint_positions[:7]))
+            time.sleep(0.1)
+ 
         return
 
     print("No direct path found. Running motion planning.")
@@ -81,6 +91,12 @@ def move_to_joint_positions(
     )
     plan = _plan_to_sim_state_trajectory(plan, sim)
     remapped_plan = remap_trajectory_to_constant_distance(plan, sim)
+
+    # Visualize the plan in RViz.
+    if rviz_publisher is not None:
+        for sim_state in remapped_plan:
+            rviz_publisher.publish(JointState(position=sim_state.robot_joints[:7]))
+            time.sleep(0.1)
 
     sim_states.extend(remapped_plan)
     robot_commands.extend(simulated_trajectory_to_kinova_commands(remapped_plan))

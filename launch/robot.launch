@@ -22,7 +22,7 @@
 
         <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
             <param name="use_gui" value="false"/>
-            <rosparam param="source_list">["robot_joint_states", "wrist_joint_states"]</rosparam>
+            <rosparam param="source_list">["sim/robot_joint_states", "sim/wrist_joint_states"]</rosparam>
             <param name="rate" value="100"/>
         </node>
 

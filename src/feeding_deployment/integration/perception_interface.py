@@ -22,6 +22,9 @@ class PerceptionInterface:
 
     def __init__(self, robot_interface: ArmInterfaceClient | None) -> None:
         self._robot_interface = robot_interface
+        # Create a shared publisher for rviz simulation.
+        self.rviz_publisher = rospy.Publisher("/sim/robot_joint_states", JointState, queue_size=10)
+
 
         # run head perception
         if robot_interface is None:
