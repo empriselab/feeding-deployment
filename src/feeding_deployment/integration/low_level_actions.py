@@ -84,8 +84,8 @@ def move_to_joint_positions(
             held_object=sim.held_object_id,
             base_link_to_held_obj=sim.held_object_tf,
         )
-        robot_commands.extend(simulated_trajectory_to_kinova_commands(remapped_plan))
         plan = remap_trajectory_to_constant_distance(plan, sim)
+        robot_commands.extend(simulated_trajectory_to_kinova_commands(plan))
     
     sim_states.extend(plan)
 
