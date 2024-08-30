@@ -13,7 +13,7 @@ def _add_cube(pose: Pose, half_extents: tuple[float, float, float],
               rgba: tuple[float, float, float, float],
               marker_id: int,
               publisher: rospy.Publisher,
-              frame_id="base_link") -> None:
+              frame_id="sim/base_link") -> None:
     
     marker = Marker()
 

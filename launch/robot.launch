@@ -1,5 +1,7 @@
+
 <launch>
 
+    <!-- Real Robot -->
     <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/gen3_robotiq_2f_85.xacro dof:=7 sim:=false vision:=false drinking_utensil:=true" />
 
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
@@ -8,13 +10,32 @@
         <param name="rate" value="100"/>
     </node>
 
-    <!-- TF Setup -->
     <node pkg="robot_state_publisher" type="robot_state_publisher" name="rob_st_pub">
         <param name="ignore_timestamp" value="true" />
     </node>
 
     <node name="st_map2world" pkg="tf" type="static_transform_publisher" respawn="false" output="screen" args="0 0 0 0 0 0 1 map world 10"/>
 
+    <!-- Simulated Robot -->
+    <group ns="sim">
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/gen3_robotiq_2f_85.xacro dof:=7 sim:=false vision:=false drinking_utensil:=true" />
+
+        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+            <param name="use_gui" value="false"/>
+            <rosparam param="source_list">["robot_joint_states", "wrist_joint_states"]</rosparam>
+            <param name="rate" value="100"/>
+        </node>
+
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="rob_st_pub">
+            <param name="ignore_timestamp" value="true" />
+            <param name="tf_prefix" value="sim"/>
+        </node>
+
+        <node name="st_map2world" pkg="tf" type="static_transform_publisher" respawn="false" output="screen" args="0 0 0 0 0 0 1 map world 10"/>
+
+    </group>
+
+    <!-- Camera -->
     <include file="$(find realsense2_camera)/launch/rs_rgbd.launch">
         <arg name="filters" value="pointcloud"/>
         <arg name="align_depth" value="true"/>
