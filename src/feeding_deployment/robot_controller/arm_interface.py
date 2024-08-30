@@ -15,16 +15,9 @@ RPC_AUTHKEY = b"secret-key"
 NUC_HOSTNAME = "192.168.1.3"
 ARM_RPC_PORT = 5000
 
-try:
-    from feeding_deployment.robot_controller.kinova import KinovaArm
-except ImportError:
-    print(
-        "KinovaArm import failed, continuing without executing arm commands on real robot"
-    )
-
 class ArmInterface:
-    def __init__(self):
-        self.arm = KinovaArm()
+    def __init__(self, arm_instance):
+        self.arm = arm_instance
         # self.arm.set_joint_limits(speed_limits=(7 * (30,)), acceleration_limits=(7 * (80,)))
         self.command_queue = queue.Queue(1)
         self.controller = None
@@ -144,5 +137,3 @@ class ArmInterface:
 
 class ArmManager(MPBaseManager):
     pass
-
-ArmManager.register("ArmInterface", ArmInterface)
