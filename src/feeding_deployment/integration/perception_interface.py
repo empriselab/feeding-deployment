@@ -10,6 +10,7 @@ from scipy.spatial.transform import Rotation as R
 try:
     import rospy
     from sensor_msgs.msg import JointState
+    from std_msgs.msg import String
 
     from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
 except ModuleNotFoundError:
@@ -23,8 +24,8 @@ class PerceptionInterface:
     def __init__(self, robot_interface: ArmInterfaceClient | None) -> None:
         self._robot_interface = robot_interface
         # Create a shared publisher for rviz simulation.
-        self.rviz_publisher = rospy.Publisher("/sim/robot_joint_states", JointState, queue_size=10)
-
+        self.rviz_joint_publisher = rospy.Publisher("/sim/robot_joint_states", JointState, queue_size=10)
+        self.rviz_robot_description_publisher = rospy.Publisher("/sim/robot_description", String, queue_size=10)
 
         # run head perception
         if robot_interface is None:

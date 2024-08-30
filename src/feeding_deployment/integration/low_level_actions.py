@@ -4,15 +4,14 @@ import abc
 from copy import copy, deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
-import rospy
-from sensor_msgs.msg import JointState
+from typing import Any, Callable
 import time
 
 import numpy as np
 from numpy.typing import NDArray
 from pybullet_helpers.geometry import Pose
 from pybullet_helpers.inverse_kinematics import add_fingers_to_joint_positions
+from pybullet_helpers.joint import JointPositions
 from pybullet_helpers.motion_planning import (
     get_joint_positions_distance,
     run_motion_planning,
@@ -39,12 +38,13 @@ from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSim
 from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
 
 
+
 def move_to_joint_positions(
     sim: FeedingDeploymentPyBulletSimulator,
     joint_positions: list[float],
     sim_states: list[FeedingDeploymentSimulatorState],
     robot_commands: list[KinovaCommand],
-    rviz_publisher: rospy.Publisher | None = None,
+    rviz_update: Callable[[JointPositions, str], None] | None = None,
 ) -> None:
     """Move the robot to the specified joint positions.
 
@@ -90,18 +90,9 @@ def move_to_joint_positions(
     sim_states.extend(plan)
 
     # Visualize the plan in RViz.
-    if rviz_publisher is not None:
+    if rviz_update is not None:
         for sim_state in plan:
-            rviz_publisher.publish(
-                JointState(
-                    name=[
-                        "joint_1", "joint_2", "joint_3", 
-                        "joint_4", "joint_5", "joint_6", 
-                        "joint_7", "finger_joint"
-                    ],
-                    position=sim_state.robot_joints[:7] + [0.0]  # Assuming you want to add 0.0 for the finger_joint
-                )
-            )
+            rviz_update(sim_state.robot_joints, sim_state.held_object)
             time.sleep(0.1)
 
 
