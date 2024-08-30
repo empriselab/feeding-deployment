@@ -73,7 +73,16 @@ def move_to_joint_positions(
 
         # Visualize the final state in RViz.
         if rviz_publisher is not None:
-            rviz_publisher.publish(JointState(position=target_joint_positions[:7]))
+            rviz_publisher.publish(
+                JointState(
+                    name=[
+                        "joint_1", "joint_2", "joint_3", 
+                        "joint_4", "joint_5", "joint_6", 
+                        "joint_7", "finger_joint"
+                    ],
+                    position=target_joint_positions[:7] + [0.0]  # Assuming you want to add 0.0 for the finger_joint
+                )
+            )
             time.sleep(0.1)
  
         return
@@ -95,7 +104,16 @@ def move_to_joint_positions(
     # Visualize the plan in RViz.
     if rviz_publisher is not None:
         for sim_state in remapped_plan:
-            rviz_publisher.publish(JointState(position=sim_state.robot_joints[:7]))
+            rviz_publisher.publish(
+                JointState(
+                    name=[
+                        "joint_1", "joint_2", "joint_3", 
+                        "joint_4", "joint_5", "joint_6", 
+                        "joint_7", "finger_joint"
+                    ],
+                    position=target_joint_positions[:7] + [0.0]  # Assuming you want to add 0.0 for the finger_joint
+                )
+            )
             time.sleep(0.1)
 
     sim_states.extend(remapped_plan)
