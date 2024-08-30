@@ -28,14 +28,13 @@ class CollisionMonitor:
     def __init__(self, use_ros: bool = True):
         if use_ros:
             assert ROSPY_IMPORTED, "rospy was not imported"
-            self._collision_pub = rospy.Publisher("/collision_detected", Bool, queue_size=1)
+            self._collision_pub = rospy.Publisher("/collision_free", Bool, queue_size=1)
             self._joint_state_sub = rospy.Subscriber(
                 "/robot_joint_states", JointState, self._joint_state_callback
             )
-            self._stop_controller_pub = rospy.Publisher("/estop", Bool, queue_size=1)
         self._use_ros = use_ros
         self._scene_description = SceneDescription()
-        self._sim = FeedingDeploymentPyBulletSimulator(self._scene_description)
+        self._sim = FeedingDeploymentPyBulletSimulator(self._scene_description, use_gui=False)
 
     def _joint_state_callback(self, joint_state_msg: "JointState") -> None:
         # Convert joint state message into JointPositions.
@@ -58,11 +57,7 @@ class CollisionMonitor:
                                                             finger_state)
         # Run collision checking.
         has_collision = self.check_collisions(combined_joint_state)
-        # If there is a collision, e-stop immediately.
-        if has_collision:
-            self._stop_controller_pub.publish(Bool(data=True))
-        # Publish the result.
-        self._collision_pub.publish(Bool(data=has_collision))
+        self._collision_pub.publish(Bool(data=not has_collision))
 
     def check_collisions(self, joint_positions: JointPositions) -> bool:
         """Check collisions, but only with objects that can't be held."""
@@ -76,8 +71,6 @@ class CollisionMonitor:
             base_link_to_held_obj=None,
             joint_state=joint_positions,
         )
-
-
     
 if __name__ == "__main__":
     import argparse
@@ -92,7 +85,7 @@ if __name__ == "__main__":
         assert not monitor.check_collisions([2.8884768101246143, -0.7913320348241513, -1.7742571378056136, -2.078073911389284, 2.2868481461996795, -0.8264030187967055, -0.11233229012519357, 0.44, 0.44, 0.44, 0.44, -0.44, -0.44])
         assert monitor.check_collisions([2.0, -0.7913320348241513, -1.7742571378056136, -2.078073911389284, 2.2868481461996795, -0.8264030187967055, -0.11233229012519357, 0.44, 0.44, 0.44, 0.44, -0.44, -0.44])
     else:
-        rospy.init_node("estop")
+        rospy.init_node("collision_free_monitor")
         monitor = CollisionMonitor()
         rospy.spin()
     

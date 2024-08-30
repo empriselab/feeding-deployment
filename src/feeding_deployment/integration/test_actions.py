@@ -30,12 +30,7 @@ from feeding_deployment.integration.high_level_actions import (
     tool_type,
 )
 from feeding_deployment.integration.perception_interface import PerceptionInterface
-from feeding_deployment.robot_controller.arm_client import (
-    ARM_RPC_PORT,
-    NUC_HOSTNAME,
-    RPC_AUTHKEY,
-    ArmManager,
-)
+from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 from feeding_deployment.simulation.scene_description import (
     SceneDescription,
     create_scene_description_from_config,
@@ -54,9 +49,7 @@ def _main(
 
     # Initialize the interface to the robot.
     if run_on_robot:
-        manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
-        manager.connect()
-        robot_interface = manager.Arm()  # type: ignore  # pylint: disable=no-member
+        robot_interface = ArmInterfaceClient()  # type: ignore  # pylint: disable=no-member
     else:
         robot_interface = None
 

@@ -1,459 +1,141 @@
-# This RPC server allows other processes to communicate with the Kinova arm
-# low-level controller, which runs in its own, dedicated real-time process.
-#
-# Note: Operations that are not time-sensitive should be run in a separate,
-# non-real-time process to avoid interfering with the real-time low-level
-# control and causing latency spikes.
+'''
+Entrypoint for controlling the robot arm on compute machine. Additionally runs two important threads:
+1. A thread that checks no safety anomalies have occurred using the watchdog
+2. A thread that publishes joint states to ROS
+'''
 
-import queue
 import threading
 import time
-
 import numpy as np
-from multiprocess.managers import BaseManager as MPBaseManager
 
-# from arm_controller import JointCompliantController
-# from constants import RPC_AUTHKEY, ARM_RPC_PORT
-RPC_AUTHKEY = b"secret-key"
-ARM_RPC_PORT = 5000
-# import rospy
+import rospy
+from sensor_msgs.msg import JointState
+from std_msgs.msg import Bool
+from geometry_msgs.msg import Pose
+from netft_rdt_driver.srv import String_cmd
 
-# from ik_solver import IKSolver
-from feeding_deployment.robot_controller.command_interface import KinovaCommand
+from feeding_deployment.robot_controller.arm_interface import ArmInterface, ArmManager, NUC_HOSTNAME, ARM_RPC_PORT, RPC_AUTHKEY
+from feeding_deployment.robot_controller.command_interface import KinovaCommand, JointTrajectoryCommand, JointCommand, CartesianCommand, OpenGripperCommand, CloseGripperCommand
+# from feeding_deployment.safety.watchdog import WATCHDOG_MONITOR_FREQUENCY, PeekableQueue
 
-try:
-    from feeding_deployment.robot_controller.kinova import KinovaArm
-except ImportError:
-    print(
-        "KinovaArm import failed, continuing without executing arm commands on real robot"
-    )
-
-# from sensor_msgs.msg import JointState
-
-NUC_HOSTNAME = "192.168.1.3"
-
-
-class Arm:
+class ArmInterfaceClient:
     def __init__(self):
-        self.arm = KinovaArm()
-        # self.arm.set_joint_limits(speed_limits=(7 * (30,)), acceleration_limits=(7 * (80,)))
-        self.command_queue = queue.Queue(1)
-        self.controller = None
 
-    def get_state(self):
-        arm_pos, gripper_pos = self.arm.get_state()
-        return arm_pos, gripper_pos
+        # make sure watchdog is running
+        print("Waiting for Watchdog status...")
+        rospy.wait_for_message("/watchdog_status", Bool)
+        print("Watchdog is running, continuing...")
 
-    def reset(self):
-        # Go to home position
-        print("Moving to home position")
-        self.arm.home()
+        # Register ArmInterface (no lambda needed on the client-side)
+        ArmManager.register("ArmInterface")
+
+        # Client setup
+        self.manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
+        self.manager.connect()
+
+        # This will now use the single, shared instance of ArmInterface
+        self._arm_interface = self.manager.ArmInterface()
+        self.in_compliant_mode = False
 
     def switch_to_joint_compliant_mode(self):
-
-        # clear command queue
-        print("Clearing command queue")
-        while not self.command_queue.empty():
-            self.command_queue.get()
-
-        # switch to joint compliant mode
-        print("Switching to joint compliant mode")
-        self.arm.switch_to_joint_compliant_mode(self.command_queue)
+        assert not self.in_compliant_mode, "Already in compliant mode"
+        self._arm_interface.switch_to_joint_compliant_mode()
 
     def switch_out_of_joint_compliant_mode(self):
-        # switch out of joint compliant mode
-        print("Switching out of joint compliant mode")
-        self.arm.switch_out_of_joint_compliant_mode()
-
-    def compliant_set_joint_position(self, command_pos):
-        print(f"Received compliant joint pos command: {command_pos}")
-        gripper_pos = 0
-        self.command_queue.put((command_pos, gripper_pos))
-
-    def set_joint_position(self, command_pos):
-        print(f"Received joint pos command: {command_pos}")
-        self.arm.move_angular(command_pos)
-
-    def set_joint_trajectory(self, trajectory_command):
-        print(
-            f"Received joint trajectory command with {len(trajectory_command)} waypoints"
-        )
-        self.arm.move_angular_trajectory(trajectory_command)
-
-    def set_ee_pose(self, xyz, xyz_quat):
-        print(f"Received cartesian pose command: {xyz}, {xyz_quat}")
-        self.arm.move_cartesian(xyz, xyz_quat)
-
-    def set_gripper(self, gripper_pos):
-        print(f"Received gripper pos command: {gripper_pos}")
-        self.arm._gripper_position_command(gripper_pos)
-
-    def open_gripper(self):
-        print("Received open gripper command")
-        self.arm.open_gripper()
-
-    def close_gripper(self):
-        print("Received close gripper command")
-        self.arm.close_gripper()
-
-    def close(self):
-        print("Closing arm connection")
-        self.arm.disconnect()
-
-    def retract(self):
-        self.arm.retract()
-
-    def stop(self):
-        print("Stopping arm")
-        self.arm.stop()
+        assert self.in_compliant_mode, "Not in compliant mode"
+        self._arm_interface.switch_out_of_joint_compliant_mode()
 
     def execute_command(self, cmd: KinovaCommand) -> None:
 
         if cmd.__class__.__name__ == "JointTrajectoryCommand":
-            return self.set_joint_trajectory(cmd.traj)
+            if self.in_compliant_mode:
+                return self._arm_interface.compliant_set_joint_trajectory(cmd.traj)
+            else:
+                return self._arm_interface.set_joint_trajectory(cmd.traj)
 
         if cmd.__class__.__name__ == "JointCommand":
-            return self.set_joint_position(cmd.pos)
+            return self._arm_interface.set_joint_position(cmd.pos)
 
         if cmd.__class__.__name__ == "CartesianCommand":
-            return self.set_ee_pose(cmd.pos, cmd.quat)
+            return self._arm_interface.set_ee_pose(cmd.pos, cmd.quat)
 
         if cmd.__class__.__name__ == "OpenGripperCommand":
-            return self.open_gripper()
+            return self._arm_interface.open_gripper()
 
         if cmd.__class__.__name__ == "CloseGripperCommand":
-            return self.close_gripper()
+            return self._arm_interface.close_gripper()
 
         raise NotImplementedError(f"Unrecognized command: {cmd}")
 
-
-class ArmManager(MPBaseManager):
-    pass
-
-
-ArmManager.register("Arm", Arm)
-
 if __name__ == "__main__":
-    # manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
-    # server = manager.get_server()
-    # print(f'Arm manager server started at {NUC_HOSTNAME}:{ARM_RPC_PORT}')
-    # server.serve_forever()
-    import numpy as np
 
-    # from constants import POLICY_CONTROL_PERIOD
-    POLICY_CONTROL_PERIOD = 0.1
-    manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
-    manager.connect()
-    arm = manager.Arm()
-    joint_state_thread = None
-    try:
-        import rospy
-        from sensor_msgs.msg import JointState
-        from std_msgs.msg import Bool
+    rospy.init_node("arm_interface_client", anonymous=True)
+    arm_client_interface = ArmInterfaceClient()
 
-        rospy.init_node("arm_client", anonymous=True)
+    run_commands = input("Press 'y' to run commands")
 
-        def emergency_stop_callback(msg):
-            arm.stop()
+    if run_commands != "y":
+        exit()
 
-        rospy.Subscriber("/estop", Bool, emergency_stop_callback)
+    cup_inside_mount = (
+        np.array([0.55, 0.52, 0.305]),
+        np.array([-0.2126311, -0.6743797, -0.6743797, 0.2126311]),
+    )
 
-        def publish_joint_states(arm):
+    cup_outside_mount = (
+        cup_inside_mount[0].copy(),
+        cup_inside_mount[1].copy(),
+    )
+    cup_outside_mount[0][1] -= 0.06
 
-            # publish joint states
-            joint_states_pub = rospy.Publisher(
-                "/robot_joint_states", JointState, queue_size=10
-            )
+    cup_above_mount = (
+        cup_inside_mount[0].copy(),
+        cup_inside_mount[1].copy(),
+    )
+    cup_above_mount[0][2] += 0.1
 
-            while not rospy.is_shutdown():
-                arm_pos, gripper_pos = arm.get_state()
-                joint_state_msg = JointState()
-                joint_state_msg.header.stamp = rospy.Time.now()
-                joint_state_msg.name = [
-                    "joint_1",
-                    "joint_2",
-                    "joint_3",
-                    "joint_4",
-                    "joint_5",
-                    "joint_6",
-                    "joint_7",
-                    "finger_joint",
-                ]
-                joint_state_msg.position = arm_pos.tolist() + [gripper_pos]
-                joint_state_msg.velocity = [0.0] * 8
-                joint_state_msg.effort = [0.0] * 8
-                joint_states_pub.publish(joint_state_msg)
-                time.sleep(0.01)
+    cup_inside_mount_pos = [-3.0706449768856463, -1.233024942579057, -1.0107718990709298, -1.3064307169693468, -1.0801286033398636, -0.6790118020676168, -3.0605814237584545]
 
-        joint_state_thread = threading.Thread(target=publish_joint_states, args=(arm,))
-        joint_state_thread.start()
+    # depend on the offsets set above
+    cup_above_mount_pos = [-3.0822113518159693, -1.0554986243143745, -0.9943061066831875, -1.2514305815048123, -1.0634620086059297, -0.7145069457084112, 3.0023889570952424]
+    cup_outside_mount_pos = [-2.9457621628368873, -1.206488672845289, -1.0073524002312677, -1.3997867637176382, -1.0606635589324744, -0.7359768177844117, -3.048252585808042]
 
-        # above_plate_pos = [
-        #     4.119619921793763,
-        #     5.927367810785151,
-        #     4.797271913808785,
-        #     4.641709217686205,
-        #     4.980350922946283,
-        #     5.268199221999715,
-        #     4.814377930122582,
-        # ]
-        # input("Press Enter to move to above plate position...")
-        # arm.set_joint_position(above_plate_pos)
+    before_transfer_pos = [
+        -2.86554642,
+        -1.61951779,
+        -2.60986085,
+        -1.37302839,
+        1.11779249,
+        -1.18028264,
+        2.05515862,
+    ]
 
-        # retract_pos = [
-        #     3.935171204564965e-05,
-        #     -0.34908768831980463,
-        #     -3.1415034376932756,
-        #     -2.548253944841698,
-        #     -2.1837920938239108e-05,
-        #     -0.8726928555047193,
-        #     1.570765833600415,
-        # ]
-        # input("Press Enter to retract the arm...")
-        # arm.set_joint_position(retract_pos)
-        # # arm.retract()
+    input("Press enter to move to outside cup pose...")
+    arm_client_interface.execute_command(JointCommand(cup_outside_mount_pos))
 
-        # home_pose = [
-        #     0.0,
-        #     0.26179939,
-        #     3.14159265,
-        #     -2.26892803,
-        #     0.0,
-        #     0.95993109,
-        #     1.57079633,
-        # ]
-        # input("Press Enter to move to home position...")
-        # arm.set_joint_position(home_pose)
-        # # arm.reset()
+    # input("Press enter to move to outside cup mount pose...")
+    # arm_client_interface.set_ee_pose(outside_cup_pose[0], outside_cup_pose[1])
 
-        # input("Press Enter to switch to joint compliant mode...")
-        # arm.switch_to_joint_compliant_mode()
+    input("Press enter to move to inside cup mount pose...")
+    arm_client_interface.execute_command(CartesianCommand(cup_inside_mount[0], cup_inside_mount[1]))
 
-        # input("Press Enter to move to joint compliant position...")
-        # arm.compliant_set_joint_position(
-        #     [0.0, 0.26179939, 3.14159265, -2.26892803, 0.0, 0.95993109, 1.9]
-        # )
+    input("Press enter to grasp the cup...")
+    arm_client_interface.execute_command(OpenGripperCommand())
 
-        # input("Press Enter to switch out of joint compliant mode...")
-        # arm.switch_out_of_joint_compliant_mode()
+    input("Press enter to pickup the cup...")
+    arm_client_interface.execute_command(CartesianCommand(cup_above_mount[0], cup_above_mount[1]))
 
-        # print("Current Arm State:", arm.get_state())
+    input("Press enter to move to before transfer pose...")
+    arm_client_interface.execute_command(JointCommand(before_transfer_pos))
 
-        # transfer_pose = [-2.76117261, -1.18670831, -1.7014329 , -1.81186993,  0.26973719, -0.09092458,  2.4944019]
-        # input("Press Enter to set the arm to transfer pose")
-        # arm.set_joint_position(transfer_pose)
+    input("Press enter to move above the mount...")
+    arm_client_interface.execute_command(CartesianCommand(cup_above_mount[0], cup_above_mount[1]))
 
-        outside_cup_pose = (
-            np.array([0.545, 0.45, 0.270]),
-            np.array([-0.2126311, -0.6743797, -0.6743797, 0.2126311]),
-        )
-        outside_cup_pos = [
-            -3.100185292329023,
-            -1.0924888665911388,
-            -0.5706994426374399,
-            -1.424560020809773,
-            -1.4250553687725285,
-            -1.041275746196697,
-            -2.8561579774322996,
-        ]
+    input("Press enter to move to inside cup mount pose...")
+    arm_client_interface.execute_command(CartesianCommand(cup_inside_mount[0], cup_inside_mount[1]))
 
-        cup_inside_mount = (
-            np.array([0.545, 0.518, 0.270]),
-            np.array([-0.2126311, -0.6743797, -0.6743797, 0.2126311]),
-        )
-        cup_inside_mount_pos = [
-            3.042634381172411,
-            -1.168988168903665,
-            -0.5663478374162505,
-            -1.2153447487342381,
-            -1.3638740364179194,
-            -1.0536210957458687,
-            -2.9810178882956833,
-        ]
+    input("Press enter to release the cup...")
+    arm_client_interface.execute_command(CloseGripperCommand())
 
-        above_cup_pose = (
-            np.array([0.545, 0.518, 0.370]),
-            np.array([-0.2126311, -0.6743797, -0.6743797, 0.2126311]),
-        )
-        above_cup_pos = [
-            3.0622933037071576,
-            -0.9648787092700299,
-            -0.5952463310369183,
-            -1.2963117700914815,
-            -1.4352504820575698,
-            -0.9462605500892867,
-            -3.085153612188289,
-        ]
-
-        before_transfer_pos = [
-            -2.86554642,
-            -1.61951779,
-            -2.60986085,
-            -1.37302839,
-            1.11779249,
-            -1.18028264,
-            2.05515862,
-        ]
-
-        # input("Press enter to move to outside cup pose...")
-        # arm.set_joint_position(outside_cup_pos)
-
-        # input("Press enter to move to outside cup mount pose...")
-        # arm.set_ee_pose(outside_cup_pose[0], outside_cup_pose[1])
-
-        # input("Press enter to move to inside cup mount pose...")
-        # arm.set_ee_pose(cup_inside_mount[0], cup_inside_mount[1])
-
-        # input("Press enter to grasp the cup...")
-        # arm.set_gripper(0.5)
-
-        # input("Press enter to pickup the cup...")
-        # arm.set_ee_pose(above_cup_pose[0], above_cup_pose[1])
-
-        input("Press enter to move to before transfer pose...")
-        arm.set_joint_position(before_transfer_pos)
-
-        input("Press enter to move above the cup...")
-        arm.set_joint_position(above_cup_pos)
-
-        input("Press enter to move to inside cup mount pose...")
-        arm.set_ee_pose(cup_inside_mount[0], cup_inside_mount[1])
-
-        input("Press enter to release the cup...")
-        arm.set_gripper(1.0)
-
-        input("Press enter to move to outside cup pose...")
-        arm.set_ee_pose(outside_cup_pose[0], outside_cup_pose[1])
-
-        # home_pos = [
-        #     2.2912759438800285,
-        #     0.7308686750765581,
-        #     2.082994642398784,
-        #     4.109475142253324,
-        #     0.2853091081120964,
-        #     5.818345985240578,
-        #     5.988186420599291,
-        # ]
-
-        # inside_mount_pose = (
-        #     np.array([-0.147, -0.17, 0.07]),
-        #     np.array([0.7071068, -0.7071068, 0, 0]),
-        # )
-
-        # outside_mount_pose = (
-        #     np.array([-0.147, -0.29, 0.07]),
-        #     np.array([0.7071068, -0.7071068, 0, 0]),
-        # )
-
-        # outside_mount_joint_states = [
-        #     2.6266411620509817,
-        #     0.6992626121546339,
-        #     2.306749708761716,
-        #     4.053362604401464,
-        #     0.9559379448584164,
-        #     5.655628973165609,
-        #     5.80065247559031,
-        # ]
-
-        # above_mount_pose = (
-        #     np.array([-0.147, -0.17, 0.15]),
-        #     np.array([0.7071068, -0.7071068, 0, 0]),
-        # )
-
-        # above_mount_joint_states = [
-        #     3.300153003835367,
-        #     0.39120874346320217,
-        #     1.8613410764520344,
-        #     3.862447510072517,
-        #     0.6143839397882825,
-        #     5.583536137192727,
-        #     6.276739392077158,
-        # ]
-
-        # infront_mount_pose = (
-        #     np.array([0.0, -0.17, 0.15]),
-        #     np.array([0.7071068, -0.7071068, 0, 0]),
-        # )
-
-        # infront_mount_joint_states = [
-        #     2.835106221647441,
-        #     0.18716812654374576,
-        #     1.7554270267415284,
-        #     -2.5582927305707517,
-        #     0.3492644556371586,
-        #     -0.5794207625752312,
-        #     -0.3984099643402903,
-        # ]
-
-        # input("Press enter to move to home joint pos...")
-        # next_pos = home_pos.copy()
-        # arm.set_joint_position(next_pos)
-
-        # input("Press enter to move to outside mount joint pos...")
-        # next_pos = outside_mount_joint_states.copy()
-        # arm.set_joint_position(next_pos)
-
-        # input("Press enter to move to inside mount pose...")
-        # arm.set_ee_pose(inside_mount_pose[0], inside_mount_pose[1])
-
-        # input("Press enter to release the utensil...")
-        # arm.set_gripper(1.0)
-
-        # input("Press enter to move up...")
-        # arm.set_ee_pose(above_mount_pose[0], above_mount_pose[1])
-
-        # input("Press enter to move forward...")
-        # arm.set_ee_pose(infront_mount_pose[0], infront_mount_pose[1])
-
-        # input("Press enter to move to home joint pos...")
-        # next_pos = home_pos.copy()
-        # arm.set_joint_position(next_pos)
-
-        # input("Press enter to move to infront mount joint pos...")
-        # next_pos = infront_mount_joint_states.copy()
-        # arm.set_joint_position(next_pos)
-
-        # input("Press enter to move to above mount joint states...")
-        # next_pos = above_mount_joint_states.copy()
-        # arm.set_joint_position(next_pos)
-
-        # input("Press enter to inside mount pose...")
-        # arm.set_ee_pose(inside_mount_pose[0], inside_mount_pose[1])
-
-        # input("Press enter to grab the utensil...")
-        # arm.set_gripper(0.5)
-
-        # input("Press enter to move to outside mount pose...")
-        # arm.set_ee_pose(outside_mount_pose[0], outside_mount_pose[1])
-
-        # input("Press enter to move to home joint pos...")
-        # next_pos = home_pos.copy()
-        # arm.set_joint_position(next_pos)
-
-        # input("Press Enter to set arm pos...")
-        # next_pos = [0.0, 0.26179939, 3.14159265, -2.26892803, 0.0, 0.95993109, 1.8]
-        # arm.execute_action(next_pos)
-        # input("Press Enter to exit...")
-        # while True:
-        # time.sleep(1)
-        # for i in range(50):
-        #     arm.execute_action({
-        #         'arm_pos': np.array([0.135, 0.002, 0.211]),
-        #         'arm_quat': np.array([0.706, 0.707, 0.029, 0.029]),
-        #         'gripper_pos': np.zeros(1),
-        #     })
-        #     print(arm.get_state())
-        #     state = arm.get_state()
-        #     state['arm_quat'][0] = 3
-        #     time.sleep(POLICY_CONTROL_PERIOD)
-    except (EOFError, ConnectionRefusedError, BrokenPipeError) as e:
-        print(f"Server connection lost: {e}")
-    except KeyboardInterrupt:
-        print("Client interrupted, shutting down...")
-    finally:
-        try:
-            if joint_state_thread is not None:
-                joint_state_thread.join()
-            arm.close()  # Ensure the arm is disconnected properly
-        except Exception as e:
-            print(f"Error during client shutdown: {e}")
+    input("Press enter to move to outside cup pose...")
+    arm_client_interface.execute_command(CartesianCommand(cup_outside_mount[0], cup_outside_mount[1]))
