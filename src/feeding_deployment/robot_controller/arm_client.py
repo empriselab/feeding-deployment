@@ -16,12 +16,10 @@ from netft_rdt_driver.srv import String_cmd
 
 from feeding_deployment.robot_controller.arm_interface import ArmInterface, ArmManager, NUC_HOSTNAME, ARM_RPC_PORT, RPC_AUTHKEY
 from feeding_deployment.robot_controller.command_interface import KinovaCommand, JointTrajectoryCommand, JointCommand, CartesianCommand, OpenGripperCommand, CloseGripperCommand
-from feeding_deployment.safety.watchdog import WatchDog, AnomalyStatus, WATCHDOG_MONITOR_FREQUENCY
+# from feeding_deployment.safety.watchdog import WATCHDOG_MONITOR_FREQUENCY, PeekableQueue
 
 class ArmInterfaceClient:
     def __init__(self):
-
-        rospy.init_node("arm_interface_client", anonymous=True)
 
         self.manager = ArmManager(address=(NUC_HOSTNAME, ARM_RPC_PORT), authkey=RPC_AUTHKEY)
         self.manager.connect()
@@ -36,21 +34,39 @@ class ArmInterfaceClient:
         self.joint_state_thread = threading.Thread(target=self.publish_joint_states)
         self.joint_state_thread.start()
 
-        # bias FT sensor
-        bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
-        bias('bias')
+        # # bias FT sensor
+        # bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
+        # bias('bias')
 
-        # create watchdog
-        self.watchdog = WatchDog()
+        # queue_size = 1000
+        # self.watchdog_sub = rospy.Subscriber('/watchdog', Bool, self.watchdog_callback, queue_size = queue_size, buff_size = 65536*queue_size)
+        # self.watchdog_timestamps = PeekableQueue()
+        # self.watchdog_status = True
+        # self.watchdog_lock = threading.Lock()
+        # self.intermediate_watchdog_callbacks = 0
 
-        # spin watchdog monitor thread
-        self.watchdog_thread = threading.Thread(target=self.monitor_watchdog)
-        self.watchdog_thread.start()
+        # # spin watchdog monitor thread
+        # input("Press enter to start watchdog monitor thread...")
+        # self.watchdog_thread = threading.Thread(target=self.monitor_watchdog)
+        # self.watchdog_thread.start()
+
+    def watchdog_callback(self, msg):
+
+        # print("Watchdog callback")
+        with self.watchdog_lock:
+            self.intermediate_watchdog_callbacks += 1
+        self.watchdog_timestamps.put(time.time())
+        if not msg.data:
+            self.watchdog_status = False
 
     def publish_joint_states(self):
 
         while not rospy.is_shutdown():
-            arm_pos, ee_pose, gripper_pos = self._arm_interface.get_state()
+            try:
+                arm_pos, ee_pose, gripper_pos = self._arm_interface.get_state()
+            except Exception as e:
+                print(f"Error getting state: {e}")
+                break
             joint_state_msg = JointState()
             joint_state_msg.header.stamp = rospy.Time.now()
             joint_state_msg.name = [
@@ -78,18 +94,30 @@ class ArmInterfaceClient:
             cartesian_state_msg.orientation.w = ee_pose[6]
             self.cartesian_states_pub.publish(cartesian_state_msg) 
 
-    def monitor_watchdog(self):
-        while True:
-            start_time = time.time()
-            anomaly_status = self.watchdog.run()
-
-            if anomaly_status != AnomalyStatus.NO_ANOMALY:
-                self._arm_interface.stop()
-                self._arm_interface.close()
-                raise Exception(f"Anomaly detected: {anomaly_status}")
-            
-            end_time = time.time()
-            time.sleep(max(0, 1.0/WATCHDOG_MONITOR_FREQUENCY - (end_time - start_time)))
+    # def monitor_watchdog(self):
+    #     while True:
+    #         print("Intermediate watchdog callbacks: ", self.intermediate_watchdog_callbacks)
+    #         start_time = time.time()
+    #         print("Start time: ", start_time)
+    #         print("Watchdog length: ", self.watchdog_timestamps.qsize())
+    #         while self.watchdog_timestamps.peek() < start_time - 1.0:
+    #             self.watchdog_timestamps.get()
+    #         watchdog_length = self.watchdog_timestamps.qsize()
+    #         with self.watchdog_lock:
+    #             self.intermediate_watchdog_callbacks = 0
+    #         print("Watchdog length: ", watchdog_length)
+    #         print("End time: ", time.time())
+    #         if watchdog_length < WATCHDOG_MONITOR_FREQUENCY or not self.watchdog_status:
+    #             print(f"Watchdog triggered: Status {self.watchdog_status}, Frequency {watchdog_length} at time {time.time()}")
+    #             self._arm_interface.stop()
+    #             self._arm_interface.close()
+    #             # kill other auxiliary threads
+    #             self.joint_state_thread.join()
+    #             # rospy shutdown
+    #             rospy.signal_shutdown(f"Watchdog triggered: Status {self.watchdog_status}, Frequency {watchdog_length}")
+    #             raise Exception(f"Watchdog triggered: Status {self.watchdog_status}, Frequency {watchdog_length}")
+    #         end_time = time.time()
+    #         time.sleep(max(0, 1.0/WATCHDOG_MONITOR_FREQUENCY - (end_time - start_time)))
 
     def switch_to_joint_compliant_mode(self):
         assert not self.in_compliant_mode, "Already in compliant mode"
@@ -122,6 +150,8 @@ class ArmInterfaceClient:
         raise NotImplementedError(f"Unrecognized command: {cmd}")
 
 if __name__ == "__main__":
+
+    rospy.init_node("arm_interface_client", anonymous=True)
     arm_client_interface = ArmInterfaceClient()
 
     run_commands = input("Press 'y' to run commands")
