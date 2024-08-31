@@ -13,7 +13,7 @@ try:
     import rospy
     from sensor_msgs.msg import JointState
     from std_msgs.msg import String
-    from visualization_msgs.msg import MarkerArray
+    from visualization_msgs.msg import MarkerArray, Marker
     import tf2_ros
     from geometry_msgs.msg import TransformStamped
 
@@ -31,9 +31,33 @@ class RVizInterface:
 
         self._scene_description = scene_description
 
-        # Create a shared publisher for rviz simulation.
+        # Create publishers for rviz simulation.
         self.sim_joint_publishers = rospy.Publisher("/sim/robot_joint_states", JointState, queue_size=10)
+        self.marker_pub = rospy.Publisher("/visualization_marker", Marker, queue_size=10)
+        
+        # Create a static transform broadcaster for rviz simulation.
         self.static_transform_broadcaster = tf2_ros.StaticTransformBroadcaster()
+
+        # Wait for RViz to subscribe to the topic.
+        rospy.sleep(1)
+
+        # Visualize the table.     
+        self._add_cube(self._scene_description.table_pose,
+                self._scene_description.table_half_extents,
+                self._scene_description.table_rgba,
+                marker_id=0)
+
+        # Visualize the vention stand.
+        self._add_cube(self._scene_description.robot_holder_pose,
+                self._scene_description.robot_holder_half_extents,
+                self._scene_description.robot_holder_rgba,
+                marker_id=1)
+
+        # Visualize the conservative bounding box.
+        self._add_cube(self._scene_description.conservative_bb_pose,
+                self._scene_description.conservative_bb_half_extents,
+                self._scene_description.conservative_bb_rgba,
+                marker_id=2)
 
         # set initial joint states
         self.joint_state_update(self._scene_description.initial_joints)
@@ -72,7 +96,6 @@ class RVizInterface:
     def publish_static_transform(self, parent_frame: str, child_frame: str, pose: Pose) -> None:
 
         static_transform_stamped = TransformStamped()
-
         static_transform_stamped.header.stamp = rospy.Time.now()
         static_transform_stamped.header.frame_id = parent_frame
         static_transform_stamped.child_frame_id = child_frame
@@ -87,3 +110,36 @@ class RVizInterface:
         static_transform_stamped.transform.rotation.w = pose.orientation[3]
 
         self.static_transform_broadcaster.sendTransform(static_transform_stamped)
+
+    def _add_cube(self, 
+                pose: Pose, half_extents: tuple[float, float, float],
+                rgba: tuple[float, float, float, float],
+                marker_id: int) -> None:
+        
+        marker = Marker()
+
+        marker.ns = "cube"
+        marker.id = marker_id
+        marker.type = Marker.CUBE
+        marker.header.stamp = rospy.Time.now()
+        marker.header.frame_id = "sim/base_link"
+        marker.action = marker.ADD
+
+        marker.pose.position.x = pose.position[0]
+        marker.pose.position.y = pose.position[1]
+        marker.pose.position.z = pose.position[2]
+        marker.pose.orientation.x = pose.orientation[0]
+        marker.pose.orientation.y = pose.orientation[1]
+        marker.pose.orientation.z = pose.orientation[2]
+        marker.pose.orientation.w = pose.orientation[3]
+
+        marker.scale.x = 2 * half_extents[0]
+        marker.scale.y = 2 * half_extents[1]
+        marker.scale.z = 2 * half_extents[2]
+
+        marker.color.r = rgba[0]
+        marker.color.g = rgba[1]
+        marker.color.b = rgba[2]
+        marker.color.a = rgba[3]
+
+        self.marker_pub.publish(marker)
