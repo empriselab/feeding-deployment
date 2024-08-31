@@ -20,7 +20,7 @@ from pybullet_helpers.motion_planning import (
 )
 from pybullet_helpers.gui import visualize_pose
 
-from feeding_deployment.integration.perception_interface import PerceptionInterface
+from feeding_deployment.integration.rviz_interface import RVizInterface
 from feeding_deployment.integration.utils import simulated_trajectory_to_kinova_commands
 from feeding_deployment.robot_controller.command_interface import (
     CartesianCommand,
@@ -44,7 +44,7 @@ def move_to_joint_positions(
     joint_positions: list[float],
     sim_states: list[FeedingDeploymentSimulatorState],
     robot_commands: list[KinovaCommand],
-    perception_interface: PerceptionInterface | None = None,
+    rviz_interface: RVizInterface | None = None,
 ) -> None:
     """Move the robot to the specified joint positions.
 
@@ -90,9 +90,9 @@ def move_to_joint_positions(
     sim_states.extend(plan)
 
     # Visualize the plan in RViz.
-    if perception_interface is not None:
+    if rviz_interface is not None:
         for sim_state in plan:
-            perception_interface.rviz_joint_state_update(sim_state.robot_joints)
+            rviz_interface.joint_state_update(sim_state.robot_joints)
             time.sleep(0.1)
 
 
