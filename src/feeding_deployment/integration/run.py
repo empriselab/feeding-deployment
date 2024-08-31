@@ -86,6 +86,11 @@ class _Runner:
         input("Press enter to populate the scene description.")
         self.scene_description = SceneDescription(**kwargs)
 
+        # set initial positions for all tools in rviz
+        self.perception_interface.rviz_tool_update(False, "cup", self.scene_description.cup_pose)
+        self.perception_interface.rviz_tool_update(False, "wiper", self.scene_description.wiper_pose)
+        self.perception_interface.rviz_tool_update(False, "utensil", self.scene_description.utensil_pose)
+
         input("Press enter to create the simulator.")
         self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description)
         # self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description, use_gui=False)

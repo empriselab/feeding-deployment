@@ -44,7 +44,7 @@ def move_to_joint_positions(
     joint_positions: list[float],
     sim_states: list[FeedingDeploymentSimulatorState],
     robot_commands: list[KinovaCommand],
-    rviz_update: Callable[[JointPositions, str], None] | None = None,
+    perception_interface: PerceptionInterface | None = None,
 ) -> None:
     """Move the robot to the specified joint positions.
 
@@ -90,9 +90,9 @@ def move_to_joint_positions(
     sim_states.extend(plan)
 
     # Visualize the plan in RViz.
-    if rviz_update is not None:
+    if perception_interface is not None:
         for sim_state in plan:
-            rviz_update(sim_state.robot_joints, sim_state.held_object)
+            perception_interface.rviz_joint_state_update(sim_state.robot_joints)
             time.sleep(0.1)
 
 
