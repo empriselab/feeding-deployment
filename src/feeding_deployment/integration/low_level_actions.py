@@ -4,12 +4,14 @@ import abc
 from copy import copy, deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
+import time
 
 import numpy as np
 from numpy.typing import NDArray
 from pybullet_helpers.geometry import Pose
 from pybullet_helpers.inverse_kinematics import add_fingers_to_joint_positions
+from pybullet_helpers.joint import JointPositions
 from pybullet_helpers.motion_planning import (
     get_joint_positions_distance,
     run_motion_planning,
@@ -18,7 +20,7 @@ from pybullet_helpers.motion_planning import (
 )
 from pybullet_helpers.gui import visualize_pose
 
-from feeding_deployment.integration.perception_interface import PerceptionInterface
+from feeding_deployment.integration.rviz_interface import RVizInterface
 from feeding_deployment.integration.utils import simulated_trajectory_to_kinova_commands
 from feeding_deployment.robot_controller.command_interface import (
     CartesianCommand,
@@ -36,11 +38,13 @@ from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSim
 from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
 
 
+
 def move_to_joint_positions(
     sim: FeedingDeploymentPyBulletSimulator,
     joint_positions: list[float],
     sim_states: list[FeedingDeploymentSimulatorState],
     robot_commands: list[KinovaCommand],
+    rviz_interface: RVizInterface | None = None,
 ) -> None:
     """Move the robot to the specified joint positions.
 
@@ -64,26 +68,32 @@ def move_to_joint_positions(
 
     if direct_path:
         # Rajat ToDo: Discuss arm / robot dissociation with Tom
-        sim_states.extend(_plan_to_sim_state_trajectory(direct_path, sim))
+        plan = _plan_to_sim_state_trajectory(direct_path, sim)
         robot_commands.append(JointCommand(pos=target_joint_positions[:7]))
-        return
+ 
+    else:
 
-    print("No direct path found. Running motion planning.")
-    plan = run_motion_planning(
-        robot=sim.robot,
-        initial_positions=initial_joint_positions,
-        target_positions=target_joint_positions,
-        collision_bodies=sim.get_collision_ids(),
-        seed=0,
-        physics_client_id=sim.physics_client_id,
-        held_object=sim.held_object_id,
-        base_link_to_held_obj=sim.held_object_tf,
-    )
-    plan = _plan_to_sim_state_trajectory(plan, sim)
-    remapped_plan = remap_trajectory_to_constant_distance(plan, sim)
+        print("No direct path found. Running motion planning.")
+        plan = run_motion_planning(
+            robot=sim.robot,
+            initial_positions=initial_joint_positions,
+            target_positions=target_joint_positions,
+            collision_bodies=sim.get_collision_ids(),
+            seed=0,
+            physics_client_id=sim.physics_client_id,
+            held_object=sim.held_object_id,
+            base_link_to_held_obj=sim.held_object_tf,
+        )
+        plan = remap_trajectory_to_constant_distance(plan, sim)
+        robot_commands.extend(simulated_trajectory_to_kinova_commands(plan))
+    
+    sim_states.extend(plan)
 
-    sim_states.extend(remapped_plan)
-    robot_commands.extend(simulated_trajectory_to_kinova_commands(remapped_plan))
+    # Visualize the plan in RViz.
+    if rviz_interface is not None:
+        for sim_state in plan:
+            rviz_interface.joint_state_update(sim_state.robot_joints)
+            time.sleep(0.1)
 
 
 def teleport_to_ee_pose(

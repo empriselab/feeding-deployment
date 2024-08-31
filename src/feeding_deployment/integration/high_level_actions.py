@@ -6,6 +6,10 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import rospy
+from std_msgs.msg import String
+from sensor_msgs.msg import JointState
+from visualization_msgs.msg import Marker, MarkerArray
 import time
 
 # Rajat ToDo: Remove this hacky addition
@@ -24,6 +28,7 @@ except ModuleNotFoundError:
 
 
 from pybullet_helpers.geometry import Pose, multiply_poses
+from pybullet_helpers.joint import JointPositions
 from relational_structs import (
     GroundAtom,
     GroundOperator,
@@ -42,6 +47,7 @@ from feeding_deployment.integration.low_level_actions import (
     move_to_ee_pose,
 )
 from feeding_deployment.integration.perception_interface import PerceptionInterface
+from feeding_deployment.integration.rviz_interface import RVizInterface
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 from feeding_deployment.robot_controller.command_interface import (
     CloseGripperCommand,
@@ -72,12 +78,14 @@ class HighLevelAction(abc.ABC):
         sim: FeedingDeploymentPyBulletSimulator,
         robot_interface: ArmInterfaceClient,
         perception_interface: PerceptionInterface,
+        rviz_interface: RVizInterface,
         hla_hyperparams: dict[str, Any],
         run_on_robot: bool,
     ) -> None:
         self._sim = sim
         self._robot_interface = robot_interface
         self._perception_interface = perception_interface
+        self._rviz_interface = rviz_interface
         self._hla_hyperparams = hla_hyperparams
         self._run_on_robot = run_on_robot
 
@@ -103,7 +111,6 @@ class HighLevelAction(abc.ABC):
         for robot_command in robot_commands:
             input("Execute next command?")
             self._robot_interface.execute_command(robot_command)
-
 
 @dataclass(frozen=True)
 class GroundHighLevelAction:
@@ -170,6 +177,7 @@ class PickToolHLA(HighLevelAction):
                 self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             move_to_joint_positions(
@@ -177,6 +185,7 @@ class PickToolHLA(HighLevelAction):
                 self._sim.scene_description.cup_outside_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             teleport_to_ee_pose(
@@ -191,6 +200,7 @@ class PickToolHLA(HighLevelAction):
             robot_commands.append(OpenGripperCommand())
             # only for sim: set held object
             sim_states.extend(_get_plan_to_execute_grasp(self._sim, "cup"))
+            self._rviz_interface.tool_update(True, "cup", Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the cup
 
             teleport_to_ee_pose(
                 self._sim,
@@ -216,6 +226,7 @@ class PickToolHLA(HighLevelAction):
                 self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             move_to_joint_positions(
@@ -223,6 +234,7 @@ class PickToolHLA(HighLevelAction):
                 self._sim.scene_description.utensil_infront_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             move_to_joint_positions(
@@ -230,6 +242,7 @@ class PickToolHLA(HighLevelAction):
                 self._sim.scene_description.utensil_above_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             teleport_to_ee_pose(
@@ -245,6 +258,7 @@ class PickToolHLA(HighLevelAction):
             # only for sim: set held object
             sim_states.extend(_get_plan_to_execute_grasp(self._sim, "utensil"))
             # input("Press Enter to continue...")
+            self._rviz_interface.tool_update(True, "utensil", Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the utensil
 
             teleport_to_ee_pose(
                 self._sim,
@@ -259,6 +273,7 @@ class PickToolHLA(HighLevelAction):
                 self._sim.scene_description.utensil_neutral_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             move_to_joint_positions(
@@ -266,6 +281,7 @@ class PickToolHLA(HighLevelAction):
                 self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             if self._run_on_robot:
@@ -313,6 +329,7 @@ class StowToolHLA(HighLevelAction):
                 self._sim.scene_description.cup_above_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             teleport_to_ee_pose(
@@ -327,6 +344,8 @@ class StowToolHLA(HighLevelAction):
             robot_commands.append(CloseGripperCommand())
             # only for sim: unset held object
             sim_states.extend(_get_plan_to_execute_ungrasp(self._sim))
+            # update rviz
+            self._rviz_interface.tool_update(False, "cup", self._sim.scene_description.cup_pose) # stow the cup
 
             teleport_to_ee_pose(
                 self._sim,
@@ -341,6 +360,7 @@ class StowToolHLA(HighLevelAction):
                 self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             if self._run_on_robot:
@@ -359,6 +379,7 @@ class StowToolHLA(HighLevelAction):
                 self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             move_to_joint_positions(
@@ -366,6 +387,7 @@ class StowToolHLA(HighLevelAction):
                 self._sim.scene_description.utensil_neutral_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             move_to_joint_positions(
@@ -373,6 +395,7 @@ class StowToolHLA(HighLevelAction):
                 self._sim.scene_description.utensil_outside_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             teleport_to_ee_pose(
@@ -388,6 +411,7 @@ class StowToolHLA(HighLevelAction):
             # only for sim: unset held object
             sim_states.extend(_get_plan_to_execute_ungrasp(self._sim))
             # input("Press Enter to continue...")
+            self._rviz_interface.tool_update(False, "utensil", self._sim.scene_description.utensil_pose) # stow the utensil
 
             teleport_to_ee_pose(
                 self._sim,
@@ -410,6 +434,7 @@ class StowToolHLA(HighLevelAction):
                 self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             if self._run_on_robot:
@@ -456,6 +481,7 @@ class TransferToolHLA(HighLevelAction):
                 self._sim.scene_description.before_transfer_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             # # target_pose = self._perception_interface.get_head_perception_forque_target_pose()
@@ -522,6 +548,7 @@ class TransferToolHLA(HighLevelAction):
                 self._sim.scene_description.before_transfer_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             if self._run_on_robot:
@@ -667,6 +694,7 @@ class PrepareToolHLA(HighLevelAction):
                 self._sim.scene_description.above_plate_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             if self._run_on_robot:
