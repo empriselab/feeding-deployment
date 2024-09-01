@@ -19,7 +19,7 @@ class EStopsPublisher:
         self.experimentor_estop_pub = rospy.Publisher("/experimentor_estop", Bool, queue_size=1)
 
     def run(self):
-        while True:
+        while not rospy.is_shutdown():
             start_time = time.time()
             user_estop_pressed = self.user_estop.check()
             experimentor_estop_pressed = self.experimentor_estop.check()

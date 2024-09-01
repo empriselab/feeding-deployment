@@ -102,17 +102,15 @@ class WatchDog:
         self.watchdog_status_pub = rospy.Publisher("/watchdog_status", Bool, queue_size=1)
 
         self.second_counter = 0
-        time.sleep(10.0) # Wait for all queues to fill up / collision monitor to start
+        time.sleep(5.0) # Wait for all queues to fill up / collision monitor to start
         print("Initialized.")
 
     def cameraCallback(self, msg):
-        print("Camera callback")
 
         self.camera_timestamps.put(time.time())
         self.camera_unexpected = False
 
     def ftCallback(self, msg):
-        print("FT callback")
 
         self.ft_timestamps.put(time.time())
         ft = [msg.wrench.force.x, msg.wrench.force.y, msg.wrench.force.z, msg.wrench.torque.x, msg.wrench.torque.y, msg.wrench.torque.z]

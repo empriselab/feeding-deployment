@@ -47,6 +47,10 @@ class JointStatesPublisher:
             "joint_7",
             "finger_joint",
         ]
+
+        if gripper_pos < 0.0:
+            gripper_pos = 0.0 # sometimes the gripper position is slightly negative
+
         joint_state_msg.position = arm_pos.tolist() + [gripper_pos*0.8] # sim/rviz gripper is 0.8x real gripper
         joint_state_msg.velocity = [0.0] * 8
         joint_state_msg.effort = [0.0] * 8
