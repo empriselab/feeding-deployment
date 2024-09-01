@@ -5,9 +5,8 @@ import time
 import numpy as np
 import numpy.typing as npt
 import pyaudio
-import rospy  # type: ignore  # pylint: disable=import-error
-from std_msgs.msg import Bool  # type: ignore  # pylint: disable=import-error
-
+from threading import Lock
+import argparse
 
 class EStop:
     """Soft E-stop with a button."""
@@ -24,7 +23,7 @@ class EStop:
         "Note that until this is addressed, the e-stop button will not be working."
     )
 
-    def __init__(self) -> None:
+    def __init__(self, input_device_index) -> None:
 
         self.start_time = time.time()
         self.prev_data_arr: npt.NDArray | None = None
@@ -41,7 +40,7 @@ class EStop:
                 rate=48000,
                 input=True,
                 frames_per_buffer=4800,
-                input_device_index=-1,
+                input_device_index=input_device_index,
                 stream_callback=self.__audio_callback,
             )
         except OSError as exc:
@@ -52,8 +51,9 @@ class EStop:
                     f"Exception: {exc}"
                 ),
             )
-
-        self.stop_controller_pub = rospy.Publisher("/estop", Bool, queue_size=1)
+        
+        self.estop_lock = Lock()
+        self.estop_value = False
 
     def close(self) -> None:
         """Close the audio stream."""
@@ -61,6 +61,16 @@ class EStop:
             self.stream.stop_stream()
             self.stream.close()
         self.audio.terminate()
+
+    def check(self) -> bool:
+        """Check if the e-stop button has been pressed."""
+        with self.estop_lock:
+            return self.estop_value
+        
+    def reset(self) -> None:
+        """Reset the e-stop button."""
+        with self.estop_lock:
+            self.estop_value = False
 
     def __audio_callback(
         self, data: bytes, frame_count: int, time_info: dict, status: int
@@ -85,9 +95,8 @@ class EStop:
         ):
             if self.detection_time is None or time.time() - self.detection_time > 2:
                 self.detection_time = time.time()
-                print("E-stop button pressed")
-                self.stop_controller_pub.publish(Bool(data=True))
-            # raise Exception("E-stop button pressed")
+                with self.estop_lock:
+                    self.estop_value = True
 
         # Return the data
         self.prev_data_arr = data_arr
@@ -177,7 +186,27 @@ class EStop:
 
 
 if __name__ == "__main__":
-    rospy.init_node("estop")
-    estop = EStop()
-    rospy.spin()
+
+    # add argument parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input_device_index", type=int, default=0, help="The index of the input device")
+    args = parser.parse_args()
+
+    if args.input_device_index == 0:
+        audio = pyaudio.PyAudio()
+        device_indices = []
+        for i in range(audio.get_device_count()):
+            device_info = audio.get_device_info_by_index(i)
+            if device_info["maxInputChannels"] > 0:  # Only consider input devices
+                device_indices.append(i)
+                print(f"Device {i}: {device_info['name']}")
+        raise ValueError("Please provide the input device index")
+
+    estop = EStop(args.input_device_index)
+    while True:
+        if estop.check():
+            print("E-stop pressed!")
+            break
+        time.sleep(0.01)
+    
     estop.close()

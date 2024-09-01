@@ -102,15 +102,17 @@ class WatchDog:
         self.watchdog_status_pub = rospy.Publisher("/watchdog_status", Bool, queue_size=1)
 
         self.second_counter = 0
-        time.sleep(2.0) # Wait for all queues to fill up
+        time.sleep(10.0) # Wait for all queues to fill up / collision monitor to start
         print("Initialized.")
 
     def cameraCallback(self, msg):
+        print("Camera callback")
 
         self.camera_timestamps.put(time.time())
         self.camera_unexpected = False
 
     def ftCallback(self, msg):
+        print("FT callback")
 
         self.ft_timestamps.put(time.time())
         ft = [msg.wrench.force.x, msg.wrench.force.y, msg.wrench.force.z, msg.wrench.torque.x, msg.wrench.torque.y, msg.wrench.torque.z]
@@ -153,6 +155,7 @@ class WatchDog:
             queue_size = _queue.qsize()
             if queue_size < _threshold:
                 print(f"Frequency: {queue_size} for {_anomaly}")
+                rospy.loginfo(f"Frequency: {queue_size} for {_anomaly}")
                 anomaly = _anomaly
                 break   
             frequencies.append(queue_size)
@@ -163,17 +166,19 @@ class WatchDog:
             self.second_counter = 0
 
         for _unexpected, _anomaly in [(self.camera_unexpected, AnomalyStatus.CAMERA_UNEXPECTED),
-                                    (self.ft_unexpected, AnomalyStatus.FT_UNEXPECTED),
+                                    # (self.ft_unexpected, AnomalyStatus.FT_UNEXPECTED),
                                     (self.collision_free_unexpected, AnomalyStatus.COLLISION_FREE_UNEXPECTED),
                                     (self.user_emergency_stop_pressed, AnomalyStatus.USER_ESTOP_PRESSED),
                                     (self.experimentor_emergency_stop_pressed, AnomalyStatus.experimentor_ESTOP_PRESSED)]:
             if _unexpected:
                 print(f"Unexpected: {_anomaly}")
+                rospy.loginfo(f"Unexpected: {_anomaly}")
                 anomaly = _anomaly
                 break
 
         if anomaly != AnomalyStatus.NO_ANOMALY:
             print(f"AnomalyStatus detected: {anomaly}")
+            rospy.loginfo(f"AnomalyStatus detected: {anomaly}")
             self._arm_interface.stop()
             self._arm_interface.close()
 
