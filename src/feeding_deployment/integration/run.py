@@ -222,12 +222,12 @@ if __name__ == "__main__":
     # msg = namedtuple("String", ["data"])
     # runner.web_interface_callback(msg(json.dumps({"status": "drink_pickup"})))
     # runner.web_interface_callback(msg(json.dumps({"status": "drink_transfer"})))
-    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
     runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.cup,)))
-    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.cup,)))
-    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.cup,)))
+    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.cup,)))
+    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.cup,)))
 
     if args.make_videos:
         runner.make_video(Path("full.mp4"))
