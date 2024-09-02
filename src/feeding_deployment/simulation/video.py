@@ -19,7 +19,7 @@ def make_simulation_video(
     outfile: Path,
     fps: int = 20,
 ) -> None:
-    """Make a video for a simulated cup manipulation plan."""
+    """Make a video for a simulated drink manipulation plan."""
     imgs = []
     for state in traj:
         sim.sync(state)

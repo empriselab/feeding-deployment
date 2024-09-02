@@ -63,7 +63,7 @@ from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSim
 from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
 
 # Define some predicates that can be used for sequencing the high-level actions.
-tool_type = Type("tool")  # utensil, cup, or wiping tool
+tool_type = Type("tool")  # utensil, drink, or wiping tool
 GripperFree = Predicate("GripperFree", [])  # not holding any tool
 Holding = Predicate("Holding", [tool_type])  # holding tool
 ToolTransferDone = Predicate("ToolTransferDone", [tool_type])  # wiped, drank, or ate
@@ -166,7 +166,7 @@ class PickToolHLA(HighLevelAction):
         assert len(objects) == 1
         tool = objects[0]
 
-        if tool.name == "cup":
+        if tool.name == "drink":
 
             assert self._sim.held_object_name is None
             sim_states: list[FeedingDeploymentSimulatorState] = []
@@ -182,7 +182,7 @@ class PickToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.cup_outside_mount_pos,
+                self._sim.scene_description.drink_outside_mount_pos,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface
@@ -190,22 +190,22 @@ class PickToolHLA(HighLevelAction):
 
             teleport_to_ee_pose(
                 self._sim,
-                self._sim.scene_description.cup_inside_mount,
-                self._sim.scene_description.cup_inside_mount_pos,
+                self._sim.scene_description.drink_inside_mount,
+                self._sim.scene_description.drink_inside_mount_pos,
                 sim_states,
                 robot_commands,
             )
 
-            # open gripperscup_inside_mount_pos
+            # open grippersdrink_inside_mount_pos
             robot_commands.append(OpenGripperCommand())
             # only for sim: set held object
-            sim_states.extend(_get_plan_to_execute_grasp(self._sim, "cup"))
-            self._rviz_interface.tool_update(True, "cup", Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the cup
+            sim_states.extend(_get_plan_to_execute_grasp(self._sim, "drink"))
+            self._rviz_interface.tool_update(True, "drink", Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the drink
 
             teleport_to_ee_pose(
                 self._sim,
-                self._sim.scene_description.cup_above_mount,
-                self._sim.scene_description.cup_above_mount_pos,
+                self._sim.scene_description.drink_above_mount,
+                self._sim.scene_description.drink_above_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -392,15 +392,15 @@ class StowToolHLA(HighLevelAction):
         assert len(objects) == 1
         tool = objects[0]
 
-        if tool.name == "cup":
+        if tool.name == "drink":
 
-            assert self._sim.held_object_name == "cup"
+            assert self._sim.held_object_name == "drink"
             sim_states: list[FeedingDeploymentSimulatorState] = []
             robot_commands = []
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.cup_above_mount_pos,
+                self._sim.scene_description.drink_above_mount_pos,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface
@@ -408,8 +408,8 @@ class StowToolHLA(HighLevelAction):
 
             teleport_to_ee_pose(
                 self._sim,
-                self._sim.scene_description.cup_inside_mount,
-                self._sim.scene_description.cup_inside_mount_pos,
+                self._sim.scene_description.drink_inside_mount,
+                self._sim.scene_description.drink_inside_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -419,12 +419,12 @@ class StowToolHLA(HighLevelAction):
             # only for sim: unset held object
             sim_states.extend(_get_plan_to_execute_ungrasp(self._sim))
             # update rviz
-            self._rviz_interface.tool_update(False, "cup", self._sim.scene_description.cup_pose) # stow the cup
+            self._rviz_interface.tool_update(False, "drink", self._sim.scene_description.drink_pose) # stow the drink
 
             teleport_to_ee_pose(
                 self._sim,
-                self._sim.scene_description.cup_outside_mount,
-                self._sim.scene_description.cup_outside_mount_pos,
+                self._sim.scene_description.drink_outside_mount,
+                self._sim.scene_description.drink_outside_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -686,8 +686,8 @@ class TransferToolHLA(HighLevelAction):
             # Rajat ToDo: Implement the rest of bite transfer
 
             return sim_states
-        elif tool.name == "cup":
-            assert self._sim.held_object_name == "cup"
+        elif tool.name == "drink":
+            assert self._sim.held_object_name == "drink"
             sim_states: list[FeedingDeploymentSimulatorState] = []
             robot_commands = []
 

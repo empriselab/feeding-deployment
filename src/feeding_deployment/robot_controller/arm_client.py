@@ -77,28 +77,28 @@ if __name__ == "__main__":
     if run_commands != "y":
         exit()
 
-    cup_inside_mount = (
+    drink_inside_mount = (
         np.array([0.55, 0.52, 0.305]),
         np.array([-0.2126311, -0.6743797, -0.6743797, 0.2126311]),
     )
 
-    cup_outside_mount = (
-        cup_inside_mount[0].copy(),
-        cup_inside_mount[1].copy(),
+    drink_outside_mount = (
+        drink_inside_mount[0].copy(),
+        drink_inside_mount[1].copy(),
     )
-    cup_outside_mount[0][1] -= 0.06
+    drink_outside_mount[0][1] -= 0.06
 
-    cup_above_mount = (
-        cup_inside_mount[0].copy(),
-        cup_inside_mount[1].copy(),
+    drink_above_mount = (
+        drink_inside_mount[0].copy(),
+        drink_inside_mount[1].copy(),
     )
-    cup_above_mount[0][2] += 0.1
+    drink_above_mount[0][2] += 0.1
 
-    cup_inside_mount_pos = [-3.0706449768856463, -1.233024942579057, -1.0107718990709298, -1.3064307169693468, -1.0801286033398636, -0.6790118020676168, -3.0605814237584545]
+    drink_inside_mount_pos = [-3.0706449768856463, -1.233024942579057, -1.0107718990709298, -1.3064307169693468, -1.0801286033398636, -0.6790118020676168, -3.0605814237584545]
 
     # depend on the offsets set above
-    cup_above_mount_pos = [-3.0822113518159693, -1.0554986243143745, -0.9943061066831875, -1.2514305815048123, -1.0634620086059297, -0.7145069457084112, 3.0023889570952424]
-    cup_outside_mount_pos = [-2.9457621628368873, -1.206488672845289, -1.0073524002312677, -1.3997867637176382, -1.0606635589324744, -0.7359768177844117, -3.048252585808042]
+    drink_above_mount_pos = [-3.0822113518159693, -1.0554986243143745, -0.9943061066831875, -1.2514305815048123, -1.0634620086059297, -0.7145069457084112, 3.0023889570952424]
+    drink_outside_mount_pos = [-2.9457621628368873, -1.206488672845289, -1.0073524002312677, -1.3997867637176382, -1.0606635589324744, -0.7359768177844117, -3.048252585808042]
 
     before_transfer_pos = [
         -2.86554642,
@@ -110,32 +110,32 @@ if __name__ == "__main__":
         2.05515862,
     ]
 
-    input("Press enter to move to outside cup pose...")
-    arm_client_interface.execute_command(JointCommand(cup_outside_mount_pos))
+    input("Press enter to move to outside drink pose...")
+    arm_client_interface.execute_command(JointCommand(drink_outside_mount_pos))
 
-    # input("Press enter to move to outside cup mount pose...")
-    # arm_client_interface.set_ee_pose(outside_cup_pose[0], outside_cup_pose[1])
+    # input("Press enter to move to outside drink mount pose...")
+    # arm_client_interface.set_ee_pose(outside_drink_pose[0], outside_drink_pose[1])
 
-    input("Press enter to move to inside cup mount pose...")
-    arm_client_interface.execute_command(CartesianCommand(cup_inside_mount[0], cup_inside_mount[1]))
+    input("Press enter to move to inside drink mount pose...")
+    arm_client_interface.execute_command(CartesianCommand(drink_inside_mount[0], drink_inside_mount[1]))
 
-    input("Press enter to grasp the cup...")
+    input("Press enter to grasp the drink...")
     arm_client_interface.execute_command(OpenGripperCommand())
 
-    input("Press enter to pickup the cup...")
-    arm_client_interface.execute_command(CartesianCommand(cup_above_mount[0], cup_above_mount[1]))
+    input("Press enter to pickup the drink...")
+    arm_client_interface.execute_command(CartesianCommand(drink_above_mount[0], drink_above_mount[1]))
 
     input("Press enter to move to before transfer pose...")
     arm_client_interface.execute_command(JointCommand(before_transfer_pos))
 
     input("Press enter to move above the mount...")
-    arm_client_interface.execute_command(CartesianCommand(cup_above_mount[0], cup_above_mount[1]))
+    arm_client_interface.execute_command(CartesianCommand(drink_above_mount[0], drink_above_mount[1]))
 
-    input("Press enter to move to inside cup mount pose...")
-    arm_client_interface.execute_command(CartesianCommand(cup_inside_mount[0], cup_inside_mount[1]))
+    input("Press enter to move to inside drink mount pose...")
+    arm_client_interface.execute_command(CartesianCommand(drink_inside_mount[0], drink_inside_mount[1]))
 
-    input("Press enter to release the cup...")
+    input("Press enter to release the drink...")
     arm_client_interface.execute_command(CloseGripperCommand())
 
-    input("Press enter to move to outside cup pose...")
-    arm_client_interface.execute_command(CartesianCommand(cup_outside_mount[0], cup_outside_mount[1]))
+    input("Press enter to move to outside drink pose...")
+    arm_client_interface.execute_command(CartesianCommand(drink_outside_mount[0], drink_outside_mount[1]))

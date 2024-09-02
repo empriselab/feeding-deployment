@@ -131,9 +131,9 @@ def _plan_to_sim_state_trajectory(
     plan: list[JointPositions], sim: FeedingDeploymentPyBulletSimulator
 ) -> list[FeedingDeploymentSimulatorState]:
     # Read out the simulator states from the plan.
-    cup_pose: Pose | None = None
-    if sim.held_object_name != "cup":
-        cup_pose = get_pose(sim.cup_id, sim.physics_client_id)
+    drink_pose: Pose | None = None
+    if sim.held_object_name != "drink":
+        drink_pose = get_pose(sim.drink_id, sim.physics_client_id)
     wipe_pose: Pose | None = None
     if sim.held_object_name != "wipe":
         wipe_pose = get_pose(sim.wipe_id, sim.physics_client_id)
@@ -145,7 +145,7 @@ def _plan_to_sim_state_trajectory(
     for joints in plan:
         sim_state = FeedingDeploymentSimulatorState(
             joints,
-            cup_pose=cup_pose,
+            drink_pose=drink_pose,
             wipe_pose=wipe_pose,
             utensil_pose=utensil_pose,
             held_object=sim.held_object_name,
@@ -166,8 +166,8 @@ def _get_plan_to_execute_grasp(
     physics_client_id = sim.physics_client_id
     robot.set_finger_state(sim.scene_description.tool_grasp_fingers_value)
     sim.held_object_name = object_name
-    if object_name == "cup":
-        sim.held_object_id = sim.cup_id
+    if object_name == "drink":
+        sim.held_object_id = sim.drink_id
     elif object_name == "wipe":
         sim.held_object_id = sim.wipe_id
     elif object_name == "utensil":
@@ -249,7 +249,7 @@ def remap_trajectory_to_constant_distance(
         # TODO need to refactor interpolate_poses.
         return FeedingDeploymentSimulatorState(
             robot_joints,
-            cup_pose=s0.cup_pose,
+            drink_pose=s0.drink_pose,
             wipe_pose=s0.wipe_pose,
             utensil_pose=s0.utensil_pose,
             held_object=s0.held_object,

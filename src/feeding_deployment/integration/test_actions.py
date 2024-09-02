@@ -88,20 +88,20 @@ def _main(
     hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
 
     high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot)
-    cup = Object("cup", tool_type)
+    drink = Object("drink", tool_type)
 
-    sim.held_object_name = "cup"
-    sim.held_object_id = sim.cup_id
+    sim.held_object_name = "drink"
+    sim.held_object_id = sim.drink_id
     sim.robot.set_finger_state(scene_description.tool_grasp_fingers_value)
     finger_frame_id = sim.robot.link_from_name("finger_tip")
     end_effector_link_id = sim.robot.link_from_name(sim.robot.tool_link_name)
-    cup_from_end_effector = get_relative_link_pose(
+    drink_from_end_effector = get_relative_link_pose(
         sim.robot.robot_id, finger_frame_id, end_effector_link_id, sim.physics_client_id
     )
-    sim.held_object_tf = cup_from_end_effector
-    print(f"cup_from_end_effector: {cup_from_end_effector}")
+    sim.held_object_tf = drink_from_end_effector
+    print(f"drink_from_end_effector: {drink_from_end_effector}")
 
-    sim_traj = high_level_action.execute_action(objects=[cup], params={})
+    sim_traj = high_level_action.execute_action(objects=[drink], params={})
 
     if make_videos:
         outfile = Path(__file__).parent / "single_action.mp4"

@@ -11,13 +11,13 @@ class FeedingDeploymentSimulatorState:
     """The state of a feeding deployment simulated environment."""
 
     robot_joints: JointPositions
-    cup_pose: Pose | None = None  # None if held
+    drink_pose: Pose | None = None  # None if held
     wipe_pose: Pose | None = None  # None if held
     utensil_pose: Pose | None = None  # None if held
     held_object: str | None = None
     held_object_tf: Pose | None = None
 
     def __post_init__(self) -> None:
-        assert self.cup_pose is not None or self.held_object == "cup"
+        assert self.drink_pose is not None or self.held_object == "drink"
         assert self.wipe_pose is not None or self.held_object == "wipe"
         assert self.utensil_pose is not None or self.held_object == "utensil"

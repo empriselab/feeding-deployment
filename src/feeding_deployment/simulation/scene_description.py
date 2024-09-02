@@ -37,9 +37,116 @@ def create_scene_description_from_config(config_file_path: str) -> SceneDescript
 class SceneDescription:
     """Scene description."""
 
+    # Robot.
+    robot_name: str = "kinova-gen3"
+    initial_joints: JointPositions = field(
+        default_factory=lambda: [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+
+        ]
+    )
+    robot_base_pose: Pose = Pose(
+        (0.0, 0.0, 0.0),
+        (0.0, 0.0, 0.0, 1.0),
+    )
+
+    # Robot holder (vention stand).
+    # robot_holder_pose: Pose = Pose((0.0, 0.0, -0.261))
+    robot_holder_pose: Pose = Pose((0.0, 0.0, -0.28))
+    robot_holder_rgba: tuple[float, float, float, float] = (0.5, 0.5, 0.5, 1.0)
+    robot_holder_half_extents: tuple[float, float, float] = (0.18, 0.12, 0.26)
+
+    # Wheelchair.
+    wheelchair_pose: Pose = Pose(
+        (0.2, 0.5, -0.25), tuple(p.getQuaternionFromEuler((0.0, 0.0, np.pi / 2)))
+    )
+    wheelchair_relative_head_pose: Pose = Pose(
+        (0.0, -0.25, 0.75), (0.0, 0.0, 0.0, 1.0)
+    )  # Rajat ToDo: Fix this
+    wheelchair_urdf_path: Path = (
+        Path(__file__).parent.parent
+        / "assets"
+        / "urdf"
+        / "wheelchair"
+        / "wheelchair.urdf"
+    )
+
+    # Conservative bounding box around the wheel chair.
+    conservative_bb_pose: Pose = Pose((-0.4, 0.7, -0.25))
+    conservative_bb_rgba: tuple[float, float, float, float] = (0.9, 0.1, 0.1, 0.5)
+    conservative_bb_half_extents: tuple[float, float, float] = (0.4, 0.4, 1.0)
+
+    # Table.
+    table_pose: Pose = Pose((0.5, 0.75, -0.175))
+    table_rgba: tuple[float, float, float, float] = (0.5, 0.5, 0.5, 1.0)
+    table_half_extents: tuple[float, float, float] = (0.25, 0.4, 0.345)
+
+    # Constants across all tools
+    above_plate_pos: JointPositions = field(
+        default_factory=lambda: [
+            -2.86495014,
+            -1.61460533,
+            -2.6115943,
+            -1.37673391,
+            1.11842806,
+            -1.17904586,
+            -2.6957422,
+        ]
+    )
+
+    before_transfer_pos: JointPositions = field(
+        default_factory=lambda: [
+            -2.86554642,
+            -1.61951779,
+            -2.60986085,
+            -1.37302839,
+            1.11779249,
+            -1.18028264,
+            2.05515862,
+        ]
+    )
+
+    retract_pos: JointPositions = field(
+        default_factory=lambda: [
+            0.0,
+            -0.34903602299465675,
+            -3.141591055693139,
+            -2.5482592711638783,
+            0.0,
+            -0.872688061814757,
+            1.57075917569769,
+        ]
+    )
+
     tool_grasp_fingers_value: float = 0.44
 
-    # robot base frame
+    ######### Utensil #########
+
+    # Used by simulator to spawn the utensil
+    utensil_pose: Pose = Pose(
+        (0.35, -0.15, -0.05), p.getQuaternionFromEuler((0.0, np.pi, np.pi))
+    )
+    utensil_urdf_path: Path = (
+        Path(__file__).parent.parent
+        / "assets"
+        / "urdf"
+        / "feeding_utensil"
+        / "feeding_utensil.urdf"
+    )
+
+    # Constants for utensil pick and place
     utensil_inside_mount: Pose = Pose(
         (-0.147, -0.17, 0.07),
         (0.7071068, -0.7071068, 0.0, 0.0),
@@ -116,103 +223,20 @@ class SceneDescription:
         ]
     )
 
-    above_plate_pos: JointPositions = field(
-        default_factory=lambda: [
-            -2.86495014,
-            -1.61460533,
-            -2.6115943,
-            -1.37673391,
-            1.11842806,
-            -1.17904586,
-            -2.6957422,
-        ]
+    # Constants for utensil transfer
+    # Rajat ToDo: Fix with correct values, copied from drinking utensil
+    utensil_tip_from_end_effector: Pose = Pose(
+        (0.270, 0.095, -0.002),
+        (-0.000, 0.707, 0.000, 0.707),
     )
 
-    before_transfer_pos: JointPositions = field(
-        default_factory=lambda: [
-            -2.86554642,
-            -1.61951779,
-            -2.60986085,
-            -1.37302839,
-            1.11779249,
-            -1.18028264,
-            2.05515862,
-        ]
+    ######### drink #########
+
+    drink_pose: Pose = Pose(
+        (0.545, 0.65, 0.270), 
+        (-0.2126311, -0.6743797, -0.6743797, 0.2126311)
     )
-
-    retract_pos: JointPositions = field(
-        default_factory=lambda: [
-            0.0,
-            -0.34903602299465675,
-            -3.141591055693139,
-            -2.5482592711638783,
-            0.0,
-            -0.872688061814757,
-            1.57075917569769,
-        ]
-    )
-
-    # Robot.
-    robot_name: str = "kinova-gen3"
-    initial_joints: JointPositions = field(
-        default_factory=lambda: [
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0
-
-        ]
-    )
-    robot_base_pose: Pose = Pose(
-        (0.0, 0.0, 0.0),
-        (0.0, 0.0, 0.0, 1.0),
-    )
-
-    # Robot holder (vention stand).
-    # robot_holder_pose: Pose = Pose((0.0, 0.0, -0.261))
-    robot_holder_pose: Pose = Pose((0.0, 0.0, -0.28))
-    robot_holder_rgba: tuple[float, float, float, float] = (0.5, 0.5, 0.5, 1.0)
-    robot_holder_half_extents: tuple[float, float, float] = (0.18, 0.12, 0.26)
-
-    # Wheelchair.
-    wheelchair_pose: Pose = Pose(
-        (0.2, 0.5, -0.25), tuple(p.getQuaternionFromEuler((0.0, 0.0, np.pi / 2)))
-    )
-    wheelchair_relative_head_pose: Pose = Pose(
-        (0.0, -0.25, 0.75), (0.0, 0.0, 0.0, 1.0)
-    )  # Rajat ToDo: Fix this
-    wheelchair_urdf_path: Path = (
-        Path(__file__).parent.parent
-        / "assets"
-        / "urdf"
-        / "wheelchair"
-        / "wheelchair.urdf"
-    )
-
-    # Conservative bounding box around the wheel chair.
-    conservative_bb_pose: Pose = Pose((-0.4, 0.7, -0.25))
-    conservative_bb_rgba: tuple[float, float, float, float] = (0.9, 0.1, 0.1, 0.5)
-    conservative_bb_half_extents: tuple[float, float, float] = (0.4, 0.4, 1.0)
-
-    # Table.
-    table_pose: Pose = Pose((0.5, 0.75, -0.175))
-    table_rgba: tuple[float, float, float, float] = (0.5, 0.5, 0.5, 1.0)
-    table_half_extents: tuple[float, float, float] = (0.25, 0.4, 0.345)
-
-    # Cup.
-    # cup_pose: Pose = Pose(
-    #     (0.53, 0.66, 0.32), p.getQuaternionFromEuler((np.pi / 2, 0.0, np.pi))
-    # )
-    cup_urdf_path: Path = (
+    drink_urdf_path: Path = (
         Path(__file__).parent.parent
         / "assets"
         / "urdf"
@@ -220,83 +244,57 @@ class SceneDescription:
         / "drinking_utensil.urdf"
     )
 
-    # Rajat ToDo: Fix with correct values, copied from drinking utensil
-    utensil_tip_from_end_effector: Pose = Pose(
-        (0.270, 0.095, -0.002),
-        (-0.000, 0.707, 0.000, 0.707),
-    )
-
-    drink_tip_from_end_effector: Pose = Pose(
-        (0.270, 0.095, -0.002),
-        (-0.000, 0.707, 0.000, 0.707),
-    )
-
-    # Rajat ToDo: Fix with correct values, copied from drinking utensil
-    wipe_tip_from_end_effector: Pose = Pose(
-        (0.270, 0.095, -0.002),
-        (-0.000, 0.707, 0.000, 0.707),
-    )
-
-    cup_pose: Pose = Pose(
-        (0.545, 0.65, 0.270), 
-        (-0.2126311, -0.6743797, -0.6743797, 0.2126311)
-    )
-
-    cup_outside_mount: Pose = Pose(
+    # Constants for drink pick and place
+    drink_outside_mount: Pose = Pose(
         (0.55, 0.46, 0.305),
         (-0.2126311, -0.6743797, -0.6743797, 0.2126311),
     )
-    cup_outside_mount_pos: JointPositions = field(
+    drink_outside_mount_pos: JointPositions = field(
         default_factory=lambda: [
             -2.9457621628368873, -1.206488672845289, -1.0073524002312677, -1.3997867637176382, -1.0606635589324744, -0.7359768177844117, -3.048252585808042
         ]
     )
 
-    cup_inside_mount: Pose = Pose(
+    drink_inside_mount: Pose = Pose(
         (0.55, 0.52, 0.305),
         (-0.2126311, -0.6743797, -0.6743797, 0.2126311),
     )
-    cup_inside_mount_pos: JointPositions = field(
+    drink_inside_mount_pos: JointPositions = field(
         default_factory=lambda: [
             -3.0706449768856463, -1.233024942579057, -1.0107718990709298, -1.3064307169693468, -1.0801286033398636, -0.6790118020676168, -3.0605814237584545
         ]
     )
 
-    cup_above_mount: Pose = Pose(
+    drink_above_mount: Pose = Pose(
         (0.55, 0.52, 0.405),
         (-0.2126311, -0.6743797, -0.6743797, 0.2126311),
     )
-    cup_above_mount_pos: JointPositions = field(
+    drink_above_mount_pos: JointPositions = field(
         default_factory=lambda: [
             -3.0822113518159693, -1.0554986243143745, -0.9943061066831875, -1.2514305815048123, -1.0634620086059297, -0.7145069457084112, 3.0023889570952424
         ]
     )
 
-    cup_grasp_fingers_orientation: Quaternion = p.getQuaternionFromEuler(
-        (np.pi, np.pi, 0)
-    )
-    cup_pregrasp_transform: Pose = Pose(
-        (0.0, 0.0, -0.1),
-        cup_grasp_fingers_orientation,
-    )
-    cup_grasp_transform: Pose = Pose(
-        (0.0, 0.0, -0.025),
-        cup_grasp_fingers_orientation,
-    )
-    cup_prestow_transform: Pose = Pose(
-        (0.0, 0.05, -0.025),
-        cup_grasp_fingers_orientation,
-    )
-    # This is relative to the wheelchair head.
-    cup_staging_transform: Pose = Pose(
-        (-0.1, 0.5, 0.0), p.getQuaternionFromEuler((-np.pi / 2, np.pi, np.pi / 2))
-    )
-    cup_transfer_transform: Pose = Pose(
-        (-0.1, 0.35, 0.0),
-        p.getQuaternionFromEuler((-np.pi / 2, np.pi - np.pi / 8, np.pi / 2)),
+    # Constants for drink transfer
+    drink_tip_from_end_effector: Pose = Pose(
+        (0.270, 0.095, -0.002),
+        (-0.000, 0.707, 0.000, 0.707),
     )
 
-    # wipe - robot base frame
+    ######### Wiping Utensil #########
+
+    wipe_pose: Pose = Pose(
+        (0.35, 0.15, -0.05), p.getQuaternionFromEuler((0.0, np.pi, np.pi))
+    )
+    wipe_urdf_path: Path = (
+        Path(__file__).parent.parent
+        / "assets"
+        / "urdf"
+        / "wiping_utensil"
+        / "wiping_utensil.urdf"
+    )
+
+    # Constants for wiping utensil pick and place
     wipe_inside_mount: Pose = Pose(
         (-0.147, -0.17, 0.07),
         (0.7071068, -0.7071068, 0.0, 0.0),
@@ -372,66 +370,12 @@ class SceneDescription:
             -0.29495787389950756,
         ]
     )
-    wipe_pose: Pose = Pose(
-        (0.35, 0.15, -0.05), p.getQuaternionFromEuler((0.0, np.pi, np.pi))
-    )
-    wipe_urdf_path: Path = (
-        Path(__file__).parent.parent
-        / "assets"
-        / "urdf"
-        / "wiping_utensil"
-        / "wiping_utensil.urdf"
-    )
-    wipe_grasp_fingers_orientation: Quaternion = p.getQuaternionFromEuler((0, 0, 0))
-    wipe_pregrasp_transform: Pose = Pose(
-        (0.0, 0.0, -0.1),
-        wipe_grasp_fingers_orientation,
-    )
-    wipe_grasp_transform: Pose = Pose(
-        (0.0, 0.0, -0.025),
-        wipe_grasp_fingers_orientation,
-    )
-    wipe_prestow_transform: Pose = Pose(
-        (0.0, 0.0, -0.2),
-        wipe_grasp_fingers_orientation,
-    )
-    # This is relative to the wheelchair head.
-    wipe_staging_transform: Pose = Pose(
-        (-0.1, 0.5, 0.0), p.getQuaternionFromEuler((-np.pi / 2, np.pi, np.pi / 2))
-    )
-    wipe_transfer_transform: Pose = Pose(
-        (-0.1, 0.35, 0.0),
-        p.getQuaternionFromEuler((-np.pi / 2, np.pi, np.pi / 2)),
-    )
 
-    # Utensil.
-    utensil_pose: Pose = Pose(
-        (0.35, -0.15, -0.05), p.getQuaternionFromEuler((0.0, np.pi, np.pi))
-    )
-    utensil_urdf_path: Path = (
-        Path(__file__).parent.parent
-        / "assets"
-        / "urdf"
-        / "feeding_utensil"
-        / "feeding_utensil.urdf"
-    )
-    utensil_grasp_fingers_orientation: Quaternion = p.getQuaternionFromEuler((0, 0, 0))
-    utensil_pregrasp_transform: Pose = Pose(
-        (0.0, 0.0, -0.1),
-        utensil_grasp_fingers_orientation,
-    )
-    utensil_grasp_transform: Pose = Pose(
-        (0.0, 0.0, -0.025),
-        wipe_grasp_fingers_orientation,
-    )
-    utensil_prestow_transform: Pose = Pose(
-        (0.0, 0.0, -0.2),
-        wipe_grasp_fingers_orientation,
-    )
-    utensil_corner_waypoint_transform: Pose = Pose((0.1, -0.4, -0.3))
-    # This is relative to the wheelchair head.
-    utensil_staging_transform: Pose = Pose(
-        (0.0, 0.75, 0.0), p.getQuaternionFromEuler((-np.pi / 2, np.pi, np.pi / 2))
+    # Constants for wiping utensil transfer
+    # Rajat ToDo: Fix with correct values, copied from drinking utensil
+    wipe_tip_from_end_effector: Pose = Pose(
+        (0.270, 0.095, -0.002),
+        (-0.000, 0.707, 0.000, 0.707),
     )
 
     @property
@@ -448,114 +392,6 @@ class SceneDescription:
         return multiply_poses(
             wheelchair_center_pose, self.wheelchair_relative_head_pose
         )
-
-    @property
-    def cup_pregrasp_pose(self) -> Pose:
-        """Pose for the finger tip to pregrasp the cup."""
-        return multiply_poses(self.cup_pose, self.cup_pregrasp_transform)
-
-    @property
-    def cup_grasp_pose(self) -> Pose:
-        """Pose for the finger tip to grasp the cup."""
-        return multiply_poses(self.cup_pose, self.cup_grasp_transform)
-
-    @property
-    def cup_prestow_pose(self) -> Pose:
-        """Pose for the finger tip to prestow the cup."""
-        return multiply_poses(
-            self.cup_pose,
-            self.cup_prestow_transform,
-        )
-
-    @property
-    def cup_staging_pose(self) -> Pose:
-        """Pose for the finger tip before cup transfer."""
-        target_cup_pose = multiply_poses(
-            self.wheelchair_head_pose, self.cup_staging_transform
-        )
-        fingers_to_cup = self.cup_grasp_transform
-        return multiply_poses(target_cup_pose, fingers_to_cup)
-
-    @property
-    def cup_transfer_pose(self) -> Pose:
-        """Pose for the finger tip for cup transfer."""
-        target_cup_pose = multiply_poses(
-            self.wheelchair_head_pose,
-            self.cup_transfer_transform,
-        )
-        fingers_to_cup = self.cup_grasp_transform
-        return multiply_poses(target_cup_pose, fingers_to_cup)
-
-    @property
-    def wipe_pregrasp_pose(self) -> Pose:
-        """Pose for the finger tip to pregrasp the wipe."""
-        return multiply_poses(self.wipe_pose, self.wipe_pregrasp_transform)
-
-    @property
-    def wipe_grasp_pose(self) -> Pose:
-        """Pose for the finger tip to grasp the wipe."""
-        return multiply_poses(self.wipe_pose, self.wipe_grasp_transform)
-
-    @property
-    def wipe_prestow_pose(self) -> Pose:
-        """Pose for the finger tip to prestow the wipe."""
-        return multiply_poses(
-            self.wipe_pose,
-            self.wipe_prestow_transform,
-        )
-
-    @property
-    def wipe_staging_pose(self) -> Pose:
-        """Pose for the finger tip before wipe transfer."""
-        target_wipe_pose = multiply_poses(
-            self.wheelchair_head_pose, self.wipe_staging_transform
-        )
-        fingers_to_wipe = self.wipe_grasp_transform
-        return multiply_poses(target_wipe_pose, fingers_to_wipe)
-
-    @property
-    def wipe_transfer_pose(self) -> Pose:
-        """Pose for the finger tip for wipe transfer."""
-        target_wipe_pose = multiply_poses(
-            self.wheelchair_head_pose, self.wipe_transfer_transform
-        )
-        fingers_to_wipe = self.wipe_grasp_transform
-        return multiply_poses(target_wipe_pose, fingers_to_wipe)
-
-    @property
-    def utensil_pregrasp_pose(self) -> Pose:
-        """Pose for the finger tip to pregrasp the utensil."""
-        return multiply_poses(self.utensil_pose, self.utensil_pregrasp_transform)
-
-    @property
-    def utensil_grasp_pose(self) -> Pose:
-        """Pose for the finger tip to grasp the utensil."""
-        return multiply_poses(self.utensil_pose, self.utensil_grasp_transform)
-
-    @property
-    def utensil_prestow_pose(self) -> Pose:
-        """Pose for the finger tip to prestow the utensil."""
-        return multiply_poses(
-            self.utensil_pose,
-            self.utensil_prestow_transform,
-        )
-
-    @property
-    def utensil_corner_waypoint_pose(self) -> Pose:
-        """Pose for the finger tip for the corner waypoint for the utensil."""
-        return multiply_poses(
-            self.utensil_pose,
-            self.utensil_corner_waypoint_transform,
-        )
-
-    @property
-    def utensil_staging_pose(self) -> Pose:
-        """Pose for the finger tip before utensil transfer."""
-        target_utensil_pose = multiply_poses(
-            self.wheelchair_head_pose, self.utensil_staging_transform
-        )
-        fingers_to_utensil = self.utensil_grasp_transform
-        return multiply_poses(target_utensil_pose, fingers_to_utensil)
 
     @property
     def camera_kwargs(self) -> dict[str, Any]:
@@ -583,7 +419,7 @@ class SceneDescription:
             "wheelchair_pose",
             "table_pose",
             "conservative_bb_pose",
-            "cup_pose",
+            "drink_pose",
             "wipe_pose",
             "utensil_pose",
         }

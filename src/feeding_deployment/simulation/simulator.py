@@ -79,16 +79,16 @@ class FeedingDeploymentPyBulletSimulator:
             physicsClientId=self.physics_client_id,
         )
 
-        # Create cup.
-        self.cup_id = p.loadURDF(
-            str(scene_description.cup_urdf_path),
+        # Create drink.
+        self.drink_id = p.loadURDF(
+            str(scene_description.drink_urdf_path),
             useFixedBase=True,
             physicsClientId=self.physics_client_id,
         )
         p.resetBasePositionAndOrientation(
-            self.cup_id,
-            scene_description.cup_pose.position,
-            scene_description.cup_pose.orientation,
+            self.drink_id,
+            scene_description.drink_pose.position,
+            scene_description.drink_pose.orientation,
             physicsClientId=self.physics_client_id,
         )
 
@@ -143,12 +143,12 @@ class FeedingDeploymentPyBulletSimulator:
             self.conservative_bb_id,
             self.robot_holder_id,
             self._wheelchair_id,
-            self.cup_id,
+            self.drink_id,
             self.wipe_id,
             self.utensil_id,
         }
-        if self.held_object_name == "cup":
-            collision_ids.remove(self.cup_id)
+        if self.held_object_name == "drink":
+            collision_ids.remove(self.drink_id)
         if self.held_object_name == "wipe":
             collision_ids.remove(self.wipe_id)
         if self.held_object_name == "utensil":
@@ -161,7 +161,7 @@ class FeedingDeploymentPyBulletSimulator:
 
         some_object_held = False
         for obj_id, name, state_pose in [
-            (self.cup_id, "cup", state.cup_pose),
+            (self.drink_id, "drink", state.drink_pose),
             (self.wipe_id, "wipe", state.wipe_pose),
             (self.utensil_id, "utensil", state.utensil_pose),
         ]:

@@ -62,7 +62,7 @@ class CollisionMonitor:
     def check_collisions(self, joint_positions: JointPositions) -> bool:
         """Check collisions, but only with objects that can't be held."""
         collision_ids = self._sim.get_collision_ids()
-        collision_ids -= {self._sim.cup_id, self._sim.utensil_id, self._sim.wipe_id}
+        collision_ids -= {self._sim.drink_id, self._sim.utensil_id, self._sim.wipe_id}
         return check_collisions_with_held_object(
             self._sim.robot,
             collision_ids,

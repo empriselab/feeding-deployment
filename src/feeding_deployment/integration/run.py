@@ -111,16 +111,16 @@ class _Runner:
         self.domain = PDDLDomain(
             "AssistedFeeding", self.operators, self.predicates, self.types
         )
-        self.cup = Object("cup", tool_type)
+        self.drink = Object("drink", tool_type)
         self.wipe = Object("wipe", tool_type)
         self.utensil = Object("utensil", tool_type)
-        self.all_objects = {self.cup, self.wipe, self.utensil}
+        self.all_objects = {self.drink, self.wipe, self.utensil}
 
         # Track the current high-level state.
         self.current_atoms = {
             LiftedAtom(GripperFree, []),
             ToolPrepared([self.wipe]),
-            ToolPrepared([self.cup]),
+            ToolPrepared([self.drink]),
         }
 
         # Record the full simulated trajectory for viz and debug.
@@ -133,11 +133,11 @@ class _Runner:
         print(msg_dict)
         if msg_dict["status"] == "drink_pickup":
             user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["PickTool"], (self.cup,)
+                self.hla_name_to_hla["PickTool"], (self.drink,)
             )
         elif msg_dict["status"] == "drink_transfer":
             user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["TransferTool"], (self.cup,)
+                self.hla_name_to_hla["TransferTool"], (self.drink,)
             )
         else:
             print("WARNING: Unrecognized message from web interface.")
@@ -222,13 +222,13 @@ if __name__ == "__main__":
     # msg = namedtuple("String", ["data"])
     # runner.web_interface_callback(msg(json.dumps({"status": "drink_pickup"})))
     # runner.web_interface_callback(msg(json.dumps({"status": "drink_transfer"})))
+    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.cup,)))
+    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.cup,)))
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.cup,)))
-    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
+    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
+    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
 
     if args.make_videos:
         runner.make_video(Path("full.mp4"))
