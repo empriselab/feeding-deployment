@@ -112,14 +112,14 @@ class _Runner:
             "AssistedFeeding", self.operators, self.predicates, self.types
         )
         self.cup = Object("cup", tool_type)
-        self.wiper = Object("wiper", tool_type)
+        self.wipe = Object("wipe", tool_type)
         self.utensil = Object("utensil", tool_type)
-        self.all_objects = {self.cup, self.wiper, self.utensil}
+        self.all_objects = {self.cup, self.wipe, self.utensil}
 
         # Track the current high-level state.
         self.current_atoms = {
             LiftedAtom(GripperFree, []),
-            ToolPrepared([self.wiper]),
+            ToolPrepared([self.wipe]),
             ToolPrepared([self.cup]),
         }
 
@@ -223,11 +223,12 @@ if __name__ == "__main__":
     # runner.web_interface_callback(msg(json.dumps({"status": "drink_pickup"})))
     # runner.web_interface_callback(msg(json.dumps({"status": "drink_transfer"})))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.cup,)))
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.cup,)))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.cup,)))
+    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.cup,)))
+    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
 
     if args.make_videos:
         runner.make_video(Path("full.mp4"))

@@ -109,7 +109,7 @@ class PerceptionInterface:
             tool_base = "forkbase"
         elif held_object == "cup":
             tool_base = "drinkbase"
-        elif held_object == "wiper":
+        elif held_object == "wipe":
             tool_base = "wipebase"
 
         if pick:

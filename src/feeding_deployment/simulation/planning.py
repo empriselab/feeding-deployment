@@ -134,9 +134,9 @@ def _plan_to_sim_state_trajectory(
     cup_pose: Pose | None = None
     if sim.held_object_name != "cup":
         cup_pose = get_pose(sim.cup_id, sim.physics_client_id)
-    wiper_pose: Pose | None = None
-    if sim.held_object_name != "wiper":
-        wiper_pose = get_pose(sim.wiper_id, sim.physics_client_id)
+    wipe_pose: Pose | None = None
+    if sim.held_object_name != "wipe":
+        wipe_pose = get_pose(sim.wipe_id, sim.physics_client_id)
     utensil_pose: Pose | None = None
     if sim.held_object_name != "utensil":
         utensil_pose = get_pose(sim.utensil_id, sim.physics_client_id)
@@ -146,7 +146,7 @@ def _plan_to_sim_state_trajectory(
         sim_state = FeedingDeploymentSimulatorState(
             joints,
             cup_pose=cup_pose,
-            wiper_pose=wiper_pose,
+            wipe_pose=wipe_pose,
             utensil_pose=utensil_pose,
             held_object=sim.held_object_name,
             held_object_tf=sim.held_object_tf,
@@ -168,8 +168,8 @@ def _get_plan_to_execute_grasp(
     sim.held_object_name = object_name
     if object_name == "cup":
         sim.held_object_id = sim.cup_id
-    elif object_name == "wiper":
-        sim.held_object_id = sim.wiper_id
+    elif object_name == "wipe":
+        sim.held_object_id = sim.wipe_id
     elif object_name == "utensil":
         sim.held_object_id = sim.utensil_id
     else:
@@ -180,10 +180,12 @@ def _get_plan_to_execute_grasp(
     assert sim.held_object_id is not None
     finger_frame_id = sim.robot.link_from_name("finger_tip")
     end_effector_link_id = sim.robot.link_from_name(sim.robot.tool_link_name)
-    cup_from_end_effector = get_relative_link_pose(
+    finger_from_end_effector = get_relative_link_pose(
         sim.robot.robot_id, finger_frame_id, end_effector_link_id, sim.physics_client_id
     )
-    sim.held_object_tf = cup_from_end_effector
+    sim.held_object_tf = finger_from_end_effector
+    print("Held object name: ", sim.held_object_name)
+    input("Picked up wipe, press enter to continue")
     return _plan_to_sim_state_trajectory([robot.get_joint_positions()], sim)
 
 
@@ -248,7 +250,7 @@ def remap_trajectory_to_constant_distance(
         return FeedingDeploymentSimulatorState(
             robot_joints,
             cup_pose=s0.cup_pose,
-            wiper_pose=s0.wiper_pose,
+            wipe_pose=s0.wipe_pose,
             utensil_pose=s0.utensil_pose,
             held_object=s0.held_object,
             held_object_tf=s0.held_object_tf,

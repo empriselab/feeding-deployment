@@ -288,6 +288,80 @@ class PickToolHLA(HighLevelAction):
                 self.execute_robot_commands(robot_commands)
 
             return sim_states
+        
+        if tool.name == "wipe":
+
+            assert self._sim.held_object_name is None
+            sim_states: list[FeedingDeploymentSimulatorState] = []
+            robot_commands = []
+
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.retract_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface
+            )
+
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.wipe_infront_mount_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface
+            )
+
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.wipe_above_mount_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface
+            )
+
+            teleport_to_ee_pose(
+                self._sim,
+                self._sim.scene_description.wipe_inside_mount,
+                self._sim.scene_description.wipe_inside_mount_pos,
+                sim_states,
+                robot_commands,
+            )
+
+            # open grippers
+            robot_commands.append(OpenGripperCommand())
+            # only for sim: set held object
+            sim_states.extend(_get_plan_to_execute_grasp(self._sim, "wipe"))
+            # input("Press Enter to continue...")
+            self._rviz_interface.tool_update(True, "wipe", Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the wipe
+
+            teleport_to_ee_pose(
+                self._sim,
+                self._sim.scene_description.wipe_outside_mount,
+                self._sim.scene_description.wipe_outside_mount_pos,
+                sim_states,
+                robot_commands,
+            )
+
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.wipe_neutral_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface
+            )
+
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.retract_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface
+            )
+
+            if self._run_on_robot:
+                self.execute_robot_commands(robot_commands)
+
+            return sim_states
 
         else:
             print(f"PickTool not yet implemented for {tool}")
@@ -425,6 +499,80 @@ class StowToolHLA(HighLevelAction):
                 self._sim,
                 self._sim.scene_description.utensil_infront_mount,
                 self._sim.scene_description.utensil_infront_mount_pos,
+                sim_states,
+                robot_commands,
+            )
+
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.retract_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface
+            )
+
+            if self._run_on_robot:
+                self.execute_robot_commands(robot_commands)
+
+            return sim_states
+        
+        if tool.name == "wipe":
+
+            assert self._sim.held_object_name == "wipe"
+            sim_states: list[FeedingDeploymentSimulatorState] = []
+            robot_commands = []
+
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.retract_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface
+            )
+
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.wipe_neutral_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface
+            )
+
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.wipe_outside_mount_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface
+            )
+
+            teleport_to_ee_pose(
+                self._sim,
+                self._sim.scene_description.wipe_inside_mount,
+                self._sim.scene_description.wipe_inside_mount_pos,
+                sim_states,
+                robot_commands,
+            )
+
+            # close grippers
+            robot_commands.append(CloseGripperCommand())
+            # only for sim: unset held object
+            sim_states.extend(_get_plan_to_execute_ungrasp(self._sim))
+            # input("Press Enter to continue...")
+            self._rviz_interface.tool_update(False, "wipe", self._sim.scene_description.wipe_pose) # stow the wipe
+
+            teleport_to_ee_pose(
+                self._sim,
+                self._sim.scene_description.wipe_above_mount,
+                self._sim.scene_description.wipe_above_mount_pos,
+                sim_states,
+                robot_commands,
+            )
+
+            teleport_to_ee_pose(
+                self._sim,
+                self._sim.scene_description.wipe_infront_mount,
+                self._sim.scene_description.wipe_infront_mount_pos,
                 sim_states,
                 robot_commands,
             )
@@ -611,6 +759,117 @@ class TransferToolHLA(HighLevelAction):
 
             # Rajat ToDo: Replace this wait with a ROS listener for button.
             input("Press enter when drinking is finished")
+            
+            # Reverse the transfer plan.
+            transfer_sim_states = sim_states[sim_length:]
+            sim_states.extend(transfer_sim_states[::-1])
+            
+            transfer_robot_commands = robot_commands.copy()
+            reversed_robot_commands = []
+            for command in transfer_robot_commands[::-1]:
+                assert isinstance(command, JointTrajectoryCommand), "Command not a joint trajectory command"
+                reversed_robot_commands.append(JointTrajectoryCommand(command.traj[::-1]))
+            
+            robot_commands.extend(reversed_robot_commands)
+
+            for i in range(len(robot_commands)):
+                assert isinstance(robot_commands[i], JointTrajectoryCommand), "Command not a joint trajectory command"
+                assert np.allclose(robot_commands[i].traj, robot_commands[-(i+1)].traj[::-1]), "Robot commands not a palindrome"
+
+            # Replay the trajectory before running on real robot
+            print("Replaying the trajectory before running on real robot..")
+
+            for state in sim_states:
+                self._sim.sync(state)
+                time.sleep(0.1)
+
+            if self._run_on_robot:
+                y = input("Does the trajectory look good? Press 'y' to execute on robot")
+                if y == "y":
+                    input("Press enter to switch to joint compliant mode")
+                    self._robot_interface.switch_to_joint_compliant_mode()
+                    self.execute_robot_commands(robot_commands)
+                    input("Press enter to switch out of joint compliant mode")
+                    self._robot_interface.switch_out_of_joint_compliant_mode()
+                else:
+                    print("Trajectory not executed on robot")
+
+            return sim_states
+        
+        elif tool.name == "wipe":
+
+            assert self._sim.held_object_name == "wipe"
+            sim_states: list[FeedingDeploymentSimulatorState] = []
+            robot_commands = []
+
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.before_transfer_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface
+            )
+
+            if self._run_on_robot:
+                self.execute_robot_commands(robot_commands)
+            robot_commands = []
+
+            sim_length = len(sim_states)
+
+            input("Press enter to perceive the target pose")
+            # target_pose = self._perception_interface.get_head_perception_forque_target_pose()
+            target_pose = Pose(position=(-0.17272330207928777, 0.6273752674813526, 0.5572539925006535), 
+                orientation=(-0.42030807,  0.56739361,  0.47188225, -0.52795148))
+            print("target_pose", target_pose)
+
+            intermediate_pose = multiply_poses(
+                target_pose, Pose(position=[0.0, 0.0, -0.10], orientation=[0.0, 0.0, 0.0, 1.0])
+            ) # 10 cms away from the mouth
+
+            visualize_pose(target_pose, self._sim.physics_client_id)
+            input("Visualizing target pose. Press Enter to continue...")
+            visualize_pose(intermediate_pose, self._sim.physics_client_id)
+            input("Visualizing intermediate pose. Press Enter to continue...")
+
+            # NOTE: disabling collision checking here between held object and
+            # conservative bounding box.
+            move_to_ee_pose(sim=self._sim,
+                target_pose=intermediate_pose,
+                exclude_collision_ids=None,
+                tip_from_end_effector=self._sim.scene_description.wipe_tip_from_end_effector,
+                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+                sim_states=sim_states,
+                robot_commands=robot_commands,
+                check_held_object_collisions=False)
+            
+            # input("Replaying the trajectory to check. Press Enter to continue...")
+            # for i in range(sim_length, len(sim_states)):
+            #     self._sim.sync(sim_states[i])
+            #     time.sleep(0.1)
+                # input("Press Enter to continue...")
+
+            # sim_length = len(sim_states)
+            # robot_command_length = len(robot_commands)
+
+            # NOTE: disabling collision checking here between held object and
+            # conservative bounding box.
+            # move_to_ee_pose(sim=self._sim,
+            #     target_pose=target_pose,
+            #     exclude_collision_ids=None,
+            #     tip_from_end_effector=self._sim.scene_description.wipe_tip_from_end_effector,
+            #     max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
+            #     sim_states=sim_states,
+            #     robot_commands=robot_commands,
+            #     check_held_object_collisions=False)
+            
+            # input("Replaying the trajectory to check. Press Enter to continue...")
+            # for i in range(sim_length, len(sim_states)):
+            #     self._sim.sync(sim_states[i])
+            #     time.sleep(0.1)
+                # input("Press Enter to continue...")
+
+            # Rajat ToDo: Replace this wait with a ROS listener for button.
+            input("Press enter when wiping is finished")
             
             # Reverse the transfer plan.
             transfer_sim_states = sim_states[sim_length:]

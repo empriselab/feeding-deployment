@@ -64,7 +64,7 @@ class RVizInterface:
 
         # Set initial tool states
         self.tool_update(False, "cup", self._scene_description.cup_pose)
-        self.tool_update(False, "wiper", self._scene_description.wiper_pose)
+        self.tool_update(False, "wipe", self._scene_description.wipe_pose)
         self.tool_update(False, "utensil", self._scene_description.utensil_pose)
     
     def joint_state_update(self, joints: JointPositions):
@@ -85,7 +85,7 @@ class RVizInterface:
             tool_base = "forkbase"
         elif held_object == "cup":
             tool_base = "drinkbase"
-        elif held_object == "wiper":
+        elif held_object == "wipe":
             tool_base = "wipebase"
 
         if pick:

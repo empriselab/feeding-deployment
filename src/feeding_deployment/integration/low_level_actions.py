@@ -113,14 +113,14 @@ def teleport_to_ee_pose(
     command = CartesianCommand(pos=pose.position, quat=pose.orientation)
 
     cup_pose = sim.scene_description.cup_pose
-    wiper_pose = sim.scene_description.wiper_pose
+    wipe_pose = sim.scene_description.wipe_pose
     utensil_pose = sim.scene_description.utensil_inside_mount
 
     if sim.held_object_name is not None:
         if sim.held_object_name == "cup":
             cup_pose = None
-        elif sim.held_object_name == "wiper":
-            wiper_pose = None
+        elif sim.held_object_name == "wipe":
+            wipe_pose = None
         elif sim.held_object_name == "utensil":
             utensil_pose = None
 
@@ -130,7 +130,7 @@ def teleport_to_ee_pose(
     sim_state = FeedingDeploymentSimulatorState(
         robot_joints=target_joint_positions,
         cup_pose=cup_pose,
-        wiper_pose=wiper_pose,
+        wipe_pose=wipe_pose,
         utensil_pose=utensil_pose,
         held_object=sim.held_object_name,
         held_object_tf=sim.held_object_tf,

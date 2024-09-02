@@ -105,16 +105,16 @@ class FeedingDeploymentPyBulletSimulator:
             physicsClientId=self.physics_client_id,
         )
 
-        # Create wiper.
-        self.wiper_id = p.loadURDF(
-            str(scene_description.wiper_urdf_path),
+        # Create wipe.
+        self.wipe_id = p.loadURDF(
+            str(scene_description.wipe_urdf_path),
             useFixedBase=True,
             physicsClientId=self.physics_client_id,
         )
         p.resetBasePositionAndOrientation(
-            self.wiper_id,
-            scene_description.wiper_pose.position,
-            scene_description.wiper_pose.orientation,
+            self.wipe_id,
+            scene_description.wipe_pose.position,
+            scene_description.wipe_pose.orientation,
             physicsClientId=self.physics_client_id,
         )
 
@@ -144,13 +144,13 @@ class FeedingDeploymentPyBulletSimulator:
             self.robot_holder_id,
             self._wheelchair_id,
             self.cup_id,
-            self.wiper_id,
+            self.wipe_id,
             self.utensil_id,
         }
         if self.held_object_name == "cup":
             collision_ids.remove(self.cup_id)
-        if self.held_object_name == "wiper":
-            collision_ids.remove(self.wiper_id)
+        if self.held_object_name == "wipe":
+            collision_ids.remove(self.wipe_id)
         if self.held_object_name == "utensil":
             collision_ids.remove(self.utensil_id)
         return collision_ids
@@ -162,7 +162,7 @@ class FeedingDeploymentPyBulletSimulator:
         some_object_held = False
         for obj_id, name, state_pose in [
             (self.cup_id, "cup", state.cup_pose),
-            (self.wiper_id, "wiper", state.wiper_pose),
+            (self.wipe_id, "wipe", state.wipe_pose),
             (self.utensil_id, "utensil", state.utensil_pose),
         ]:
             if state.held_object == name:

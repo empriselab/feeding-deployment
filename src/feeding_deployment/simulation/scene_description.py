@@ -231,6 +231,12 @@ class SceneDescription:
         (-0.000, 0.707, 0.000, 0.707),
     )
 
+    # Rajat ToDo: Fix with correct values, copied from drinking utensil
+    wipe_tip_from_end_effector: Pose = Pose(
+        (0.270, 0.095, -0.002),
+        (-0.000, 0.707, 0.000, 0.707),
+    )
+
     cup_pose: Pose = Pose(
         (0.545, 0.65, 0.270), 
         (-0.2126311, -0.6743797, -0.6743797, 0.2126311)
@@ -290,35 +296,110 @@ class SceneDescription:
         p.getQuaternionFromEuler((-np.pi / 2, np.pi - np.pi / 8, np.pi / 2)),
     )
 
-    # Wiper.
-    wiper_pose: Pose = Pose(
+    # wipe - robot base frame
+    wipe_inside_mount: Pose = Pose(
+        (-0.147, -0.17, 0.07),
+        (0.7071068, -0.7071068, 0.0, 0.0),
+    )
+    wipe_inside_mount_pos: JointPositions = field(
+        default_factory=lambda: [
+            2.854928662273119,
+            0.5484296235490069,
+            2.3664516551307853,
+            -2.5354838210986594,
+            1.1181978253322737,
+            -0.4196300319060411,
+            -0.4776571162655596,
+        ]
+    )
+
+    wipe_outside_mount: Pose = Pose(
+        (-0.147, -0.29, 0.07),
+        (0.7071068, -0.7071068, 0.0, 0.0),
+    )
+    wipe_outside_mount_pos: JointPositions = field(
+        default_factory=lambda: [
+            2.6263072016502855,
+            0.6990732614011294,
+            2.3072804767669686,
+            -2.22978328799399,
+            0.9554788158864868,
+            -0.6272143841300117,
+            -0.4820587889152428,
+        ]
+    )
+
+    wipe_above_mount: Pose = Pose(
+        (-0.147, -0.17, 0.15),
+        (0.7071068, -0.7071068, 0.0, 0.0),
+    )
+    wipe_above_mount_pos: JointPositions = field(
+        default_factory=lambda: [
+            -2.9830267107059303,
+            0.39129809251777437,
+            1.8614008644185065,
+            -2.4207417918487044,
+            0.614389066373381,
+            -0.6996630184245269,
+            -0.006409696111602692,
+        ]
+    )
+
+    wipe_infront_mount: Pose = Pose(
+        (0.0, -0.17, 0.15),
+        (0.7071068, -0.7071068, 0.0, 0.0),
+    )
+    wipe_infront_mount_pos: JointPositions = field(
+        default_factory=lambda: [
+            2.835106221647441,
+            0.18716812654374576,
+            1.7554270267415284,
+            -2.5582927305707517,
+            0.3492644556371586,
+            -0.5794207625752312,
+            -0.3984099643402903,
+        ]
+    )
+
+    wipe_neutral_pos: JointPositions = field(
+        default_factory=lambda: [
+            2.2912525080624357,
+            0.730991513381838,
+            2.0830126187361424,
+            -2.1737367965371632,
+            0.28532185799581516,
+            -0.4648462461578422,
+            -0.29495787389950756,
+        ]
+    )
+    wipe_pose: Pose = Pose(
         (0.35, 0.15, -0.05), p.getQuaternionFromEuler((0.0, np.pi, np.pi))
     )
-    wiper_urdf_path: Path = (
+    wipe_urdf_path: Path = (
         Path(__file__).parent.parent
         / "assets"
         / "urdf"
         / "wiping_utensil"
         / "wiping_utensil.urdf"
     )
-    wiper_grasp_fingers_orientation: Quaternion = p.getQuaternionFromEuler((0, 0, 0))
-    wiper_pregrasp_transform: Pose = Pose(
+    wipe_grasp_fingers_orientation: Quaternion = p.getQuaternionFromEuler((0, 0, 0))
+    wipe_pregrasp_transform: Pose = Pose(
         (0.0, 0.0, -0.1),
-        wiper_grasp_fingers_orientation,
+        wipe_grasp_fingers_orientation,
     )
-    wiper_grasp_transform: Pose = Pose(
+    wipe_grasp_transform: Pose = Pose(
         (0.0, 0.0, -0.025),
-        wiper_grasp_fingers_orientation,
+        wipe_grasp_fingers_orientation,
     )
-    wiper_prestow_transform: Pose = Pose(
+    wipe_prestow_transform: Pose = Pose(
         (0.0, 0.0, -0.2),
-        wiper_grasp_fingers_orientation,
+        wipe_grasp_fingers_orientation,
     )
     # This is relative to the wheelchair head.
-    wiper_staging_transform: Pose = Pose(
+    wipe_staging_transform: Pose = Pose(
         (-0.1, 0.5, 0.0), p.getQuaternionFromEuler((-np.pi / 2, np.pi, np.pi / 2))
     )
-    wiper_transfer_transform: Pose = Pose(
+    wipe_transfer_transform: Pose = Pose(
         (-0.1, 0.35, 0.0),
         p.getQuaternionFromEuler((-np.pi / 2, np.pi, np.pi / 2)),
     )
@@ -341,11 +422,11 @@ class SceneDescription:
     )
     utensil_grasp_transform: Pose = Pose(
         (0.0, 0.0, -0.025),
-        wiper_grasp_fingers_orientation,
+        wipe_grasp_fingers_orientation,
     )
     utensil_prestow_transform: Pose = Pose(
         (0.0, 0.0, -0.2),
-        wiper_grasp_fingers_orientation,
+        wipe_grasp_fingers_orientation,
     )
     utensil_corner_waypoint_transform: Pose = Pose((0.1, -0.4, -0.3))
     # This is relative to the wheelchair head.
@@ -406,40 +487,40 @@ class SceneDescription:
         return multiply_poses(target_cup_pose, fingers_to_cup)
 
     @property
-    def wiper_pregrasp_pose(self) -> Pose:
-        """Pose for the finger tip to pregrasp the wiper."""
-        return multiply_poses(self.wiper_pose, self.wiper_pregrasp_transform)
+    def wipe_pregrasp_pose(self) -> Pose:
+        """Pose for the finger tip to pregrasp the wipe."""
+        return multiply_poses(self.wipe_pose, self.wipe_pregrasp_transform)
 
     @property
-    def wiper_grasp_pose(self) -> Pose:
-        """Pose for the finger tip to grasp the wiper."""
-        return multiply_poses(self.wiper_pose, self.wiper_grasp_transform)
+    def wipe_grasp_pose(self) -> Pose:
+        """Pose for the finger tip to grasp the wipe."""
+        return multiply_poses(self.wipe_pose, self.wipe_grasp_transform)
 
     @property
-    def wiper_prestow_pose(self) -> Pose:
-        """Pose for the finger tip to prestow the wiper."""
+    def wipe_prestow_pose(self) -> Pose:
+        """Pose for the finger tip to prestow the wipe."""
         return multiply_poses(
-            self.wiper_pose,
-            self.wiper_prestow_transform,
+            self.wipe_pose,
+            self.wipe_prestow_transform,
         )
 
     @property
-    def wiper_staging_pose(self) -> Pose:
-        """Pose for the finger tip before wiper transfer."""
-        target_wiper_pose = multiply_poses(
-            self.wheelchair_head_pose, self.wiper_staging_transform
+    def wipe_staging_pose(self) -> Pose:
+        """Pose for the finger tip before wipe transfer."""
+        target_wipe_pose = multiply_poses(
+            self.wheelchair_head_pose, self.wipe_staging_transform
         )
-        fingers_to_wiper = self.wiper_grasp_transform
-        return multiply_poses(target_wiper_pose, fingers_to_wiper)
+        fingers_to_wipe = self.wipe_grasp_transform
+        return multiply_poses(target_wipe_pose, fingers_to_wipe)
 
     @property
-    def wiper_transfer_pose(self) -> Pose:
-        """Pose for the finger tip for wiper transfer."""
-        target_wiper_pose = multiply_poses(
-            self.wheelchair_head_pose, self.wiper_transfer_transform
+    def wipe_transfer_pose(self) -> Pose:
+        """Pose for the finger tip for wipe transfer."""
+        target_wipe_pose = multiply_poses(
+            self.wheelchair_head_pose, self.wipe_transfer_transform
         )
-        fingers_to_wiper = self.wiper_grasp_transform
-        return multiply_poses(target_wiper_pose, fingers_to_wiper)
+        fingers_to_wipe = self.wipe_grasp_transform
+        return multiply_poses(target_wipe_pose, fingers_to_wipe)
 
     @property
     def utensil_pregrasp_pose(self) -> Pose:
@@ -503,7 +584,7 @@ class SceneDescription:
             "table_pose",
             "conservative_bb_pose",
             "cup_pose",
-            "wiper_pose",
+            "wipe_pose",
             "utensil_pose",
         }
         pose_dict: dict[str, Any] = {
