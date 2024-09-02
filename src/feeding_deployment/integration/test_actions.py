@@ -23,7 +23,7 @@ from tomsutils.pddl_planning import run_pyperplan_planning
 from pybullet_helpers.geometry import Pose
 from pybullet_helpers.link import get_link_pose, get_relative_link_pose
 
-from feeding_deployment.integration.high_level_actions import (
+from feeding_deployment.actions.high_level_actions import (
     GripperFree,
     GroundHighLevelAction,
     Holding,
@@ -36,8 +36,8 @@ from feeding_deployment.integration.high_level_actions import (
     pddl_plan_to_hla_plan,
     tool_type,
 )
-from feeding_deployment.integration.perception_interface import PerceptionInterface
-from feeding_deployment.integration.rviz_interface import RVizInterface
+from feeding_deployment.interfaces.perception_interface import PerceptionInterface
+from feeding_deployment.interfaces.rviz_interface import RVizInterface
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 from feeding_deployment.simulation.scene_description import (
     SceneDescription,
