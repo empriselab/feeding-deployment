@@ -19,20 +19,37 @@
 2. On the NUC, run the controller server: `cd feeding-deployment/src/feeding_deployment/robot_controller && python arm_server.py`
 3. On another terminal on the compute system, run the controller client example: `cd deployment_ws/src/feeding-deployment/src/feeding_deployment/robot_controller && python arm_client.py`
 
-## Run Feeding
+## Run Feeding Demo on Real Robot
 1. Run the arm controller server on the NUC:
    - ssh to the NUC: `sshnuc` with lab password
-   - run the controller server: `cd feeding-deployment/src/feeding_deployment/robot_controller && python arm_server.py`
+   - run the controller server:
+        - Alias `run_server` on NUC
+        - Otherwise, run the following commands:
+             - `conda activate controller`
+             - `cd feeding-deployment/src/feeding_deployment/robot_controller`
+             - `python arm_server.py`
 2. Launch the roslaunch on compute system for visualization / publish tfs:
-   - Navigate to the launch files: `cd launch`
-   - Launch: `roslaunch robot.launch`
+   - Alias `launch_robot` on compute system
+   - Otherwise,run the following commands from the root of your ROS workspace:
+        - `conda activate feed`
+        - `source devel/setup.bash`
+        - `cd src/feeding-deployment/launch`
+        - `roslaunch robot.launch`
 3. Run the feeding demo:
-   - Navigate to integration scripts: `cd src/feeding_deployment/integration`
-   - Run demo: `python demo.py --run_on_robot`
+   - Alias `run_demo` on compute system
+   - Otherwise,run the following commands from the root of your ROS workspace:
+        - `conda activate feed`
+        - `source devel/setup.bash`
+        - `cd src/feeding-deployment/src/feeding_deployment/integration`
+        - `python demo.py --run_on_robot`
   
-## Simulate E-Stop Buttons
-- User E-Stop: `rostopic pub -r 1000 user_estop std_msgs/Bool False`
-- Experimentor E-Stop: `rostopic pub -r 1000 experimentor_estop std_msgs/Bool False`
+## Run Feeding Demo in Simulation
+1. Launch the roslaunch for visualization / publish tfs:
+   - Navigate to the launch files: `cd launch`
+   - Launch: `roslaunch sim.launch`
+2. Run the feeding demo:
+   - Navigate to integration scripts: `cd src/feeding_deployment/integration`
+   - Run demo: `python demo.py`
 
 ## Check Installation
 
