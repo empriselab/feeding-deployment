@@ -174,9 +174,7 @@ def _get_plan_to_execute_grasp(
         sim.held_object_id = sim.utensil_id
     else:
         raise NotImplementedError("TODO")
-    world_from_end_effector = get_link_pose(
-        robot.robot_id, robot.end_effector_id, physics_client_id
-    )
+
     assert sim.held_object_id is not None
     finger_frame_id = sim.robot.link_from_name("finger_tip")
     end_effector_link_id = sim.robot.link_from_name(sim.robot.tool_link_name)
@@ -184,8 +182,6 @@ def _get_plan_to_execute_grasp(
         sim.robot.robot_id, finger_frame_id, end_effector_link_id, sim.physics_client_id
     )
     sim.held_object_tf = finger_from_end_effector
-    print("Held object name: ", sim.held_object_name)
-    input("Picked up wipe, press enter to continue")
     return _plan_to_sim_state_trajectory([robot.get_joint_positions()], sim)
 
 

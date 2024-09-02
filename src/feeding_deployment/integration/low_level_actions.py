@@ -114,7 +114,7 @@ def teleport_to_ee_pose(
 
     drink_pose = sim.scene_description.drink_pose
     wipe_pose = sim.scene_description.wipe_pose
-    utensil_pose = sim.scene_description.utensil_inside_mount
+    utensil_pose = sim.scene_description.utensil_pose
 
     if sim.held_object_name is not None:
         if sim.held_object_name == "drink":
