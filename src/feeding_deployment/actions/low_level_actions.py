@@ -20,7 +20,7 @@ from pybullet_helpers.motion_planning import (
 )
 from pybullet_helpers.gui import visualize_pose
 
-from feeding_deployment.integration.rviz_interface import RVizInterface
+from feeding_deployment.interfaces.rviz_interface import RVizInterface
 from feeding_deployment.integration.utils import simulated_trajectory_to_kinova_commands
 from feeding_deployment.robot_controller.command_interface import (
     CartesianCommand,
@@ -148,6 +148,7 @@ def move_to_ee_pose(
     max_motion_plan_time: float,
     sim_states: list[FeedingDeploymentSimulatorState],
     robot_commands: list[KinovaCommand],
+    rviz_interface: RVizInterface | None = None,
     check_held_object_collisions: bool = True,
 ) -> None:
     """Plan ee pose trajectory to desired pose."""
@@ -167,8 +168,14 @@ def move_to_ee_pose(
 
     assert plan is not None
 
-    remapped_plan = remap_trajectory_to_constant_distance(plan, sim)
+    plan = remap_trajectory_to_constant_distance(plan, sim)
 
-    sim_states.extend(remapped_plan)
-    robot_commands.extend(simulated_trajectory_to_kinova_commands(remapped_plan))
+    sim_states.extend(plan)
+    robot_commands.extend(simulated_trajectory_to_kinova_commands(plan))
+
+    # Visualize the plan in RViz.
+    if rviz_interface is not None:
+        for sim_state in plan:
+            rviz_interface.joint_state_update(sim_state.robot_joints)
+            time.sleep(0.1)
 

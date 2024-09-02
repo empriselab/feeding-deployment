@@ -24,7 +24,7 @@ from relational_structs import (
 from relational_structs.utils import parse_pddl_plan
 from tomsutils.pddl_planning import run_pyperplan_planning
 
-from feeding_deployment.integration.high_level_actions import (
+from feeding_deployment.actions.high_level_actions import (
     GripperFree,
     GroundHighLevelAction,
     Holding,
@@ -37,8 +37,8 @@ from feeding_deployment.integration.high_level_actions import (
     pddl_plan_to_hla_plan,
     tool_type,
 )
-from feeding_deployment.integration.perception_interface import PerceptionInterface
-from feeding_deployment.integration.rviz_interface import RVizInterface
+from feeding_deployment.interfaces.perception_interface import PerceptionInterface
+from feeding_deployment.interfaces.rviz_interface import RVizInterface
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 from feeding_deployment.simulation.scene_description import (
     SceneDescription,
@@ -84,12 +84,10 @@ class _Runner:
         else:
             print("Running in simulation mode.")
 
-        input("Press enter to populate the scene description.")
         self.scene_description = SceneDescription(**kwargs)
 
         self.rviz_interface = RVizInterface(self.scene_description)
 
-        input("Press enter to create the simulator.")
         self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description)
         # self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description, use_gui=False)
 
@@ -222,12 +220,8 @@ if __name__ == "__main__":
     # msg = namedtuple("String", ["data"])
     # runner.web_interface_callback(msg(json.dumps({"status": "drink_pickup"})))
     # runner.web_interface_callback(msg(json.dumps({"status": "drink_transfer"})))
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
+    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
     runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
 
     if args.make_videos:
