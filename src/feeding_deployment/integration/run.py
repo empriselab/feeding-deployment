@@ -137,6 +137,18 @@ class _Runner:
             user_cmd = GroundHighLevelAction(
                 self.hla_name_to_hla["TransferTool"], (self.drink,)
             )
+        elif msg_dict["status"] == "aquire_food":
+            user_cmd = GroundHighLevelAction(
+                self.hla_name_to_hla["PrepareTool"], (self.utensil,)
+            )
+        elif msg_dict["status"] == "bite_transfer":
+            user_cmd = GroundHighLevelAction(
+                self.hla_name_to_hla["TransferTool"], (self.utensil,)
+            )
+        elif msg_dict["status"] == "mouth_wiping":
+            user_cmd = GroundHighLevelAction(
+                self.hla_name_to_hla["TransferTool"], (self.wipe,)
+            )
         else:
             print("WARNING: Unrecognized message from web interface.")
             return
@@ -220,10 +232,10 @@ if __name__ == "__main__":
     # msg = namedtuple("String", ["data"])
     # runner.web_interface_callback(msg(json.dumps({"status": "drink_pickup"})))
     # runner.web_interface_callback(msg(json.dumps({"status": "drink_transfer"})))
-    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
-    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.utensil,)))
+    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.utensil,)))
 
     if args.make_videos:
         runner.make_video(Path("full.mp4"))
