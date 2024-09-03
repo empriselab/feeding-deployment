@@ -18,10 +18,12 @@ import sys
 
 sys.path.append(FLAIR_PATH)
 try:
-    raise ModuleNotFoundError  # Just to skip this block
+    # raise ModuleNotFoundError  # Just to skip this block
     from skill_library import SkillLibrary
+    from wrist_controller import WristController
 
     FLAIR_IMPORTED = True
+    print("FLAIR imported successfully")
 except ModuleNotFoundError:
     FLAIR_IMPORTED = False
     pass
@@ -197,7 +199,7 @@ class PickToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface
             )
 
-            # open grippersdrink_inside_mount_pos
+            # open grippers
             robot_commands.append(OpenGripperCommand())
             # only for sim: set held object
             sim_states.extend(_get_plan_to_execute_grasp(self._sim, "drink"))
@@ -254,6 +256,16 @@ class PickToolHLA(HighLevelAction):
             sim_states.extend(_get_plan_to_execute_grasp(self._sim, "utensil"))
             # input("Press Enter to continue...")
             self._rviz_interface.tool_update(True, "utensil", Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the utensil
+
+            if self._run_on_robot:
+                self.execute_robot_commands(robot_commands)
+            robot_commands = []
+
+            if FLAIR_IMPORTED:
+                time.sleep(1.0) # wait for the utensil to be connected
+                self.wrist_controller = WristController()
+                self.wrist_controller.set_velocity_mode()
+                self.wrist_controller.reset()
 
             teleport_to_ee_pose(
                 self._sim,
@@ -710,7 +722,7 @@ class TransferToolHLA(HighLevelAction):
             return sim_states
         
         elif tool.name == "drink":
-            
+
             assert self._sim.held_object_name == "drink"
             sim_states: list[FeedingDeploymentSimulatorState] = []
             robot_commands = []
@@ -943,7 +955,8 @@ class PrepareToolHLA(HighLevelAction):
         # Rajat todo: how do I initialize FLAIR just for the utensil tool?
         print("Initializing Acquisition Skill Library")
         if FLAIR_IMPORTED:
-            self.acquisition_skill_library = SkillLibrary(self._robot_interface)
+            self.wrist_controller = WristController()
+            self.acquisition_skill_library = SkillLibrary(self._robot_interface, self.wrist_controller)
 
     def get_name(self) -> str:
         return "PrepareTool"
@@ -986,6 +999,7 @@ class PrepareToolHLA(HighLevelAction):
             if FLAIR_IMPORTED:
                 # Do Bite Acquisition
                 print("Doing Bite Acquisition")
+                self.wrist_controller.set_velocity_mode()
                 self.acquisition_skill_library.reset()
                 camera_color_data, camera_info_data, camera_depth_data, _ = (
                     self._perception_interface.get_camera_data()
