@@ -194,6 +194,7 @@ class PickToolHLA(HighLevelAction):
                 self._sim.scene_description.drink_inside_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             # open grippersdrink_inside_mount_pos
@@ -208,6 +209,7 @@ class PickToolHLA(HighLevelAction):
                 self._sim.scene_description.drink_above_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             if self._run_on_robot:
@@ -243,6 +245,7 @@ class PickToolHLA(HighLevelAction):
                 self._sim.scene_description.utensil_inside_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             # open grippers
@@ -258,6 +261,7 @@ class PickToolHLA(HighLevelAction):
                 self._sim.scene_description.utensil_outside_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             teleport_to_ee_pose(
@@ -266,6 +270,7 @@ class PickToolHLA(HighLevelAction):
                 self._sim.scene_description.utensil_outside_above_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             if self._run_on_robot:
@@ -309,6 +314,7 @@ class PickToolHLA(HighLevelAction):
                 self._sim.scene_description.wipe_inside_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             # open grippers
@@ -324,6 +330,7 @@ class PickToolHLA(HighLevelAction):
                 self._sim.scene_description.wipe_outside_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             move_to_joint_positions(
@@ -396,6 +403,7 @@ class StowToolHLA(HighLevelAction):
                 self._sim.scene_description.drink_inside_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             # close grippers
@@ -411,6 +419,7 @@ class StowToolHLA(HighLevelAction):
                 self._sim.scene_description.drink_outside_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             move_to_joint_positions(
@@ -446,6 +455,7 @@ class StowToolHLA(HighLevelAction):
                 self._sim.scene_description.utensil_outside_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             teleport_to_ee_pose(
@@ -454,6 +464,7 @@ class StowToolHLA(HighLevelAction):
                 self._sim.scene_description.utensil_inside_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             # close grippers
@@ -469,6 +480,7 @@ class StowToolHLA(HighLevelAction):
                 self._sim.scene_description.utensil_above_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             move_to_joint_positions(
@@ -520,6 +532,7 @@ class StowToolHLA(HighLevelAction):
                 self._sim.scene_description.wipe_inside_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             # close grippers
@@ -535,6 +548,7 @@ class StowToolHLA(HighLevelAction):
                 self._sim.scene_description.wipe_above_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             teleport_to_ee_pose(
@@ -543,6 +557,7 @@ class StowToolHLA(HighLevelAction):
                 self._sim.scene_description.wipe_infront_mount_pos,
                 sim_states,
                 robot_commands,
+                rviz_interface=self._rviz_interface
             )
 
             move_to_joint_positions(

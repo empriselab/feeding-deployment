@@ -102,6 +102,7 @@ def teleport_to_ee_pose(
     expected_joint_positions: list[float],
     sim_states: list[FeedingDeploymentSimulatorState],
     robot_commands: list[KinovaCommand],
+    rviz_interface: RVizInterface | None = None,
 ) -> None:
     """Call Kinova's move_to_ee_pose to move the robot to the specified pose.
 
@@ -136,6 +137,11 @@ def teleport_to_ee_pose(
         held_object_tf=sim.held_object_tf,
     )
     sim.sync(sim_state)
+
+    # Visualize the state in RViz.
+    if rviz_interface is not None:
+        rviz_interface.joint_state_update(sim_state.robot_joints)
+        time.sleep(1.0) # long because we are teleporting
 
     sim_states.append(sim_state)
     robot_commands.append(command)
