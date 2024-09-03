@@ -137,6 +137,8 @@ class _Runner:
             user_cmd = GroundHighLevelAction(
                 self.hla_name_to_hla["TransferTool"], (self.drink,)
             )
+        elif msg_dict["status"] == "move_to_above_plate":
+            user_cmd = {GroundAtom(Holding, [self.utensil])}
         elif msg_dict["status"] == "aquire_food":
             user_cmd = GroundHighLevelAction(
                 self.hla_name_to_hla["PrepareTool"], (self.utensil,)

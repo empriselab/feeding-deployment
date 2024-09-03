@@ -33,6 +33,9 @@ class PerceptionInterface:
         self.sim_joint_publishers = rospy.Publisher("/sim/robot_joint_states", JointState, queue_size=10)
         self.static_transform_broadcaster = tf2_ros.StaticTransformBroadcaster()
 
+        # Create a publisher for communication with the web interface.
+        self.web_interface_publisher = rospy.Publisher("/ServerComm", String, queue_size=10)
+
         # run head perception
         if robot_interface is None:
             self._head_perception = None

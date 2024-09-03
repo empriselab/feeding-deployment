@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import json
 import rospy
 from std_msgs.msg import String
 from sensor_msgs.msg import JointState
@@ -113,6 +114,11 @@ class HighLevelAction(abc.ABC):
         for robot_command in robot_commands:
             input("Execute next command?")
             self._robot_interface.execute_command(robot_command)
+
+    def _send_web_interface_message(self, msg_dict: dict[str, Any]) -> None:
+        self._perception_interface.web_interface_publisher.publish(
+            String(json.dumps(msg_dict))
+        )
 
 @dataclass(frozen=True)
 class GroundHighLevelAction:
@@ -287,6 +293,8 @@ class PickToolHLA(HighLevelAction):
 
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
+
+            self._send_web_interface_message({"state": "prepare_bite", "status": "completed"})
 
             return sim_states
         
@@ -686,6 +694,25 @@ class TransferToolHLA(HighLevelAction):
 
             # Rajat ToDo: Replace this wait with a ROS listener for button.
             # input("Press enter when wiping is finished")
+
+            if self._run_on_robot:
+                y = input("Does the trajectory look good? Press 'y' to execute on robot")
+                if y == "y":
+                    input("Press enter to switch to joint compliant mode")
+                    self._robot_interface.switch_to_joint_compliant_mode()
+                    self.execute_robot_commands(robot_commands)
+                    input("Press enter to switch out of joint compliant mode")
+                    self._robot_interface.switch_out_of_joint_compliant_mode()
+                else:
+                    print("Trajectory not executed on robot")
+
+            
+            # Wait for button press to indicate that transfer is finished.
+            # TODO
+            input("PRESS ENTER WHEN TRANSFER IS FINISHED")
+            
+            # Send message to web interface indicating transfer is done.
+            self._send_web_interface_message({"state": "bite_transfer", "status": "complete"})
             
             # Reverse the transfer plan.
             transfer_sim_states = sim_states[sim_length:]
@@ -713,7 +740,7 @@ class TransferToolHLA(HighLevelAction):
                 if y == "y":
                     input("Press enter to switch to joint compliant mode")
                     self._robot_interface.switch_to_joint_compliant_mode()
-                    self.execute_robot_commands(robot_commands)
+                    self.execute_robot_commands(reversed_robot_commands)
                     input("Press enter to switch out of joint compliant mode")
                     self._robot_interface.switch_out_of_joint_compliant_mode()
                 else:
@@ -996,6 +1023,10 @@ class PrepareToolHLA(HighLevelAction):
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
 
+            # Send message to web interface indicating that robot is ready
+            # for bite acquisition.
+            self._send_web_interface_message({"state": "prepare_bite", "status": "complete"})
+
             if FLAIR_IMPORTED:
                 # Do Bite Acquisition
                 print("Doing Bite Acquisition")
@@ -1017,6 +1048,10 @@ class PrepareToolHLA(HighLevelAction):
             # skill_library.twirling_skill(camera_color_data, camera_depth_data, camera_info_data)
 
             # skill_library.cutting_skill(camera_color_data, camera_depth_data, camera_info_data)
+
+            # Send message to web interface indicating that robot is done with acquisition.
+            self._send_web_interface_message({"state": "bite_pickup", "status": "complete"})
+
 
             return sim_states
 
