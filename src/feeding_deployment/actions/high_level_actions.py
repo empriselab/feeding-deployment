@@ -231,14 +231,6 @@ class PickToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.utensil_infront_mount_pos,
-                sim_states,
-                robot_commands,
-                rviz_interface=self._rviz_interface
-            )
-
-            move_to_joint_positions(
-                self._sim,
                 self._sim.scene_description.utensil_above_mount_pos,
                 sim_states,
                 robot_commands,
@@ -268,20 +260,12 @@ class PickToolHLA(HighLevelAction):
                 robot_commands,
             )
 
-            move_to_joint_positions(
+            teleport_to_ee_pose(
                 self._sim,
-                self._sim.scene_description.utensil_neutral_pos,
+                self._sim.scene_description.utensil_outside_above_mount,
+                self._sim.scene_description.utensil_outside_above_mount_pos,
                 sim_states,
                 robot_commands,
-                rviz_interface=self._rviz_interface
-            )
-
-            move_to_joint_positions(
-                self._sim,
-                self._sim.scene_description.retract_pos,
-                sim_states,
-                robot_commands,
-                rviz_interface=self._rviz_interface
             )
 
             if self._run_on_robot:
@@ -450,26 +434,18 @@ class StowToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.retract_pos,
+                self._sim.scene_description.utensil_outside_above_mount_pos,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface
             )
 
-            move_to_joint_positions(
+            teleport_to_ee_pose(
                 self._sim,
-                self._sim.scene_description.utensil_neutral_pos,
-                sim_states,
-                robot_commands,
-                rviz_interface=self._rviz_interface
-            )
-
-            move_to_joint_positions(
-                self._sim,
+                self._sim.scene_description.utensil_outside_mount,
                 self._sim.scene_description.utensil_outside_mount_pos,
                 sim_states,
                 robot_commands,
-                rviz_interface=self._rviz_interface
             )
 
             teleport_to_ee_pose(
@@ -491,14 +467,6 @@ class StowToolHLA(HighLevelAction):
                 self._sim,
                 self._sim.scene_description.utensil_above_mount,
                 self._sim.scene_description.utensil_above_mount_pos,
-                sim_states,
-                robot_commands,
-            )
-
-            teleport_to_ee_pose(
-                self._sim,
-                self._sim.scene_description.utensil_infront_mount,
-                self._sim.scene_description.utensil_infront_mount_pos,
                 sim_states,
                 robot_commands,
             )
