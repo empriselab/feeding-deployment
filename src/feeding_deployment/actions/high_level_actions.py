@@ -699,18 +699,18 @@ class TransferToolHLA(HighLevelAction):
             if self._run_on_robot:
                 y = input("Does the trajectory look good? Press 'y' to execute on robot")
                 if y == "y":
-                    # input("Press enter to switch to joint compliant mode")
-                    # self._robot_interface.switch_to_joint_compliant_mode()
+                    input("Press enter to switch to joint compliant mode")
+                    self._robot_interface.switch_to_joint_compliant_mode()
                     self.execute_robot_commands(robot_commands)
-                    # input("Press enter to switch out of joint compliant mode")
-                    # self._robot_interface.switch_out_of_joint_compliant_mode()
+                    input("Press enter to switch out of joint compliant mode")
+                    self._robot_interface.switch_out_of_joint_compliant_mode()
                 else:
                     print("Trajectory not executed on robot")
 
-            # Rajat ToDo: Implement the rest of bite transfer
-
             return sim_states
+        
         elif tool.name == "drink":
+            
             assert self._sim.held_object_name == "drink"
             sim_states: list[FeedingDeploymentSimulatorState] = []
             robot_commands = []
