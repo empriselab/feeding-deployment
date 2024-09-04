@@ -5,11 +5,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-import ipdb.stdout
+import cv2
 import numpy as np
 import json
 import rospy
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool
 from sensor_msgs.msg import JointState
 from visualization_msgs.msg import Marker, MarkerArray
 import time
@@ -110,6 +110,14 @@ class HighLevelAction(abc.ABC):
         self._perception_interface.web_interface_publisher.publish(
             String(json.dumps(msg_dict))
         )
+
+    def _send_web_interface_image(self, image) -> None:
+        self._perception_interface.update_web_interface_image(image)
+
+    def _wait_for_user_continue_button(self) -> None:
+        msg = rospy.wait_for_message("/user_continue_button", Bool)
+        assert msg.data
+
 
 @dataclass(frozen=True)
 class GroundHighLevelAction:
@@ -709,8 +717,7 @@ class TransferToolHLA(HighLevelAction):
                     print("Trajectory not executed on robot")
             
             # Wait for button press to indicate that transfer is finished.
-            # TODO
-            input("PRESS ENTER WHEN TRANSFER IS FINISHED")
+            self._wait_for_user_continue_button()
             
             # Send message to web interface indicating transfer is done.
             self._send_web_interface_message({"state": "bite_transfer", "status": "completed"})
@@ -840,7 +847,8 @@ class TransferToolHLA(HighLevelAction):
                 else:
                     print("Trajectory not executed on robot")
             
-            input("PRESS ENTER WHEN TRANSFER IS FINISHED")
+            # Wait for button press to indicate that transfer is finished.
+            self._wait_for_user_continue_button()
 
             self._send_web_interface_message({"state": "drink_transfer", "status": "completed"})
 
@@ -970,7 +978,8 @@ class TransferToolHLA(HighLevelAction):
                 else:
                     print("Trajectory not executed on robot")
             
-            input("PRESS ENTER WHEN TRANSFER IS FINISHED")
+            # Wait for button press to indicate that transfer is finished.
+            self._wait_for_user_continue_button()
 
             self._send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})
 
@@ -1073,6 +1082,10 @@ class LookAtPlateHLA(HighLevelAction):
                 print(" --- Next Action Prediction:", next_action_prediction['action_type'])
                 
                 # TODO send images to web interface.
+            else:
+                # Test image.
+                rng = np.random.default_rng(123)
+                camera_color_data = rng.integers(0, 255, size=(512, 512, 3))
 
             # Send message to web interface.
             self._send_web_interface_message({"state": "prepare_bite", "status": "completed"})

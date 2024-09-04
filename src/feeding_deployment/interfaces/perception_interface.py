@@ -11,11 +11,13 @@ from scipy.spatial.transform import Rotation as R
 
 try:
     import rospy
-    from sensor_msgs.msg import JointState
+    from sensor_msgs.msg import JointState, CompressedImage
     from std_msgs.msg import String
     from visualization_msgs.msg import MarkerArray
     import tf2_ros
     from geometry_msgs.msg import TransformStamped
+    from cv_bridge import CvBridge
+
 
     from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
 except ModuleNotFoundError:
@@ -35,6 +37,15 @@ class PerceptionInterface:
 
         # Create a publisher for communication with the web interface.
         self.web_interface_publisher = rospy.Publisher("/ServerComm", String, queue_size=10)
+        self.web_interface_image_publisher = rospy.Publisher("/camera/image/compressed", CompressedImage, queue_size=10)
+        self.image_bridge = CvBridge()
+        self.last_captured_ros_image = None
+        self.update_web_interface_image(np.zeros((512, 512, 3)))
+        thread = threading.Thread(target=self._publish_web_interface_image)
+        thread.start()
+
+        # This doesn't work in simulation.
+        # rospy.Timer(rospy.Duration(1.0), self._web_interface_image_callback)
 
         # run head perception
         if robot_interface is None:
@@ -138,3 +149,12 @@ class PerceptionInterface:
         static_transform_stamped.transform.rotation.w = pose.orientation[3]
 
         self.static_transform_broadcaster.sendTransform(static_transform_stamped)
+
+    def update_web_interface_image(self, image):
+        self.last_captured_ros_image = self.image_bridge.cv2_to_compressed_imgmsg(image)
+
+    def _publish_web_interface_image(self):
+        rate = rospy.Rate(1)  # 1Hz
+        while not rospy.is_shutdown():
+            self.web_interface_image_publisher.publish(self.last_captured_ros_image)
+            rate.sleep()
