@@ -1024,6 +1024,10 @@ class TransferToolHLA(HighLevelAction):
 class LookAtPlateHLA(HighLevelAction):
     """Look at plate in preparation of bite acquisition."""
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._preferences_set = False
+
     def get_name(self) -> str:
         return "LookAtPlate"
 
@@ -1062,21 +1066,64 @@ class LookAtPlateHLA(HighLevelAction):
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
 
+            self._send_web_interface_message({"state": "prepare_bite", "status": "completed"})
+
             if self.flair is not None:
+
+                # Run FLAIR perception.
+                camera_color_data, camera_info_data, camera_depth_data, _ = (
+                    self._perception_interface.get_camera_data()
+                )
+                self._send_web_interface_image(camera_color_data)
+                items = self.flair.identify_plate(camera_color_data)
+                # flair.set_food_items(items)
+                self.flair.set_food_items(['banana slice', 'baby carrot'])
+                items_detection = self.flair.detect_items(camera_color_data, camera_depth_data, camera_info_data, log_path=None)
+                print(" --- Food items detected:", items_detection['clean_item_labels'])
+
+                if not self._preferences_set:
+
+                    # Handle one-time preference setting.
+
+                    import ipdb; ipdb.set_trace()
+                    food_types = sorted(set(items_detection['clean_item_labels']))
+
+                    # Send detections back to interface.
+                    n_food_types = len(food_types)
+                    food_type_to_data = {food_type: [] for food_type in food_types}
+                    for label, bb in zip(items_detection['clean_item_labels'],
+                                         items_detection['detections'].xyxy,
+                                                strict=True):
+                        x0, y0, x1, y1 = bb
+                        w = x1 - x0
+                        h = y1 - y0
+                        item_data = [int(x0), int(y0), int(w), int(h)]
+                        food_type_to_data[label].append(item_data)
+                    data = [{k: v} for k, v in food_type_to_data.items()]
+                    self._send_web_interface_message({"n_food_types": n_food_types, "data": data})
+
+                    # TODO: generalize this...
+                    ordering_options = [f"Eat all the {food_type}s first" for food_type in food_types]
+                    ordering_options += ["No preference"]
+                    self._send_web_interface_message({"n_ordering": len(ordering_options), "data": ordering_options})
+
+                    # Wait for web interface to report order selection.
+                    selected_order_preference = None
+                    while True:
+                        msg = rospy.wait_for_message("/WepAppComm", String)
+                        msg_dict = json.loads(msg.data)
+                        if msg_dict["state"] == "order_selection":
+                            selected_order_preference = msg_dict["status"]
+                            break
+
+                    self.flair.set_preferences(selected_order_preference)
+                    self._preferences_set = True
+
                 # Prepare for bite acquisition.
                 print("Doing Bite Acquisition")
                 self.wrist_controller.set_velocity_mode()
                 self.wrist_controller.reset()
 
-                camera_color_data, camera_info_data, camera_depth_data, _ = (
-                    self._perception_interface.get_camera_data()
-                )
-
-                items = self.flair.identify_plate(camera_color_data)
-                # flair.set_food_items(items)
-                self.flair.set_food_items(['banana slice'])
-                items_detection = self.flair.detect_items(camera_color_data, camera_depth_data, camera_info_data, log_path=None)
-                print(" --- Food items detected:", items_detection['clean_item_labels'])
                 next_action_prediction = self.flair.predict_next_action(camera_color_data, items_detection=None, log_path=None)
                 print(" --- Next Food Item Prediction:", next_action_prediction['labels_list'][next_action_prediction['food_id']])
                 print(" --- Next Action Prediction:", next_action_prediction['action_type'])
@@ -1085,11 +1132,6 @@ class LookAtPlateHLA(HighLevelAction):
                 # Test image.
                 rng = np.random.default_rng(123)
                 camera_color_data = rng.integers(0, 255, size=(512, 512, 3))
-
-            self._send_web_interface_image(camera_color_data)
-
-            # Send message to web interface.
-            self._send_web_interface_message({"state": "prepare_bite", "status": "completed"})
 
             return sim_states
 
