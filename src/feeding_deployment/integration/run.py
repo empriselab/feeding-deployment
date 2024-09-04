@@ -251,7 +251,8 @@ class _Runner:
 
             # Save the latest state in case we want to resume execution
             # after a crash.
-            self._save_state(self.full_simulated_traj[-1], self.current_atoms)
+            sim_state = self.full_simulated_traj[-1] if self.full_simulated_traj else None
+            self._save_state(sim_state, self.current_atoms)
 
     def make_video(self, outfile: Path) -> None:
         """Create a video of the simulated trajectory."""
@@ -266,7 +267,8 @@ class _Runner:
     def _load_from_last_state(self) -> None:
         with open(self._saved_state_outfile, "rb") as f:
             sim_state, self.current_atoms = pickle.load(f)
-        self.sim.sync(sim_state)
+        if sim_state is not None:
+            self.sim.sync(sim_state)
         print(f"Loaded system state to {self._saved_state_outfile}")
 
 
