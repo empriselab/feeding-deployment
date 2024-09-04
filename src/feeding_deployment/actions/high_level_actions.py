@@ -10,7 +10,7 @@ import numpy as np
 import json
 import rospy
 from std_msgs.msg import String
-from sensor_msgs.msg import JointState, CompressedImage
+from sensor_msgs.msg import JointState
 from visualization_msgs.msg import Marker, MarkerArray
 import time
 
@@ -112,11 +112,7 @@ class HighLevelAction(abc.ABC):
         )
 
     def _send_web_interface_image(self, image) -> None:
-        msg = CompressedImage()
-        msg.header.stamp = rospy.Time.now()
-        msg.format = "jpeg"
-        msg.data = np.array(cv2.imencode('.jpg', image)[1]).tostring()
-        self._perception_interface.web_interface_image_publisher.publish(msg)
+        self._perception_interface.update_web_interface_image(image)
 
 
 @dataclass(frozen=True)
