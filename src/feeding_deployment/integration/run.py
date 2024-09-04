@@ -251,7 +251,7 @@ class _Runner:
 
             # Save the latest state in case we want to resume execution
             # after a crash.
-            self._save_state(sim_traj[-1], self.current_atoms)
+            self._save_state(self.full_simulated_traj[-1], self.current_atoms)
 
     def make_video(self, outfile: Path) -> None:
         """Create a video of the simulated trajectory."""
