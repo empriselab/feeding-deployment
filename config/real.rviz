@@ -228,18 +228,174 @@ Visualization Manager:
     - Alpha: 0.5
       Class: rviz/RobotModel
       Collision Enabled: false
-      Enabled: false
+      Enabled: true
       Links:
         All Links Enabled: true
         Expand Joint Details: false
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        bracelet_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        drink_tip:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        drinkbase:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        end_effector_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        feeding_tool_tip:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        finger_tip:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        forearm_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        fork_tip:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        forkbase:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        forkpitch:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        forkroll:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        half_arm_1_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        half_arm_2_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        inertia_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        left_inner_finger:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_inner_finger_pad:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_inner_knuckle:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_outer_finger:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_outer_knuckle:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_inner_finger:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_inner_finger_pad:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_inner_knuckle:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_outer_finger:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_outer_knuckle:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        robotiq_arg2f_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        shoulder_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        spherical_wrist_1_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        spherical_wrist_2_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        tool_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        wipe_tip:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        wipebase:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        world:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
       Name: RobotModel
       Robot Description: sim/robot_description
       TF Prefix: sim
       Update Interval: 0
-      Value: false
+      Value: true
       Visual Enabled: true
     - Class: rviz/Image
       Enabled: true
@@ -258,7 +414,7 @@ Visualization Manager:
       Marker Topic: /visualization_marker
       Name: Marker
       Namespaces:
-        {}
+        cube: true
       Queue Size: 100
       Value: true
     - Alpha: 1
@@ -336,10 +492,14 @@ Visualization Manager:
           Value: false
         forkroll:
           Value: false
+        forque_end_effector_target:
+          Value: true
         half_arm_1_link:
           Value: false
         half_arm_2_link:
           Value: false
+        head_pose:
+          Value: true
         inertia_link:
           Value: false
         left_inner_finger:
@@ -354,6 +514,8 @@ Visualization Manager:
           Value: false
         map:
           Value: false
+        reference_head_pose:
+          Value: true
         right_inner_finger:
           Value: false
         right_inner_finger_pad:
@@ -458,6 +620,15 @@ Visualization Manager:
         map:
           sim/world:
             sim/base_link:
+              sim/drinkbase:
+                sim/drink_tip:
+                  {}
+              sim/forkbase:
+                sim/forkpitch:
+                  sim/forkroll:
+                    sim/feeding_tool_tip:
+                      sim/fork_tip:
+                        {}
               sim/shoulder_link:
                 sim/half_arm_1_link:
                   sim/half_arm_2_link:
@@ -487,6 +658,9 @@ Visualization Manager:
                                         {}
                               sim/tool_frame:
                                 {}
+              sim/wipebase:
+                sim/wipe_tip:
+                  {}
           world:
             base_link:
               drinkbase:
@@ -495,6 +669,12 @@ Visualization Manager:
               food_frame:
                 {}
               fork_tip_target:
+                {}
+              forque_end_effector_target:
+                {}
+              head_pose:
+                {}
+              reference_head_pose:
                 {}
               shoulder_link:
                 half_arm_1_link:
@@ -544,18 +724,6 @@ Visualization Manager:
               wipebase:
                 wipe_tip:
                   {}
-        sim/drinkbase:
-          sim/drink_tip:
-            {}
-        sim/forkbase:
-          sim/forkpitch:
-            sim/forkroll:
-              sim/feeding_tool_tip:
-                sim/fork_tip:
-                  {}
-        sim/wipebase:
-          sim/wipe_tip:
-            {}
       Update Interval: 0
       Value: true
   Enabled: true
@@ -586,7 +754,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.4280719757080078
+      Distance: 2.9832282066345215
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -602,9 +770,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.49539873003959656
+      Pitch: 0.46539875864982605
       Target Frame: <Fixed Frame>
-      Yaw: 2.8485753536224365
+      Yaw: 0.5285760164260864
     Saved: ~
 Window Geometry:
   Displays:
@@ -625,4 +793,4 @@ Window Geometry:
     collapsed: false
   Width: 1917
   X: 1491
-  Y: 223
+  Y: 149

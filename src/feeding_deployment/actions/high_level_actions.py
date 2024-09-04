@@ -72,7 +72,7 @@ class HighLevelAction(abc.ABC):
         hla_hyperparams: dict[str, Any],
         run_on_robot: bool,
         wrist_controller,
-        skill_library,
+        flair,
     ) -> None:
         self._sim = sim
         self._robot_interface = robot_interface
@@ -81,7 +81,7 @@ class HighLevelAction(abc.ABC):
         self._hla_hyperparams = hla_hyperparams
         self._run_on_robot = run_on_robot
         self.wrist_controller = wrist_controller
-        self.acquisition_skill_library = skill_library
+        self.flair = flair
 
     @abc.abstractmethod
     def get_name(self) -> str:
@@ -272,7 +272,6 @@ class PickToolHLA(HighLevelAction):
             if self.wrist_controller is not None:
                 time.sleep(1.0) # wait for the utensil to be connected
                 print("Resetting wrist controller ...")
-                self.wrist_controller = WristController()
                 self.wrist_controller.set_velocity_mode()
                 self.wrist_controller.reset()
 
@@ -628,6 +627,7 @@ class TransferToolHLA(HighLevelAction):
 
         if tool.name == "utensil":
             assert self._sim.held_object_name == "utensil"
+            
             sim_states: list[FeedingDeploymentSimulatorState] = []
             robot_commands = []
 
@@ -642,6 +642,10 @@ class TransferToolHLA(HighLevelAction):
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
             robot_commands = []
+
+            # Rajat ToDo: Implement horizontal utensil
+            if self.flair is not None:
+                self.wrist_controller.reset()
 
             sim_length = len(sim_states)
 
@@ -1058,21 +1062,30 @@ class LookAtPlateHLA(HighLevelAction):
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
 
-            if self.wrist_controller is not None:
+            if self.flair is not None:
                 # Prepare for bite acquisition.
                 print("Doing Bite Acquisition")
                 self.wrist_controller.set_velocity_mode()
-                self.acquisition_skill_library.reset()
+                self.wrist_controller.reset()
+
                 camera_color_data, camera_info_data, camera_depth_data, _ = (
                     self._perception_interface.get_camera_data()
                 )
 
+                items = self.flair.identify_plate(camera_color_data)
+                # flair.set_food_items(items)
+                self.flair.set_food_items(['banana slice'])
+                items_detection = self.flair.detect_items(camera_color_data, camera_depth_data, camera_info_data, log_path=None)
+                print(" --- Food items detected:", items_detection['clean_item_labels'])
+                next_action_prediction = self.flair.predict_next_action(camera_color_data, items_detection=None, log_path=None)
+                print(" --- Next Food Item Prediction:", next_action_prediction['labels_list'][next_action_prediction['food_id']])
+                print(" --- Next Action Prediction:", next_action_prediction['action_type'])
+                
+                # TODO send images to web interface.
             else:
                 # Test image.
                 rng = np.random.default_rng(123)
                 camera_color_data = rng.integers(0, 255, size=(512, 512, 3))
-
-            self._send_web_interface_image(camera_color_data)
 
             # Send message to web interface.
             self._send_web_interface_message({"state": "prepare_bite", "status": "completed"})
@@ -1111,14 +1124,17 @@ class AcquireBiteHLA(HighLevelAction):
 
         if tool.name == "utensil":
 
-            if self.acquisition_skill_library is not None:
+            if self.flair is not None:
                 print("Doing Bite Acquisition")
                 camera_color_data, camera_info_data, camera_depth_data, _ = (
                     self._perception_interface.get_camera_data()
                 )
-                self.acquisition_skill_library.skewering_skill(
-                    camera_color_data, camera_depth_data, camera_info_data
-                )
+                # Autonomous - execute next action prediction
+                self.flair.execute_action(camera_color_data, camera_depth_data, camera_info_data, next_action_prediction=None, log_path=None)
+
+                # Manual - execute action from web interface
+                # action_type = "Skewer"
+                # self.flair.execute_manual_action(action_type, camera_color_data, camera_depth_data, camera_info_data):
             else:
                 time.sleep(2.0)  # simulate delay, also needed for web interface
 
