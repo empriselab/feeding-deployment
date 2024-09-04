@@ -27,7 +27,7 @@ class JointStatesPublisher:
 
         # create joint/cartesian states publishers
         self.joint_states_pub = rospy.Publisher("/robot_joint_states", JointState, queue_size=10)
-        self.cartesian_states_pub = rospy.Publisher("/robot_cartesian_states", Pose, queue_size=10)
+        self.cartesian_states_pub = rospy.Publisher("/robot_cartesian_state", Pose, queue_size=10)
 
     def publish_joint_states(self):
 
@@ -35,6 +35,7 @@ class JointStatesPublisher:
             arm_pos, ee_pose, gripper_pos = self._arm_interface.get_state()
         except Exception as e:
             raise Exception(f"Error getting state: {e}")
+        
         joint_state_msg = JointState()
         joint_state_msg.header.stamp = rospy.Time.now()
         joint_state_msg.name = [

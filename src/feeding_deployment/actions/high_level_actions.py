@@ -263,6 +263,7 @@ class PickToolHLA(HighLevelAction):
 
             if FLAIR_IMPORTED:
                 time.sleep(1.0) # wait for the utensil to be connected
+                print("Resetting wrist controller ...")
                 self.wrist_controller = WristController()
                 self.wrist_controller.set_velocity_mode()
                 self.wrist_controller.reset()
@@ -709,7 +710,8 @@ class TransferToolHLA(HighLevelAction):
                 assert np.allclose(robot_commands[i].traj, robot_commands[-(i+1)].traj[::-1]), "Robot commands not a palindrome"
 
             if self._run_on_robot:
-                y = input("Does the trajectory look good? Press 'y' to execute on robot")
+                # y = input("Does the trajectory look good? Press 'y' to execute on robot")
+                y = "n"
                 if y == "y":
                     input("Press enter to switch to joint compliant mode")
                     self._robot_interface.switch_to_joint_compliant_mode()
@@ -820,7 +822,8 @@ class TransferToolHLA(HighLevelAction):
                 assert np.allclose(robot_commands[i].traj, robot_commands[-(i+1)].traj[::-1]), "Robot commands not a palindrome"
 
             if self._run_on_robot:
-                y = input("Does the trajectory look good? Press 'y' to execute on robot")
+                # y = input("Does the trajectory look good? Press 'y' to execute on robot")
+                y = "n"
                 if y == "y":
                     input("Press enter to switch to joint compliant mode")
                     self._robot_interface.switch_to_joint_compliant_mode()
@@ -931,7 +934,8 @@ class TransferToolHLA(HighLevelAction):
                 assert np.allclose(robot_commands[i].traj, robot_commands[-(i+1)].traj[::-1]), "Robot commands not a palindrome"
 
             if self._run_on_robot:
-                y = input("Does the trajectory look good? Press 'y' to execute on robot")
+                # y = input("Does the trajectory look good? Press 'y' to execute on robot")
+                y = "n"
                 if y == "y":
                     input("Press enter to switch to joint compliant mode")
                     self._robot_interface.switch_to_joint_compliant_mode()
@@ -997,8 +1001,9 @@ class PrepareToolHLA(HighLevelAction):
                 self.execute_robot_commands(robot_commands)
 
             if FLAIR_IMPORTED:
+                # print("Ignoring this for now")
                 # Do Bite Acquisition
-                print("Doing Bite Acquisition")
+                # print("Doing Bite Acquisition")
                 self.wrist_controller.set_velocity_mode()
                 self.acquisition_skill_library.reset()
                 camera_color_data, camera_info_data, camera_depth_data, _ = (
