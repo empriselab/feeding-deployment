@@ -4,6 +4,7 @@ import json
 from collections import namedtuple
 from pathlib import Path
 from typing import Any
+import pickle
 
 try:
     import rospy
@@ -76,9 +77,11 @@ HLAS = {PickToolHLA, StowToolHLA, LookAtPlateHLA, AcquireBiteHLA, TransferToolHL
 class _Runner:
     """A class for running the integrated system."""
 
-    def __init__(self, run_on_robot: bool, max_motion_planning_time: float):
+    def __init__(self, run_on_robot: bool, max_motion_planning_time: float,
+                 resume_from_last_save: bool = False):
         self.run_on_robot = run_on_robot
         self.max_motion_planning_time = max_motion_planning_time
+        self._saved_state_outfile = Path(__file__).parent / "saved_state.p"
 
         # Subscribe to the web interface topics.
         if ROSPY_IMPORTED:
@@ -153,6 +156,14 @@ class _Runner:
 
         # Record the full simulated trajectory for viz and debug.
         self.full_simulated_traj: list[FeedingDeploymentSimulatorState] = []
+
+        if resume_from_last_save:
+            self._load_from_last_state()
+            print("WARNING: The system state has been restored to:")
+            print(" ", sorted(self.current_atoms))
+            resp = input("Are you sure you want to continue from here? [y/n]")
+            if resp != "y":
+                sys.exit(0)
 
     def web_interface_callback(self, msg: "String") -> None:
         """Callback for the web interface."""
@@ -238,12 +249,25 @@ class _Runner:
             self.current_atoms -= operator.delete_effects
             self.current_atoms |= operator.add_effects
 
-        # TODO: send a message back to the web interface upon completion!
+            # Save the latest state in case we want to resume execution
+            # after a crash.
+            self._save_state(sim_traj[-1], self.current_atoms)
 
     def make_video(self, outfile: Path) -> None:
         """Create a video of the simulated trajectory."""
         make_simulation_video(self.sim, self.full_simulated_traj, outfile)
         print(f"Saved video to {outfile}")
+
+    def _save_state(self, sim_state: FeedingDeploymentSimulatorState, atoms: set[GroundAtom]) -> None:
+        with open(self._saved_state_outfile, "wb") as f:
+            pickle.dump((sim_state, atoms), f)
+        print(f"Saved system state to {self._saved_state_outfile}")
+
+    def _load_from_last_state(self) -> None:
+        with open(self._saved_state_outfile, "rb") as f:
+            sim_state, self.current_atoms = pickle.load(f)
+        self.sim.sync(sim_state)
+        print(f"Loaded system state to {self._saved_state_outfile}")
 
 
 if __name__ == "__main__":
@@ -253,6 +277,7 @@ if __name__ == "__main__":
     parser.add_argument("--run_on_robot", action="store_true")
     parser.add_argument("--make_videos", action="store_true")
     parser.add_argument("--max_motion_planning_time", type=float, default=10.0)
+    parser.add_argument("--resume_from_last_save", action="store_true")
     args = parser.parse_args()
 
     if ROSPY_IMPORTED:
@@ -260,7 +285,8 @@ if __name__ == "__main__":
     else:
         assert not args.run_on_robot, "Need ROS to run on robot"
 
-    runner = _Runner(args.run_on_robot, args.max_motion_planning_time)
+    runner = _Runner(args.run_on_robot, args.max_motion_planning_time,
+                     args.resume_from_last_save)
 
     # # Uncomment to test commands.
     # msg = namedtuple("String", ["data"])
