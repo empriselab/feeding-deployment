@@ -1081,11 +1081,12 @@ class LookAtPlateHLA(HighLevelAction):
                 print(" --- Next Food Item Prediction:", next_action_prediction['labels_list'][next_action_prediction['food_id']])
                 print(" --- Next Action Prediction:", next_action_prediction['action_type'])
                 
-                # TODO send images to web interface.
             else:
                 # Test image.
                 rng = np.random.default_rng(123)
                 camera_color_data = rng.integers(0, 255, size=(512, 512, 3))
+
+            self._send_web_interface_image(camera_color_data)
 
             # Send message to web interface.
             self._send_web_interface_message({"state": "prepare_bite", "status": "completed"})
