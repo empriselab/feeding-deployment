@@ -5,12 +5,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-import ipdb.stdout
+import cv2
 import numpy as np
 import json
 import rospy
 from std_msgs.msg import String
-from sensor_msgs.msg import JointState
+from sensor_msgs.msg import JointState, CompressedImage
 from visualization_msgs.msg import Marker, MarkerArray
 import time
 
@@ -110,6 +110,14 @@ class HighLevelAction(abc.ABC):
         self._perception_interface.web_interface_publisher.publish(
             String(json.dumps(msg_dict))
         )
+
+    def _send_web_interface_image(self, image) -> None:
+        msg = CompressedImage()
+        msg.header.stamp =rospy.Time.now()
+        msg.format = "jpeg"
+        msg.data = np.array(cv2.imencode('.jpg', image)[1]).tostring()
+        self._perception_interface.web_interface_image_publisher.publish(msg)
+
 
 @dataclass(frozen=True)
 class GroundHighLevelAction:
@@ -1058,7 +1066,12 @@ class LookAtPlateHLA(HighLevelAction):
                     self._perception_interface.get_camera_data()
                 )
 
-                # TODO send images to web interface.
+            else:
+                # Test image.
+                rng = np.random.default_rng(123)
+                camera_color_data = rng.integers(0, 255, size=(512, 512, 3))
+
+            self._send_web_interface_image(camera_color_data)
 
             # Send message to web interface.
             self._send_web_interface_message({"state": "prepare_bite", "status": "completed"})

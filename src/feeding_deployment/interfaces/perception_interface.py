@@ -11,7 +11,7 @@ from scipy.spatial.transform import Rotation as R
 
 try:
     import rospy
-    from sensor_msgs.msg import JointState
+    from sensor_msgs.msg import JointState, CompressedImage
     from std_msgs.msg import String
     from visualization_msgs.msg import MarkerArray
     import tf2_ros
@@ -35,6 +35,7 @@ class PerceptionInterface:
 
         # Create a publisher for communication with the web interface.
         self.web_interface_publisher = rospy.Publisher("/ServerComm", String, queue_size=10)
+        self.web_interface_image_publisher = rospy.Publisher("/camera/image/compressed", CompressedImage, queue_size=10)
 
         # run head perception
         if robot_interface is None:
