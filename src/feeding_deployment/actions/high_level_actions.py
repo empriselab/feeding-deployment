@@ -9,7 +9,7 @@ import cv2
 import numpy as np
 import json
 import rospy
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool
 from sensor_msgs.msg import JointState
 from visualization_msgs.msg import Marker, MarkerArray
 import time
@@ -113,6 +113,10 @@ class HighLevelAction(abc.ABC):
 
     def _send_web_interface_image(self, image) -> None:
         self._perception_interface.update_web_interface_image(image)
+
+    def _wait_for_user_continue_button(self) -> None:
+        msg = rospy.wait_for_message("/user_continue_button", Bool)
+        assert msg.data
 
 
 @dataclass(frozen=True)
@@ -709,8 +713,7 @@ class TransferToolHLA(HighLevelAction):
                     print("Trajectory not executed on robot")
             
             # Wait for button press to indicate that transfer is finished.
-            # TODO
-            input("PRESS ENTER WHEN TRANSFER IS FINISHED")
+            self._wait_for_user_continue_button()
             
             # Send message to web interface indicating transfer is done.
             self._send_web_interface_message({"state": "bite_transfer", "status": "completed"})
@@ -840,7 +843,8 @@ class TransferToolHLA(HighLevelAction):
                 else:
                     print("Trajectory not executed on robot")
             
-            input("PRESS ENTER WHEN TRANSFER IS FINISHED")
+            # Wait for button press to indicate that transfer is finished.
+            self._wait_for_user_continue_button()
 
             self._send_web_interface_message({"state": "drink_transfer", "status": "completed"})
 
@@ -970,7 +974,8 @@ class TransferToolHLA(HighLevelAction):
                 else:
                     print("Trajectory not executed on robot")
             
-            input("PRESS ENTER WHEN TRANSFER IS FINISHED")
+            # Wait for button press to indicate that transfer is finished.
+            self._wait_for_user_continue_button()
 
             self._send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})
 
