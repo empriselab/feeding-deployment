@@ -113,7 +113,7 @@ class HighLevelAction(abc.ABC):
 
     def _send_web_interface_image(self, image) -> None:
         msg = CompressedImage()
-        msg.header.stamp =rospy.Time.now()
+        msg.header.stamp = rospy.Time.now()
         msg.format = "jpeg"
         msg.data = np.array(cv2.imencode('.jpg', image)[1]).tostring()
         self._perception_interface.web_interface_image_publisher.publish(msg)
