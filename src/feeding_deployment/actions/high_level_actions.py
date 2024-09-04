@@ -5,28 +5,14 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+import ipdb.stdout
 import numpy as np
+import json
 import rospy
 from std_msgs.msg import String
 from sensor_msgs.msg import JointState
 from visualization_msgs.msg import Marker, MarkerArray
 import time
-
-# Rajat ToDo: Remove this hacky addition
-FLAIR_PATH = "/home/isacc/deployment_ws/src/FLAIR/bite_acquisition/scripts"
-import sys
-
-sys.path.append(FLAIR_PATH)
-try:
-    # raise ModuleNotFoundError  # Just to skip this block
-    from skill_library import SkillLibrary
-    from wrist_controller import WristController
-
-    FLAIR_IMPORTED = True
-    print("FLAIR imported successfully")
-except ModuleNotFoundError:
-    FLAIR_IMPORTED = False
-    pass
 
 
 from pybullet_helpers.geometry import Pose, multiply_poses
@@ -70,6 +56,8 @@ GripperFree = Predicate("GripperFree", [])  # not holding any tool
 Holding = Predicate("Holding", [tool_type])  # holding tool
 ToolTransferDone = Predicate("ToolTransferDone", [tool_type])  # wiped, drank, or ate
 ToolPrepared = Predicate("ToolPrepared", [tool_type])  # e.g., bite acquired
+PlateInView = Predicate("PlateInView", [])  # of the hand camera
+IsUtensil = Predicate("IsUtensil", [tool_type])
 
 # Define high-level actions.
 class HighLevelAction(abc.ABC):
@@ -83,6 +71,8 @@ class HighLevelAction(abc.ABC):
         rviz_interface: RVizInterface,
         hla_hyperparams: dict[str, Any],
         run_on_robot: bool,
+        wrist_controller,
+        skill_library,
     ) -> None:
         self._sim = sim
         self._robot_interface = robot_interface
@@ -90,6 +80,8 @@ class HighLevelAction(abc.ABC):
         self._rviz_interface = rviz_interface
         self._hla_hyperparams = hla_hyperparams
         self._run_on_robot = run_on_robot
+        self.wrist_controller = wrist_controller
+        self.acquisition_skill_library = skill_library
 
     @abc.abstractmethod
     def get_name(self) -> str:
@@ -113,6 +105,11 @@ class HighLevelAction(abc.ABC):
         for robot_command in robot_commands:
             input("Execute next command?")
             self._robot_interface.execute_command(robot_command)
+
+    def _send_web_interface_message(self, msg_dict: dict[str, Any]) -> None:
+        self._perception_interface.web_interface_publisher.publish(
+            String(json.dumps(msg_dict))
+        )
 
 @dataclass(frozen=True)
 class GroundHighLevelAction:
@@ -217,6 +214,9 @@ class PickToolHLA(HighLevelAction):
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
 
+            # Send message to web interface.
+            self._send_web_interface_message({"state": "drink_pickup", "status": "completed"})
+
             return sim_states
 
         if tool.name == "utensil":
@@ -261,7 +261,7 @@ class PickToolHLA(HighLevelAction):
                 self.execute_robot_commands(robot_commands)
             robot_commands = []
 
-            if FLAIR_IMPORTED:
+            if self.wrist_controller is not None:
                 time.sleep(1.0) # wait for the utensil to be connected
                 print("Resetting wrist controller ...")
                 self.wrist_controller = WristController()
@@ -364,6 +364,9 @@ class PickToolHLA(HighLevelAction):
 
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
+
+            # Send message to web interface.
+            self._send_web_interface_message({"state": "prepare_mouth_wiping", "status": "completed"})
 
             return sim_states
 
@@ -685,8 +688,28 @@ class TransferToolHLA(HighLevelAction):
             #     time.sleep(0.1)
                 # input("Press Enter to continue...")
 
-            # Rajat ToDo: Replace this wait with a ROS listener for button.
-            # input("Press enter when wiping is finished")
+            if self._rviz_interface is not None:
+                for sim_state in sim_states:
+                    self._rviz_interface.joint_state_update(sim_state.robot_joints)
+                    time.sleep(0.1)
+
+            if self._run_on_robot:
+                y = input("Does the trajectory look good? Press 'y' to execute on robot")
+                if y == "y":
+                    input("Press enter to switch to joint compliant mode")
+                    self._robot_interface.switch_to_joint_compliant_mode()
+                    self.execute_robot_commands(robot_commands)
+                    input("Press enter to switch out of joint compliant mode")
+                    self._robot_interface.switch_out_of_joint_compliant_mode()
+                else:
+                    print("Trajectory not executed on robot")
+            
+            # Wait for button press to indicate that transfer is finished.
+            # TODO
+            input("PRESS ENTER WHEN TRANSFER IS FINISHED")
+            
+            # Send message to web interface indicating transfer is done.
+            self._send_web_interface_message({"state": "bite_transfer", "status": "completed"})
             
             # Reverse the transfer plan.
             transfer_sim_states = sim_states[sim_length:]
@@ -715,7 +738,7 @@ class TransferToolHLA(HighLevelAction):
                 if y == "y":
                     input("Press enter to switch to joint compliant mode")
                     self._robot_interface.switch_to_joint_compliant_mode()
-                    self.execute_robot_commands(robot_commands)
+                    self.execute_robot_commands(reversed_robot_commands)
                     input("Press enter to switch out of joint compliant mode")
                     self._robot_interface.switch_out_of_joint_compliant_mode()
                 else:
@@ -797,9 +820,26 @@ class TransferToolHLA(HighLevelAction):
             #     time.sleep(0.1)
                 # input("Press Enter to continue...")
 
-            # Rajat ToDo: Replace this wait with a ROS listener for button.
-            # input("Press enter when drinking is finished")
+            if self._rviz_interface is not None:
+                for sim_state in sim_states:
+                    self._rviz_interface.joint_state_update(sim_state.robot_joints)
+                    time.sleep(0.1)
+
+            if self._run_on_robot:
+                y = input("Does the trajectory look good? Press 'y' to execute on robot")
+                if y == "y":
+                    input("Press enter to switch to joint compliant mode")
+                    self._robot_interface.switch_to_joint_compliant_mode()
+                    self.execute_robot_commands(robot_commands)
+                    input("Press enter to switch out of joint compliant mode")
+                    self._robot_interface.switch_out_of_joint_compliant_mode()
+                else:
+                    print("Trajectory not executed on robot")
             
+            input("PRESS ENTER WHEN TRANSFER IS FINISHED")
+
+            self._send_web_interface_message({"state": "drink_transfer", "status": "completed"})
+
             # Reverse the transfer plan.
             transfer_sim_states = sim_states[sim_length:]
             sim_states.extend(transfer_sim_states[::-1])
@@ -827,7 +867,7 @@ class TransferToolHLA(HighLevelAction):
                 if y == "y":
                     input("Press enter to switch to joint compliant mode")
                     self._robot_interface.switch_to_joint_compliant_mode()
-                    self.execute_robot_commands(robot_commands)
+                    self.execute_robot_commands(reversed_robot_commands)
                     input("Press enter to switch out of joint compliant mode")
                     self._robot_interface.switch_out_of_joint_compliant_mode()
                 else:
@@ -909,9 +949,27 @@ class TransferToolHLA(HighLevelAction):
             #     time.sleep(0.1)
                 # input("Press Enter to continue...")
 
-            # Rajat ToDo: Replace this wait with a ROS listener for button.
-            # input("Press enter when wiping is finished")
+
+            if self._rviz_interface is not None:
+                for sim_state in sim_states:
+                    self._rviz_interface.joint_state_update(sim_state.robot_joints)
+                    time.sleep(0.1)
+
+            if self._run_on_robot:
+                y = input("Does the trajectory look good? Press 'y' to execute on robot")
+                if y == "y":
+                    input("Press enter to switch to joint compliant mode")
+                    self._robot_interface.switch_to_joint_compliant_mode()
+                    self.execute_robot_commands(robot_commands)
+                    input("Press enter to switch out of joint compliant mode")
+                    self._robot_interface.switch_out_of_joint_compliant_mode()
+                else:
+                    print("Trajectory not executed on robot")
             
+            input("PRESS ENTER WHEN TRANSFER IS FINISHED")
+
+            self._send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})
+
             # Reverse the transfer plan.
             transfer_sim_states = sim_states[sim_length:]
             sim_states.extend(transfer_sim_states[::-1])
@@ -939,7 +997,7 @@ class TransferToolHLA(HighLevelAction):
                 if y == "y":
                     input("Press enter to switch to joint compliant mode")
                     self._robot_interface.switch_to_joint_compliant_mode()
-                    self.execute_robot_commands(robot_commands)
+                    self.execute_robot_commands(reversed_robot_commands)
                     input("Press enter to switch out of joint compliant mode")
                     self._robot_interface.switch_out_of_joint_compliant_mode()
                 else:
@@ -950,28 +1008,19 @@ class TransferToolHLA(HighLevelAction):
         print("Not implemented yet")
 
 
-class PrepareToolHLA(HighLevelAction):
-    """Bite acquisition; other tools are always prepared."""
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
-        # Rajat todo: how do I initialize FLAIR just for the utensil tool?
-        print("Initializing Acquisition Skill Library")
-        if FLAIR_IMPORTED:
-            self.wrist_controller = WristController()
-            self.acquisition_skill_library = SkillLibrary(self._robot_interface, self.wrist_controller)
+class LookAtPlateHLA(HighLevelAction):
+    """Look at plate in preparation of bite acquisition."""
 
     def get_name(self) -> str:
-        return "PrepareTool"
+        return "LookAtPlate"
 
     def get_operator(self) -> LiftedOperator:
         tool = Variable("?tool", tool_type)
         return LiftedOperator(
             self.get_name(),
             parameters=[tool],
-            preconditions={Holding([tool])},
-            add_effects={ToolPrepared([tool])},
+            preconditions={Holding([tool]), IsUtensil([tool])},
+            add_effects={LiftedAtom(PlateInView, [])},
             delete_effects=set(),
         )
 
@@ -1000,18 +1049,64 @@ class PrepareToolHLA(HighLevelAction):
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
 
-            if FLAIR_IMPORTED:
-                # print("Ignoring this for now")
-                # Do Bite Acquisition
-                # print("Doing Bite Acquisition")
+            if self.wrist_controller is not None:
+                # Prepare for bite acquisition.
+                print("Doing Bite Acquisition")
                 self.wrist_controller.set_velocity_mode()
                 self.acquisition_skill_library.reset()
+                camera_color_data, camera_info_data, camera_depth_data, _ = (
+                    self._perception_interface.get_camera_data()
+                )
+
+                # TODO send images to web interface.
+
+            # Send message to web interface.
+            self._send_web_interface_message({"state": "prepare_bite", "status": "completed"})
+
+            return sim_states
+
+        else:
+            # Other tools are always prepared
+            pass
+        return []
+
+
+class AcquireBiteHLA(HighLevelAction):
+    """Bite acquisition; other tools are always prepared."""
+
+    def get_name(self) -> str:
+        return "AcquireBite"
+
+    def get_operator(self) -> LiftedOperator:
+        tool = Variable("?tool", tool_type)
+        return LiftedOperator(
+            self.get_name(),
+            parameters=[tool],
+            preconditions={Holding([tool]), IsUtensil([tool]), LiftedAtom(PlateInView, [])},
+            add_effects={ToolPrepared([tool])},
+            delete_effects={LiftedAtom(PlateInView, [])},
+        )
+
+    def execute_action(
+        self,
+        objects: tuple[Object, ...],
+        params: dict[str, Any],
+    ) -> list[FeedingDeploymentSimulatorState]:
+        assert len(objects) == 1
+        tool = objects[0]
+
+        if tool.name == "utensil":
+
+            if self.acquisition_skill_library is not None:
+                print("Doing Bite Acquisition")
                 camera_color_data, camera_info_data, camera_depth_data, _ = (
                     self._perception_interface.get_camera_data()
                 )
                 self.acquisition_skill_library.skewering_skill(
                     camera_color_data, camera_depth_data, camera_info_data
                 )
+            else:
+                time.sleep(2.0)  # simulate delay, also needed for web interface
 
             # skill_library.scooping_skill(camera_color_data, camera_depth_data, camera_info_data)
 
@@ -1023,7 +1118,10 @@ class PrepareToolHLA(HighLevelAction):
 
             # skill_library.cutting_skill(camera_color_data, camera_depth_data, camera_info_data)
 
-            return sim_states
+            # Send message to web interface indicating that robot is done with acquisition.
+            self._send_web_interface_message({"state": "bite_pickup", "status": "completed"})
+
+            return []
 
         else:
             # Other tools are always prepared

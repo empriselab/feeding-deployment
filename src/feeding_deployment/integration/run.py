@@ -13,6 +13,22 @@ try:
 except ModuleNotFoundError:
     ROSPY_IMPORTED = False
 
+# Rajat ToDo: Remove this hacky addition
+FLAIR_PATH = "/home/isacc/deployment_ws/src/FLAIR/bite_acquisition/scripts"
+import sys
+
+sys.path.append(FLAIR_PATH)
+try:
+    # raise ModuleNotFoundError  # Just to skip this block
+    from skill_library import SkillLibrary
+    from wrist_controller import WristController
+
+    FLAIR_IMPORTED = True
+    print("FLAIR imported successfully")
+except ModuleNotFoundError:
+    FLAIR_IMPORTED = False
+    pass
+
 from relational_structs import (
     GroundAtom,
     LiftedAtom,
@@ -28,8 +44,11 @@ from feeding_deployment.actions.high_level_actions import (
     GripperFree,
     GroundHighLevelAction,
     Holding,
+    IsUtensil,
+    PlateInView,
     PickToolHLA,
-    PrepareToolHLA,
+    LookAtPlateHLA,
+    AcquireBiteHLA,
     StowToolHLA,
     ToolPrepared,
     ToolTransferDone,
@@ -51,7 +70,7 @@ from feeding_deployment.simulation.simulator import (
 from feeding_deployment.simulation.video import make_simulation_video
 
 # All the high level actions we want to consider.
-HLAS = {PickToolHLA, StowToolHLA, PrepareToolHLA, TransferToolHLA}
+HLAS = {PickToolHLA, StowToolHLA, LookAtPlateHLA, AcquireBiteHLA, TransferToolHLA}
 
 
 class _Runner:
@@ -76,6 +95,14 @@ class _Runner:
         # Initialize the perceiver (e.g., get joint states or human head poses).
         self.perception_interface = PerceptionInterface(self.robot_interface)
 
+        # Initialize the FLAIR interface.
+        if FLAIR_IMPORTED:
+            wrist_controller = WristController()
+            skill_library = SkillLibrary(self.robot_interface, wrist_controller)
+        else:
+            wrist_controller = None
+            skill_library = None
+
         # Initialize the simulator.
         kwargs: dict[str, Any] = {}
         if run_on_robot:
@@ -91,11 +118,11 @@ class _Runner:
         self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description)
         # self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description, use_gui=False)
 
-        input("Press enter to create the high-level actions.")
         # Create skills for high-level planning.
         hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
         self.hlas = {
-            cls(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, hla_hyperparams, run_on_robot) for cls in HLAS  # type: ignore
+            cls(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, hla_hyperparams, run_on_robot,
+                wrist_controller, skill_library) for cls in HLAS  # type: ignore
         }
         self.hla_name_to_hla = {hla.get_name(): hla for hla in self.hlas}
         self.operators = {hla.get_operator() for hla in self.hlas}
@@ -104,6 +131,8 @@ class _Runner:
             GripperFree,
             Holding,
             ToolTransferDone,
+            IsUtensil,
+            PlateInView,
         }
         self.types = {tool_type}
         self.domain = PDDLDomain(
@@ -119,6 +148,7 @@ class _Runner:
             LiftedAtom(GripperFree, []),
             ToolPrepared([self.wipe]),
             ToolPrepared([self.drink]),
+            IsUtensil([self.utensil]),
         }
 
         # Record the full simulated trajectory for viz and debug.
@@ -136,6 +166,22 @@ class _Runner:
         elif msg_dict["status"] == "drink_transfer":
             user_cmd = GroundHighLevelAction(
                 self.hla_name_to_hla["TransferTool"], (self.drink,)
+            )
+        elif msg_dict["status"] == "move_to_above_plate":
+            user_cmd = GroundHighLevelAction(
+                self.hla_name_to_hla["LookAtPlate"], (self.utensil,)
+            )
+        elif msg_dict["status"] == "aquire_food":
+            user_cmd = GroundHighLevelAction(
+                self.hla_name_to_hla["AcquireBite"], (self.utensil,)
+            )
+        elif msg_dict["status"] == "bite_transfer":
+            user_cmd = GroundHighLevelAction(
+                self.hla_name_to_hla["TransferTool"], (self.utensil,)
+            )
+        elif msg_dict["status"] == "mouth_wiping":
+            user_cmd = GroundHighLevelAction(
+                self.hla_name_to_hla["TransferTool"], (self.wipe,)
             )
         else:
             print("WARNING: Unrecognized message from web interface.")
@@ -220,7 +266,7 @@ if __name__ == "__main__":
     # msg = namedtuple("String", ["data"])
     # runner.web_interface_callback(msg(json.dumps({"status": "drink_pickup"})))
     # runner.web_interface_callback(msg(json.dumps({"status": "drink_transfer"})))
-    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
     runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
     runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
