@@ -358,7 +358,6 @@ class HeadPerception:
                 visualization_points_world_frame,
                 neck_frame,
                 neck_frame,
-                landmarks_selected_model_camera_frame
             )
 
         else:

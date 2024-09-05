@@ -202,8 +202,8 @@ class SceneDescription:
     # Constants for utensil transfer
     # Rajat ToDo: Fix with correct values, copied from drinking utensil
     utensil_tip_from_end_effector: Pose = Pose(
-        (0.270, 0.095, -0.002),
-        (-0.000, 0.707, 0.000, 0.707),
+        (0.255, 0.0, -0.018),
+        (0.000, 0.707, 0.000, 0.707),
     )
 
     ######### drink #########
