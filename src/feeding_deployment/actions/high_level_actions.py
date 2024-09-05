@@ -115,9 +115,9 @@ class HighLevelAction(abc.ABC):
         self._perception_interface.update_web_interface_image(image)
 
     def _wait_for_user_continue_button(self) -> None:
-        print("Waiting for message from web interface on user_continue_button")
-        msg = rospy.wait_for_message("/user_continue_button", Bool)
-        assert msg.data
+        print("[Removed for now] Waiting for message from web interface on user_continue_button")
+        # msg = rospy.wait_for_message("/user_continue_button", Bool)
+        # assert msg.data
         print("Received message, continuing ...")
 
 
@@ -705,13 +705,13 @@ class TransferToolHLA(HighLevelAction):
                     time.sleep(0.1)
 
             if self._run_on_robot:
-                y = input("Does the trajectory look good? Press 'y' to execute on robot")
+                y = input("Does the trajectory look good? Press 'y/n' to execute on robot")
+                while y != "y" and y != "n":
+                    y = input("Please enter 'y' or 'n'")
                 if y == "y":
                     input("Press enter to switch to joint compliant mode")
                     self._robot_interface.switch_to_joint_compliant_mode()
                     self.execute_robot_commands(robot_commands)
-                    input("Press enter to switch out of joint compliant mode")
-                    self._robot_interface.switch_out_of_joint_compliant_mode()
                 else:
                     print("Trajectory not executed on robot")
             
@@ -744,8 +744,12 @@ class TransferToolHLA(HighLevelAction):
 
             if self._run_on_robot:
                 y = input("Does the trajectory look good? Press 'y' to execute on robot")
+                while y != "y" and y != "n":
+                    y = input("Please enter 'y' or 'n'")
                 if y == "y":
                     self.execute_robot_commands(reversed_robot_commands)
+                    input("Press enter to switch out of joint compliant mode")
+                    self._robot_interface.switch_out_of_joint_compliant_mode()
                 else:
                     print("Trajectory not executed on robot")
 

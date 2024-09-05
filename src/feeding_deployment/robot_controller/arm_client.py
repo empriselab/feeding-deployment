@@ -40,10 +40,12 @@ class ArmInterfaceClient:
     def switch_to_joint_compliant_mode(self):
         assert not self.in_compliant_mode, "Already in compliant mode"
         self._arm_interface.switch_to_joint_compliant_mode()
+        self.in_compliant_mode = True
 
     def switch_out_of_joint_compliant_mode(self):
         assert self.in_compliant_mode, "Not in compliant mode"
         self._arm_interface.switch_out_of_joint_compliant_mode()
+        self.in_compliant_mode = False
 
     def execute_command(self, cmd: KinovaCommand) -> None:
 
