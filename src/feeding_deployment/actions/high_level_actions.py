@@ -652,10 +652,10 @@ class TransferToolHLA(HighLevelAction):
             sim_length = len(sim_states)
 
             target_pose = self._perception_interface.get_head_perception_forque_target_pose(simulation=True)
-            # k = input("Does pose look good? Press 'y/n' to continue")
-            # while k != "y":
-            #     target_pose = self._perception_interface.get_head_perception_forque_target_pose()
-            #     k = input("Does pose look good? Press 'y/n' to continue")
+            k = input("Does pose look good? Press 'y/n' to continue")
+            while k != "y":
+                target_pose = self._perception_interface.get_head_perception_forque_target_pose()
+                k = input("Does pose look good? Press 'y/n' to continue")
 
             # target_pose = Pose(position=(-0.17272330207928777, 0.6273752674813526, 0.5572539925006535), 
                 # orientation=(-0.42030807,  0.56739361,  0.47188225, -0.52795148))
@@ -730,10 +730,10 @@ class TransferToolHLA(HighLevelAction):
             transfer_sim_states = sim_states[sim_length:]
             sim_states.extend(transfer_sim_states[::-1])
 
-            if self._rviz_interface is not None:
-                for sim_state in transfer_sim_states[::-1]:
-                    self._rviz_interface.joint_state_update(sim_state.robot_joints)
-                    time.sleep(0.02)
+            # if self._rviz_interface is not None:
+            #     for sim_state in transfer_sim_states[::-1]:
+            #         self._rviz_interface.joint_state_update(sim_state.robot_joints)
+            #         time.sleep(0.02)
             
             transfer_robot_commands = robot_commands.copy()
             reversed_robot_commands = []

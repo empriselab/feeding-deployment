@@ -174,7 +174,7 @@ def move_to_ee_pose(
 
     assert plan is not None
 
-    plan = remap_trajectory_to_constant_distance(plan, sim, max_joint_space_distance=0.01)
+    plan = remap_trajectory_to_constant_distance(plan, sim, max_joint_space_distance=0.005)
 
     sim_states.extend(plan)
     robot_commands.extend(simulated_trajectory_to_kinova_commands(plan))
@@ -183,5 +183,5 @@ def move_to_ee_pose(
     if rviz_interface is not None:
         for sim_state in plan:
             rviz_interface.joint_state_update(sim_state.robot_joints)
-            time.sleep(0.02)
+            time.sleep(0.005)
 

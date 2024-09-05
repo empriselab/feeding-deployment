@@ -6,6 +6,7 @@ import queue
 import subprocess
 import threading
 import time
+import copy
 
 import numpy as np
 import pinocchio as pin
@@ -288,6 +289,11 @@ class KinovaArm:
         self._execute_reference_action("Zero")
 
     def get_state(self):
+
+        if self.cyclic_running:
+            q, dq, tau, gripper_pos = self.get_update_state()
+            ee_pos = np.zeros(7)
+            return q, ee_pos, gripper_pos
 
         assert (
             not self.cyclic_running
@@ -774,15 +780,20 @@ class KinovaArm:
         )
     
     def get_update_state(self):
+
+        assert self.cyclic_running, "Arm must be in low-level servoing mode"
+
         q = self.q.copy()
         dq = self.dq.copy()
         tau = self.tau.copy()
+        gripper_pos = copy.copy(self.gripper_pos)
 
         # normalize q
         for pos in range(len(q)):
             if q[pos] > np.pi:
                 q[pos] -= 2 * np.pi
-        return q, dq, tau
+        
+        return q, dq, tau, gripper_pos
 
     def gravity(self):
         assert self.cyclic_running, "Arm must be in low-level servoing mode"
