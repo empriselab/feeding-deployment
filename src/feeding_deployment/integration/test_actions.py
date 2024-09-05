@@ -10,6 +10,22 @@ try:
 except ModuleNotFoundError:
     ROSPY_IMPORTED = False
 
+# Rajat ToDo: Remove this hacky addition
+FLAIR_PATH = "/home/isacc/deployment_ws/src/FLAIR/bite_acquisition/scripts"
+import sys
+
+sys.path.append(FLAIR_PATH)
+try:
+    # raise ModuleNotFoundError  # Just to skip this block
+    from wrist_controller import WristController
+    from flair import FLAIR
+
+    FLAIR_IMPORTED = True
+    print("FLAIR imported successfully")
+except ModuleNotFoundError:
+    FLAIR_IMPORTED = False
+    pass
+
 from relational_structs import (
     GroundAtom,
     LiftedAtom,
@@ -24,16 +40,7 @@ from pybullet_helpers.geometry import Pose
 from pybullet_helpers.link import get_link_pose, get_relative_link_pose
 
 from feeding_deployment.actions.high_level_actions import (
-    GripperFree,
-    GroundHighLevelAction,
-    Holding,
-    PickToolHLA,
-    PrepareToolHLA,
-    StowToolHLA,
-    ToolPrepared,
-    ToolTransferDone,
     TransferToolHLA,
-    pddl_plan_to_hla_plan,
     tool_type,
 )
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
@@ -68,6 +75,14 @@ def _main(
     # Initialize the perceiver (e.g., get joint states or human head poses).
     perception_interface = PerceptionInterface(robot_interface)
 
+    # Initialize the FLAIR interface.
+    if FLAIR_IMPORTED:
+        wrist_controller = WristController()
+        flair = FLAIR(robot_interface, wrist_controller)
+    else:
+        wrist_controller = None
+        flair = None
+
     # Initialize the simulator.
     kwargs: dict[str, Any] = {}
     if run_on_robot:
@@ -87,19 +102,19 @@ def _main(
     # Create skills for high-level planning.
     hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
 
-    high_level_action = PickToolHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot)
+    high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot, wrist_controller, flair)
     utensil = Object("utensil", tool_type)
 
-    # sim.held_object_name = "utensil"
-    # sim.held_object_id = sim.utensil_id
-    # sim.robot.set_finger_state(scene_description.tool_grasp_fingers_value)
-    # finger_frame_id = sim.robot.link_from_name("finger_tip")
-    # end_effector_link_id = sim.robot.link_from_name(sim.robot.tool_link_name)
-    # utensil_from_end_effector = get_relative_link_pose(
-    #     sim.robot.robot_id, finger_frame_id, end_effector_link_id, sim.physics_client_id
-    # )
-    # sim.held_object_tf = utensil_from_end_effector
-    # print(f"utensil_from_end_effector: {utensil_from_end_effector}")
+    sim.held_object_name = "utensil"
+    sim.held_object_id = sim.utensil_id
+    sim.robot.set_finger_state(sim.scene_description.tool_grasp_fingers_value)
+    finger_frame_id = sim.robot.link_from_name("finger_tip")
+    end_effector_link_id = sim.robot.link_from_name(sim.robot.tool_link_name)
+    utensil_from_end_effector = get_relative_link_pose(
+        sim.robot.robot_id, finger_frame_id, end_effector_link_id, sim.physics_client_id
+    )
+    sim.held_object_tf = utensil_from_end_effector
+    print(f"utensil_from_end_effector: {utensil_from_end_effector}")
 
     sim_traj = high_level_action.execute_action(objects=[utensil], params={})
 

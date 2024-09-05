@@ -6,6 +6,7 @@
 
 # Rajat ToDo: Remove this line
 src/feeding_deployment/head_perception/DECA/*
+src/feeding_deployment/integration/log/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
