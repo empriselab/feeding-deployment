@@ -166,7 +166,7 @@ def move_to_ee_pose(
         target_pose,
         tip_from_end_effector.invert(),
         sim,
-        num_interp_waypoints=10,
+        num_interp_waypoints=3,
         max_motion_plan_time=max_motion_plan_time,
         exclude_collision_ids=exclude_collision_ids,
         check_held_object_collisions=check_held_object_collisions,
@@ -174,7 +174,7 @@ def move_to_ee_pose(
 
     assert plan is not None
 
-    plan = remap_trajectory_to_constant_distance(plan, sim, max_joint_space_distance=0.05)
+    plan = remap_trajectory_to_constant_distance(plan, sim, max_joint_space_distance=0.01)
 
     sim_states.extend(plan)
     robot_commands.extend(simulated_trajectory_to_kinova_commands(plan))
@@ -183,5 +183,5 @@ def move_to_ee_pose(
     if rviz_interface is not None:
         for sim_state in plan:
             rviz_interface.joint_state_update(sim_state.robot_joints)
-            time.sleep(0.1)
+            time.sleep(0.02)
 

@@ -704,10 +704,10 @@ class TransferToolHLA(HighLevelAction):
             #     time.sleep(0.1)
                 # input("Press Enter to continue...")
 
-            if self._rviz_interface is not None:
-                for sim_state in sim_states:
-                    self._rviz_interface.joint_state_update(sim_state.robot_joints)
-                    time.sleep(0.1)
+            # if self._rviz_interface is not None:
+            #     for sim_state in sim_states:
+            #         self._rviz_interface.joint_state_update(sim_state.robot_joints)
+            #         time.sleep(0.1)
 
             if self._run_on_robot:
                 y = input("Does the trajectory look good? Press 'y/n' to execute on robot")
@@ -733,7 +733,7 @@ class TransferToolHLA(HighLevelAction):
             if self._rviz_interface is not None:
                 for sim_state in transfer_sim_states[::-1]:
                     self._rviz_interface.joint_state_update(sim_state.robot_joints)
-                    time.sleep(0.1)
+                    time.sleep(0.02)
             
             transfer_robot_commands = robot_commands.copy()
             reversed_robot_commands = []

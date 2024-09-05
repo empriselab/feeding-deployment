@@ -94,7 +94,7 @@ class ArmInterface:
         gripper_pos = 0
         for command_pos in trajectory_command:
             self.command_queue.put((command_pos, gripper_pos))
-            time.sleep(0.1)
+            time.sleep(0.01)
 
         assert self.command_queue.empty(), "After trajectory execution - command queue not empty"
 
