@@ -7,6 +7,7 @@ import numpy as np
 from pybullet_helpers.geometry import Pose
 from pybullet_helpers.joint import JointPositions
 from scipy.spatial.transform import Rotation as R
+import json
 
 
 try:
@@ -43,6 +44,12 @@ class PerceptionInterface:
         self.update_web_interface_image(np.zeros((512, 512, 3)))
         thread = threading.Thread(target=self._publish_web_interface_image)
         thread.start()
+        # The following is a hacky leaky abstraction to handle the one-time preference
+        # setting step at the beginning of FLAIR.
+        self.user_preference = None
+        self.web_interface_sub = rospy.Subscriber(
+            "WebAppComm", String, self._web_interface_callback
+        )
 
         # This doesn't work in simulation.
         # rospy.Timer(rospy.Duration(1.0), self._web_interface_image_callback)
@@ -158,3 +165,10 @@ class PerceptionInterface:
         while not rospy.is_shutdown():
             self.web_interface_image_publisher.publish(self.last_captured_ros_image)
             rate.sleep()
+
+    def _web_interface_callback(self, msg: "String") -> None:
+        """Callback for the web interface."""
+        msg_dict = json.loads(msg.data)
+        if msg_dict["state"] == "order_selection" and msg_dict["status"] != "ready_for_initial_data":
+            self.user_preference =msg_dict["status"]
+
