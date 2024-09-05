@@ -56,6 +56,9 @@ from feeding_deployment.simulation.simulator import (
 )
 from feeding_deployment.simulation.video import make_simulation_video
 
+import numpy as np
+from scipy.spatial.transform import Rotation
+
 def _main(
     tool: str, test: bool, max_motion_planning_time: float = 10
 ) -> None:
@@ -68,75 +71,73 @@ def _main(
 
     # Initialize the interface to the robot.
     robot_interface = ArmInterfaceClient()  # type: ignore  # pylint: disable=no-member
-    else:
-        robot_interface = None
 
     # Initialize the perceiver (e.g., get joint states or human head poses).
-    perception_interface = PerceptionInterface(robot_interface)
+    perception_interface = PerceptionInterface(robot_interface, not test)
+    
+    wrist_controller = WristController()
 
-    # Initialize the FLAIR interface.
-    if FLAIR_IMPORTED:
-        wrist_controller = WristController()
-        flair = FLAIR(robot_interface, wrist_controller)
-    else:
-        wrist_controller = None
-        flair = None
+    if not test: # calibrate utensil tip
+        # set tool transform - only required once globally
+        perception_interface._head_perception.save_tool_tip_transform(args.tool)
+        
+        perception_interface._head_perception.set_tool(args.tool)
+        while not rospy.is_shutdown():
+            perception_interface._head_perception.run_head_perception()
+    else: # actually do the transfer
+        run_on_robot = True
 
-    # Initialize the simulator.
-    kwargs: dict[str, Any] = {}
-    if run_on_robot:
+        # Initialize the simulator.
+        kwargs: dict[str, Any] = {}
         kwargs["initial_joints"] = perception_interface.get_robot_joints()
-        print(f"Initial joint state: {kwargs['initial_joints']}")
-    else:
-        print("Running in simulation mode.")
-    scene_description = SceneDescription(**kwargs)
-    sim = FeedingDeploymentPyBulletSimulator(scene_description)
+        scene_description = SceneDescription(**kwargs)
+        sim = FeedingDeploymentPyBulletSimulator(scene_description, use_gui=False)
 
-    # Step 1: move to before transfer state
-
-    # Step 2: Run head perception in a loop limited by ENTER key press
-
-    if ROSPY_IMPORTED:
-        # Initialize the interface to RViz.
         rviz_interface = RVizInterface(scene_description)
-    else:
-        rviz_interface = None
 
-    # Create skills for high-level planning.
-    hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
+        # Create skills for high-level planning.
+        hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
 
-    high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot, wrist_controller, flair)
-    utensil = Object("utensil", tool_type)
+        high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot, wrist_controller, None)
 
-    sim.held_object_name = "utensil"
-    sim.held_object_id = sim.utensil_id
-    sim.robot.set_finger_state(sim.scene_description.tool_grasp_fingers_value)
-    finger_frame_id = sim.robot.link_from_name("finger_tip")
-    end_effector_link_id = sim.robot.link_from_name(sim.robot.tool_link_name)
-    utensil_from_end_effector = get_relative_link_pose(
-        sim.robot.robot_id, finger_frame_id, end_effector_link_id, sim.physics_client_id
-    )
-    sim.held_object_tf = utensil_from_end_effector
-    print(f"utensil_from_end_effector: {utensil_from_end_effector}")
+        if tool == "fork":
+            object = Object("utensil", tool_type)
+            sim.held_object_name = "utensil"
+            sim.held_object_id = sim.utensil_id
+        elif tool == "drink":
+            object = Object("drink", tool_type)
+            sim.held_object_name = "drink"
+            sim.held_object_id = sim.drink_id
+        elif tool == "wipe":
+            object = Object("wipe", tool_type)
+            sim.held_object_name = "wipe"
+            sim.held_object_id = sim.wipe_id
+        else:
+            raise ValueError(f"Invalid tool: {tool}")
+        sim.robot.set_finger_state(sim.scene_description.tool_grasp_fingers_value)
+        finger_frame_id = sim.robot.link_from_name("finger_tip")
+        end_effector_link_id = sim.robot.link_from_name(sim.robot.tool_link_name)
+        utensil_from_end_effector = get_relative_link_pose(
+            sim.robot.robot_id, finger_frame_id, end_effector_link_id, sim.physics_client_id
+        )
+        sim.held_object_tf = utensil_from_end_effector
+        print(f"utensil_from_end_effector: {utensil_from_end_effector}")
 
-    sim_traj = high_level_action.execute_action(objects=[utensil], params={})
+        rviz_interface.tool_update(True, sim.held_object_name, Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the tool in rviz
 
-    if make_videos:
-        outfile = Path(__file__).parent / "single_action.mp4"
-        make_simulation_video(sim, sim_traj, outfile)
-        print(f"Saved video to {outfile}")
-
+        perception_interface._head_perception.set_tool(args.tool)
+        sim_traj = high_level_action.execute_action(objects=[object], params={})
 
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--tool", type=str, default="utensil")
+    parser.add_argument("--tool", type=str, default="fork")
     parser.add_argument("--test", action="store_true")
     parser.add_argument("--max_motion_planning_time", type=float, default=10.0)
     args = parser.parse_args()
 
-    if args.tool not in ["utensil", "drink", "wipe"]:
-        raise ValueError(f"Invalid tool: {args.tool}, must be one of utensil, drink, wipe")
+    if args.tool not in ["fork", "drink", "wipe"]:
+        raise ValueError(f"Invalid tool: {args.tool}, must be one of fork, drink, wipe")
 
     _main(args.tool, args.test, args.max_motion_planning_time)
