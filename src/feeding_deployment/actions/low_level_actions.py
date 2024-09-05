@@ -174,7 +174,7 @@ def move_to_ee_pose(
 
     assert plan is not None
 
-    plan = remap_trajectory_to_constant_distance(plan, sim)
+    plan = remap_trajectory_to_constant_distance(plan, sim, max_joint_space_distance=0.05)
 
     sim_states.extend(plan)
     robot_commands.extend(simulated_trajectory_to_kinova_commands(plan))

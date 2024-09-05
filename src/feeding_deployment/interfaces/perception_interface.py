@@ -85,9 +85,9 @@ class PerceptionInterface:
     def get_camera_data(self):  # Rajat ToDo: Add return type
         return self._head_perception.get_top_camera_data()
 
-    def get_head_perception_forque_target_pose(self) -> Pose:
+    def get_head_perception_forque_target_pose(self, simulation = False) -> Pose:
         """Get a target of the forque from head perception."""
-        if self._head_perception is not None:
+        if self._head_perception is not None and not simulation:
             forque_target_transform = self._head_perception.run_head_perception()
             print("\n--\n---\n----Forque target transform: ", forque_target_transform)
         else:

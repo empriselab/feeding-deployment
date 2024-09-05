@@ -651,11 +651,11 @@ class TransferToolHLA(HighLevelAction):
 
             sim_length = len(sim_states)
 
-            target_pose = self._perception_interface.get_head_perception_forque_target_pose()
-            k = input("Does pose look good? Press 'y/n' to continue")
-            while k != "y":
-                target_pose = self._perception_interface.get_head_perception_forque_target_pose()
-                k = input("Does pose look good? Press 'y/n' to continue")
+            target_pose = self._perception_interface.get_head_perception_forque_target_pose(simulation=True)
+            # k = input("Does pose look good? Press 'y/n' to continue")
+            # while k != "y":
+            #     target_pose = self._perception_interface.get_head_perception_forque_target_pose()
+            #     k = input("Does pose look good? Press 'y/n' to continue")
 
             # target_pose = Pose(position=(-0.17272330207928777, 0.6273752674813526, 0.5572539925006535), 
                 # orientation=(-0.42030807,  0.56739361,  0.47188225, -0.52795148))
@@ -714,8 +714,8 @@ class TransferToolHLA(HighLevelAction):
                 while y != "y" and y != "n":
                     y = input("Please enter 'y' or 'n'")
                 if y == "y":
-                    # input("Press enter to switch to joint compliant mode")
-                    # self._robot_interface.switch_to_joint_compliant_mode()
+                    input("Press enter to switch to joint compliant mode")
+                    self._robot_interface.switch_to_joint_compliant_mode()
                     self.execute_robot_commands(robot_commands)
                 else:
                     print("Trajectory not executed on robot")
@@ -753,8 +753,8 @@ class TransferToolHLA(HighLevelAction):
                     y = input("Please enter 'y' or 'n'")
                 if y == "y":
                     self.execute_robot_commands(reversed_robot_commands)
-                    # input("Press enter to switch out of joint compliant mode")
-                    # self._robot_interface.switch_out_of_joint_compliant_mode()
+                    input("Press enter to switch out of joint compliant mode")
+                    self._robot_interface.switch_out_of_joint_compliant_mode()
                 else:
                     print("Trajectory not executed on robot")
 
