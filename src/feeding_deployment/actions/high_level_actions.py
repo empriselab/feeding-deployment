@@ -1053,7 +1053,8 @@ class LookAtPlateHLA(HighLevelAction):
         tool = objects[0]
 
         if tool.name == "utensil":
-
+            
+            print("In LookAtPlateHLA")
             assert self._sim.held_object_name == "utensil"
             sim_states: list[FeedingDeploymentSimulatorState] = []
             robot_commands = []
@@ -1077,11 +1078,17 @@ class LookAtPlateHLA(HighLevelAction):
                 camera_color_data, camera_info_data, camera_depth_data, _ = (
                     self._perception_interface.get_camera_data()
                 )
-                self._send_web_interface_image(camera_color_data)
+
                 items = self.flair.identify_plate(camera_color_data)
                 # flair.set_food_items(items)
-                self.flair.set_food_items(['banana slice', 'baby carrot'])
+                self.flair.set_food_items(['yellow banana slice', 'orange baby carrot'])
                 items_detection = self.flair.detect_items(camera_color_data, camera_depth_data, camera_info_data, log_path=None)
+                
+                plate_bounds = items_detection['plate_bounds']
+                plate_image = camera_color_data.copy()[plate_bounds[1]:plate_bounds[1]+plate_bounds[3], plate_bounds[0]:plate_bounds[0]+plate_bounds[2]]
+                self._send_web_interface_image(plate_image)
+                time.sleep(1.0)  # simulate delay, also needed for web interface
+                
                 print(" --- Food items detected:", items_detection['clean_item_labels'])
 
                 if not self._preferences_set:
@@ -1099,7 +1106,8 @@ class LookAtPlateHLA(HighLevelAction):
                         x0, y0, x1, y1 = bb
                         w = x1 - x0
                         h = y1 - y0
-                        item_data = [int(x0), int(y0), int(w), int(h)]
+                        x_diff, y_diff, _, _ = plate_bounds
+                        item_data = [int(x0-x_diff), int(y0-y_diff), int(w), int(h)]
                         food_type_to_data[label].append(item_data)
                     data = [{k: v} for k, v in food_type_to_data.items()]
                     self._send_web_interface_message({"n_food_types": n_food_types, "data": data})

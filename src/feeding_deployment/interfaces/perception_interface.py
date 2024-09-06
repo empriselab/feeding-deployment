@@ -83,7 +83,7 @@ class PerceptionInterface:
         return joint_state
 
     def get_camera_data(self):  # Rajat ToDo: Add return type
-        return self._head_perception.get_top_camera_data()
+        return self._head_perception.get_camera_data()
 
     def get_head_perception_forque_target_pose(self, simulation = False) -> Pose:
         """Get a target of the forque from head perception."""
@@ -166,5 +166,5 @@ class PerceptionInterface:
         """Callback for the web interface."""
         msg_dict = json.loads(msg.data)
         if msg_dict["state"] == "order_selection" and msg_dict["status"] != "ready_for_initial_data":
-            self.user_preference =msg_dict["status"]
+            self.user_preference = msg_dict["status"]
 
