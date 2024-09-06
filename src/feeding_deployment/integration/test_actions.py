@@ -41,6 +41,7 @@ from pybullet_helpers.link import get_link_pose, get_relative_link_pose
 
 from feeding_deployment.actions.high_level_actions import (
     TransferToolHLA,
+    LookAtPlateHLA,
     tool_type,
 )
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
@@ -55,6 +56,52 @@ from feeding_deployment.simulation.simulator import (
     FeedingDeploymentSimulatorState,
 )
 from feeding_deployment.simulation.video import make_simulation_video
+
+def test_TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos):
+
+    high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot, wrist_controller, flair)
+    utensil = Object("utensil", tool_type)
+
+    sim.held_object_name = "utensil"
+    sim.held_object_id = sim.utensil_id
+    sim.robot.set_finger_state(sim.scene_description.tool_grasp_fingers_value)
+    finger_frame_id = sim.robot.link_from_name("finger_tip")
+    end_effector_link_id = sim.robot.link_from_name(sim.robot.tool_link_name)
+    utensil_from_end_effector = get_relative_link_pose(
+        sim.robot.robot_id, finger_frame_id, end_effector_link_id, sim.physics_client_id
+    )
+    sim.held_object_tf = utensil_from_end_effector
+    print(f"utensil_from_end_effector: {utensil_from_end_effector}")
+
+    rviz_interface.tool_update(True, sim.held_object_name, Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the tool in rviz
+
+    perception_interface._head_perception.set_tool("fork") # set the tool in the head perception
+    sim_traj = high_level_action.execute_action(objects=[utensil], params={})
+
+    if make_videos:
+        outfile = Path(__file__).parent / "single_action.mp4"
+        make_simulation_video(sim, sim_traj, outfile)
+        print(f"Saved video to {outfile}")
+
+def test_LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos):
+
+    high_level_action = LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot, wrist_controller, flair)
+    utensil = Object("utensil", tool_type)
+
+    sim.held_object_name = "utensil"
+    sim.held_object_id = sim.utensil_id
+    sim.robot.set_finger_state(sim.scene_description.tool_grasp_fingers_value)
+    finger_frame_id = sim.robot.link_from_name("finger_tip")
+    end_effector_link_id = sim.robot.link_from_name(sim.robot.tool_link_name)
+    utensil_from_end_effector = get_relative_link_pose(
+        sim.robot.robot_id, finger_frame_id, end_effector_link_id, sim.physics_client_id
+    )
+    sim.held_object_tf = utensil_from_end_effector
+    print(f"utensil_from_end_effector: {utensil_from_end_effector}")
+
+    rviz_interface.tool_update(True, sim.held_object_name, Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the tool in rviz
+
+    sim_traj = high_level_action.execute_action(objects=[utensil], params={})
 
 def _main(
     run_on_robot: bool, make_videos: bool, max_motion_planning_time: float = 10
@@ -91,7 +138,7 @@ def _main(
     else:
         print("Running in simulation mode.")
     scene_description = SceneDescription(**kwargs)
-    sim = FeedingDeploymentPyBulletSimulator(scene_description)
+    sim = FeedingDeploymentPyBulletSimulator(scene_description, use_gui=False)
 
     if ROSPY_IMPORTED:
         # Initialize the interface to RViz.
@@ -102,27 +149,7 @@ def _main(
     # Create skills for high-level planning.
     hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
 
-    high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot, wrist_controller, flair)
-    utensil = Object("utensil", tool_type)
-
-    sim.held_object_name = "utensil"
-    sim.held_object_id = sim.utensil_id
-    sim.robot.set_finger_state(sim.scene_description.tool_grasp_fingers_value)
-    finger_frame_id = sim.robot.link_from_name("finger_tip")
-    end_effector_link_id = sim.robot.link_from_name(sim.robot.tool_link_name)
-    utensil_from_end_effector = get_relative_link_pose(
-        sim.robot.robot_id, finger_frame_id, end_effector_link_id, sim.physics_client_id
-    )
-    sim.held_object_tf = utensil_from_end_effector
-    print(f"utensil_from_end_effector: {utensil_from_end_effector}")
-
-    sim_traj = high_level_action.execute_action(objects=[utensil], params={})
-
-    if make_videos:
-        outfile = Path(__file__).parent / "single_action.mp4"
-        make_simulation_video(sim, sim_traj, outfile)
-        print(f"Saved video to {outfile}")
-
+    test_LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos)
 
 if __name__ == "__main__":
     import argparse
