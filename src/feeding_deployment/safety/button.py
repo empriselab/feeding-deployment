@@ -8,8 +8,8 @@ import pyaudio
 from threading import Lock
 import argparse
 
-class EStop:
-    """Soft E-stop with a button."""
+class Button:
+    """Physical button that connects over audio jack."""
 
     PYAUDIO_STREAM_TROUBLESHOOTING = (
         "The Pyaudio stream not opening error is often caused by another process using "
@@ -47,13 +47,13 @@ class EStop:
             raise RuntimeError(
                 (
                     f"Error opening audio device {0}. "
-                    f"{EStop.PYAUDIO_STREAM_TROUBLESHOOTING}\n\n"
+                    f"{Button.PYAUDIO_STREAM_TROUBLESHOOTING}\n\n"
                     f"Exception: {exc}"
                 ),
             )
         
-        self.estop_lock = Lock()
-        self.estop_value = False
+        self.button_lock = Lock()
+        self.button_value = False
 
     def close(self) -> None:
         """Close the audio stream."""
@@ -64,13 +64,13 @@ class EStop:
 
     def check(self) -> bool:
         """Check if the e-stop button has been pressed."""
-        with self.estop_lock:
-            return self.estop_value
+        with self.button_lock:
+            return self.button_value
         
     def reset(self) -> None:
         """Reset the e-stop button."""
-        with self.estop_lock:
-            self.estop_value = False
+        with self.button_lock:
+            self.button_value = False
 
     def __audio_callback(
         self, data: bytes, frame_count: int, time_info: dict, status: int
@@ -84,19 +84,19 @@ class EStop:
         data_arr = np.frombuffer(data, dtype=np.int16)
 
         # Check if the e-stop button has been pressed
-        if EStop.rising_edge_detector(
+        if Button.rising_edge_detector(
             data_arr,
             self.prev_data_arr,
             self.max_threshold,
-        ) or EStop.falling_edge_detector(
+        ) or Button.falling_edge_detector(
             data_arr,
             self.prev_data_arr,
             self.min_threshold,
         ):
             if self.detection_time is None or time.time() - self.detection_time > 2:
                 self.detection_time = time.time()
-                with self.estop_lock:
-                    self.estop_value = True
+                with self.button_lock:
+                    self.button_value = True
 
         # Return the data
         self.prev_data_arr = data_arr
@@ -178,7 +178,7 @@ class EStop:
             True if a falling edge was detected, False otherwise
         """
         # Flip all signs and call the rising edge detector
-        return EStop.rising_edge_detector(
+        return Button.rising_edge_detector(
             -curr_data_arr,
             None if prev_data_arr is None else -prev_data_arr,
             -threshold,
@@ -192,6 +192,10 @@ if __name__ == "__main__":
     parser.add_argument("--input_device_index", type=int, default=0, help="The index of the input device")
     args = parser.parse_args()
 
+    # -1 is user emergency stop button
+    # 9 is experimentor emergency stop button
+    # 7 is transfer button
+
     if args.input_device_index == 0:
         audio = pyaudio.PyAudio()
         device_indices = []
@@ -202,11 +206,11 @@ if __name__ == "__main__":
                 print(f"Device {i}: {device_info['name']}")
         raise ValueError("Please provide the input device index")
 
-    estop = EStop(args.input_device_index)
+    button = Button(args.input_device_index)
     while True:
-        if estop.check():
+        if button.check():
             print("E-stop pressed!")
             break
         time.sleep(0.01)
     
-    estop.close()
+    button.close()

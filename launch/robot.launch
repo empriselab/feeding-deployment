@@ -42,18 +42,23 @@
 
     <!-- Emergency Stops -->
     <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_emergency_stop">
-        <param name="cmd" value="$(arg python_path) $(arg base_path)/src/feeding_deployment/safety/estops_publisher.py --user_estop 7 --exp_estop 9"/>
+        <param name="cmd" value="$(arg python_path) $(arg base_path)/src/feeding_deployment/safety/estops_publisher.py --user_estop -1 --exp_estop 9"/>
+    </node>
+
+    <!-- Transfer Complete Button -->
+    <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_transfer_button_listener">
+        <param name="cmd" value="$(arg python_path) $(arg base_path)/src/feeding_deployment/safety/transfer_button_listener.py --button_id 7"/>
     </node>
 
     <!-- Joint States Publisher -->
-    <!-- <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_joint_states">
+    <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_joint_states">
         <param name="cmd" value="$(arg python_path) $(arg base_path)/src/feeding_deployment/robot_controller/joint_states_publisher.py"/>
-    </node> -->
+    </node>
 
     <!-- Collision Monitor -->
-    <!-- <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_collision_monitor">
+    <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_collision_monitor">
         <param name="cmd" value="$(arg python_path) $(arg base_path)/src/feeding_deployment/safety/collision_monitor.py"/>
-    </node> -->
+    </node>
 
     <!-- Watchdog -->
     <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_watchdog">

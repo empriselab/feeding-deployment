@@ -21,6 +21,8 @@ class ArmInterface:
         # self.arm.set_joint_limits(speed_limits=(7 * (30,)), acceleration_limits=(7 * (80,)))
         self.command_queue = queue.Queue(1)
         self.controller = None
+        self.in_compliant_mode = False
+        self.arm_stopped = False
 
     def get_state(self):
         arm_pos, ee_pose, gripper_pos = self.arm.get_state()
@@ -37,6 +39,9 @@ class ArmInterface:
 
     def switch_to_joint_compliant_mode(self):
 
+        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.in_compliant_mode, "Already in compliant mode"
+
         # clear command queue
         print("Clearing command queue")
         while not self.command_queue.empty():
@@ -49,12 +54,19 @@ class ArmInterface:
 
     def switch_out_of_joint_compliant_mode(self):
 
+        assert not self.arm_stopped, "Arm is stopped"
+        assert self.in_compliant_mode, "Not in compliant mode"
+
         # switch out of joint compliant mode
         print("Switching out of joint compliant mode")
         self.arm.switch_out_of_joint_compliant_mode()
         self.in_compliant_mode = False
 
     def compliant_set_joint_position(self, command_pos):
+
+        assert not self.arm_stopped, "Arm is stopped"
+        assert self.in_compliant_mode, "Not in compliant mode"
+
         print(f"Received compliant joint pos command: {command_pos}")
         gripper_pos = 0
         self.command_queue.put((command_pos, gripper_pos))
@@ -78,6 +90,10 @@ class ArmInterface:
     #                 break
 
     def compliant_set_joint_trajectory(self, trajectory_command):
+
+        assert not self.arm_stopped, "Arm is stopped"
+        assert self.in_compliant_mode, "Not in compliant mode"
+
         print(
             f"Received compliant joint trajectory command with {len(trajectory_command)} waypoints"
         )
@@ -99,28 +115,52 @@ class ArmInterface:
         assert self.command_queue.empty(), "After trajectory execution - command queue not empty"
 
     def set_joint_position(self, command_pos):
+        
+        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.in_compliant_mode, "In compliant mode"
+
         print(f"Received joint pos command: {command_pos}")
         self.arm.move_angular(command_pos)
 
     def set_joint_trajectory(self, trajectory_command):
+
+        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.in_compliant_mode, "In compliant mode"
+
         print(
             f"Received joint trajectory command with {len(trajectory_command)} waypoints"
         )
         self.arm.move_angular_trajectory(trajectory_command)
 
     def set_ee_pose(self, xyz, xyz_quat):
+
+        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.in_compliant_mode, "In compliant mode"
+
         print(f"Received cartesian pose command: {xyz}, {xyz_quat}")
         self.arm.move_cartesian(xyz, xyz_quat)
 
     def set_gripper(self, gripper_pos):
+
+        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.in_compliant_mode, "In compliant mode"
+
         print(f"Received gripper pos command: {gripper_pos}")
         self.arm._gripper_position_command(gripper_pos)
 
     def open_gripper(self):
+
+        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.in_compliant_mode, "In compliant mode"
+
         print("Received open gripper command")
         self.arm.open_gripper()
 
     def close_gripper(self):
+
+        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.in_compliant_mode, "In compliant mode"
+
         print("Received close gripper command")
         self.arm.close_gripper()
 
@@ -129,11 +169,21 @@ class ArmInterface:
         self.arm.disconnect()
 
     def retract(self):
+
+        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.in_compliant_mode, "In compliant mode"
+
         self.arm.retract()
 
     def stop(self):
-        print("Stopping arm")
-        self.arm.stop()
+        self.arm_stopped = True
+        print("No longer accepting commands")
+        if self.in_compliant_mode:
+            self.arm.switch_to_gravity_compensation_mode()
+            print("Switched to gravity compensation mode")
+        else:
+            self.arm.stop()
+            print("Stopped arm")
 
 class ArmManager(MPBaseManager):
     pass
