@@ -1081,7 +1081,7 @@ class LookAtPlateHLA(HighLevelAction):
 
                 items = self.flair.identify_plate(camera_color_data)
                 # flair.set_food_items(items)
-                self.flair.set_food_items(['yellow banana slice', 'orange baby carrot'])
+                self.flair.set_food_items(['banana', 'baby carrot'])
                 items_detection = self.flair.detect_items(camera_color_data, camera_depth_data, camera_info_data, log_path=None)
                 
                 plate_bounds = items_detection['plate_bounds']
@@ -1126,15 +1126,56 @@ class LookAtPlateHLA(HighLevelAction):
                     self.flair.set_preferences(self._perception_interface.user_preference)
                     self._preferences_set = True
 
+                food_types = sorted(set(items_detection['clean_item_labels']))
+
+                # Send detections back to interface.
+                n_food_types = len(food_types)
+                food_type_to_data = {food_type: [] for food_type in food_types}
+                for label, bb in zip(items_detection['clean_item_labels'],
+                                        items_detection['detections'].xyxy,
+                                            strict=True):
+                    x0, y0, x1, y1 = bb
+                    w = x1 - x0
+                    h = y1 - y0
+                    x_diff, y_diff, _, _ = plate_bounds
+                    item_data = [int(x0-x_diff), int(y0-y_diff), int(w), int(h)]
+                    food_type_to_data[label].append(item_data)
+                # data = [{k: v} for k, v in food_type_to_data.items()]
+
                 # Prepare for bite acquisition.
                 print("Doing Bite Acquisition")
                 self.wrist_controller.set_velocity_mode()
                 self.wrist_controller.reset()
 
                 next_action_prediction = self.flair.predict_next_action(camera_color_data, items_detection=None, log_path=None)
+
+                next_food_item = next_action_prediction['labels_list'][next_action_prediction['food_id']]
+                bite_mask_idx = next_action_prediction['bite_mask_idx']
                 print(" --- Next Food Item Prediction:", next_action_prediction['labels_list'][next_action_prediction['food_id']])
                 print(" --- Next Action Prediction:", next_action_prediction['action_type'])
-                
+
+                # remove next_food_item from data
+                data = [{k: v} for k, v in food_type_to_data.items() if k != next_food_item]
+                current_bite = {next_food_item: food_type_to_data[next_food_item]}
+
+                # current_bite = {next_food_item: []}
+
+                # for label, bb in zip(items_detection['clean_item_labels'],
+                #                         items_detection['detections'].xyxy,
+                #                             strict=True):
+                #     if label == next_food_item:
+                #         x0, y0, x1, y1 = bb
+                #         w = x1 - x0
+                #         h = y1 - y0
+                #         x_diff, y_diff, _, _ = plate_bounds
+                #         item_data = [int(x0-x_diff), int(y0-y_diff), int(w), int(h)]
+                #         current_bite[next_food_item].append(item_data) # how to set bite mask idx here?
+
+                # switch 'yellow banana slice' to 'banana' in '
+                data
+
+                self._send_web_interface_message({"n_food_types": n_food_types, "data": data, "current_bite": current_bite})            
+  
             else:
                 # Test image.
                 rng = np.random.default_rng(123)
