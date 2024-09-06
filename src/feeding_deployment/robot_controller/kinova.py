@@ -811,21 +811,28 @@ class KinovaArm:
     def switch_to_gravity_compensation_mode(self):
         def grav_comp_control_callback(arm):
             torque_command = arm.gravity()
-            gripper_command = 0
+            gripper_command = arm.gripper_pos
             return torque_command, gripper_command
 
-        try:
-            # if compliant control is already running, stop it (but do not switch back to high-level servoing mode)
-            if self.cyclic_running:
-                self.kill_the_thread = True
-                self.cyclic_thread.join()
-            self.init_cyclic(grav_comp_control_callback)
-            print("Arm is in gravity compensation mode")
-            while self.cyclic_running:
-                time.sleep(0.01)
-        except KeyboardInterrupt:
-            print("Keyboard interrupt detected: Stopping gravity compensation mode")
+        q, ee_pos, gripper_pos = self.get_state()
+        self.gripper_pos = gripper_pos # set gripper position to current position to avoid sudden jumps
+
+        # if compliant control is already running, stop it (but do not switch back to high-level servoing mode)
+        if self.cyclic_running:
+            self.kill_the_thread = True
+            self.cyclic_thread.join()
+            
+        self.init_cyclic(grav_comp_control_callback)
+        while not self.cyclic_running:
+            time.sleep(0.01)
+
+        print("Arm is in gravity compensation mode")
+
+    def switch_out_of_gravity_compensation_mode(self):
+        if self.cyclic_running:
             self.stop_cyclic()
+        else:
+            print("Not switching as arm is not in gravity compensation mode")
 
     def switch_to_joint_compliant_mode(self, command_queue):
 
