@@ -115,9 +115,9 @@ class HighLevelAction(abc.ABC):
         self._perception_interface.update_web_interface_image(image)
 
     def _wait_for_user_continue_button(self) -> None:
-        print("[Removed for now] Waiting for message from web interface on user_continue_button")
-        # msg = rospy.wait_for_message("/user_continue_button", Bool)
-        # assert msg.data
+        print("Waiting for transfer complete button press / ft sensor trigger ...")
+        msg = rospy.wait_for_message("/transfer_complete", Bool)
+        assert msg.data
         print("Received message, continuing ...")
 
 

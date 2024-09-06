@@ -6,7 +6,7 @@ import pyaudio
 import rospy
 from std_msgs.msg import Bool
 
-from feeding_deployment.safety.estop import EStop
+from feeding_deployment.safety.button import Button as EStop
 ESTOP_FREQUENCY = 1200
 
 class EStopsPublisher:

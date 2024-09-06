@@ -67,6 +67,22 @@ class JointStatesPublisher:
         cartesian_state_msg.orientation.w = ee_pose[6]
         self.cartesian_states_pub.publish(cartesian_state_msg) 
 
+        before_transfer_pos = [
+            -2.86554642,
+            -1.61951779,
+            -2.60986085,
+            -1.37302839,
+            1.11779249,
+            -1.18028264,
+            2.05515862,
+        ]
+
+        error = np.array(arm_pos) - np.array(before_transfer_pos)
+
+        # set 3 decimal places for error
+        np.set_printoptions(precision=3, suppress=True)
+        print(f"Tracking error: {error}")
+
     def run(self):
         while not rospy.is_shutdown():
             self.publish_joint_states()

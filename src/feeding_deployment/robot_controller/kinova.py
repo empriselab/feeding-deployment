@@ -815,6 +815,10 @@ class KinovaArm:
             return torque_command, gripper_command
 
         try:
+            # if compliant control is already running, stop it (but do not switch back to high-level servoing mode)
+            if self.cyclic_running:
+                self.kill_the_thread = True
+                self.cyclic_thread.join()
             self.init_cyclic(grav_comp_control_callback)
             while self.cyclic_running:
                 time.sleep(0.01)
