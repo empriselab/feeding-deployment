@@ -79,21 +79,16 @@ if __name__ == "__main__":
     if run_commands != "y":
         exit()
 
-    before_transfer_pos = [
-        -2.86554642,
-        -1.61951779,
-        -2.60986085,
-        -1.37302839,
-        1.11779249,
-        -1.18028264,
-        2.05515862,
-    ]
+    home_pos = [0.0, 0.26179939, 3.14159265, -2.26892803, 0.0, 0.95993109, 1.57079633]
+
+    input("Press enter to move to home position...")
+    arm_client_interface.execute_command(JointCommand(home_pos))
 
     input("Press enter to go to compliance mode...")
     arm_client_interface.switch_to_joint_compliant_mode()
 
-    input("Press enter to set bite transfer pose as compliant joint command...")
-    arm_client_interface._arm_interface.compliant_set_joint_position(before_transfer_pos)
+    input("Press enter to set home pos as compliant joint command...")
+    arm_client_interface._arm_interface.compliant_set_joint_position(home_pos)
 
     input("Press enter to go to non-compliance mode...")
     arm_client_interface.switch_out_of_joint_compliant_mode()
@@ -136,6 +131,16 @@ if __name__ == "__main__":
     #     1.11842806,
     #     -1.17904586,
     #     -2.6957422,
+    # ]
+
+    # before_transfer_pos = [
+    #     -2.86554642,
+    #     -1.61951779,
+    #     -2.60986085,
+    #     -1.37302839,
+    #     1.11779249,
+    #     -1.18028264,
+    #     2.05515862,
     # ]
 
     # # input("Press enter to move to above utensil mount pose...")

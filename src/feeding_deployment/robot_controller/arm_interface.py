@@ -180,7 +180,6 @@ class ArmInterface:
         print("No longer accepting commands")
         if self.in_compliant_mode:
             self.arm.switch_to_gravity_compensation_mode()
-            print("Switched to gravity compensation mode")
         else:
             self.arm.stop()
             print("Stopped arm")

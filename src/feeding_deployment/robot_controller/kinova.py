@@ -820,9 +820,11 @@ class KinovaArm:
                 self.kill_the_thread = True
                 self.cyclic_thread.join()
             self.init_cyclic(grav_comp_control_callback)
+            print("Arm is in gravity compensation mode")
             while self.cyclic_running:
                 time.sleep(0.01)
         except KeyboardInterrupt:
+            print("Keyboard interrupt detected: Stopping gravity compensation mode")
             self.stop_cyclic()
 
     def switch_to_joint_compliant_mode(self, command_queue):
