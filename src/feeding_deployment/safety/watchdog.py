@@ -77,6 +77,7 @@ class WatchDog:
         # bias FT sensor
         bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
         bias('bias')
+        time.sleep(2.0) # wait for bias to complete
 
         queue_size = 1000
         self.camera_info_sub = rospy.Subscriber("/camera/color/camera_info", CameraInfo, self.cameraCallback, queue_size = queue_size, buff_size = 65536*queue_size)
@@ -102,7 +103,7 @@ class WatchDog:
         self.watchdog_status_pub = rospy.Publisher("/watchdog_status", Bool, queue_size=1)
 
         self.second_counter = 0
-        time.sleep(5.0) # Wait for all queues to fill up / collision monitor to start
+        time.sleep(3.0) # Wait for all queues to fill up / collision monitor to start
         print("Initialized.")
 
     def cameraCallback(self, msg):
@@ -117,6 +118,7 @@ class WatchDog:
         if not self.ft_unexpected:
             for i in range(6):
                 if abs(ft[i]) > FT_THRESHOLD[i]:
+                    print("FT threshold exceeded with magnitude: ", ft)
                     self.ft_unexpected = True
                     break
 
@@ -164,7 +166,7 @@ class WatchDog:
             self.second_counter = 0
 
         for _unexpected, _anomaly in [(self.camera_unexpected, AnomalyStatus.CAMERA_UNEXPECTED),
-                                    # (self.ft_unexpected, AnomalyStatus.FT_UNEXPECTED),
+                                    (self.ft_unexpected, AnomalyStatus.FT_UNEXPECTED),
                                     (self.collision_free_unexpected, AnomalyStatus.COLLISION_FREE_UNEXPECTED),
                                     (self.user_emergency_stop_pressed, AnomalyStatus.USER_ESTOP_PRESSED),
                                     (self.experimentor_emergency_stop_pressed, AnomalyStatus.experimentor_ESTOP_PRESSED)]:

@@ -166,6 +166,7 @@ class ArmInterface:
 
     def close(self):
         print("Closing arm connection")
+        self.arm.stop()
         self.arm.disconnect()
 
     def retract(self):
@@ -179,6 +180,7 @@ class ArmInterface:
         self.arm_stopped = True
         print("No longer accepting commands")
         if self.in_compliant_mode:
+            self.in_compliant_mode = False
             self.arm.switch_to_gravity_compensation_mode()
         else:
             self.arm.stop()
