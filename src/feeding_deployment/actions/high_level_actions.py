@@ -35,6 +35,7 @@ from feeding_deployment.actions.low_level_actions import (
     move_to_ee_pose,
 )
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
+from feeding_deployment.interfaces.web_interface import WebInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 from feeding_deployment.robot_controller.command_interface import (
@@ -69,6 +70,7 @@ class HighLevelAction(abc.ABC):
         robot_interface: ArmInterfaceClient,
         perception_interface: PerceptionInterface,
         rviz_interface: RVizInterface,
+        web_interface: WebInterface,
         hla_hyperparams: dict[str, Any],
         run_on_robot: bool,
         wrist_controller,
@@ -78,6 +80,7 @@ class HighLevelAction(abc.ABC):
         self._robot_interface = robot_interface
         self._perception_interface = perception_interface
         self._rviz_interface = rviz_interface
+        self._web_interface = web_interface
         self._hla_hyperparams = hla_hyperparams
         self._run_on_robot = run_on_robot
         self.wrist_controller = wrist_controller
@@ -105,21 +108,6 @@ class HighLevelAction(abc.ABC):
         for robot_command in robot_commands:
             input("Execute next command?")
             self._robot_interface.execute_command(robot_command)
-
-    def _send_web_interface_message(self, msg_dict: dict[str, Any]) -> None:
-        self._perception_interface.web_interface_publisher.publish(
-            String(json.dumps(msg_dict))
-        )
-
-    def _send_web_interface_image(self, image) -> None:
-        self._perception_interface.update_web_interface_image(image)
-
-    def _wait_for_user_continue_button(self) -> None:
-        print("Waiting for transfer complete button press / ft sensor trigger ...")
-        msg = rospy.wait_for_message("/transfer_complete", Bool)
-        assert msg.data
-        print("Received message, continuing ...")
-
 
 @dataclass(frozen=True)
 class GroundHighLevelAction:
@@ -225,7 +213,7 @@ class PickToolHLA(HighLevelAction):
                 self.execute_robot_commands(robot_commands)
 
             # Send message to web interface.
-            self._send_web_interface_message({"state": "drink_pickup", "status": "completed"})
+            self._web_interface.send_web_interface_message({"state": "drink_pickup", "status": "completed"})
 
             return sim_states
 
@@ -375,7 +363,7 @@ class PickToolHLA(HighLevelAction):
                 self.execute_robot_commands(robot_commands)
 
             # Send message to web interface.
-            self._send_web_interface_message({"state": "prepare_mouth_wiping", "status": "completed"})
+            self._web_interface.send_web_interface_message({"state": "prepare_mouth_wiping", "status": "completed"})
 
             return sim_states
 
@@ -649,6 +637,10 @@ class TransferToolHLA(HighLevelAction):
             if self.flair is not None:
                 self.wrist_controller.reset()
 
+            # Send message to web interface indicating transfer is done.
+            self._web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
+            return sim_states
+
             sim_length = len(sim_states)
 
             target_pose = self._perception_interface.get_head_perception_forque_target_pose(simulation=True)
@@ -721,10 +713,7 @@ class TransferToolHLA(HighLevelAction):
                     print("Trajectory not executed on robot")
             
             # Wait for button press to indicate that transfer is finished.
-            self._wait_for_user_continue_button()
-            
-            # Send message to web interface indicating transfer is done.
-            self._send_web_interface_message({"state": "bite_transfer", "status": "completed"})
+            self._perception_interface.wait_for_user_continue_button()
             
             # Reverse the transfer plan.
             transfer_sim_states = sim_states[sim_length:]
@@ -777,6 +766,8 @@ class TransferToolHLA(HighLevelAction):
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
             robot_commands = []
+
+            return sim_states
 
             sim_length = len(sim_states)
 
@@ -851,9 +842,9 @@ class TransferToolHLA(HighLevelAction):
                     print("Trajectory not executed on robot")
             
             # Wait for button press to indicate that transfer is finished.
-            self._wait_for_user_continue_button()
+            self._perception_interface.wait_for_user_continue_button()
 
-            self._send_web_interface_message({"state": "drink_transfer", "status": "completed"})
+            self._web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})
 
             # Reverse the transfer plan.
             transfer_sim_states = sim_states[sim_length:]
@@ -907,6 +898,9 @@ class TransferToolHLA(HighLevelAction):
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
             robot_commands = []
+
+            
+            return sim_states
 
             sim_length = len(sim_states)
 
@@ -982,9 +976,9 @@ class TransferToolHLA(HighLevelAction):
                     print("Trajectory not executed on robot")
             
             # Wait for button press to indicate that transfer is finished.
-            self._wait_for_user_continue_button()
+            self._perception_interface.wait_for_user_continue_button()
 
-            self._send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})
+            self._web_interface.send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})
 
             # Reverse the transfer plan.
             transfer_sim_states = sim_states[sim_length:]
@@ -1066,11 +1060,14 @@ class LookAtPlateHLA(HighLevelAction):
                 robot_commands,
                 rviz_interface=self._rviz_interface
             )
+            
 
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
-
-            self._send_web_interface_message({"state": "prepare_bite", "status": "completed"})
+            
+            if self.wrist_controller is not None:
+                self.wrist_controller.set_velocity_mode()
+                self.wrist_controller.reset()
 
             if self.flair is not None:
 
@@ -1084,63 +1081,35 @@ class LookAtPlateHLA(HighLevelAction):
                 self.flair.set_food_items(['banana', 'baby carrot'])
                 items_detection = self.flair.detect_items(camera_color_data, camera_depth_data, camera_info_data, log_path=None)
                 
-                plate_bounds = items_detection['plate_bounds']
-                plate_image = camera_color_data.copy()[plate_bounds[1]:plate_bounds[1]+plate_bounds[3], plate_bounds[0]:plate_bounds[0]+plate_bounds[2]]
-                self._send_web_interface_image(plate_image)
-                time.sleep(1.0)  # simulate delay, also needed for web interface
-                
-                print(" --- Food items detected:", items_detection['clean_item_labels'])
-
                 if not self._preferences_set:
 
                     # Handle one-time preference setting.
-
-                    food_types = sorted(set(items_detection['clean_item_labels']))
-
-                    # Send detections back to interface.
-                    n_food_types = len(food_types)
-                    food_type_to_data = {food_type: [] for food_type in food_types}
-                    for label, bb in zip(items_detection['clean_item_labels'],
-                                         items_detection['detections'].xyxy,
-                                                strict=True):
-                        x0, y0, x1, y1 = bb
-                        w = x1 - x0
-                        h = y1 - y0
-                        x_diff, y_diff, _, _ = plate_bounds
-                        item_data = [int(x0-x_diff), int(y0-y_diff), int(w), int(h)]
-                        food_type_to_data[label].append(item_data)
+    
+                    food_type_to_data = items_detection['food_type_to_bounding_boxes_plate']
+                    n_food_types = len(food_type_to_data)
                     data = [{k: v} for k, v in food_type_to_data.items()]
-                    self._send_web_interface_message({"n_food_types": n_food_types, "data": data})
+
+                    food_types = food_type_to_data.keys()
 
                     # TODO: generalize this...
                     ordering_options = [f"Eat all the {food_type}s first" for food_type in food_types]
                     ordering_options += ["No preference"]
-                    self._send_web_interface_message({"n_ordering": len(ordering_options), "data": ordering_options})
+
+                    self._web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
+                    time.sleep(1.0) # simulate delay, also needed for web interface
+                    self._web_interface.update_web_interface_image(items_detection['plate_image'])
+                    time.sleep(1.0)  # simulate delay, also needed for web interface
+                    self._web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data})
+                    self._web_interface.send_web_interface_message({"n_ordering": len(ordering_options), "data": ordering_options})
 
                     # Wait for web interface to report order selection.
                     print("WAITING TO GET PREFERENCE")
-                    while self._perception_interface.user_preference is None:
+                    while self._web_interface.user_preference is None:
                         time.sleep(1e-1)
                     print("FINISHED GETTING PREFERENCES")
 
-                    self.flair.set_preferences(self._perception_interface.user_preference)
+                    self.flair.set_preferences(self._web_interface.user_preference)
                     self._preferences_set = True
-
-                food_types = sorted(set(items_detection['clean_item_labels']))
-
-                # Send detections back to interface.
-                n_food_types = len(food_types)
-                food_type_to_data = {food_type: [] for food_type in food_types}
-                for label, bb in zip(items_detection['clean_item_labels'],
-                                        items_detection['detections'].xyxy,
-                                            strict=True):
-                    x0, y0, x1, y1 = bb
-                    w = x1 - x0
-                    h = y1 - y0
-                    x_diff, y_diff, _, _ = plate_bounds
-                    item_data = [int(x0-x_diff), int(y0-y_diff), int(w), int(h)]
-                    food_type_to_data[label].append(item_data)
-                # data = [{k: v} for k, v in food_type_to_data.items()]
 
                 # Prepare for bite acquisition.
                 print("Doing Bite Acquisition")
@@ -1155,26 +1124,13 @@ class LookAtPlateHLA(HighLevelAction):
                 print(" --- Next Action Prediction:", next_action_prediction['action_type'])
 
                 # remove next_food_item from data
+                food_type_to_data = items_detection['food_type_to_bounding_boxes_plate']
+
+                n_food_types = len(food_type_to_data)
                 data = [{k: v} for k, v in food_type_to_data.items() if k != next_food_item]
                 current_bite = {next_food_item: food_type_to_data[next_food_item]}
 
-                # current_bite = {next_food_item: []}
-
-                # for label, bb in zip(items_detection['clean_item_labels'],
-                #                         items_detection['detections'].xyxy,
-                #                             strict=True):
-                #     if label == next_food_item:
-                #         x0, y0, x1, y1 = bb
-                #         w = x1 - x0
-                #         h = y1 - y0
-                #         x_diff, y_diff, _, _ = plate_bounds
-                #         item_data = [int(x0-x_diff), int(y0-y_diff), int(w), int(h)]
-                #         current_bite[next_food_item].append(item_data) # how to set bite mask idx here?
-
-                # switch 'yellow banana slice' to 'banana' in '
-                data
-
-                self._send_web_interface_message({"n_food_types": n_food_types, "data": data, "current_bite": current_bite})            
+                self._web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data, "current_bite": current_bite})            
   
             else:
                 # Test image.
@@ -1215,32 +1171,66 @@ class AcquireBiteHLA(HighLevelAction):
 
         if tool.name == "utensil":
 
+            print("params", params)
+            input("Press Enter to continue...")
+
             if self.flair is not None:
+
                 print("Doing Bite Acquisition")
                 camera_color_data, camera_info_data, camera_depth_data, _ = (
                     self._perception_interface.get_camera_data()
                 )
-                # Autonomous - execute next action prediction
-                self.flair.execute_action(camera_color_data, camera_depth_data, camera_info_data, next_action_prediction=None, log_path=None)
 
-                # Manual - execute action from web interface
-                # action_type = "Skewer"
-                # self.flair.execute_manual_action(action_type, camera_color_data, camera_depth_data, camera_info_data):
+                if params["status"] == 0:
+
+                    detections = self.flair.get_items_detection()
+                    plate_bounds = detections["plate_bounds"]
+
+                    skewer_center = (int(params["positions"][0]["x"] + plate_bounds[0]), int(params["positions"][0]["y"] + plate_bounds[1]))
+                    skewer_angle = 0
+
+                    self.flair.skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_center, major_axis = skewer_angle)
+
+                    # Manual - execute action from web interface
+                    # action_type = "Skewer"
+                    # self.flair.execute_manual_action(action_type, camera_color_data, camera_depth_data, camera_info_data):
+
+                elif params["status"] == "aquire_food":
+                    detections = self.flair.get_items_detection()
+                    food_type_to_masks = detections["food_type_to_masks"]
+                    food_type_to_skill = detections["food_type_to_skill"]
+                    
+                    food_type = params["data"][0]
+                    item_id = params["data"][1] - 1
+
+                    mask = food_type_to_masks[food_type][item_id]
+                    skill = food_type_to_skill[food_type]
+
+                    if skill == "Skewer":
+                        skewer_point, skewer_angle = self.flair.inference_server.get_skewer_action(mask)
+                        self.flair.skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_point, major_axis = skewer_angle)
+                    elif skill == "Scoop":
+                        raise NotImplementedError("Scoop skill not yet implemented")
+
+                sim_states: list[FeedingDeploymentSimulatorState] = []
+                robot_commands = []
+
+                move_to_joint_positions(
+                    self._sim,
+                    self._sim.scene_description.above_plate_pos,
+                    sim_states,
+                    robot_commands,
+                    rviz_interface=self._rviz_interface
+                )
+
+                if self._run_on_robot:
+                    self.execute_robot_commands(robot_commands)
+    
             else:
                 time.sleep(2.0)  # simulate delay, also needed for web interface
 
-            # skill_library.scooping_skill(camera_color_data, camera_depth_data, camera_info_data)
-
-            # skill_library.dipping_skill(camera_color_data, camera_depth_data, camera_info_data)
-
-            # skill_library.pushing_skill(camera_color_data, camera_depth_data, camera_info_data)
-
-            # skill_library.twirling_skill(camera_color_data, camera_depth_data, camera_info_data)
-
-            # skill_library.cutting_skill(camera_color_data, camera_depth_data, camera_info_data)
-
             # Send message to web interface indicating that robot is done with acquisition.
-            self._send_web_interface_message({"state": "bite_pickup", "status": "completed"})
+            self._web_interface.send_web_interface_message({"state": "bite_pickup", "status": "completed"})
 
             return []
 

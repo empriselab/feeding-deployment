@@ -3,8 +3,11 @@
 from pathlib import Path
 from typing import Any
 
+import json
+
 try:
     import rospy
+    from std_msgs.msg import String
 
     ROSPY_IMPORTED = True
 except ModuleNotFoundError:
@@ -42,9 +45,11 @@ from pybullet_helpers.link import get_link_pose, get_relative_link_pose
 from feeding_deployment.actions.high_level_actions import (
     TransferToolHLA,
     LookAtPlateHLA,
+    AcquireBiteHLA,
     tool_type,
 )
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
+from feeding_deployment.interfaces.web_interface import WebInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 from feeding_deployment.simulation.scene_description import (
@@ -57,9 +62,9 @@ from feeding_deployment.simulation.simulator import (
 )
 from feeding_deployment.simulation.video import make_simulation_video
 
-def test_TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos):
+def test_TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos):
 
-    high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot, wrist_controller, flair)
+    high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair)
     utensil = Object("utensil", tool_type)
 
     sim.held_object_name = "utensil"
@@ -83,9 +88,9 @@ def test_TransferToolHLA(sim, robot_interface, perception_interface, rviz_interf
         make_simulation_video(sim, sim_traj, outfile)
         print(f"Saved video to {outfile}")
 
-def test_LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos):
+def test_LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos):
 
-    high_level_action = LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot, wrist_controller, flair)
+    high_level_action = LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair)
     utensil = Object("utensil", tool_type)
 
     sim.held_object_name = "utensil"
@@ -103,6 +108,31 @@ def test_LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interfa
 
     sim_traj = high_level_action.execute_action(objects=[utensil], params={})
 
+def test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos):
+
+    print("WAITING FOR MESSAGE on /WebAppComm")
+    msg = rospy.wait_for_message("/WebAppComm", String)
+    msg_dict = json.loads(msg.data)   
+    print(f"Received message: {msg_dict}")
+
+    high_level_action = AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair)
+    utensil = Object("utensil", tool_type)
+
+    sim.held_object_name = "utensil"
+    sim.held_object_id = sim.utensil_id
+    sim.robot.set_finger_state(sim.scene_description.tool_grasp_fingers_value)
+    finger_frame_id = sim.robot.link_from_name("finger_tip")
+    end_effector_link_id = sim.robot.link_from_name(sim.robot.tool_link_name)
+    utensil_from_end_effector = get_relative_link_pose(
+        sim.robot.robot_id, finger_frame_id, end_effector_link_id, sim.physics_client_id
+    )
+    sim.held_object_tf = utensil_from_end_effector
+    print(f"utensil_from_end_effector: {utensil_from_end_effector}")
+
+    rviz_interface.tool_update(True, sim.held_object_name, Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the tool in rviz
+
+    sim_traj = high_level_action.execute_action(objects=[utensil], params=msg_dict)
+    
 def _main(
     run_on_robot: bool, make_videos: bool, max_motion_planning_time: float = 10
 ) -> None:
@@ -118,6 +148,11 @@ def _main(
         robot_interface = ArmInterfaceClient()  # type: ignore  # pylint: disable=no-member
     else:
         robot_interface = None
+
+    if ROSPY_IMPORTED:
+        web_interface = WebInterface()
+    else:
+        web_interface = None
 
     # Initialize the perceiver (e.g., get joint states or human head poses).
     perception_interface = PerceptionInterface(robot_interface)
@@ -149,7 +184,9 @@ def _main(
     # Create skills for high-level planning.
     hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
 
-    test_LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos)
+    test_LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos)
+    test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos)
+    test_TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos)
 
 if __name__ == "__main__":
     import argparse

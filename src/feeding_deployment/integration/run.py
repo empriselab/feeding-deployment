@@ -58,6 +58,7 @@ from feeding_deployment.actions.high_level_actions import (
     tool_type,
 )
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
+from feeding_deployment.interfaces.web_interface import WebInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 from feeding_deployment.simulation.scene_description import (
@@ -84,12 +85,6 @@ class _Runner:
         self.max_motion_planning_time = max_motion_planning_time
         self._saved_state_outfile = Path(__file__).parent / "saved_state.p"
 
-        # Subscribe to the web interface topics.
-        if ROSPY_IMPORTED:
-            self.web_interface_sub = rospy.Subscriber(
-                "WebAppComm", String, self.web_interface_callback
-            )
-
         # Initialize the interface to the robot.
         if run_on_robot:
             self.robot_interface = ArmInterfaceClient()  # type: ignore  # pylint: disable=no-member
@@ -98,6 +93,13 @@ class _Runner:
 
         # Initialize the perceiver (e.g., get joint states or human head poses).
         self.perception_interface = PerceptionInterface(self.robot_interface)
+
+        if ROSPY_IMPORTED:
+            # Initialize the web interface.
+            self.web_interface = WebInterface()
+            self.web_interface_sub = rospy.Subscriber(
+                "WebAppComm", String, self.web_interface_callback
+            )
 
         # Initialize the FLAIR interface.
         if FLAIR_IMPORTED:
@@ -119,15 +121,17 @@ class _Runner:
 
         self.rviz_interface = RVizInterface(self.scene_description)
 
-        self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description)
-        # self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description, use_gui=False)
+        # self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description)
+        self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description, use_gui=False)
 
         # Create skills for high-level planning.
         hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
+        print("Creating HLAs...")
         self.hlas = {
-            cls(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, hla_hyperparams, run_on_robot,
+            cls(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.web_interface, hla_hyperparams, run_on_robot,
                 wrist_controller, flair) for cls in HLAS  # type: ignore
         }
+        print("HLAs created.")
         self.hla_name_to_hla = {hla.get_name(): hla for hla in self.hlas}
         self.operators = {hla.get_operator() for hla in self.hlas}
         self.predicates: set[Predicate] = {
@@ -165,6 +169,8 @@ class _Runner:
             resp = input("Are you sure you want to continue from here? [y/n] ")
             if resp != "y":
                 sys.exit(0)
+        
+        print("Runner is ready.")
 
     def web_interface_callback(self, msg: "String") -> None:
         """Callback for the web interface."""
@@ -183,9 +189,9 @@ class _Runner:
             user_cmd = GroundHighLevelAction(
                 self.hla_name_to_hla["LookAtPlate"], (self.utensil,)
             )
-        elif msg_dict["status"] == "aquire_food":
+        elif msg_dict["status"] == "aquire_food" or msg_dict["status"] == 0: # manual acquire food
             user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["AcquireBite"], (self.utensil,)
+                self.hla_name_to_hla["AcquireBite"], (self.utensil,), params=msg_dict
             )
         elif msg_dict["status"] == "bite_transfer":
             user_cmd = GroundHighLevelAction(

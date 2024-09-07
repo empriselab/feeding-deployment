@@ -45,6 +45,7 @@ from feeding_deployment.actions.high_level_actions import (
 )
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
+from feeding_deployment.interfaces.web_interface import WebInterface
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 from feeding_deployment.simulation.scene_description import (
     SceneDescription,
@@ -72,6 +73,11 @@ def _main(
     # Initialize the interface to the robot.
     robot_interface = ArmInterfaceClient()  # type: ignore  # pylint: disable=no-member
 
+    if ROSPY_IMPORTED:
+        web_interface = WebInterface()
+    else:
+        web_interface = None
+
     # Initialize the perceiver (e.g., get joint states or human head poses).
     perception_interface = PerceptionInterface(robot_interface, not test)
     
@@ -98,7 +104,7 @@ def _main(
         # Create skills for high-level planning.
         hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
 
-        high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot, wrist_controller, None)
+        high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, None)
 
         if tool == "fork":
             object = Object("utensil", tool_type)
