@@ -75,9 +75,9 @@ class WatchDog:
         self._arm_interface = self.manager.ArmInterface()
 
         # bias FT sensor
-        bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
-        bias('bias')
-        time.sleep(2.0) # wait for bias to complete
+        # bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
+        # bias('bias')
+        # time.sleep(2.0) # wait for bias to complete
 
         queue_size = 1000
         self.camera_info_sub = rospy.Subscriber("/camera/color/camera_info", CameraInfo, self.cameraCallback, queue_size = queue_size, buff_size = 65536*queue_size)

@@ -35,17 +35,10 @@
     </include>
 
     <!-- FT sensor -->
-    <include file="$(find netft_rdt_driver)/launch/ft_sensor.launch">
-        <arg name="ip_address" value="192.168.1.23"/>
-        <arg name="rate" value="1000"/>
-    </include>
 
     <!-- Emergency Stops -->
 
     <!-- Transfer Complete Button -->
-    <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_transfer_button_listener">
-        <param name="cmd" value="$(arg python_path) $(arg base_path)/src/feeding_deployment/safety/transfer_button_listener.py --button_id 7"/>
-    </node>
 
     <!-- Joint States Publisher -->
     <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_joint_states">
@@ -53,9 +46,6 @@
     </node>
 
     <!-- Collision Monitor -->
-    <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_collision_monitor">
-        <param name="cmd" value="$(arg python_path) $(arg base_path)/src/feeding_deployment/safety/collision_monitor.py"/>
-    </node>
 
     <!-- Watchdog -->
 

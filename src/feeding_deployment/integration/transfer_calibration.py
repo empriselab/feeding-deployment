@@ -61,7 +61,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 def _main(
-    tool: str, test: bool, max_motion_planning_time: float = 10
+    tool: str, test: bool, record_rom: bool, max_motion_planning_time: float = 10
 ) -> None:
     """Testing components of the system."""
 
@@ -84,12 +84,17 @@ def _main(
     wrist_controller = WristController()
 
     if not test: # calibrate utensil tip
-        # set tool transform - only required once globally
-        perception_interface._head_perception.save_tool_tip_transform(args.tool)
-        
-        perception_interface._head_perception.set_tool(args.tool)
-        while not rospy.is_shutdown():
-            perception_interface._head_perception.run_head_perception()
+        if not record_rom:
+            # set tool transform - only required once globally
+            perception_interface._head_perception.save_tool_tip_transform(args.tool)
+            
+            perception_interface._head_perception.set_tool(args.tool)
+            while not rospy.is_shutdown():
+                perception_interface._head_perception.run_head_perception()
+        else:
+            perception_interface._head_perception.set_tool(args.tool)
+            while not rospy.is_shutdown():
+                perception_interface._head_perception.run_head_perception()
     else: # actually do the transfer
         run_on_robot = True
 
@@ -140,10 +145,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--tool", type=str, default="fork")
     parser.add_argument("--test", action="store_true")
+    parser.add_argument("--record_rom", action="store_true")
     parser.add_argument("--max_motion_planning_time", type=float, default=10.0)
     args = parser.parse_args()
 
     if args.tool not in ["fork", "drink", "wipe"]:
         raise ValueError(f"Invalid tool: {args.tool}, must be one of fork, drink, wipe")
 
-    _main(args.tool, args.test, args.max_motion_planning_time)
+    _main(args.tool, args.test, args.record_rom, args.max_motion_planning_time)
