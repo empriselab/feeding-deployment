@@ -79,10 +79,18 @@ if __name__ == "__main__":
     if run_commands != "y":
         exit()
 
-    home_pos = [0.0, 0.26179939, 3.14159265, -2.26892803, 0.0, 0.95993109, 1.57079633]
+    before_transfer_pos = [
+        -2.8655331,  
+        -1.61973777, 
+        -2.6097253, 
+        -1.37301134, 
+        1.11781087,
+        -1.18039928,
+        2.05515662
+    ]
 
     input("Press enter to move to home position...")
-    arm_client_interface.execute_command(JointCommand(home_pos))
+    arm_client_interface.execute_command(JointCommand(before_transfer_pos))
 
     input("Press enter to go to compliance mode...")
     arm_client_interface.switch_to_joint_compliant_mode()
