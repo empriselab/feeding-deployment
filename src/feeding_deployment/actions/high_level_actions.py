@@ -633,6 +633,15 @@ class TransferToolHLA(HighLevelAction):
                 self.execute_robot_commands(robot_commands)
             robot_commands = []
 
+            if self._run_on_robot:
+                input("Press enter to switch to task compliant mode")
+                self._robot_interface.switch_to_task_compliant_mode()
+                # Do inside-mouth transfer here
+                input("Press enter to switch out of compliant mode")
+                self._robot_interface.switch_out_of_compliant_mode()
+
+            return sim_states
+
             # Rajat ToDo: Implement horizontal utensil
             if self.flair is not None:
                 self.wrist_controller.reset()
@@ -707,7 +716,7 @@ class TransferToolHLA(HighLevelAction):
                     y = input("Please enter 'y' or 'n'")
                 if y == "y":
                     input("Press enter to switch to joint compliant mode")
-                    self._robot_interface.switch_to_joint_compliant_mode()
+                    self._robot_interface.switch_to_task_compliant_mode()
                     self.execute_robot_commands(robot_commands)
                 else:
                     print("Trajectory not executed on robot")
@@ -743,7 +752,7 @@ class TransferToolHLA(HighLevelAction):
                 if y == "y":
                     self.execute_robot_commands(reversed_robot_commands)
                     input("Press enter to switch out of joint compliant mode")
-                    self._robot_interface.switch_out_of_joint_compliant_mode()
+                    self._robot_interface.switch_out_of_compliant_mode()
                 else:
                     print("Trajectory not executed on robot")
 
@@ -834,10 +843,10 @@ class TransferToolHLA(HighLevelAction):
                 y = input("Does the trajectory look good? Press 'y' to execute on robot")
                 if y == "y":
                     input("Press enter to switch to joint compliant mode")
-                    self._robot_interface.switch_to_joint_compliant_mode()
+                    self._robot_interface.switch_to_task_compliant_mode()
                     self.execute_robot_commands(robot_commands)
                     input("Press enter to switch out of joint compliant mode")
-                    self._robot_interface.switch_out_of_joint_compliant_mode()
+                    self._robot_interface.switch_out_of_compliant_mode()
                 else:
                     print("Trajectory not executed on robot")
             
@@ -872,10 +881,10 @@ class TransferToolHLA(HighLevelAction):
                 y = "n"
                 if y == "y":
                     input("Press enter to switch to joint compliant mode")
-                    self._robot_interface.switch_to_joint_compliant_mode()
+                    self._robot_interface.switch_to_task_compliant_mode()
                     self.execute_robot_commands(reversed_robot_commands)
                     input("Press enter to switch out of joint compliant mode")
-                    self._robot_interface.switch_out_of_joint_compliant_mode()
+                    self._robot_interface.switch_out_of_compliant_mode()
                 else:
                     print("Trajectory not executed on robot")
 
@@ -968,10 +977,10 @@ class TransferToolHLA(HighLevelAction):
                 y = input("Does the trajectory look good? Press 'y' to execute on robot")
                 if y == "y":
                     input("Press enter to switch to joint compliant mode")
-                    self._robot_interface.switch_to_joint_compliant_mode()
+                    self._robot_interface.switch_to_task_compliant_mode()
                     self.execute_robot_commands(robot_commands)
                     input("Press enter to switch out of joint compliant mode")
-                    self._robot_interface.switch_out_of_joint_compliant_mode()
+                    self._robot_interface.switch_out_of_compliant_mode()
                 else:
                     print("Trajectory not executed on robot")
             
@@ -1006,10 +1015,10 @@ class TransferToolHLA(HighLevelAction):
                 y = "n"
                 if y == "y":
                     input("Press enter to switch to joint compliant mode")
-                    self._robot_interface.switch_to_joint_compliant_mode()
+                    self._robot_interface.switch_to_task_compliant_mode()
                     self.execute_robot_commands(reversed_robot_commands)
                     input("Press enter to switch out of joint compliant mode")
-                    self._robot_interface.switch_out_of_joint_compliant_mode()
+                    self._robot_interface.switch_out_of_compliant_mode()
                 else:
                     print("Trajectory not executed on robot")
 

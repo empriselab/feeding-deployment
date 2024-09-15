@@ -29,7 +29,7 @@ class ArmInterface:
         return arm_pos, ee_pose, gripper_pos
     
     def get_update_state(self):
-        arm_pos, arm_vel, gripper_pos = self.arm.get_update_state()
+        arm_pos, arm_vel, _, gripper_pos = self.arm.get_update_state()
         return arm_pos, arm_vel, gripper_pos
 
     def reset(self):
@@ -37,7 +37,7 @@ class ArmInterface:
         print("Moving to home position")
         self.arm.home()
 
-    def switch_to_joint_compliant_mode(self):
+    def switch_to_task_compliant_mode(self):
 
         assert not self.arm_stopped, "Arm is stopped"
         assert not self.in_compliant_mode, "Already in compliant mode"
@@ -49,27 +49,27 @@ class ArmInterface:
 
         # switch to joint compliant mode
         print("Switching to joint compliant mode")
-        self.arm.switch_to_joint_compliant_mode(self.command_queue)
+        self.arm.switch_to_task_compliant_mode(self.command_queue)
         self.in_compliant_mode = True
 
-    def switch_out_of_joint_compliant_mode(self):
+    def switch_out_of_compliant_mode(self):
 
         assert not self.arm_stopped, "Arm is stopped"
         assert self.in_compliant_mode, "Not in compliant mode"
 
         # switch out of joint compliant mode
         print("Switching out of joint compliant mode")
-        self.arm.switch_out_of_joint_compliant_mode()
+        self.arm.switch_out_of_compliant_mode()
         self.in_compliant_mode = False
 
-    def compliant_set_joint_position(self, command_pos):
+    # def compliant_set_joint_position(self, command_pos):
 
-        assert not self.arm_stopped, "Arm is stopped"
-        assert self.in_compliant_mode, "Not in compliant mode"
+    #     assert not self.arm_stopped, "Arm is stopped"
+    #     assert self.in_compliant_mode, "Not in compliant mode"
 
-        print(f"Received compliant joint pos command: {command_pos}")
-        gripper_pos = 0
-        self.command_queue.put((command_pos, gripper_pos))
+    #     print(f"Received compliant joint pos command: {command_pos}")
+    #     gripper_pos = 0
+    #     self.command_queue.put((command_pos, gripper_pos))
 
     # def compliant_set_joint_trajectory(self, trajectory_command):
     #     print(
@@ -89,30 +89,30 @@ class ArmInterface:
     #                 self.command_queue.put((command_pos, gripper_pos))
     #                 break
 
-    def compliant_set_joint_trajectory(self, trajectory_command):
+    # def compliant_set_joint_trajectory(self, trajectory_command):
 
-        assert not self.arm_stopped, "Arm is stopped"
-        assert self.in_compliant_mode, "Not in compliant mode"
+    #     assert not self.arm_stopped, "Arm is stopped"
+    #     assert self.in_compliant_mode, "Not in compliant mode"
 
-        print(
-            f"Received compliant joint trajectory command with {len(trajectory_command)} waypoints"
-        )
+    #     print(
+    #         f"Received compliant joint trajectory command with {len(trajectory_command)} waypoints"
+    #     )
 
-        for command_pos in trajectory_command:
-            for i in range(len(command_pos)):
-                if command_pos[i] > np.pi:
-                    command_pos[i] -= 2 * np.pi
-                if command_pos[i] < -np.pi:
-                    command_pos[i] += 2 * np.pi
+    #     for command_pos in trajectory_command:
+    #         for i in range(len(command_pos)):
+    #             if command_pos[i] > np.pi:
+    #                 command_pos[i] -= 2 * np.pi
+    #             if command_pos[i] < -np.pi:
+    #                 command_pos[i] += 2 * np.pi
 
-        assert self.command_queue.empty(), "Before trajectory execution - command queue not empty"
+    #     assert self.command_queue.empty(), "Before trajectory execution - command queue not empty"
 
-        gripper_pos = 0
-        for command_pos in trajectory_command:
-            self.command_queue.put((command_pos, gripper_pos))
-            time.sleep(0.01)
+    #     gripper_pos = 0
+    #     for command_pos in trajectory_command:
+    #         self.command_queue.put((command_pos, gripper_pos))
+    #         time.sleep(0.01)
 
-        assert self.command_queue.empty(), "After trajectory execution - command queue not empty"
+    #     assert self.command_queue.empty(), "After trajectory execution - command queue not empty"
 
     def set_joint_position(self, command_pos):
         

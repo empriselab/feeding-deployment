@@ -37,14 +37,14 @@ class ArmInterfaceClient:
         self._arm_interface = self.manager.ArmInterface()
         self.in_compliant_mode = False
 
-    def switch_to_joint_compliant_mode(self):
+    def switch_to_task_compliant_mode(self):
         assert not self.in_compliant_mode, "Already in compliant mode"
-        self._arm_interface.switch_to_joint_compliant_mode()
+        self._arm_interface.switch_to_task_compliant_mode()
         self.in_compliant_mode = True
 
-    def switch_out_of_joint_compliant_mode(self):
+    def switch_out_of_compliant_mode(self):
         assert self.in_compliant_mode, "Not in compliant mode"
-        self._arm_interface.switch_out_of_joint_compliant_mode()
+        self._arm_interface.switch_out_of_compliant_mode()
         self.in_compliant_mode = False
 
     def execute_command(self, cmd: KinovaCommand) -> None:
@@ -79,19 +79,24 @@ if __name__ == "__main__":
     if run_commands != "y":
         exit()
 
-    home_pos = [0.0, 0.26179939, 3.14159265, -2.26892803, 0.0, 0.95993109, 1.57079633]
+    before_transfer_pos = [
+        -2.8655331,  
+        -1.61973777, 
+        -2.6097253, 
+        -1.37301134, 
+        1.11781087,
+        -1.18039928,
+        2.05515662
+    ]
 
     input("Press enter to move to home position...")
-    arm_client_interface.execute_command(JointCommand(home_pos))
+    arm_client_interface.execute_command(JointCommand(before_transfer_pos))
 
     input("Press enter to go to compliance mode...")
-    arm_client_interface.switch_to_joint_compliant_mode()
-
-    input("Press enter to set home pos as compliant joint command...")
-    arm_client_interface._arm_interface.compliant_set_joint_position(home_pos)
+    arm_client_interface.switch_to_task_compliant_mode()
 
     input("Press enter to go to non-compliance mode...")
-    arm_client_interface.switch_out_of_joint_compliant_mode()
+    arm_client_interface.switch_out_of_compliant_mode()
 
     # utensil_inside_mount = (
     #     np.array([0.242, -0.077, 0.07]),

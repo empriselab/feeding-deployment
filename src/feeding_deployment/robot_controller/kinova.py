@@ -43,8 +43,8 @@ except ModuleNotFoundError:
 from scipy.spatial.transform import Rotation as R
 
 # for joint space compliant control
-from feeding_deployment.robot_controller.joint_compliant_controller import (
-    JointCompliantController,
+from feeding_deployment.robot_controller.compliant_controller import (
+    CompliantController,
     command_loop_retract,
 )
 
@@ -101,6 +101,10 @@ class KinovaArm:
     ACTION_TIMEOUT_DURATION = 60
 
     def __init__(self):
+
+        # Using Hack: fix joint 6
+        self.fix_joint_hack = True
+
         # rospy.init_node("kinova_controller", anonymous=True)
 
         # self.estop_sub = rospy.Subscriber(
@@ -180,8 +184,13 @@ class KinovaArm:
         # Note: Torque commands are converted to current commands since
         # Kinova's torque controller is unable to achieve commanded torques.
         # See relevant GitHub issue: https://github.com/Kinovarobotics/kortex/issues/38
-        self.torque_constant = np.array([11.0, 11.0, 11.0, 11.0, 7.6, 7.6, 7.6])
-        self.current_limit_max = np.array([10.0, 10.0, 10.0, 10.0, 6.0, 6.0, 6.0])
+
+        if self.fix_joint_hack:
+            self.torque_constant = np.array([11.0, 11.0, 11.0, 11.0, 7.6, 7.6])
+            self.current_limit_max = np.array([10.0, 10.0, 10.0, 10.0, 6.0, 6.0])
+        else:
+            self.torque_constant = np.array([11.0, 11.0, 11.0, 11.0, 7.6, 7.6, 7.6])
+            self.current_limit_max = np.array([10.0, 10.0, 10.0, 10.0, 6.0, 6.0, 6.0])
         self.current_limit_min = -self.current_limit_max
 
         # Cyclic thread setup
@@ -189,17 +198,30 @@ class KinovaArm:
         self.kill_the_thread = False
         self.cyclic_running = False
 
+        if self.fix_joint_hack:
+            self.n_compliant_dofs = self.actuator_count - 1 # Hack: fix joint 6
+        else:
+            self.n_compliant_dofs = self.actuator_count
+            
         # Robot state setup (only used in low-level servoing mode)
-        self.q = np.zeros(self.actuator_count)
-        self.dq = np.zeros(self.actuator_count)
-        self.tau = np.zeros(self.actuator_count)
+        self.q = np.zeros(self.n_compliant_dofs)
+        self.dq = np.zeros(self.n_compliant_dofs)
+        self.tau = np.zeros(self.n_compliant_dofs)
+        self.x = np.zeros(7)
+        self.dx = np.zeros(7)
         self.gripper_pos = 0
 
         # Pinocchio setup (only used in low-level servoing mode)
         self.file_path = os.path.dirname(os.path.realpath(__file__))
-        self.model = pin.buildModelFromUrdf(
-            os.path.join(self.file_path, "gen3_robotiq_2f_85.urdf")
-        )
+
+        if self.fix_joint_hack:
+            self.model = pin.buildModelFromUrdf(
+                os.path.join(self.file_path, "hack_gen3_robotiq_2f_85.urdf")
+            )
+        else:
+            self.model = pin.buildModelFromUrdf(
+                os.path.join(self.file_path, "gen3_robotiq_2f_85.urdf")
+            )
         self.data = self.model.createData()
         self.q_pin = np.zeros(self.model.nq)
         self.tool_frame_id = self.model.getFrameId("tool_frame")
@@ -291,10 +313,14 @@ class KinovaArm:
     def get_state(self):
 
         if self.cyclic_running:
-            q, dq, tau, gripper_pos = self.get_update_state()
-            ee_pos = np.zeros(7)
-            return q, ee_pos, gripper_pos
+            q, dq, tau, x, gripper_pos = self.get_update_state()
+            if self.fix_joint_hack:
+                q = np.insert(q, 5, -1.18039928)
+                dq = np.insert(dq, 5, 0)
+                tau = np.insert(tau, 5, 0)
 
+            return q, x, gripper_pos
+            
         assert (
             not self.cyclic_running
         ), "Arm must be in high-level servoing mode"  # Rajat ToDo: Combine this with self.update_state()
@@ -624,6 +650,10 @@ class KinovaArm:
             "CURRENT"
         )
         for device_id in self.actuator_device_ids:
+            print(f"Setting actuator {device_id} to current control mode")
+            if self.fix_joint_hack and device_id == 6:
+                print("Hack Activated: Skipping actuator 6")
+                continue
             self.actuator_config.SetControlMode(control_mode_message, device_id)
 
         # Start cyclic thread
@@ -649,7 +679,7 @@ class KinovaArm:
             step_time = t_now - t_cyclic
             if step_time >= 0.001:  # 1 kHz
                 t_cyclic = t_now
-                if step_time > 0.004:  # 4 ms
+                if step_time > 0.01:  # 10 ms # Rajat ToDo: Change back to 0.004 (4ms)
                     print(
                         f"Warning: Step time {1000 * step_time:.3f} ms in {self.__class__.__name__} run_cyclic"
                     )
@@ -673,13 +703,28 @@ class KinovaArm:
 
                 # Update arm command
                 for i in range(self.actuator_count):
-                    # Update current command
-                    self.base_command.actuators[i].current_motor = current_command[i]
 
                     # Update position command to avoid triggering following error
                     self.base_command.actuators[i].position = (
                         self.base_feedback.actuators[i].position
                     )
+
+                    if self.fix_joint_hack: 
+
+                        # Ignore actuator 6
+                        if i == 5:
+                            continue
+                        
+                        # Update current command
+                        if i < 5:
+                            self.base_command.actuators[i].current_motor = current_command[i]
+                        else:
+                            self.base_command.actuators[i].current_motor = current_command[i - 1]
+
+                    else:
+
+                        # Update current command
+                        self.base_command.actuators[i].current_motor = current_command[i]
 
                     # Update command ID
                     self.base_command.actuators[i].command_id = (
@@ -749,10 +794,15 @@ class KinovaArm:
         assert self.cyclic_running, "Arm must be in low-level servoing mode"
 
         # Robot state
-        for i in range(self.actuator_count):
-            self.q[i] = self.base_feedback.actuators[i].position
-            self.dq[i] = self.base_feedback.actuators[i].velocity
-            self.tau[i] = self.base_feedback.actuators[i].torque
+        for i in range(self.n_compliant_dofs):
+            if self.fix_joint_hack and i >= 5:
+                self.q[i] = self.base_feedback.actuators[i + 1].position
+                self.dq[i] = self.base_feedback.actuators[i + 1].velocity
+                self.tau[i] = self.base_feedback.actuators[i + 1].torque
+            else:
+                self.q[i] = self.base_feedback.actuators[i].position
+                self.dq[i] = self.base_feedback.actuators[i].velocity
+                self.tau[i] = self.base_feedback.actuators[i].torque
         np.deg2rad(self.q, out=self.q)
         np.deg2rad(self.dq, out=self.dq)
         np.negative(
@@ -762,22 +812,44 @@ class KinovaArm:
             self.base_feedback.interconnect.gripper_feedback.motor[0].position / 100.0
         )
 
-        # Pinocchio joint configuration
-        self.q_pin = np.array(
-            [
-                math.cos(self.q[0]),
-                math.sin(self.q[0]),
-                self.q[1],
-                math.cos(self.q[2]),
-                math.sin(self.q[2]),
-                self.q[3],
-                math.cos(self.q[4]),
-                math.sin(self.q[4]),
-                self.q[5],
-                math.cos(self.q[6]),
-                math.sin(self.q[6]),
-            ]
-        )
+        if self.fix_joint_hack:
+            # Pinocchio joint configuration
+            self.q_pin = np.array(
+                [
+                    math.cos(self.q[0]),
+                    math.sin(self.q[0]),
+                    self.q[1],
+                    math.cos(self.q[2]),
+                    math.sin(self.q[2]),
+                    self.q[3],
+                    math.cos(self.q[4]),
+                    math.sin(self.q[4]),
+                    math.cos(self.q[5]),
+                    math.sin(self.q[5]),
+                ]
+            )
+        else:
+            # Pinocchio joint configuration
+            self.q_pin = np.array(
+                [
+                    math.cos(self.q[0]),
+                    math.sin(self.q[0]),
+                    self.q[1],
+                    math.cos(self.q[2]),
+                    math.sin(self.q[2]),
+                    self.q[3],
+                    math.cos(self.q[4]),
+                    math.sin(self.q[4]),
+                    self.q[5],
+                    math.cos(self.q[6]),
+                    math.sin(self.q[6]),
+                ]
+            )
+
+        pin.framesForwardKinematics(self.model, self.data, self.q_pin)
+        tool_pose = self.data.oMf[self.tool_frame_id]
+        self.x[:3] = tool_pose.translation.copy()
+        self.x[3:] = R.from_matrix(tool_pose.rotation).as_quat()
     
     def get_update_state(self):
 
@@ -786,6 +858,7 @@ class KinovaArm:
         q = self.q.copy()
         dq = self.dq.copy()
         tau = self.tau.copy()
+        x = self.x.copy()
         gripper_pos = copy.copy(self.gripper_pos)
 
         # normalize q
@@ -793,7 +866,7 @@ class KinovaArm:
             if q[pos] > np.pi:
                 q[pos] -= 2 * np.pi
         
-        return q, dq, tau, gripper_pos
+        return q, dq, tau, x, gripper_pos
 
     def gravity(self):
         assert self.cyclic_running, "Arm must be in low-level servoing mode"
@@ -807,6 +880,64 @@ class KinovaArm:
         # quat = pin.Quaternion(tool_pose.rotation).coeffs()  # This causes a segfault
         quat = R.from_matrix(tool_pose.rotation).as_quat()
         return pos, quat
+
+    def get_fk(self, q):
+        assert self.cyclic_running, "Arm must be in low-level servoing mode"
+        if self.fix_joint_hack:
+            # Pinocchio joint configuration
+            q_pin = np.array(
+                [
+                    math.cos(q[0]),
+                    math.sin(q[0]),
+                    q[1],
+                    math.cos(q[2]),
+                    math.sin(q[2]),
+                    q[3],
+                    math.cos(q[4]),
+                    math.sin(q[4]),
+                    math.cos(q[5]),
+                    math.sin(q[5]),
+                ]
+            )
+        else:
+            # Pinocchio joint configuration
+            q_pin = np.array(
+                [
+                    math.cos(q[0]),
+                    math.sin(q[0]),
+                    q[1],
+                    math.cos(q[2]),
+                    math.sin(q[2]),
+                    q[3],
+                    math.cos(q[4]),
+                    math.sin(q[4]),
+                    q[5],
+                    math.cos(q[6]),
+                    math.sin(q[6]),
+                ]
+            )
+
+        pin.computeJointJacobians(self.model, self.data, q_pin)
+        pin.framesForwardKinematics(self.model, self.data, q_pin)
+        tool_pose = self.data.oMf[self.tool_frame_id]
+
+        # Copy the rotation matrix
+        rotation_matrix = tool_pose.rotation.copy()
+
+        # # Make first and second columns negative to account for axis convention
+        # rotation_matrix[:, 0] = -rotation_matrix[:, 0]
+        # rotation_matrix[:, 1] = -rotation_matrix[:, 1]
+
+        # Construct pose
+        pose = np.zeros(7)
+        pose[:3] = tool_pose.translation.copy()
+        pose[3:] = R.from_matrix(rotation_matrix).as_quat()
+        
+        J = pin.getFrameJacobian(
+            self.model, self.data, self.tool_frame_id, pin.ReferenceFrame.LOCAL_WORLD_ALIGNED
+        )
+        
+        return pose, J
 
     def switch_to_gravity_compensation_mode(self):
         def grav_comp_control_callback(arm):
@@ -828,39 +959,95 @@ class KinovaArm:
 
         print("Arm is in gravity compensation mode")
 
-    def switch_out_of_gravity_compensation_mode(self):
-        if self.cyclic_running:
-            self.stop_cyclic()
-        else:
-            print("Not switching as arm is not in gravity compensation mode")
-
     def switch_to_joint_compliant_mode(self, command_queue):
 
-        controller = JointCompliantController(command_queue)
+        controller = CompliantController(command_queue, control_type="joint", fix_joint_hack=self.fix_joint_hack)
         self.init_cyclic(controller.control_callback)
         while not self.cyclic_running:
             time.sleep(0.01)
 
         print("Arm is in joint compliant mode")
 
-    def switch_out_of_joint_compliant_mode(self):
+    def switch_to_task_compliant_mode(self, command_queue):
+
+        controller = CompliantController(command_queue, control_type="task", fix_joint_hack=self.fix_joint_hack)
+        self.init_cyclic(controller.control_callback)
+        while not self.cyclic_running:
+            time.sleep(0.01)
+
+        print("Arm is in task compliant mode")
+
+    def switch_out_of_compliant_mode(self):
         if self.cyclic_running:
             self.stop_cyclic()
         else:
-            print("Not switching as arm is not in joint compliant mode")
-
+            print("Not switching as arm is not in compliant mode")
 
 def main():
     arm = KinovaArm()
     try:
-        input("Press Enter to move to retract pos")
-        arm.retract()
+        np.set_printoptions(precision=4, suppress=True)
 
-        input("Press Enter to zero torque offsets")
-        arm.zero_torque_offsets()
+        # input("Press Enter to move to home pos")
+        # arm.home()
 
-        input("Press Enter to move to retract pos")
-        arm.retract()
+        # input("Press Enter to zero torque offsets")
+        # arm.zero_torque_offsets()
+
+        # input("Press Enter to move to home pos")
+        # arm.home()
+
+        before_transfer_pos = [
+            -2.8655331,  
+            -1.61973777, 
+            -2.6097253, 
+            -1.37301134, 
+            1.11781087,
+            -1.18039928,
+            2.05515662
+        ]
+
+        # before_transfer_pos = [
+        #     -2.86554642,
+        #     -1.61951779,
+        #     -2.60986085,
+        #     -1.37302839,
+        #     1.11779249,
+        #     -1.18028264,
+        #     2.05515862,
+        # ]
+
+        input("Press Enter to move to before transfer pos")
+        arm.move_angular(before_transfer_pos)
+
+        # input('Press Enter to switch to gravity compensation mode')
+        # arm.switch_to_gravity_compensation_mode()
+
+        # input('Press Enter to switch to joint compliant mode')
+        # command_queue = queue.Queue(1)
+        # arm.switch_to_joint_compliant_mode(command_queue)    
+
+        input('Press Enter to switch to task compliant mode')
+        command_queue = queue.Queue(1)
+        arm.switch_to_task_compliant_mode(command_queue)
+
+        _, _, _, initial_x, gripper_pos = arm.get_update_state()
+        # send 5 commands to the robot
+        for i in range(5):
+            _, _, _, current_x, _ = arm.get_update_state()
+            print(f"Current x: {current_x}")
+            # enter desired x
+            desired_x_x = float(input("Enter desired x x: "))
+            desired_x_y = float(input("Enter desired x y: "))
+            desired_x_z = float(input("Enter desired x z: "))
+            desired_x = np.array([desired_x_x, desired_x_y, desired_x_z, initial_x[3], initial_x[4], initial_x[5], initial_x[6]])
+            print(f"Desired x: {desired_x}")
+            command_queue.put((desired_x, gripper_pos))
+            time.sleep(1)
+
+        input('Press Enter to switch out of joint compliant mode')
+        arm.switch_out_of_compliant_mode()
+
         # arm.home()
 
         # home_pos = [
