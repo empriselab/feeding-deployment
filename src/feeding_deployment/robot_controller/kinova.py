@@ -314,9 +314,13 @@ class KinovaArm:
 
         if self.cyclic_running:
             q, dq, tau, x, gripper_pos = self.get_update_state()
-            ee_pos = np.zeros(7)
-            return q, ee_pos, gripper_pos
+            if self.fix_joint_hack:
+                q = np.insert(q, 5, -1.18039928)
+                dq = np.insert(dq, 5, 0)
+                tau = np.insert(tau, 5, 0)
 
+            return q, x, gripper_pos
+            
         assert (
             not self.cyclic_running
         ), "Arm must be in high-level servoing mode"  # Rajat ToDo: Combine this with self.update_state()
