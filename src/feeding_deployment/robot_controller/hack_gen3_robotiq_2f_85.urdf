@@ -197,8 +197,10 @@
       </geometry>
     </collision>
   </link>
-  <joint name="joint_6" type="revolute">
-    <origin rpy="1.5708 9.2076E-28 -8.2157E-15" xyz="0 0.00017505 -0.10593"/>
+  <joint name="joint_6" type="fixed">
+  <!-- <joint name="joint_6" type="revolute"> -->
+    <!-- <origin rpy="1.5708 9.2076E-28 -8.2157E-15" xyz="0 0.00017505 -0.10593"/> -->
+    <origin rpy="1.5708 1.18051646 -8.2157E-15" xyz="0 0.00017505 -0.10593"/>
     <parent link="spherical_wrist_1_link"/>
     <child link="spherical_wrist_2_link"/>
     <axis xyz="0 0 1"/>
@@ -257,9 +259,9 @@
     <!-- Add gripper inertial properties based on Section 5.2.3 in 2F-85_2F-140_General_PDF_20210623.pdf -->
     <inertial>
       <!-- Shift by 14 mm since gripper has no coupling -->
-      <origin rpy="0 0 0" xyz="0 0 0.046"/>
+      <origin rpy="0 0 0" xyz="0 0 0.058"/>
       <!-- Mass of gripper without coupling -->
-      <mass value="1.6"/>
+      <mass value="0.9"/>
       <!-- Use approximation since Robotiq does not provide matrix for gripper without coupling -->
       <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
     </inertial>
