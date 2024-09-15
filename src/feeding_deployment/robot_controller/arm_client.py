@@ -87,9 +87,6 @@ if __name__ == "__main__":
     input("Press enter to go to compliance mode...")
     arm_client_interface.switch_to_joint_compliant_mode()
 
-    input("Press enter to set home pos as compliant joint command...")
-    arm_client_interface._arm_interface.compliant_set_joint_position(home_pos)
-
     input("Press enter to go to non-compliance mode...")
     arm_client_interface.switch_out_of_joint_compliant_mode()
 
