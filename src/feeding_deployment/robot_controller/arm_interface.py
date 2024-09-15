@@ -59,7 +59,7 @@ class ArmInterface:
 
         # switch out of joint compliant mode
         print("Switching out of joint compliant mode")
-        self.arm.switch_out_of_joint_compliant_mode()
+        self.arm.switch_out_of_compliant_mode()
         self.in_compliant_mode = False
 
     # def compliant_set_joint_position(self, command_pos):
