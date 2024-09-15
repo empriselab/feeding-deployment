@@ -45,6 +45,7 @@ from feeding_deployment.actions.high_level_actions import (
 )
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
+from feeding_deployment.interfaces.web_interface import WebInterface
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 from feeding_deployment.simulation.scene_description import (
     SceneDescription,
@@ -60,7 +61,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 def _main(
-    tool: str, test: bool, max_motion_planning_time: float = 10
+    tool: str, test: bool, record_rom: bool, max_motion_planning_time: float = 10
 ) -> None:
     """Testing components of the system."""
 
@@ -72,7 +73,15 @@ def _main(
     # Initialize the interface to the robot.
     robot_interface = ArmInterfaceClient()  # type: ignore  # pylint: disable=no-member
 
+    if ROSPY_IMPORTED:
+        web_interface = WebInterface()
+    else:
+        web_interface = None
+
     # Initialize the perceiver (e.g., get joint states or human head poses).
+    if record_rom:
+        test = True
+
     perception_interface = PerceptionInterface(robot_interface, not test)
     
     wrist_controller = WristController()
@@ -81,6 +90,10 @@ def _main(
         # set tool transform - only required once globally
         perception_interface._head_perception.save_tool_tip_transform(args.tool)
         
+        perception_interface._head_perception.set_tool(args.tool)
+        while not rospy.is_shutdown():
+            perception_interface._head_perception.run_head_perception()
+    elif record_rom:
         perception_interface._head_perception.set_tool(args.tool)
         while not rospy.is_shutdown():
             perception_interface._head_perception.run_head_perception()
@@ -98,7 +111,7 @@ def _main(
         # Create skills for high-level planning.
         hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
 
-        high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, hla_hyperparams, run_on_robot, wrist_controller, None)
+        high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, None)
 
         if tool == "fork":
             object = Object("utensil", tool_type)
@@ -134,10 +147,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--tool", type=str, default="fork")
     parser.add_argument("--test", action="store_true")
+    parser.add_argument("--record_rom", action="store_true")
     parser.add_argument("--max_motion_planning_time", type=float, default=10.0)
     args = parser.parse_args()
 
     if args.tool not in ["fork", "drink", "wipe"]:
         raise ValueError(f"Invalid tool: {args.tool}, must be one of fork, drink, wipe")
 
-    _main(args.tool, args.test, args.max_motion_planning_time)
+    _main(args.tool, args.test, args.record_rom, args.max_motion_planning_time)
