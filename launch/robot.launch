@@ -29,10 +29,10 @@
     <!-- <node pkg="wrist_driver_ros" type="wrist_driver" name="wrist_driver" output="screen"/> -->
 
     <!-- Camera -->
-    <!-- <include file="$(find realsense2_camera)/launch/rs_rgbd.launch">
+    <include file="$(find realsense2_camera)/launch/rs_rgbd.launch">
         <arg name="filters" value="pointcloud"/>
         <arg name="align_depth" value="true"/>
-    </include> -->
+    </include>
 
     <!-- FT sensor -->
 
