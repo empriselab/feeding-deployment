@@ -37,7 +37,7 @@ class ArmInterface:
         print("Moving to home position")
         self.arm.home()
 
-    def switch_to_joint_compliant_mode(self):
+    def switch_to_task_compliant_mode(self):
 
         assert not self.arm_stopped, "Arm is stopped"
         assert not self.in_compliant_mode, "Already in compliant mode"
@@ -49,10 +49,10 @@ class ArmInterface:
 
         # switch to joint compliant mode
         print("Switching to joint compliant mode")
-        self.arm.switch_to_joint_compliant_mode(self.command_queue)
+        self.arm.switch_to_task_compliant_mode(self.command_queue)
         self.in_compliant_mode = True
 
-    def switch_out_of_joint_compliant_mode(self):
+    def switch_out_of_compliant_mode(self):
 
         assert not self.arm_stopped, "Arm is stopped"
         assert self.in_compliant_mode, "Not in compliant mode"

@@ -37,14 +37,14 @@ class ArmInterfaceClient:
         self._arm_interface = self.manager.ArmInterface()
         self.in_compliant_mode = False
 
-    def switch_to_joint_compliant_mode(self):
+    def switch_to_task_compliant_mode(self):
         assert not self.in_compliant_mode, "Already in compliant mode"
-        self._arm_interface.switch_to_joint_compliant_mode()
+        self._arm_interface.switch_to_task_compliant_mode()
         self.in_compliant_mode = True
 
-    def switch_out_of_joint_compliant_mode(self):
+    def switch_out_of_compliant_mode(self):
         assert self.in_compliant_mode, "Not in compliant mode"
-        self._arm_interface.switch_out_of_joint_compliant_mode()
+        self._arm_interface.switch_out_of_compliant_mode()
         self.in_compliant_mode = False
 
     def execute_command(self, cmd: KinovaCommand) -> None:
@@ -93,10 +93,10 @@ if __name__ == "__main__":
     arm_client_interface.execute_command(JointCommand(before_transfer_pos))
 
     input("Press enter to go to compliance mode...")
-    arm_client_interface.switch_to_joint_compliant_mode()
+    arm_client_interface.switch_to_task_compliant_mode()
 
     input("Press enter to go to non-compliance mode...")
-    arm_client_interface.switch_out_of_joint_compliant_mode()
+    arm_client_interface.switch_out_of_compliant_mode()
 
     # utensil_inside_mount = (
     #     np.array([0.242, -0.077, 0.07]),
