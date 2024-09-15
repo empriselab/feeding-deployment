@@ -313,7 +313,7 @@ class KinovaArm:
     def get_state(self):
 
         if self.cyclic_running:
-            q, dq, tau, gripper_pos = self.get_update_state()
+            q, dq, tau, x, gripper_pos = self.get_update_state()
             ee_pos = np.zeros(7)
             return q, ee_pos, gripper_pos
 
@@ -675,7 +675,7 @@ class KinovaArm:
             step_time = t_now - t_cyclic
             if step_time >= 0.001:  # 1 kHz
                 t_cyclic = t_now
-                if step_time > 0.004:  # 4 ms
+                if step_time > 0.01:  # 10 ms # Rajat ToDo: Change back to 0.004 (4ms)
                     print(
                         f"Warning: Step time {1000 * step_time:.3f} ms in {self.__class__.__name__} run_cyclic"
                     )
@@ -854,6 +854,7 @@ class KinovaArm:
         q = self.q.copy()
         dq = self.dq.copy()
         tau = self.tau.copy()
+        x = self.x.copy()
         gripper_pos = copy.copy(self.gripper_pos)
 
         # normalize q
@@ -861,7 +862,7 @@ class KinovaArm:
             if q[pos] > np.pi:
                 q[pos] -= 2 * np.pi
         
-        return q, dq, tau, gripper_pos
+        return q, dq, tau, x, gripper_pos
 
     def gravity(self):
         assert self.cyclic_running, "Arm must be in low-level servoing mode"
@@ -956,8 +957,8 @@ class KinovaArm:
 
     def switch_to_joint_compliant_mode(self, command_queue):
 
-        self.controller = CompliantController(command_queue, control_type="joint", fix_joint_hack=self.fix_joint_hack)
-        self.init_cyclic(self.controller.control_callback)
+        controller = CompliantController(command_queue, control_type="joint", fix_joint_hack=self.fix_joint_hack)
+        self.init_cyclic(controller.control_callback)
         while not self.cyclic_running:
             time.sleep(0.01)
 
@@ -965,8 +966,8 @@ class KinovaArm:
 
     def switch_to_task_compliant_mode(self, command_queue):
 
-        self.controller = CompliantController(command_queue, control_type="task", fix_joint_hack=self.fix_joint_hack)
-        self.init_cyclic(self.controller.control_callback)
+        controller = CompliantController(command_queue, control_type="task", fix_joint_hack=self.fix_joint_hack)
+        self.init_cyclic(controller.control_callback)
         while not self.cyclic_running:
             time.sleep(0.01)
 
@@ -978,16 +979,11 @@ class KinovaArm:
         else:
             print("Not switching as arm is not in compliant mode")
 
-        # only print 10 equally spaced entries
-        print("Data logged: ")
-
-        for datapoint in self.controller.data[::len(self.controller.data)//10]:
-            print(datapoint)
-
-
 def main():
     arm = KinovaArm()
     try:
+        np.set_printoptions(precision=4, suppress=True)
+
         # input("Press Enter to move to home pos")
         # arm.home()
 
@@ -1030,6 +1026,20 @@ def main():
         input('Press Enter to switch to task compliant mode')
         command_queue = queue.Queue(1)
         arm.switch_to_task_compliant_mode(command_queue)
+
+        _, _, _, initial_x, gripper_pos = arm.get_update_state()
+        # send 5 commands to the robot
+        for i in range(5):
+            _, _, _, current_x, _ = arm.get_update_state()
+            print(f"Current x: {current_x}")
+            # enter desired x
+            desired_x_x = float(input("Enter desired x x: "))
+            desired_x_y = float(input("Enter desired x y: "))
+            desired_x_z = float(input("Enter desired x z: "))
+            desired_x = np.array([desired_x_x, desired_x_y, desired_x_z, initial_x[3], initial_x[4], initial_x[5], initial_x[6]])
+            print(f"Desired x: {desired_x}")
+            command_queue.put((desired_x, gripper_pos))
+            time.sleep(1)
 
         input('Press Enter to switch out of joint compliant mode')
         arm.switch_out_of_compliant_mode()

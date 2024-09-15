@@ -51,7 +51,7 @@ class CompliantController:
         self.otg_out = None
         self.otg_res = None
 
-        self.data = []
+        # self.data = []
 
     def set_contants(self):
 
@@ -169,12 +169,12 @@ class CompliantController:
         # Compute joint torque for task
         g = arm.gravity()
 
-        if not np.allclose(self.q_s, self.q_d, atol=1e-3):
-            self.data.append({
-                'q_s': self.q_s.tolist(),
-                'q_d': self.q_d.tolist(),
-                'q_n': self.q_n.tolist(),
-            })
+        # if not np.allclose(self.q_s, self.q_d, atol=1e-3):
+        #     self.data.append({
+        #         'q_s': self.q_s.tolist(),
+        #         'q_d': self.q_d.tolist(),
+        #         'q_n': self.q_n.tolist(),
+        #     })
 
         if self.control_type == "joint":
             
