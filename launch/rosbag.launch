@@ -1,0 +1,17 @@
+
+<launch>
+
+    <arg name="base_path" default="/home/isacc/deployment_ws/src/feeding-deployment" />
+    <arg name="python_path" default="/home/isacc/miniconda3/envs/feed/bin/python" />
+
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/gen3_robotiq_2f_85.xacro dof:=7 vision:=false tool:=all" />
+
+    <!-- Simulated Robot -->
+    <group ns="sim">
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/gen3_robotiq_2f_85.xacro dof:=7 vision:=false tool:=all" />
+    </group>
+
+    <!-- RViz -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg base_path)/config/real.rviz" required="true" />
+
+</launch> 
