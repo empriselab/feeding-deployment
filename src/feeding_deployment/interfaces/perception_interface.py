@@ -75,15 +75,14 @@ class PerceptionInterface:
     def get_head_perception_tool_tip_target_pose(self) -> np.ndarray:
         """Get a target of the forque from head perception."""
         if self._head_perception is not None:
-            forque_target_transform = self._head_perception.run_head_perception()
+            forque_target_pose = self._head_perception.run_head_perception()
         else:
             # forque_target_pose = Pose((-0.282, 0.540, 0.619), (-0.490, 0.510, 0.511, -0.489))
-
             forque_target_pose = np.eye(4)
             forque_target_pose[:3, 3] = [-0.282, 0.540, 0.619]
             forque_target_pose[:3, :3] = R.from_quat([-0.490, 0.510, 0.511, -0.489]).as_matrix()
 
-            return forque_target_pose
+        return forque_target_pose
         
     def get_tool_tip_pose(self) -> np.ndarray:
         
