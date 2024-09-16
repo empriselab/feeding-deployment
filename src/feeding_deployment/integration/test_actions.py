@@ -19,7 +19,7 @@ import sys
 
 sys.path.append(FLAIR_PATH)
 try:
-    # raise ModuleNotFoundError  # Just to skip this block
+    raise ModuleNotFoundError  # Just to skip this block
     from wrist_controller import WristController
     from flair import FLAIR
 

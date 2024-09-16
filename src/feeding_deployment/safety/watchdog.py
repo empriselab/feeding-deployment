@@ -15,6 +15,8 @@ import numpy as np
 import time
 from enum import Enum
 import queue
+import signal
+import sys
 
 from sensor_msgs.msg import CameraInfo
 from geometry_msgs.msg import WrenchStamped
@@ -196,9 +198,17 @@ class WatchDog:
             # print(f"Time taken: {end_time - start_time}")
             time.sleep(max(0, 1.0/WATCHDOG_RUN_FREQUENCY - (end_time - start_time)))
 
+    def signal_handler(self, signal, frame):
+
+        print("\nprogram exiting gracefully")
+        sys.exit(0)
+
 if __name__ == '__main__':
 
     rospy.init_node('WatchDog', anonymous=True)
+    
     watchdog = WatchDog()
+    signal.signal(signal.SIGINT, watchdog.signal_handler) # ctrl+c
+    
     watchdog.run()
     
