@@ -62,6 +62,19 @@ class ArmInterface:
         self.arm.switch_out_of_compliant_mode()
         self.in_compliant_mode = False
 
+    def compliant_set_ee_pose(self, xyz, xyz_quat):
+            
+        assert not self.arm_stopped, "Arm is stopped"
+        assert self.in_compliant_mode, "Not in compliant mode"
+
+        command_pose = np.zeros(7)
+        command_pose[:3] = xyz
+        command_pose[3:] = xyz_quat
+
+        print(f"Received compliant cartesian pose command: {xyz}, {xyz_quat}")
+        gripper_pos = 0
+        self.command_queue.put((command_pose, gripper_pos))
+
     # def compliant_set_joint_position(self, command_pos):
 
     #     assert not self.arm_stopped, "Arm is stopped"

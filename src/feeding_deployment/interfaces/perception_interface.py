@@ -32,6 +32,9 @@ class PerceptionInterface:
     def __init__(self, robot_interface: ArmInterfaceClient | None, record_goal_pose: bool = False, simulate_head_perception: bool = False) -> None:
         self._robot_interface = robot_interface
 
+        self.tfBuffer = tf2_ros.Buffer()
+        self.listener = tf2_ros.TransformListener(self.tfBuffer)
+
         # run head perception
         if robot_interface is None or simulate_head_perception:
             self._head_perception = None
@@ -83,14 +86,42 @@ class PerceptionInterface:
             return forque_target_pose
         
     def get_tool_tip_pose(self) -> np.ndarray:
-        raise NotImplementedError
+        
+        # Rajat ToDo: Update this to use forward kinematics from the robot interface
+        forque_base = self.getTransformationFromTF("base_link", "fork_tip")
+        
+        return forque_base
     
     def get_tool_tip_pose_at_staging(self) -> np.ndarray:
-        raise NotImplementedError
+
+        # Rajat ToDo: Update this to return Pose type
+        fork_tip_staging_pose = np.eye(4)
+        fork_tip_staging_pose[:3, 3] = [0.250, 0.272, 0.518]
+        fork_tip_staging_pose[:3, :3] = R.from_quat([0.523, -0.503, -0.469, 0.503]).as_matrix()
+
+        return fork_tip_staging_pose
     
     def wait_for_user_continue_button(self) -> None:
         print("Waiting for transfer complete button press / ft sensor trigger ...")
         msg = rospy.wait_for_message("/transfer_complete", Bool)
         assert msg.data
         print("Received message, continuing ...")
+
+    def getTransformationFromTF(self, source_frame, target_frame):
+
+        while not rospy.is_shutdown():
+            try:
+                # print("Looking for transform")
+                transform = self.tfBuffer.lookup_transform(source_frame, target_frame, rospy.Time())
+                break
+            except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+                self.control_rate.sleep()
+                continue
+
+        T = np.zeros((4,4))
+        T[:3,:3] = R.from_quat([transform.transform.rotation.x, transform.transform.rotation.y, transform.transform.rotation.z, transform.transform.rotation.w]).as_matrix()
+        T[:3,3] = np.array([transform.transform.translation.x, transform.transform.translation.y, transform.transform.translation.z]).reshape(1,3)
+        T[3,3] = 1
+
+        return T
 

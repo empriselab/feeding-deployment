@@ -50,16 +50,16 @@ class ArmInterfaceClient:
     def execute_command(self, cmd: KinovaCommand) -> None:
 
         if cmd.__class__.__name__ == "JointTrajectoryCommand":
-            if self.in_compliant_mode:
-                return self._arm_interface.compliant_set_joint_trajectory(cmd.traj)
-            else:
-                return self._arm_interface.set_joint_trajectory(cmd.traj)
+            return self._arm_interface.set_joint_trajectory(cmd.traj)
 
         if cmd.__class__.__name__ == "JointCommand":
             return self._arm_interface.set_joint_position(cmd.pos)
 
         if cmd.__class__.__name__ == "CartesianCommand":
-            return self._arm_interface.set_ee_pose(cmd.pos, cmd.quat)
+            if self.in_compliant_mode:
+                return self._arm_interface.compliant_set_ee_pose(cmd.pos, cmd.quat)
+            else:
+                return self._arm_interface.set_ee_pose(cmd.pos, cmd.quat)
 
         if cmd.__class__.__name__ == "OpenGripperCommand":
             return self._arm_interface.open_gripper()

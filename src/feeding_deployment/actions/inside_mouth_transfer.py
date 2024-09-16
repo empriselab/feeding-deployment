@@ -88,6 +88,7 @@ class InsideMouthTransfer:
 
     def publishTaskCommand(self, target):
 
+        # input("Press enter to move to next target")
         command = CartesianCommand(pos=target[:3,3], quat=Rotation.from_matrix(target[:3,:3]).as_quat())
         self.robot_interface.execute_command(command)
 
@@ -102,11 +103,11 @@ class InsideMouthTransfer:
         current_state = self.state
 
         last_time = time.time()
-        while True: 
+        while not rospy.is_shutdown():
 
             self.control_rate.sleep()
 
-            # print("Frequency: ",1.0/(time.time() - last_time))
+            print("Frequency: ",1.0/(time.time() - last_time))
             last_time = time.time()
             
             with self.state_lock:

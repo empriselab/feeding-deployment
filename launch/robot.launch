@@ -48,6 +48,9 @@
     <!-- Collision Monitor -->
 
     <!-- Watchdog -->
+    <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_watchdog">
+        <param name="cmd" value="$(arg python_path) $(arg base_path)/src/feeding_deployment/safety/watchdog.py"/>
+    </node>
 
     <!-- Simulated Robot -->
     <group ns="sim">
