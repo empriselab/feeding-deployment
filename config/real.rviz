@@ -7,7 +7,6 @@ Panels:
         - /Global Options1
         - /Status1
         - /TF1/Frames1
-        - /MarkerArray1/Status1
       Splitter Ratio: 0.47647058963775635
     Tree Height: 747
   - Class: rviz/Selection
@@ -398,7 +397,7 @@ Visualization Manager:
       Value: true
       Visual Enabled: true
     - Class: rviz/Image
-      Enabled: true
+      Enabled: false
       Image Topic: /camera/color/image_raw
       Max Value: 1
       Median window: 5
@@ -408,7 +407,7 @@ Visualization Manager:
       Queue Size: 2
       Transport Hint: raw
       Unreliable: false
-      Value: true
+      Value: false
     - Class: rviz/Marker
       Enabled: true
       Marker Topic: /visualization_marker
@@ -488,8 +487,6 @@ Visualization Manager:
           Value: false
         forkroll:
           Value: false
-        forque_end_effector_target:
-          Value: true
         half_arm_1_link:
           Value: false
         half_arm_2_link:
@@ -619,12 +616,6 @@ Visualization Manager:
               sim/drinkbase:
                 sim/drink_tip:
                   {}
-              sim/forkbase:
-                sim/forkpitch:
-                  sim/forkroll:
-                    sim/feeding_tool_tip:
-                      sim/fork_tip:
-                        {}
               sim/shoulder_link:
                 sim/half_arm_1_link:
                   sim/half_arm_2_link:
@@ -634,7 +625,12 @@ Visualization Manager:
                           sim/bracelet_link:
                             sim/end_effector_link:
                               sim/finger_tip:
-                                {}
+                                sim/forkbase:
+                                  sim/forkpitch:
+                                    sim/forkroll:
+                                      sim/feeding_tool_tip:
+                                        sim/fork_tip:
+                                          {}
                               sim/inertia_link:
                                 {}
                               sim/robotiq_arg2f_base_link:
@@ -662,8 +658,6 @@ Visualization Manager:
               drinkbase:
                 drink_tip:
                   {}
-              forque_end_effector_target:
-                {}
               head_pose:
                 {}
               reference_head_pose:
@@ -679,8 +673,7 @@ Visualization Manager:
                               camera_link:
                                 camera_aligned_depth_to_color_frame:
                                   camera_color_optical_frame:
-                                    tool_tip_target:
-                                      {}
+                                    {}
                                 camera_color_frame:
                                   {}
                                 camera_depth_frame:
@@ -712,6 +705,8 @@ Visualization Manager:
                                         {}
                               tool_frame:
                                 {}
+              tool_tip_target:
+                {}
               wipebase:
                 wipe_tip:
                   {}
@@ -761,7 +756,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.799002766609192
+      Distance: 1.6363154649734497
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -769,27 +764,27 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.22168254852294922
-        Y: 0.09114851802587509
-        Z: 0.42337164282798767
+        X: 0.09809131920337677
+        Y: 0.07315188646316528
+        Z: 0.4510246813297272
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.43039795756340027
+      Pitch: 0.45539793372154236
       Target Frame: <Fixed Frame>
-      Yaw: 1.6135683059692383
+      Yaw: 1.0385686159133911
     Saved: ~
 Window Geometry:
   Displays:
-    collapsed: false
+    collapsed: true
   Height: 1477
-  Hide Left Dock: false
+  Hide Left Dock: true
   Hide Right Dock: false
   Image:
-    collapsed: false
-  QMainWindow State: 000000ff00000000fd000000040000000000000354000004bffc0200000009fb0000001200530065006c0065006300740069006f006e00000001e10000009b000000b000fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000b0fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000006e000003e30000018200fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d006100670065010000045d000000d00000002600ffffff000000010000015f000004bffc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000006e000004bf0000013200fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000077d0000005efc0100000002fb0000000800540069006d006501000000000000077d000006dc00fffffffb0000000800540069006d00650100000000000004500000000000000000000002b2000004bf00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+    collapsed: true
+  QMainWindow State: 000000ff00000000fd000000040000000000000354000004bffc0200000009fb0000001200530065006c0065006300740069006f006e00000001e10000009b000000b000fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000b0fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073000000006e000003e30000018200fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d006100670065000000045d000000d00000002600ffffff000000010000015f000004bffc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000006e000004bf0000013200fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000077d0000005efc0100000002fb0000000800540069006d006501000000000000077d000006dc00fffffffb0000000800540069006d0065010000000000000450000000000000000000000612000004bf00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -800,4 +795,4 @@ Window Geometry:
     collapsed: false
   Width: 1917
   X: 1491
-  Y: 75
+  Y: 54

@@ -12,8 +12,8 @@ import rospy
 from geometry_msgs.msg import WrenchStamped
 
 # Parameters
-OPEN_LOOP_RADIUS = 0.02
-# OPEN_LOOP_RADIUS = 0.0
+# OPEN_LOOP_RADIUS = 0.02
+OPEN_LOOP_RADIUS = 0.0
 INTERMEDIATE_THRESHOLD_RELAXED = 0.02
 INTERMEDIATE_ANGULAR_THRESHOLD_RELAXED = 5*np.pi/180
 INTERMEDIATE_THRESHOLD = 0.014
@@ -109,6 +109,9 @@ class InsideMouthTransfer:
         self.robot_interface.execute_command(command)
 
     def execute_transfer_loop(self):
+
+        # start head perception thread
+        self.perception_interface.start_head_perception_thread()
 
         closed_loop = True
         run_once = True
@@ -214,6 +217,8 @@ class InsideMouthTransfer:
 
                 if distance < OPEN_LOOP_RADIUS and closed_loop:
                     closed_loop = False
+                    # shutdown the head perception thread
+                    self.perception_interface.stop_head_perception_thread()
 
                 intermediate_forque_target = np.zeros((4,4))
                 intermediate_forque_target[0, 0] = 1
