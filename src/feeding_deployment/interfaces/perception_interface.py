@@ -35,18 +35,28 @@ class PerceptionInterface:
         self.tfBuffer = tf2_ros.Buffer()
         self.listener = tf2_ros.TransformListener(self.tfBuffer)
 
+        self.tool_tip_target_lock = threading.Lock()
+        # this term is updated in the run_head_perception method and read in the get_tool_tip_pose method
+        self.tool_tip_target_pose = None
+
         # run head perception
         if robot_interface is None or simulate_head_perception:
             self._head_perception = None
         else:
             # self._head_perception = None
             self._head_perception = HeadPerceptionROSWrapper(record_goal_pose)
+            self._head_perception.set_tool("fork")
             
             # warm start head perception
             self._head_perception.set_tool("fork")
             for _ in range(10):
                 self._head_perception.run_head_perception()
 
+        # Head perception thread setup
+        self.head_perception_thread = None
+        self.kill_the_thread = False
+        self.head_perception_running = False
+        
     def get_robot_joints(self) -> "JointState":
         """Get the current robot joint state."""
         joint_state_msg = rospy.wait_for_message("/robot_joint_states", JointState)
@@ -71,18 +81,48 @@ class PerceptionInterface:
         if self._head_perception is not None:
             self._head_perception.set_tool(tool)
 
+    def start_head_perception_thread(self):
+        assert not self.head_perception_running, "Head perception thread is already running"
+
+        # Start head perception thread
+        self.kill_the_thread = False
+        self.head_perception_thread = threading.Thread(
+            target=self.run_head_perception_thread, args=(), daemon=True
+        )
+        self.head_perception_thread.start()
+        print("Head perception thread started")
+
+    def run_head_perception_thread(self):
+        self.head_perception_running = True
+
+        t_init = time.time()
+        while not self.kill_the_thread:
+            t_now = time.time()
+            step_time = t_now - t_init
+            if step_time >= 0.02:  # 50 Hz
+                if self._head_perception is not None:
+                    tool_tip_target_pose = self._head_perception.run_head_perception()
+                else:
+                    tool_tip_target_pose = np.eye(4)
+                    tool_tip_target_pose[:3, 3] = [-0.282, 0.540, 0.619]
+                    tool_tip_target_pose[:3, :3] = R.from_quat([-0.490, 0.510, 0.511, -0.489]).as_matrix()
+                with self.tool_tip_target_lock:
+                    self.tool_tip_target_pose = tool_tip_target_pose
+        self.head_perception_running = False
+
+    def stop_head_perception_thread(self):
+        if self.head_perception_running:
+            self.kill_the_thread = True
+            self.head_perception_thread.join()
+            print("Head perception thread stopped")
+        else:
+            print("Head perception thread is not running")
+
     # Rajat ToDo: Change return type to Pose
     def get_head_perception_tool_tip_target_pose(self) -> np.ndarray:
         """Get a target of the forque from head perception."""
-        if self._head_perception is not None:
-            forque_target_pose = self._head_perception.run_head_perception()
-        else:
-            # forque_target_pose = Pose((-0.282, 0.540, 0.619), (-0.490, 0.510, 0.511, -0.489))
-            forque_target_pose = np.eye(4)
-            forque_target_pose[:3, 3] = [-0.282, 0.540, 0.619]
-            forque_target_pose[:3, :3] = R.from_quat([-0.490, 0.510, 0.511, -0.489]).as_matrix()
-
-        return forque_target_pose
+        with self.tool_tip_target_lock:
+            return self.tool_tip_target_pose
         
     def get_tool_tip_pose(self) -> np.ndarray:
         
