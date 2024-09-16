@@ -440,17 +440,31 @@ class HeadPerception:
                 ]
             )
 
-            # Rajat ToDo: Bring noise search back
-            # if self.last_trans is not None:
-            #     if (np.any(np.abs(translation_from_reference) > self.max_distance_threshold)
-            #          or np.any( np.abs(rotation_from_reference) > self.max_rotation_threshold)):
-            #         # print("Noisy reading!")
+            visualization_points_world_frame = np.concatenate(
+                (
+                    current_head_points_world_frame,
+                    current_neck_point_world_frame,
+                    current_face_points_world_frame,
+                ),
+                axis=0,
+            )
 
-            #         self.last_landmark2d = landmark2d
-            #         self.last_landmarks3d = landmarks3d
-            #         self.last_viz_image = viz_image
+            if self.last_trans is not None:
+                if (np.any(np.abs(translation_from_reference) > self.max_distance_threshold)
+                     or np.any( np.abs(rotation_from_reference) > self.max_rotation_threshold)):
+                    print("Noisy reading!")
 
-            #         return landmark2d, landmarks3d, viz_image, mouth_state, average_head_point, forque_target_pose, self.reference_neck_frame, neck_frame
+                    return (
+                        landmark2d,
+                        landmarks3d,
+                        viz_image,
+                        mouth_state,
+                        average_head_point,
+                        self.last_forque_target_pose,
+                        visualization_points_world_frame,
+                        self.reference_neck_frame,
+                        self.last_neck_frame,
+                    )
 
             if self.last_trans is not None:
                 if debug_print:
@@ -474,6 +488,7 @@ class HeadPerception:
             if debug_print:
                 print("trans_std: ", trans_std)
 
+            # if change is small, then average the last 10 values
             if (
                 np.abs(trans_std[0, 3]) < 0.005
                 and np.abs(trans_std[1, 3]) < 0.005
@@ -503,9 +518,6 @@ class HeadPerception:
                     and np.abs(trans[2, 3] - self.last_trans[2, 3]) < 0.005
                 ):
                     # print("Not updating forque target pose")
-                    self.last_landmark2d = landmark2d
-                    self.last_landmarks3d = landmarks3d
-                    self.last_viz_image = viz_image
 
                     return (
                         landmark2d,
@@ -514,7 +526,7 @@ class HeadPerception:
                         mouth_state,
                         average_head_point,
                         self.last_forque_target_pose,
-                        self.visualization_points_world_frame,
+                        self.last_visualization_points_world_frame,
                         self.reference_neck_frame,
                         self.last_neck_frame,
                     )
@@ -546,20 +558,11 @@ class HeadPerception:
                 ),
             )
 
-            visualization_points_world_frame = np.concatenate(
-                (
-                    current_head_points_world_frame,
-                    current_neck_point_world_frame,
-                    current_face_points_world_frame,
-                ),
-                axis=0,
-            )
-
             self.last_forque_target_pose = forque_target_pose
             self.last_landmark2d = landmark2d
             self.last_landmarks3d = landmarks3d
             self.last_viz_image = viz_image
-            self.visualization_points_world_frame = visualization_points_world_frame
+            self.last_visualization_points_world_frame = visualization_points_world_frame
 
             return (
                 landmark2d,
