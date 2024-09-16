@@ -273,7 +273,7 @@
         <!-- Shift by 14 mm since gripper has no coupling -->
         <origin rpy="0 0 0" xyz="0 0 0.058"/>
         <!-- Mass of gripper without coupling -->
-        <mass value="0.9"/>
+        <mass value="1.7"/>
         <!-- Use approximation since Robotiq does not provide matrix for gripper without coupling -->
         <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
       </inertial>
