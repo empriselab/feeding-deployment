@@ -213,7 +213,7 @@ class KinovaArm:
 
         if self.fix_joint_hack:
             self.model = pin.buildModelFromUrdf(
-                os.path.join(self.file_path, "hack_gen3_robotiq_2f_85.urdf")
+                os.path.join(self.file_path, "hack_gen3_robotiq_2f_85_feeding.urdf")
             )
         else:
             self.model = pin.buildModelFromUrdf(
@@ -221,7 +221,11 @@ class KinovaArm:
             )
         self.data = self.model.createData()
         self.q_pin = np.zeros(self.model.nq)
-        self.tool_frame_id = self.model.getFrameId("tool_frame")
+
+        if self.fix_joint_hack:
+            self.tool_frame_id = self.model.getFrameId("fork_tip")
+        else:
+            self.tool_frame_id = self.model.getFrameId("tool_frame")
 
         # Action topic notifications
         self.end_or_abort_event = threading.Event()
