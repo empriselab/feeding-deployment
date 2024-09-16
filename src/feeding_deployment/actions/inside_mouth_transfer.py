@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 
 import sys
-import rospy
 import numpy as np
 from scipy.spatial.transform import Rotation, Slerp
 from std_msgs.msg import Int64
@@ -9,9 +8,12 @@ import threading
 import time
 import signal
 
+import rospy
+from geometry_msgs.msg import WrenchStamped
+
 # Parameters
-# OPEN_LOOP_RADIUS = 0.02
-OPEN_LOOP_RADIUS = 0.0
+OPEN_LOOP_RADIUS = 0.02
+# OPEN_LOOP_RADIUS = 0.0
 INTERMEDIATE_THRESHOLD_RELAXED = 0.02
 INTERMEDIATE_ANGULAR_THRESHOLD_RELAXED = 5*np.pi/180
 INTERMEDIATE_THRESHOLD = 0.014
@@ -46,6 +48,20 @@ class InsideMouthTransfer:
         self.state = 0
         self.state_lock = threading.Lock()
         self.state_sub = rospy.Subscriber('/state', Int64, self.state_callback)
+
+        self.ft_sensor_sub = rospy.Subscriber('/forque/forqueSensor', WrenchStamped, self.ft_callback)
+
+    def ft_callback(self, msg):
+
+        ft_reading = np.array([msg.wrench.force.x, msg.wrench.force.y, msg.wrench.force.z, msg.wrench.torque.x, msg.wrench.torque.y, msg.wrench.torque.z])
+
+        down_torque = ft_reading[3]
+        if np.abs(down_torque) > 0.05:
+            with self.state_lock:
+                # if inside mouth, move outside
+                if self.state == 2:
+                    print(f"Bit detected with down torque: {down_torque}. Moving outside mouth")
+                    self.state = 3
     
     def state_callback(self, msg):
 
