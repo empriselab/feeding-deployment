@@ -61,7 +61,6 @@ class HeadPerceptionROSWrapper:
         self.tf_buffer_lock = Lock()
         self.tfBuffer = tf2_ros.Buffer()  # Using default cache time of 10 secs
         self.listener = tf2_ros.TransformListener(self.tfBuffer)
-        time.sleep(1.0)
 
         self.broadcaster = tf2_ros.TransformBroadcaster()
 
@@ -90,6 +89,8 @@ class HeadPerceptionROSWrapper:
         )
         ts_top.registerCallback(self.rgbdCallback)
         ts_top.enable_reset = True
+
+        time.sleep(2.0) # sleep until all subscribers are registered
 
     def rgbdCallback(self, rgb_image_msg, camera_info_msg, depth_image_msg):
         # print("RGB Callback")
@@ -144,6 +145,8 @@ class HeadPerceptionROSWrapper:
                 self.get_camera_data()
             )
             if camera_info_data is None:
+                print("No camera data")
+                time.sleep(0.01)
                 continue
             transform = self.get_base_to_camera_transform(camera_info_data)
 

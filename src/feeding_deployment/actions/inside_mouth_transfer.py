@@ -9,7 +9,9 @@ import time
 import signal
 
 import rospy
+from std_msgs.msg import Bool
 from geometry_msgs.msg import WrenchStamped
+from netft_rdt_driver.srv import String_cmd
 
 # Parameters
 # OPEN_LOOP_RADIUS = 0.02
@@ -55,13 +57,13 @@ class InsideMouthTransfer:
 
         ft_reading = np.array([msg.wrench.force.x, msg.wrench.force.y, msg.wrench.force.z, msg.wrench.torque.x, msg.wrench.torque.y, msg.wrench.torque.z])
 
-        down_torque = ft_reading[3]
-        if np.abs(down_torque) > 0.05:
-            with self.state_lock:
-                # if inside mouth, move outside
-                if self.state == 2:
-                    print(f"Bite detected with down torque: {down_torque}. Moving outside mouth")
-                    self.state = 3
+        # down_torque = ft_reading[3]
+        # if np.abs(down_torque) > 0.05:
+        #     with self.state_lock:
+        #         # if inside mouth, move outside
+        #         if self.state == 2:
+        #             print(f"Bite detected with down torque: {down_torque}. Moving outside mouth")
+        #             self.state = 3
     
     def state_callback(self, msg):
 
@@ -112,6 +114,12 @@ class InsideMouthTransfer:
 
         # start head perception thread
         self.perception_interface.start_head_perception_thread()
+
+        # bias the force torque sensor
+        # bias FT sensor
+        bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
+        bias('bias')
+        time.sleep(2.0) # wait for bias to complete
 
         closed_loop = True
         run_once = True
