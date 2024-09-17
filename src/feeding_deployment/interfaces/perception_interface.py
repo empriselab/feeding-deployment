@@ -46,7 +46,6 @@ class PerceptionInterface:
         else:
             # self._head_perception = None
             self._head_perception = HeadPerceptionROSWrapper(record_goal_pose)
-            self._head_perception.set_tool("fork")
             
             # warm start head perception
             self._head_perception.set_tool("fork")
