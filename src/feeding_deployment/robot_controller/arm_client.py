@@ -50,6 +50,10 @@ class ArmInterfaceClient:
     def get_state(self):
         return self._arm_interface.get_state()
 
+    def set_tool(self, tool: str):
+        assert not self.in_compliant_mode, "Cannot set tool in compliant mode"
+        self._arm_interface.set_tool(tool)
+
     def execute_command(self, cmd: KinovaCommand) -> None:
 
         if cmd.__class__.__name__ == "JointTrajectoryCommand":

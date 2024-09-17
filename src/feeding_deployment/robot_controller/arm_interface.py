@@ -33,6 +33,9 @@ class ArmInterface:
         print("Moving to home position")
         self.arm.home()
 
+    def set_tool(self, tool: str):
+        self.arm.set_tool(tool)
+
     def switch_to_task_compliant_mode(self):
 
         assert not self.arm_stopped, "Arm is stopped"

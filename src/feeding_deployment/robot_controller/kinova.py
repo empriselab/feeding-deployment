@@ -213,7 +213,7 @@ class KinovaArm:
 
         if self.fix_joint_hack:
             self.model = pin.buildModelFromUrdf(
-                os.path.join(self.file_path, "hack_gen3_robotiq_2f_85_feeding.urdf")
+                os.path.join(self.file_path, "hack_gen3_robotiq_2f_85.urdf")
             )
         else:
             self.model = pin.buildModelFromUrdf(
@@ -222,10 +222,7 @@ class KinovaArm:
         self.data = self.model.createData()
         self.q_pin = np.zeros(self.model.nq)
 
-        if self.fix_joint_hack:
-            self.tool_frame_id = self.model.getFrameId("fork_tip")
-        else:
-            self.tool_frame_id = self.model.getFrameId("tool_frame")
+        self.tool_frame_id = self.model.getFrameId("tool_frame")
 
         # Action topic notifications
         self.end_or_abort_event = threading.Event()
@@ -246,6 +243,66 @@ class KinovaArm:
             check_for_end_or_abort(self.end_or_abort_event),
             Base_pb2.NotificationOptions(),
         )
+
+    def set_tool(self, tool):
+        assert not self.cyclic_running, "Arm must be in high-level servoing mode to set tool"
+        
+        # updates the urdf being used by pinocchio to include tool mass
+        if tool == "fork":
+            # Pinocchio setup (only used in low-level servoing mode)
+            self.file_path = os.path.dirname(os.path.realpath(__file__))
+
+            if self.fix_joint_hack:
+                self.model = pin.buildModelFromUrdf(
+                    os.path.join(self.file_path, "hack_gen3_robotiq_2f_85_fork.urdf")
+                )
+            else:
+                raise ValueError("URDF not available for fork tool without joint hack")
+                self.model = pin.buildModelFromUrdf(
+                    os.path.join(self.file_path, "gen3_robotiq_2f_85_fork.urdf")
+                )
+            self.data = self.model.createData()
+            self.q_pin = np.zeros(self.model.nq)
+
+            self.tool_frame_id = self.model.getFrameId("fork_tip")
+        elif tool == "wipe":
+            # Pinocchio setup (only used in low-level servoing mode)
+            self.file_path = os.path.dirname(os.path.realpath(__file__))
+
+            if self.fix_joint_hack:
+                self.model = pin.buildModelFromUrdf(
+                    os.path.join(self.file_path, "hack_gen3_robotiq_2f_85_wipe.urdf")
+                )
+            else:
+                raise ValueError("URDF not available for wipe tool without joint hack")
+                self.model = pin.buildModelFromUrdf(
+                    os.path.join(self.file_path, "gen3_robotiq_2f_85_wipe.urdf")
+                )
+            self.data = self.model.createData()
+            self.q_pin = np.zeros(self.model.nq)
+
+            # Rajat ToDo: Actually add wiper tip frame
+            self.tool_frame_id = self.model.getFrameId("fork_tip")
+        elif tool == "drink":
+            # Pinocchio setup (only used in low-level servoing mode)
+            self.file_path = os.path.dirname(os.path.realpath(__file__))
+
+            if self.fix_joint_hack:
+                self.model = pin.buildModelFromUrdf(
+                    os.path.join(self.file_path, "hack_gen3_robotiq_2f_85_drink.urdf")
+                )
+            else:
+                raise ValueError("URDF not available for drink tool without joint hack")
+                self.model = pin.buildModelFromUrdf(
+                    os.path.join(self.file_path, "gen3_robotiq_2f_85.urdf")
+                )
+            self.data = self.model.createData()
+            self.q_pin = np.zeros(self.model.nq)
+
+            # Rajat ToDo: Actually add drink tip frame
+            self.tool_frame_id = self.model.getFrameId("fork_tip")
+        else:
+            raise ValueError("Invalid tool")
 
     # def estop_callback(self, msg):
     #     if msg.data:
