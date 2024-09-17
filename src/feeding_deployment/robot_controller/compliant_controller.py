@@ -60,7 +60,7 @@ class CompliantController:
         self.POLICY_CONTROL_PERIOD = 0.1
         self.ALPHA = 0.01
         self.DT = 0.001
-        self.DAMPING_FACTOR = 0.01
+        self.DAMPING_FACTOR = 0.05
 
         if not self.fix_joint_hack:
             self.K_r = np.diag([0.3, 0.3, 0.3, 0.3, 0.18, 0.18, 0.18])
@@ -87,8 +87,8 @@ class CompliantController:
                 self.K_p = np.diag([100.0, 100.0, 100.0, 100.0, 50.0, 50.0])
                 self.K_d = np.diag([3.0, 3.0, 3.0, 3.0, 2.0, 2.0])
             elif self.control_type == "task":
-                self.K_T_p = np.diag([100.0, 100.0, 100.0, 400.0, 400.0, 400.0])
-                self.K_T_d = np.diag([20, 20, 20, 40, 40, 40])
+                self.K_T_p = np.diag([100.0, 100.0, 100.0, 100.0, 100.0, 100.0])
+                self.K_T_d = np.diag([20, 20, 20, 20, 20, 20])
 
     def control_callback(self, arm):
         # Initialize variables on first call
