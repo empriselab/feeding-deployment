@@ -14,8 +14,8 @@ from geometry_msgs.msg import WrenchStamped
 from netft_rdt_driver.srv import String_cmd
 
 # Parameters
-# OPEN_LOOP_RADIUS = 0.02
-OPEN_LOOP_RADIUS = 0.0
+OPEN_LOOP_RADIUS = 0.02
+# OPEN_LOOP_RADIUS = 0.0
 INTERMEDIATE_THRESHOLD_RELAXED = 0.02
 INTERMEDIATE_ANGULAR_THRESHOLD_RELAXED = 5*np.pi/180
 INTERMEDIATE_THRESHOLD = 0.014
