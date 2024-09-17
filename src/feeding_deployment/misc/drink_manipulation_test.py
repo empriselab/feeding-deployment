@@ -19,13 +19,16 @@ from visualization_msgs.msg import MarkerArray, Marker
 
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 from feeding_deployment.robot_controller.command_interface import CartesianCommand
+from geometry_msgs.msg import TransformStamped
+
+# from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
 
 from geometry_msgs.msg import Pose as pose_msg
 
 class ArUcoPerception:
     def __init__(self):
         rospy.init_node('ArUcoPerception')
-        self.AR_center_pose = None
+        self.AR_center_pose = None # get rid of this later
 
         self.bridge = CvBridge()
 
@@ -42,10 +45,8 @@ class ArUcoPerception:
 
         self.tfBuffer = tf2_ros.Buffer()  # Using default cache time of 10 secs
         self.listener = tf2_ros.TransformListener(self.tfBuffer)
+        self.broadcaster = tf2_ros.TransformBroadcaster()
         time.sleep(1.0)
-
-
-        
 
     def rgbdCallback(self, rgb_image_msg, camera_info_msg, depth_image_msg):
 
@@ -102,43 +103,18 @@ class ArUcoPerception:
 
         transform = self.get_base_to_camera_transform(camera_info_msg)
 
-        if transform is not None:
-            base_to_camera = np.zeros((4, 4))
-            base_to_camera[:3, :3] = Rotation.from_quat(
-                [
-                    transform.transform.rotation.x,
-                    transform.transform.rotation.y,
-                    transform.transform.rotation.z,
-                    transform.transform.rotation.w,
-                ]
-            ).as_matrix()
-            base_to_camera[:3, 3] = np.array(
-                [
-                    transform.transform.translation.x,
-                    transform.transform.translation.y,
-                    transform.transform.translation.z,
-                ]
-            ).reshape(1, 3)
-            base_to_camera[3, 3] = 1
+        if transform is not None:   
+            base_to_camera = self.make_homogeneous_transform(transform)
 
-            world_tag_pos = np.dot(base_to_camera, tag_pos)
+            # cam to tag homogeneous transform
+            camera_to_tag = np.zeros((4, 4))
+            camera_to_tag[:3, :3] = ret_R
+            camera_to_tag[:3, 3] = np.array([ tag_pos[0], tag_pos[1], tag_pos[2] ]).reshape(1, 3)
+            camera_to_tag[3, 3] = 1 
 
-            print(np.dot(base_to_camera, tag_pos))
-
-
-
-            # linear distance to the base
-            # t = transform.transform.translation
-            # t = np.array([t.x, t.y, t.z])
-            # print(np.mean(t, axis=0))
-
-        # print(len(valid_landmarks_world))
-        self.AR_center_pose = None
-        # self.AR_center_pose = valid_landmarks_world, ret_R
-
-
-
-
+            # base to tag homogeneous transform and update tf
+            base_to_tag = np.dot(base_to_camera, camera_to_tag)
+            self.updateTF("base_link", "AR_tag", base_to_tag)
 
 
 
@@ -278,7 +254,7 @@ class ArUcoPerception:
             print("Exexption finding transform between base_link and", target_frame)
             return None
 
-    def make_homogeneous(self, rotation, position):
+    def make_homogeneous_transform(self, transform):
         A_to_B = np.zeros((4, 4))
         A_to_B[:3, :3] = Rotation.from_quat(
             [
@@ -298,6 +274,29 @@ class ArUcoPerception:
         A_to_B[3, 3] = 1
 
         return A_to_B
+
+    def updateTF(self, source_frame, target_frame, pose):
+
+        t = TransformStamped()
+
+        t.header.stamp = rospy.Time.now()
+        t.header.frame_id = source_frame
+        t.child_frame_id = target_frame
+
+        t.transform.translation.x = pose[0][3]
+        t.transform.translation.y = pose[1][3]
+        t.transform.translation.z = pose[2][3]
+
+        R = Rotation.from_matrix(pose[:3, :3]).as_quat()
+        t.transform.rotation.x = R[0]
+        t.transform.rotation.y = R[1]
+        t.transform.rotation.z = R[2]
+        t.transform.rotation.w = R[3]
+
+        print(t)
+
+        self.broadcaster.sendTransform(t)
+
 
     def follow_AR_tag(self, cartesian_state_msg):
 
