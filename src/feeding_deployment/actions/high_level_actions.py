@@ -643,15 +643,15 @@ class TransferToolHLA(HighLevelAction):
                 # stop the keep horizontal thread
                 self.wrist_controller.stop_horizontal_spoon_thread()
 
-            # if self._run_on_robot:
-            #     input("Press enter to switch to task compliant mode")
-            #     self._robot_interface.switch_to_task_compliant_mode()
+            if self._run_on_robot:
+                input("Press enter to switch to task compliant mode")
+                self._robot_interface.switch_to_task_compliant_mode()
                 
-            #     # Do inside-mouth transfer here
-            #     self.inside_mouth_transfer.execute_transfer_loop()
+                # Do inside-mouth transfer here
+                self.inside_mouth_transfer.execute_transfer_loop()
 
-            #     input("Press enter to switch out of compliant mode")
-            #     self._robot_interface.switch_out_of_compliant_mode()
+                input("Press enter to switch out of compliant mode")
+                self._robot_interface.switch_out_of_compliant_mode()
 
             return sim_states
         

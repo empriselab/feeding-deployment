@@ -126,11 +126,9 @@ class PerceptionInterface:
             return self.tool_tip_target_pose
         
     def get_tool_tip_pose(self) -> np.ndarray:
-        
-        # Rajat ToDo: Update this to use forward kinematics from the robot interface
-        forque_base = self.getTransformationFromTF("base_link", "fork_tip")
-        
-        return forque_base
+
+        arm_pos, tool_tip_pose, gripper_pos = self._robot_interface.get_state()
+        return tool_tip_pose
     
     def get_tool_tip_pose_at_staging(self) -> np.ndarray:
 

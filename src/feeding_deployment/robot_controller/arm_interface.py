@@ -27,10 +27,6 @@ class ArmInterface:
     def get_state(self):
         arm_pos, ee_pose, gripper_pos = self.arm.get_state()
         return arm_pos, ee_pose, gripper_pos
-    
-    def get_update_state(self):
-        arm_pos, arm_vel, _, gripper_pos = self.arm.get_update_state()
-        return arm_pos, arm_vel, gripper_pos
 
     def reset(self):
         # Go to home position

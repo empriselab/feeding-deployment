@@ -47,6 +47,9 @@ class ArmInterfaceClient:
         self._arm_interface.switch_out_of_compliant_mode()
         self.in_compliant_mode = False
 
+    def get_state(self):
+        return self._arm_interface.get_state()
+
     def execute_command(self, cmd: KinovaCommand) -> None:
 
         if cmd.__class__.__name__ == "JointTrajectoryCommand":

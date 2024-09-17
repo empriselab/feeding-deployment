@@ -313,6 +313,7 @@ class KinovaArm:
 
     def get_state(self):
 
+        # Rajat ToDo: this isn't exactly the same as get_state as it returns tool tip pose instead of tool_frame pose
         if self.cyclic_running:
             q, dq, tau, x, gripper_pos = self.get_update_state()
             if self.fix_joint_hack:
