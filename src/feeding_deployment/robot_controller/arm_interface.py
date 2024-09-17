@@ -12,13 +12,13 @@ import numpy as np
 from multiprocess.managers import BaseManager as MPBaseManager
 
 RPC_AUTHKEY = b"secret-key"
-NUC_HOSTNAME = "192.168.1.3"
+NUC_HOSTNAME = "localhost"
 ARM_RPC_PORT = 5000
 
 class ArmInterface:
     def __init__(self, arm_instance):
         self.arm = arm_instance
-        # self.arm.set_joint_limits(speed_limits=(7 * (30,)), acceleration_limits=(7 * (80,)))
+        # self.arm.set_joint_limits(speed_limits=(7 * (30,)), acceleration_limits=(7 * (80,))) # Slows the arm down?
         self.command_queue = queue.Queue(1)
         self.controller = None
         self.in_compliant_mode = False

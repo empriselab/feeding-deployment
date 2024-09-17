@@ -45,7 +45,7 @@ class JointStatesPublisher:
             "joint_4",
             "joint_5",
             "joint_6",
-            "joint_7",
+            # "joint_7",
             "finger_joint",
         ]
 
@@ -74,7 +74,7 @@ class JointStatesPublisher:
             -1.37302839,
             1.11779249,
             -1.18028264,
-            2.05515862,
+            # 2.05515862,
         ]
 
         error = np.array(arm_pos) - np.array(before_transfer_pos)

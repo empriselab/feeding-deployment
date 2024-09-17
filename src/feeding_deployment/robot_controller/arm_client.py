@@ -22,9 +22,9 @@ class ArmInterfaceClient:
     def __init__(self):
 
         # make sure watchdog is running
-        print("Waiting for Watchdog status...")
-        rospy.wait_for_message("/watchdog_status", Bool)
-        print("Watchdog is running, continuing...")
+        # print("Waiting for Watchdog status...")
+        # rospy.wait_for_message("/watchdog_status", Bool)
+        # print("Watchdog is running, continuing...")
 
         # Register ArmInterface (no lambda needed on the client-side)
         ArmManager.register("ArmInterface")

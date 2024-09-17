@@ -49,7 +49,7 @@ from feeding_deployment.robot_controller.compliant_controller import CompliantCo
 
 
 class DeviceConnection:
-    IP_ADDRESS = "192.168.1.10"
+    IP_ADDRESS = "192.168.1.42"
     TCP_PORT = 10000
     UDP_PORT = 10001
 
@@ -111,7 +111,7 @@ class KinovaArm:
         # Check whether arm is connected
         try:
             subprocess.run(
-                ["ping", "-c", "1", "192.168.1.10"],
+                ["ping", "-c", "1", "192.168.1.42"],
                 check=True,
                 timeout=1,
                 stdout=subprocess.DEVNULL,

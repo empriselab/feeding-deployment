@@ -14,11 +14,11 @@ import message_filters
 from sensor_msgs.msg import Image, CameraInfo
 from cv_bridge import CvBridge, CvBridgeError
 import tf2_ros
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import Point, Pose
 from visualization_msgs.msg import MarkerArray, Marker
 
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
-from feeding_deployment.robot_controller.command_interface import CartesianCommand
+from feeding_deployment.robot_controller.command_interface import CartesianCommand, JointCommand, CloseGripperCommand
 from geometry_msgs.msg import TransformStamped
 from collections import deque
 
@@ -26,18 +26,94 @@ from collections import deque
 
 from geometry_msgs.msg import Pose as pose_msg
 
-class ArUcoPerception:
+
+class TFInterface:
+    def __init__(self):
+        self.tfBuffer = tf2_ros.Buffer()  # Using default cache time of 10 secs
+        self.listener = tf2_ros.TransformListener(self.tfBuffer)
+        self.broadcaster = tf2_ros.TransformBroadcaster()
+        time.sleep(1.0)
+
+    def updateTF(self, source_frame, target_frame, pose):
+
+        t = TransformStamped()
+
+        t.header.stamp = rospy.Time.now()
+        t.header.frame_id = source_frame
+        t.child_frame_id = target_frame
+
+        t.transform.translation.x = pose[0][3]
+        t.transform.translation.y = pose[1][3]
+        t.transform.translation.z = pose[2][3]
+
+        R = Rotation.from_matrix(pose[:3, :3]).as_quat()
+        t.transform.rotation.x = R[0]
+        t.transform.rotation.y = R[1]
+        t.transform.rotation.z = R[2]
+        t.transform.rotation.w = R[3]
+
+        self.broadcaster.sendTransform(t)
+
+    def get_frame_to_frame_transform(self, camera_info_data, frame_A = "base_link", target_frame = "camera_color_optical_frame"):
+        stamp = camera_info_data.header.stamp
+        try:
+            transform = self.tfBuffer.lookup_transform(
+                frame_A,
+                target_frame,
+                rospy.Time(secs=stamp.secs, nsecs=stamp.nsecs),
+            )
+            return transform
+        except (
+            tf2_ros.LookupException,
+            tf2_ros.ConnectivityException,
+            tf2_ros.ExtrapolationException,
+        ):
+            print("Exexption finding transform between base_link and", target_frame)
+            return None
+
+    def make_homogeneous_transform(self, transform):
+        A_to_B = np.zeros((4, 4))
+        A_to_B[:3, :3] = Rotation.from_quat(
+            [
+                transform.transform.rotation.x,
+                transform.transform.rotation.y,
+                transform.transform.rotation.z,
+                transform.transform.rotation.w,
+            ]
+        ).as_matrix()
+        A_to_B[:3, 3] = np.array(
+            [
+                transform.transform.translation.x,
+                transform.transform.translation.y,
+                transform.transform.translation.z,
+            ]
+        ).reshape(1, 3)
+        A_to_B[3, 3] = 1
+
+        return A_to_B
+
+    def pose_to_matrix(self, pose):
+        position = pose[0]
+        orientation = pose[1]
+        pose_matrix = np.zeros((4, 4))
+        pose_matrix[:3, 3] = position
+        pose_matrix[:3, :3] = Rotation.from_quat(orientation).as_matrix()
+        pose_matrix[3, 3] = 1
+        return pose_matrix
+    
+    def matrix_to_pose(self, mat):
+        position = mat[:3, 3]
+        orientation = Rotation.from_matrix(mat[:3, :3]).as_quat()
+        return (position, orientation)
+
+
+class ArUcoPerception(TFInterface):
     def __init__(self):
         rospy.init_node('ArUcoPerception')
-        self.AR_center_pose = None # get rid of this later
 
-        self.robot_interface = ArmInterfaceClient()
         self.bridge = CvBridge()
-        self.current_pose = None
-        self.goal_pose_queue = deque(maxlen=10)
-
-        self.cartesian_state_sub = message_filters.Subscriber('/robot_cartesian_state', pose_msg)
-        self.cartesian_state_sub.registerCallback(self.read_pose)
+        self.aruco_pose_queue = deque(maxlen=10)
+        self.aruco_pose_publisher =  rospy.Publisher("/aruco_pose", Pose, queue_size=10)
 
         self.color_image_sub = message_filters.Subscriber('/camera/color/image_raw', Image)
         self.camera_info_sub = message_filters.Subscriber('/camera/color/camera_info', CameraInfo)
@@ -45,14 +121,7 @@ class ArUcoPerception:
         ts = message_filters.TimeSynchronizer([self.color_image_sub, self.camera_info_sub, self.depth_image_sub], 1)
         ts.registerCallback(self.rgbdCallback)
 
-        self.voxel_publisher =  rospy.Publisher("/head_perception/voxels/marker_array", MarkerArray, queue_size=10)
-
-        self.tfBuffer = tf2_ros.Buffer()  # Using default cache time of 10 secs
-        self.listener = tf2_ros.TransformListener(self.tfBuffer)
-        self.broadcaster = tf2_ros.TransformBroadcaster()
-        time.sleep(1.0)
-
-
+        super().__init__()
 
     def rgbdCallback(self, rgb_image_msg, camera_info_msg, depth_image_msg):
 
@@ -101,8 +170,6 @@ class ArUcoPerception:
         landmarks_model_camera_frame = ret_t.reshape(3,1) + s * (ret_R @ landmarks_model[:,:,np.newaxis])
         landmarks_model_camera_frame = np.squeeze(landmarks_model_camera_frame)
 
-
-
         # get things into world frame
 
         tag_pos = np.append(np.mean(valid_landmarks_world, axis=0), 1) # pad with 1 for homogeneous coordinate
@@ -121,57 +188,22 @@ class ArUcoPerception:
             # base to tag homogeneous transform and update tf
             base_to_tag = np.dot(base_to_camera, camera_to_tag)
             self.updateTF("base_link", "AR_tag", base_to_tag)
+            self.update_aruco_pose(base_to_tag)
 
-            base_to_tool = self.get_frame_to_frame_transform(camera_info_msg, "base_link", "tool_frame")
-            self.follow_AR_tag(self.make_homogeneous_transform(base_to_tool), base_to_tag)
-
-        self.visualizeVoxels(landmarks_model_camera_frame)
-
-    def visualizeVoxels(self, voxels):
-
-        # print(voxels)
-
-        markerArray = MarkerArray()
-
-        marker = Marker()
-        marker.header.seq = 0
-        marker.header.stamp = rospy.Time.now()
-        marker.header.frame_id = "camera_color_optical_frame"
-        marker.ns = "visualize_voxels"
-        marker.id =  1
-        marker.type = 6; # CUBE LIST
-        marker.action = 0; # ADD
-        marker.lifetime = rospy.Duration()
-        marker.scale.x = 0.01
-        marker.scale.y = 0.01
-        marker.scale.z = 0.01
-        marker.color.r = 1
-        marker.color.g = 1
-        marker.color.b = 0
-        marker.color.a = 1
-
-        for i in range(voxels.shape[0]):
-
-            point = Point()
-            point.x = voxels[i,0]
-            point.y = voxels[i,1]
-            point.z = voxels[i,2]
-
-            marker.points.append(point)
-
-
-        # average of the voxels is the center of the AR tag
-        center = np.mean(voxels, axis=0)
-        point = Point()
-        point.x = center[0]
-        point.y = center[1]
-        point.z = center[2]
-        marker.points.append(point)
-        # 
-        markerArray.markers.append(marker)
-        self.voxel_publisher.publish(markerArray)
-
-        return center
+    def update_aruco_pose(self, aruco_pose_mat):
+        aruco_pose = self.matrix_to_pose(aruco_pose_mat)
+        self.aruco_pose_queue.append(aruco_pose)
+        running_average_position = np.mean([pose[0] for pose in self.aruco_pose_queue], axis=0)
+        running_average_orientation = np.mean([pose[1] for pose in self.aruco_pose_queue], axis=0)
+        p = Pose()
+        p.position.x = running_average_position[0]
+        p.position.y = running_average_position[1]
+        p.position.z = running_average_position[2]
+        p.orientation.x = running_average_orientation[0]
+        p.orientation.y = running_average_orientation[1]
+        p.orientation.z = running_average_orientation[2]
+        p.orientation.w = running_average_orientation[3]
+        self.aruco_pose_publisher.publish(p)
 
     def pixel2World(self, camera_info, image_x, image_y, depth_image):
 
@@ -237,153 +269,58 @@ class ArUcoPerception:
         t = np.mean(A, axis=0) - R.as_matrix()@np.mean(scaled_B, axis=0)
 
         return scale, R.as_matrix(), t
-    
-    def get_frame_to_frame_transform(self, camera_info_data, frame_A = "base_link", target_frame = "camera_color_optical_frame"):
-        stamp = camera_info_data.header.stamp
-        try:
-            transform = self.tfBuffer.lookup_transform(
-                frame_A,
-                target_frame,
-                rospy.Time(secs=stamp.secs, nsecs=stamp.nsecs),
-            )
-            return transform
-        except (
-            tf2_ros.LookupException,
-            tf2_ros.ConnectivityException,
-            tf2_ros.ExtrapolationException,
-        ):
-            print("Exexption finding transform between base_link and", target_frame)
-            return None
-
-    def make_homogeneous_transform(self, transform):
-        A_to_B = np.zeros((4, 4))
-        A_to_B[:3, :3] = Rotation.from_quat(
-            [
-                transform.transform.rotation.x,
-                transform.transform.rotation.y,
-                transform.transform.rotation.z,
-                transform.transform.rotation.w,
-            ]
-        ).as_matrix()
-        A_to_B[:3, 3] = np.array(
-            [
-                transform.transform.translation.x,
-                transform.transform.translation.y,
-                transform.transform.translation.z,
-            ]
-        ).reshape(1, 3)
-        A_to_B[3, 3] = 1
-
-        return A_to_B
-
-    def updateTF(self, source_frame, target_frame, pose):
-
-        t = TransformStamped()
-
-        t.header.stamp = rospy.Time.now()
-        t.header.frame_id = source_frame
-        t.child_frame_id = target_frame
-
-        t.transform.translation.x = pose[0][3]
-        t.transform.translation.y = pose[1][3]
-        t.transform.translation.z = pose[2][3]
-
-        R = Rotation.from_matrix(pose[:3, :3]).as_quat()
-        t.transform.rotation.x = R[0]
-        t.transform.rotation.y = R[1]
-        t.transform.rotation.z = R[2]
-        t.transform.rotation.w = R[3]
-
-        self.broadcaster.sendTransform(t)
 
 
-    def follow_AR_tag(self, base_to_tool, base_to_tag):
+class DrinkManipulation(TFInterface):
+    def __init__(self):
+        self.robot_interface = ArmInterfaceClient()
+        self.aruco_pose_sub =  message_filters.Subscriber("/aruco_pose", Pose)
+        self.aruco_pose_sub.registerCallback(self.update_aruco_pose)
+        self.aruco_pose = None
+        super().__init__()
 
-        # print(base_to_tool)
+    def update_aruco_pose(self, msg):
+        position = (msg.position.x, msg.position.y, msg.position.z)
+        orientation = (msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w)
+        self.aruco_pose = (position, orientation)
 
+    def get_pre_grasp_pose(self, aruco_pose):
+        aruco_pos_mat = self.pose_to_matrix(aruco_pose)
+        
         static_transform = np.zeros((4, 4))
-
-
-
-        static_transform[:3, :3] = np.array([  [0,  1,  0],[0,  0, -1],[-1,  0,  0] ])
-        static_transform[:3, 3] = np.array([.02, 0, .4]).reshape(1, 3)
+        static_transform[:3, :3] = Rotation.from_euler("xyz", [np.pi, 0, np.pi / 2]).as_matrix()
+        static_transform[:3, 3] = np.array([0.02, 0, 0.05])
         static_transform[3, 3] = 1 
 
-        goal_frame = np.dot(base_to_tag, static_transform)
-        # self.updateTF("base_link", "goal_frame", goal_frame)
+        goal_frame = np.dot(aruco_pos_mat, static_transform)
+        goal_pose = self.matrix_to_pose(goal_frame)
+        return goal_pose
 
-        target_position = (goal_frame[0, 3], goal_frame[1, 3], goal_frame[2, 3]) # list slice instead? does this accept non-tuple?
-        target_orientation = Rotation.from_matrix(goal_frame[:3, :3]).as_quat()
-        target_orientation = (target_orientation[0], target_orientation[1], target_orientation[2], target_orientation[3])
+    def pick_up_drink(self):
+        # Wait for the aruco pose to be found.
+        while self.aruco_pose is None:
+            time.sleep(0.1)
 
-        self.goal_pose_queue.append((target_position, target_orientation))
+        # Close the fingers.
+        self.close_fingers()
 
-        running_average_position = np.mean([pose[0] for pose in self.goal_pose_queue], axis=0)
-        running_average_orientation = np.mean([pose[1] for pose in self.goal_pose_queue], axis=0)
-        running_average_rotation = Rotation.from_quat(running_average_orientation).as_matrix()
-        running_average_frame = np.zeros((4, 4))
-        running_average_frame[:3, :3] = running_average_rotation
-        running_average_frame[:3, 3] = running_average_position
-        self.updateTF("base_link", "goal_frame", running_average_frame)
-
-        # Move in the direction of the goal, but not too quickly.
-        current_position = np.array(self.current_pose[0])
-        current_orientation = np.array(self.current_pose[1])
-        position_delta = running_average_position - current_position
-        orientation_delta = running_average_orientation - current_orientation
+        # Move to the pre-grasp pose.
+        pre_grasp_pose = self.get_pre_grasp_pose(self.aruco_pose)
+        self.move_to_pose(pre_grasp_pose)
         
-        max_position_delta = 0.01
-        magnitude = np.linalg.norm(position_delta)
-        if magnitude > max_position_delta:
-            scale = max_position_delta / magnitude
-            position_delta = position_delta * scale
-            orientation_delta = orientation_delta * scale
 
-        move_position = current_position + position_delta
-        move_orientation = current_orientation + orientation_delta 
-        
-        self.send_command(move_position, move_orientation)
+    def move_to_pose(self, pose):
+        self.updateTF("base_link", "goal_frame", self.pose_to_matrix(pose))
+        input("Press enter to go to goal pose")        
 
-        # print(target_position, target_orientation)
-
-        # self.send_command(target_position, target_orientation)
-
-        # tool_to_tag = np.dot(np.linalg.inv(base_to_tool),base_to_tag)
-
-        # print(tool_to_tag[0,3], tool_to_tag[1,3], tool_to_tag[2,3])
-
-
-    def send_command(self, target_position, target_orientation):
-        cmd = CartesianCommand(target_position, target_orientation)
+        cmd = CartesianCommand(pose[0], pose[1])
         self.robot_interface.execute_command(cmd)
-        # robot_interface = ArmInterfaceClient()
-        # robot_interface.execute_command(cmd)
-        
-    def read_pose(self, arm_pose_msg):
-        self.current_pose = (
-            (arm_pose_msg.position.x, arm_pose_msg.position.y, arm_pose_msg.position.z),
-            (arm_pose_msg.orientation.x, arm_pose_msg.orientation.y, arm_pose_msg.orientation.z, arm_pose_msg.orientation.w)
-        )
 
-        """
-        
-(0.5736776157933938, -0.09580082382673927, 0.0766157263532676) [0.5627823  0.43596175 0.43279593 0.55308329]"""
+    def close_fingers(self):
+        self.robot_interface.execute_command(CloseGripperCommand())
 
-        """
-        position: 
-            x: 0.5629775524139404
-            y: -0.09015465527772903
-            z: 0.07269313931465149
-        orientation: 
-            x: 0.5700255012489195
-            y: 0.46046393122423585
-            z: 0.4095031450955806
-            w: 0.5434621147092666
-        """
 
 if __name__ == '__main__':
-
-
 
     # target_position = (0.61, -0.12, 0.6)
     # target_orientation = (0.56, 0.37, 0.49, 0.55)
@@ -392,4 +329,17 @@ if __name__ == '__main__':
     # robot_interface.execute_command(cmd)
 
     aruco_perception = ArUcoPerception()
-    rospy.spin()
+    drink_manipulation = DrinkManipulation()
+
+    # NOTE: these are 6dof-specific joint positions, would need to be updated
+    input("Press enter to reset the robot to gaze position")
+    gaze_joints = [1.125354671287698, 0.9558922716457215, -1.8328343338277167, -2.020429265225662, -1.428489781314294, -1.8853739747611273]
+    drink_manipulation.robot_interface.execute_command(JointCommand(gaze_joints))
+
+    input("Press enter to reset the robot to staging position")
+    gaze_joints = [0.7834493286907556, 1.0428972118263922, -1.3236784134531359, -1.053118290932062, -1.9758625959637302, -2.263605433837996]
+    drink_manipulation.robot_interface.execute_command(JointCommand(gaze_joints))
+
+    input("Press enter to pick up the drink")
+    drink_manipulation.pick_up_drink()
+

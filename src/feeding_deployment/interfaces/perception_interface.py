@@ -10,20 +10,16 @@ from scipy.spatial.transform import Rotation as R
 import json
 
 
-try:
-    import rospy
-    from sensor_msgs.msg import JointState, CompressedImage
-    from std_msgs.msg import String, Bool
-    from visualization_msgs.msg import MarkerArray
-    import tf2_ros
-    from geometry_msgs.msg import TransformStamped
-    from cv_bridge import CvBridge
+import rospy
+from sensor_msgs.msg import JointState, CompressedImage
+from std_msgs.msg import String, Bool
+from visualization_msgs.msg import MarkerArray
+import tf2_ros
+from geometry_msgs.msg import TransformStamped
+from cv_bridge import CvBridge
 
 
-    from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
-except ModuleNotFoundError:
-    pass
-
+from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 
 class PerceptionInterface:
@@ -33,7 +29,7 @@ class PerceptionInterface:
         self._robot_interface = robot_interface
 
         # run head perception
-        if robot_interface is None:
+        if True:  #robot_interface is None:
             self._head_perception = None
         else:
             # self._head_perception = None
@@ -47,8 +43,8 @@ class PerceptionInterface:
     def get_robot_joints(self) -> "JointState":
         """Get the current robot joint state."""
         joint_state_msg = rospy.wait_for_message("/robot_joint_states", JointState)
-        q = np.array(joint_state_msg.position[:7])
-        gripper_position = joint_state_msg.position[7]
+        q = np.array(joint_state_msg.position[:6])
+        gripper_position = joint_state_msg.position[6]
         
         joint_state = q.tolist() + [
             gripper_position,
