@@ -37,8 +37,6 @@ from feeding_deployment.simulation.planning import (
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
 
-
-
 def move_to_joint_positions(
     sim: FeedingDeploymentPyBulletSimulator,
     joint_positions: list[float],
@@ -184,4 +182,5 @@ def move_to_ee_pose(
         for sim_state in plan:
             rviz_interface.joint_state_update(sim_state.robot_joints)
             time.sleep(0.005)
+
 

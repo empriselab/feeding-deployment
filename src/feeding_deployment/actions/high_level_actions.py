@@ -34,6 +34,8 @@ from feeding_deployment.actions.low_level_actions import (
     teleport_to_ee_pose,
     move_to_ee_pose,
 )
+from feeding_deployment.actions.inside_mouth_transfer import InsideMouthTransfer
+
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
 from feeding_deployment.interfaces.web_interface import WebInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
@@ -594,6 +596,10 @@ class StowToolHLA(HighLevelAction):
 class TransferToolHLA(HighLevelAction):
     """Wipe, or transfer drink, or transfer bite."""
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.inside_mouth_transfer = InsideMouthTransfer(perception_interface=self._perception_interface, robot_interface=self._robot_interface, rviz_interface=self._rviz_interface)
+
     def get_name(self) -> str:
         return "TransferTool"
 
@@ -636,125 +642,12 @@ class TransferToolHLA(HighLevelAction):
             if self._run_on_robot:
                 input("Press enter to switch to task compliant mode")
                 self._robot_interface.switch_to_task_compliant_mode()
+                
                 # Do inside-mouth transfer here
+                self.inside_mouth_transfer.execute_transfer_loop()
+
                 input("Press enter to switch out of compliant mode")
                 self._robot_interface.switch_out_of_compliant_mode()
-
-            return sim_states
-
-            # Rajat ToDo: Implement horizontal utensil
-            if self.flair is not None:
-                self.wrist_controller.reset()
-
-            # Send message to web interface indicating transfer is done.
-            self._web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
-            return sim_states
-
-            sim_length = len(sim_states)
-
-            target_pose = self._perception_interface.get_head_perception_forque_target_pose(simulation=True)
-            k = input("Does pose look good? Press 'y/n' to continue")
-            while k != "y":
-                target_pose = self._perception_interface.get_head_perception_forque_target_pose()
-                k = input("Does pose look good? Press 'y/n' to continue")
-
-            # target_pose = Pose(position=(-0.17272330207928777, 0.6273752674813526, 0.5572539925006535), 
-                # orientation=(-0.42030807,  0.56739361,  0.47188225, -0.52795148))
-            intermediate_pose = multiply_poses(
-                target_pose, Pose(position=[0.0, 0.0, -0.1], orientation=[0.0, 0.0, 0.0, 1.0])
-            ) # 10 cms away from the mouth
-
-            visualize_pose(target_pose, self._sim.physics_client_id)
-            # input("Visualizing target pose. Press Enter to continue...")
-            visualize_pose(intermediate_pose, self._sim.physics_client_id)
-            # input("Visualizing intermediate pose. Press Enter to continue...")
-
-            # NOTE: disabling collision checking here between held object and
-            # conservative bounding box.
-            move_to_ee_pose(sim=self._sim,
-                target_pose=intermediate_pose,
-                exclude_collision_ids=None,
-                tip_from_end_effector=self._sim.scene_description.utensil_tip_from_end_effector,
-                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
-                sim_states=sim_states,
-                robot_commands=robot_commands,
-                rviz_interface=self._rviz_interface,
-                check_held_object_collisions=False)
-            
-            # input("Replaying the trajectory to check. Press Enter to continue...")
-            # for i in range(sim_length, len(sim_states)):
-            #     self._sim.sync(sim_states[i])
-            #     time.sleep(0.1)
-                # input("Press Enter to continue...")
-
-            # NOTE: disabling collision checking here between held object and
-            # conservative bounding box.
-            move_to_ee_pose(sim=self._sim,
-                target_pose=target_pose,
-                exclude_collision_ids=None,
-                tip_from_end_effector=self._sim.scene_description.utensil_tip_from_end_effector,
-                max_motion_plan_time=self._hla_hyperparams["max_motion_planning_time"],
-                sim_states=sim_states,
-                robot_commands=robot_commands,
-                rviz_interface=self._rviz_interface,
-                check_held_object_collisions=False)
-            
-            # input("Replaying the trajectory to check. Press Enter to continue...")
-            # for i in range(sim_length, len(sim_states)):
-            #     self._sim.sync(sim_states[i])
-            #     time.sleep(0.1)
-                # input("Press Enter to continue...")
-
-            # if self._rviz_interface is not None:
-            #     for sim_state in sim_states:
-            #         self._rviz_interface.joint_state_update(sim_state.robot_joints)
-            #         time.sleep(0.1)
-
-            if self._run_on_robot:
-                y = input("Does the trajectory look good? Press 'y/n' to execute on robot")
-                while y != "y" and y != "n":
-                    y = input("Please enter 'y' or 'n'")
-                if y == "y":
-                    input("Press enter to switch to joint compliant mode")
-                    self._robot_interface.switch_to_task_compliant_mode()
-                    self.execute_robot_commands(robot_commands)
-                else:
-                    print("Trajectory not executed on robot")
-            
-            # Wait for button press to indicate that transfer is finished.
-            self._perception_interface.wait_for_user_continue_button()
-            
-            # Reverse the transfer plan.
-            transfer_sim_states = sim_states[sim_length:]
-            sim_states.extend(transfer_sim_states[::-1])
-
-            # if self._rviz_interface is not None:
-            #     for sim_state in transfer_sim_states[::-1]:
-            #         self._rviz_interface.joint_state_update(sim_state.robot_joints)
-            #         time.sleep(0.02)
-            
-            transfer_robot_commands = robot_commands.copy()
-            reversed_robot_commands = []
-            for command in transfer_robot_commands[::-1]:
-                assert isinstance(command, JointTrajectoryCommand), "Command not a joint trajectory command"
-                reversed_robot_commands.append(JointTrajectoryCommand(command.traj[::-1]))
-            
-            robot_commands.extend(reversed_robot_commands)
-
-            for i in range(len(robot_commands)):
-                assert isinstance(robot_commands[i], JointTrajectoryCommand), "Command not a joint trajectory command"
-                assert np.allclose(robot_commands[i].traj, robot_commands[-(i+1)].traj[::-1]), "Robot commands not a palindrome"
-
-            if self._run_on_robot:
-                y = input("Does the trajectory look good? Press 'y' to execute on robot")
-                while y != "y" and y != "n":
-                    y = input("Please enter 'y' or 'n'")
-                if y == "y":
-                    self.execute_robot_commands(reversed_robot_commands)
-                    input("Press enter to switch out of joint compliant mode")
-                    self._robot_interface.switch_out_of_compliant_mode()
-                else:
-                    print("Trajectory not executed on robot")
 
             return sim_states
         
@@ -781,7 +674,7 @@ class TransferToolHLA(HighLevelAction):
             sim_length = len(sim_states)
 
             # input("Press enter to perceive the target pose")
-            # target_pose = self._perception_interface.get_head_perception_forque_target_pose()
+            # target_pose = self._perception_interface.get_head_perception_tool_tip_target_pose()
             target_pose = Pose(position=(-0.17272330207928777, 0.6273752674813526, 0.5572539925006535), 
                 orientation=(-0.42030807,  0.56739361,  0.47188225, -0.52795148))
             print("target_pose", target_pose)
@@ -914,7 +807,7 @@ class TransferToolHLA(HighLevelAction):
             sim_length = len(sim_states)
 
             # input("Press enter to perceive the target pose")
-            # target_pose = self._perception_interface.get_head_perception_forque_target_pose()
+            # target_pose = self._perception_interface.get_head_perception_tool_tip_target_pose()
             target_pose = Pose(position=(-0.17272330207928777, 0.6273752674813526, 0.5572539925006535), 
                 orientation=(-0.42030807,  0.56739361,  0.47188225, -0.52795148))
             print("target_pose", target_pose)

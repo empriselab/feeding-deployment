@@ -35,7 +35,11 @@
     </include>
 
     <!-- FT sensor -->
-
+    <include file="$(find netft_rdt_driver)/launch/ft_sensor.launch">
+        <arg name="ip_address" value="192.168.1.23"/>
+        <arg name="rate" value="1000"/>
+    </include>
+    
     <!-- Emergency Stops -->
 
     <!-- Transfer Complete Button -->
@@ -48,6 +52,9 @@
     <!-- Collision Monitor -->
 
     <!-- Watchdog -->
+    <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_watchdog">
+        <param name="cmd" value="$(arg python_path) $(arg base_path)/src/feeding_deployment/safety/watchdog.py"/>
+    </node>
 
     <!-- Simulated Robot -->
     <group ns="sim">

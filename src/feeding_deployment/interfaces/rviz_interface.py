@@ -38,6 +38,9 @@ class RVizInterface:
         # Create a static transform broadcaster for rviz simulation.
         self.static_transform_broadcaster = tf2_ros.StaticTransformBroadcaster()
 
+        # Create a broadcaster for tf2 transforms.
+        self.broadcaster = tf2_ros.TransformBroadcaster()
+
         # Wait for RViz to subscribe to the topic.
         rospy.sleep(1)
 
@@ -143,3 +146,29 @@ class RVizInterface:
         marker.color.a = rgba[3]
 
         self.marker_pub.publish(marker)
+
+    def publishTransformationToTF(self, source_frame, target_frame, transform):
+
+        t = TransformStamped()
+
+        t.header.stamp = rospy.Time.now()
+        t.header.frame_id = source_frame
+        t.child_frame_id = target_frame
+
+        t.transform.translation.x = transform[0][3]
+        t.transform.translation.y = transform[1][3]
+        t.transform.translation.z = transform[2][3]
+
+        rot = R.from_matrix(transform[:3,:3]).as_quat()
+        t.transform.rotation.x = rot[0]
+        t.transform.rotation.y = rot[1]
+        t.transform.rotation.z = rot[2]
+        t.transform.rotation.w = rot[3]
+
+        self.broadcaster.sendTransform(t)
+
+    def visualizeTransform(self, source_frame, target_frame, transform):
+
+        self.publishTransformationToTF(source_frame, target_frame, transform)
+
+    

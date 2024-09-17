@@ -19,7 +19,7 @@ import sys
 
 sys.path.append(FLAIR_PATH)
 try:
-    # raise ModuleNotFoundError  # Just to skip this block
+    raise ModuleNotFoundError  # Just to skip this block
     from wrist_controller import WristController
     from flair import FLAIR
 
@@ -80,7 +80,7 @@ def test_TransferToolHLA(sim, robot_interface, perception_interface, rviz_interf
 
     rviz_interface.tool_update(True, sim.held_object_name, Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the tool in rviz
 
-    perception_interface._head_perception.set_tool("fork") # set the tool in the head perception
+    perception_interface.set_head_perception_tool("fork") # set the tool in the perception interface
     sim_traj = high_level_action.execute_action(objects=[utensil], params={})
 
     if make_videos:
@@ -134,7 +134,7 @@ def test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interfa
     sim_traj = high_level_action.execute_action(objects=[utensil], params=msg_dict)
     
 def _main(
-    run_on_robot: bool, make_videos: bool, max_motion_planning_time: float = 10
+    run_on_robot: bool, simulate_head_perception: bool, make_videos: bool, max_motion_planning_time: float = 10
 ) -> None:
     """Testing components of the system."""
 
@@ -155,7 +155,7 @@ def _main(
         web_interface = None
 
     # Initialize the perceiver (e.g., get joint states or human head poses).
-    perception_interface = PerceptionInterface(robot_interface)
+    perception_interface = PerceptionInterface(robot_interface=robot_interface, simulate_head_perception=simulate_head_perception)
 
     # Initialize the FLAIR interface.
     if FLAIR_IMPORTED:
@@ -193,8 +193,9 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--run_on_robot", action="store_true")
+    parser.add_argument("--simulate_head_perception", action="store_true")
     parser.add_argument("--make_videos", action="store_true")
     parser.add_argument("--max_motion_planning_time", type=float, default=10.0)
     args = parser.parse_args()
 
-    _main(args.run_on_robot, args.make_videos, args.max_motion_planning_time)
+    _main(args.run_on_robot, args.simulate_head_perception, args.make_videos, args.max_motion_planning_time)

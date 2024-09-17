@@ -680,7 +680,7 @@ class KinovaArm:
             step_time = t_now - t_cyclic
             if step_time >= 0.001:  # 1 kHz
                 t_cyclic = t_now
-                if step_time > 0.01:  # 10 ms # Rajat ToDo: Change back to 0.004 (4ms)
+                if step_time > 0.004:  
                     print(
                         f"Warning: Step time {1000 * step_time:.3f} ms in {self.__class__.__name__} run_cyclic"
                     )
@@ -705,16 +705,16 @@ class KinovaArm:
                 # Update arm command
                 for i in range(self.actuator_count):
 
-                    # Update position command to avoid triggering following error
-                    self.base_command.actuators[i].position = (
-                        self.base_feedback.actuators[i].position
-                    )
-
                     if self.fix_joint_hack: 
 
                         # Ignore actuator 6
                         if i == 5:
                             continue
+
+                        # Update position command to avoid triggering following error
+                        self.base_command.actuators[i].position = (
+                            self.base_feedback.actuators[i].position
+                        )
                         
                         # Update current command
                         if i < 5:
@@ -724,6 +724,11 @@ class KinovaArm:
 
                     else:
 
+                        # Update position command to avoid triggering following error
+                        self.base_command.actuators[i].position = (
+                            self.base_feedback.actuators[i].position
+                        )
+
                         # Update current command
                         self.base_command.actuators[i].current_motor = current_command[i]
 
@@ -732,11 +737,11 @@ class KinovaArm:
                         self.base_command.frame_id
                     )
 
-                # Update gripper command
-                self.motor_cmd.position = 100 * gripper_command
-                self.motor_cmd.velocity = np.clip(
-                    abs(400 * (gripper_command - self.gripper_pos)), 0, 100
-                )
+                # # Update gripper command
+                # self.motor_cmd.position = 100 * gripper_command
+                # self.motor_cmd.velocity = np.clip(
+                #     abs(400 * (gripper_command - self.gripper_pos)), 0, 100
+                # )
 
                 # Send command frame
                 try:
@@ -987,13 +992,13 @@ class KinovaArm:
 def main():
     arm = KinovaArm()
     try:
-        np.set_printoptions(precision=4, suppress=True)
-
         # input("Press Enter to move to home pos")
         # arm.home()
 
         # input("Press Enter to zero torque offsets")
         # arm.zero_torque_offsets()
+
+        # np.set_printoptions(precision=4, suppress=True)
 
         # input("Press Enter to move to home pos")
         # arm.home()
@@ -1008,16 +1013,10 @@ def main():
             2.05515662
         ]
 
-        # before_transfer_pos = [
-        #     -2.86554642,
-        #     -1.61951779,
-        #     -2.60986085,
-        #     -1.37302839,
-        #     1.11779249,
-        #     -1.18028264,
-        #     2.05515862,
-        # ]
-
+        before_transfer_tool_transform = np.zeros(7)
+        before_transfer_tool_transform[:3] = [0.250, 0.271, 0.529]
+        before_transfer_tool_transform[3:] = [0.539, -0.445, -0.526, 0.483]
+        
         input("Press Enter to move to before transfer pos")
         arm.move_angular(before_transfer_pos)
 
@@ -1026,25 +1025,37 @@ def main():
 
         # input('Press Enter to switch to joint compliant mode')
         # command_queue = queue.Queue(1)
-        # arm.switch_to_joint_compliant_mode(command_queue)    
+        # arm.switch_to_joint_compliant_mode(command_queue)  
 
         input('Press Enter to switch to task compliant mode')
         command_queue = queue.Queue(1)
         arm.switch_to_task_compliant_mode(command_queue)
 
-        _, _, _, initial_x, gripper_pos = arm.get_update_state()
-        # send 5 commands to the robot
         for i in range(5):
-            _, _, _, current_x, _ = arm.get_update_state()
-            print(f"Current x: {current_x}")
-            # enter desired x
-            desired_x_x = float(input("Enter desired x x: "))
-            desired_x_y = float(input("Enter desired x y: "))
-            desired_x_z = float(input("Enter desired x z: "))
-            desired_x = np.array([desired_x_x, desired_x_y, desired_x_z, initial_x[3], initial_x[4], initial_x[5], initial_x[6]])
-            print(f"Desired x: {desired_x}")
-            command_queue.put((desired_x, gripper_pos))
-            time.sleep(1)
+            input("Press Enter to read current state")
+            q, _, _, current_x, _ = arm.get_update_state()
+            print(f"Current q: {q}")
+            print(f"Goal q: {before_transfer_pos}")
+            print(f"Current x: {current_x[:3]}")
+            print(f"Goal x: {before_transfer_tool_transform[:3]}")
+
+        # input('Press Enter to switch to task compliant mode')
+        # command_queue = queue.Queue(1)
+        # arm.switch_to_task_compliant_mode(command_queue)
+
+        # _, _, _, initial_x, gripper_pos = arm.get_update_state()
+        # # send 5 commands to the robot
+        # for i in range(5):
+        #     _, _, _, current_x, _ = arm.get_update_state()
+        #     print(f"Current x: {current_x}")
+        #     # enter desired x
+        #     desired_x_x = float(input("Enter desired x x: "))
+        #     desired_x_y = float(input("Enter desired x y: "))
+        #     desired_x_z = float(input("Enter desired x z: "))
+        #     desired_x = np.array([desired_x_x, desired_x_y, desired_x_z, initial_x[3], initial_x[4], initial_x[5], initial_x[6]])
+        #     print(f"Desired x: {desired_x}")
+        #     command_queue.put((desired_x, gripper_pos))
+        #     time.sleep(1)
 
         input('Press Enter to switch out of joint compliant mode')
         arm.switch_out_of_compliant_mode()
