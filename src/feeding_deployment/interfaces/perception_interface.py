@@ -127,7 +127,12 @@ class PerceptionInterface:
         
     def get_tool_tip_pose(self) -> np.ndarray:
 
-        arm_pos, tool_tip_pose, gripper_pos = self._robot_interface.get_state()
+        arm_pos, ee_pose, gripper_pos = self._robot_interface.get_state()
+
+        tool_tip_pose = np.eye(4)
+        tool_tip_pose[:3, 3] = ee_pose[:3]
+        tool_tip_pose[:3, :3] = R.from_quat(ee_pose[3:]).as_matrix()
+
         return tool_tip_pose
     
     def get_tool_tip_pose_at_staging(self) -> np.ndarray:
