@@ -31,6 +31,7 @@ class PerceptionInterface:
 
     def __init__(self, robot_interface: ArmInterfaceClient | None, record_goal_pose: bool = False, simulate_head_perception: bool = False) -> None:
         self._robot_interface = robot_interface
+        self._simulate_head_perception = simulate_head_perception
 
         self.tfBuffer = tf2_ros.Buffer()
         self.listener = tf2_ros.TransformListener(self.tfBuffer)
@@ -40,7 +41,7 @@ class PerceptionInterface:
         self.tool_tip_target_pose = None
 
         # run head perception
-        if robot_interface is None or simulate_head_perception:
+        if robot_interface is None:
             self._head_perception = None
         else:
             # self._head_perception = None
@@ -100,7 +101,7 @@ class PerceptionInterface:
             t_now = time.time()
             step_time = t_now - t_init
             if step_time >= 0.02:  # 50 Hz
-                if self._head_perception is not None:
+                if not self._simulate_head_perception:
                     tool_tip_target_pose = self._head_perception.run_head_perception()
                 else:
                     tool_tip_target_pose = np.eye(4)

@@ -60,7 +60,7 @@ class InsideMouthTransfer:
             with self.state_lock:
                 # if inside mouth, move outside
                 if self.state == 2:
-                    print(f"Bit detected with down torque: {down_torque}. Moving outside mouth")
+                    print(f"Bite detected with down torque: {down_torque}. Moving outside mouth")
                     self.state = 3
     
     def state_callback(self, msg):

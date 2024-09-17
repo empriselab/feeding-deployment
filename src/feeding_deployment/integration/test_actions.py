@@ -19,7 +19,7 @@ import sys
 
 sys.path.append(FLAIR_PATH)
 try:
-    raise ModuleNotFoundError  # Just to skip this block
+    # raise ModuleNotFoundError  # Just to skip this block
     from wrist_controller import WristController
     from flair import FLAIR
 
@@ -184,8 +184,8 @@ def _main(
     # Create skills for high-level planning.
     hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
 
-    # test_LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos)
-    # test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos)
+    test_LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos)
+    test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos)
     test_TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos)
 
 if __name__ == "__main__":
