@@ -43,7 +43,8 @@ class WebInterface:
         # The following is a hacky leaky abstraction to handle the one-time preference
         # setting step at the beginning of FLAIR.
         self.user_preference = None
-        self.web_interface_sub = rospy.Subscriber("WebAppComm", String, self._message_callback)
+        self.web_interface_sub = rospy.Subscriber("WebAppComm", String, self._message_callback, queue_size=100)
+        time.sleep(1.0)  # Wait for the subscriber to connect
 
     def update_web_interface_image(self, image):
         self.last_captured_ros_image = self.image_bridge.cv2_to_compressed_imgmsg(image)
@@ -56,13 +57,14 @@ class WebInterface:
 
     def _message_callback(self, msg: "String") -> None:
         """Callback for the web interface."""
-        msg_dict = json.loads(msg.data)
-        print(f"Received message: {msg_dict}")
-        if msg_dict["state"] == "order_selection" and msg_dict["status"] != "ready_for_initial_data":
-            self.user_preference = msg_dict["status"]
-            print("SETTING USER PREFERENCE: ", self.user_preference)
-        else:
-            print("DID NOT SET USER PREFERENCE")
+        print("(web interface) Received message on WebAppComm: ", msg.data)
+        # msg_dict = json.loads(msg.data)
+        # print(f"Received message: {msg_dict}")
+        # if msg_dict["state"] == "order_selection" and msg_dict["status"] != "ready_for_initial_data":
+        #     self.user_preference = msg_dict["status"]
+        #     print("SETTING USER PREFERENCE: ", self.user_preference)
+        # else:
+        #     print("DID NOT SET USER PREFERENCE")
 
     def send_web_interface_message(self, msg_dict: dict[str, Any]) -> None:
         self.web_interface_publisher.publish(
@@ -71,3 +73,24 @@ class WebInterface:
 
     def _send_web_interface_image(self, image) -> None:
         self._perception_interface.update_web_interface_image(image)
+
+if __name__ == "__main__":
+    rospy.init_node("test_web_interface")
+    web_interface = WebInterface()
+
+    web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
+    time.sleep(1.0) # simulate delay, also needed for web interface
+    web_interface.update_web_interface_image(np.ones((512, 512, 3)))
+    time.sleep(1.0)  # simulate delay, also needed for web interface
+
+
+    # Wait for web interface to report order selection.
+    print("WAITING TO GET PREFERENCE")
+    while web_interface.user_preference is None:
+        print("user preference is still None")
+        time.sleep(1e-1)
+    print("FINISHED GETTING PREFERENCES")
+
+    print("User Preference:", web_interface.user_preference)
+    input("Received user preference. Press Enter to continue...")
+    rospy.spin()

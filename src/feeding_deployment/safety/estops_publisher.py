@@ -38,12 +38,12 @@ class EStopsPublisher:
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--user_estop", type=int, default=0)
-    parser.add_argument("--exp_estop", type=int, default=0)
+    parser.add_argument("--user_estop", type=int)
+    parser.add_argument("--exp_estop", type=int)
 
     args = parser.parse_args()
 
-    if args.user_estop == 0 or args.exp_estop == 0:
+    if args.user_estop is None or args.exp_estop is None:
         audio = pyaudio.PyAudio()
         device_indices = []
         for i in range(audio.get_device_count()):

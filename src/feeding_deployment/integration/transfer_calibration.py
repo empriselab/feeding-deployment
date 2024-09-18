@@ -83,8 +83,7 @@ def _main(
         test = True
 
     perception_interface = PerceptionInterface(robot_interface = robot_interface, record_goal_pose = not test)
-    
-    wrist_controller = WristController()
+
 
     if not test: # calibrate utensil tip
         # set tool transform - only required once globally
@@ -107,6 +106,7 @@ def _main(
         sim = FeedingDeploymentPyBulletSimulator(scene_description, use_gui=False)
 
         rviz_interface = RVizInterface(scene_description)
+        wrist_controller = WristController()
 
         # Create skills for high-level planning.
         hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
