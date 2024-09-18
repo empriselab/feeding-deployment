@@ -28,28 +28,29 @@
              - `conda activate controller`
              - `cd feeding-deployment/src/feeding_deployment/robot_controller`
              - `python arm_server.py`
-2. Launch the roslaunch on compute system for visualization / publish tfs:
+2. Run a roscore on the compute system: `roscore`
+3. Launch the roslaunch on compute system for visualization / publish tfs:
    - Alias `launch_robot` on compute system
    - Otherwise,run the following commands from the root of your ROS workspace:
         - `conda activate feed`
         - `source devel/setup.bash`
         - `cd src/feeding-deployment/launch`
         - `roslaunch robot.launch`
-3. Start feeding utensil:
+4. Start feeding utensil:
    - Alias `launch_utensil` on compute system
    - Otherwise, run the following commands from the root of your ROS workspace:
         - `conda activate feed`
         - `source devel/setup.bash`
         - `rosrun wrist_driver_ros wrist_driver`  
    - _Important Note:_ To shutdown this node, press Ctrl + / (Signal handling is setup to shutdown cleanly)
-4. Start the web application:
+5. Start the web application:
    - Alias `launch_app` on compute system
    - Otherwise, run the following commands from the root of your ROS workspace:
         - `conda activate feed`
         - `source devel/setup.bash`
         - `cd ~/deployment_ws/src/feedingpage/vue-ros-demo`
         - `npm run serve` 
-5. Run the feeding demo:
+6. Run the feeding demo:
    - Alias `run_demo` on compute system
    - Otherwise,run the following commands from the root of your ROS workspace:
         - `conda activate feed`
