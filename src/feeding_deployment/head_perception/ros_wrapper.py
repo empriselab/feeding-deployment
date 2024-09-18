@@ -133,7 +133,7 @@ class HeadPerceptionROSWrapper:
             tf2_ros.ConnectivityException,
             tf2_ros.ExtrapolationException,
         ):
-            print("Exexption finding transform between base_link and", target_frame)
+            print("Exception finding transform between base_link and", target_frame)
             return None
 
     def run_head_perception(self, visualize=False):

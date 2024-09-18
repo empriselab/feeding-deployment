@@ -123,9 +123,13 @@ def teleport_to_ee_pose(
         elif sim.held_object_name == "utensil":
             utensil_pose = None
 
-    target_joint_positions = add_fingers_to_joint_positions(
-        sim.robot, expected_joint_positions
-    )
+    # Rajat ToDo: Change visualization to only show the end effector pose
+    if expected_joint_positions is None:
+        target_joint_positions = sim.robot.get_joint_positions().copy()
+    else:
+        target_joint_positions = add_fingers_to_joint_positions(
+            sim.robot, expected_joint_positions
+        )
     sim_state = FeedingDeploymentSimulatorState(
         robot_joints=target_joint_positions,
         drink_pose=drink_pose,
