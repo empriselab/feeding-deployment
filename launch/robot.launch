@@ -14,8 +14,8 @@
       args="-0.04611404 0.0837761 0.11 0.7071068, 0, 0, 0.7071068 end_effector_link camera_link" />
 
     <node pkg="tf" type="static_transform_publisher" name="static_tf_feeding_tool" args="0 0 0 0 0 0 1 finger_tip forkbase 10"/>
-    <node pkg="tf" type="static_transform_publisher" name="static_tf_drinking_tool" args="0 0 0 0 0 0 1 base_link drinkbase 10"/>
-    <node pkg="tf" type="static_transform_publisher" name="static_tf_wiping_tool" args="0 0 0 0 0 0 1 base_link wipebase 10"/>
+    <node pkg="tf" type="static_transform_publisher" name="static_tf_drinking_tool" args="0 0 0 0 0 0 1 finger_tip drinkbase 10"/>
+    <node pkg="tf" type="static_transform_publisher" name="static_tf_wiping_tool" args="0 0 0 0 0 0 1 finger_tip wipebase 10"/>
 
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
         <param name="use_gui" value="false"/>
