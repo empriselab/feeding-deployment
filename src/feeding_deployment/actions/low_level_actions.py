@@ -10,7 +10,7 @@ import time
 import numpy as np
 from numpy.typing import NDArray
 from pybullet_helpers.geometry import Pose
-from pybullet_helpers.inverse_kinematics import add_fingers_to_joint_positions
+from pybullet_helpers.inverse_kinematics import add_fingers_to_joint_positions, inverse_kinematics
 from pybullet_helpers.joint import JointPositions
 from pybullet_helpers.motion_planning import (
     get_joint_positions_distance,
@@ -126,7 +126,8 @@ def teleport_to_ee_pose(
 
     # Rajat ToDo: Change visualization to only show the end effector pose
     if expected_joint_positions is None:
-        target_joint_positions = sim.robot.get_joint_positions().copy()
+        # Run IK to show one possible joint position consistent with end effector.
+        target_joint_positions = inverse_kinematics(sim.robot, pose)
     else:
         target_joint_positions = add_fingers_to_joint_positions(
             sim.robot, expected_joint_positions
