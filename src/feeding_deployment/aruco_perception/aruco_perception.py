@@ -107,7 +107,7 @@ class TFInterface:
 
 
 class ArUcoPerception(TFInterface):
-    def __init__(self, num_perception_samples=10):
+    def __init__(self, num_perception_samples=25):
         # rospy.init_node('ArUcoPerception')
 
         self.num_perception_samples = num_perception_samples

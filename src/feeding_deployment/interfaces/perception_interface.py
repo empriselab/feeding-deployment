@@ -188,6 +188,8 @@ class PerceptionInterface:
         drink_poses['inside_bottom_pose'] = self.get_aruco_relative_pose(self.get_inside_bottom_transform())
         drink_poses['inside_top_pose'] = self.get_aruco_relative_pose(self.get_inside_top_transform())
         drink_poses['post_grasp_pose'] = self.get_aruco_relative_pose(self.get_post_grasp_pose())
+        drink_poses['place_inside_bottom_pose'] = self.get_aruco_relative_pose(self.get_place_inside_bottom_transform())
+        drink_poses['place_pre_grasp_pose'] = self.get_aruco_relative_pose(self.get_place_pre_grasp_transform())
 
         self.last_drink_poses = drink_poses
 
@@ -199,33 +201,53 @@ class PerceptionInterface:
     def get_last_drink_pickup_configs(self):
         return self.last_drink_poses, self.drink_pickup_joint_pos
 
-    def get_aruco_relative_pose(self, transform):
+    def get_aruco_relative_pose(self, transform, override_angles = True):
         aruco_pos_mat = self.pose_to_matrix(self.aruco_pose)
         goal_frame = np.dot(aruco_pos_mat, transform)
         goal_pose = self.matrix_to_pose(goal_frame)
+
+        # If true, use 2 hardcoded angle values.
+        if override_angles:
+            rot = R.from_quat(goal_pose[1])
+            roll = np.pi / 2
+            pitch = 0
+            _, _, yaw = rot.as_euler("xyz")
+            new_rot = R.from_euler("xyz", [roll, pitch, yaw])
+            goal_pose = Pose(goal_pose[0], new_rot.as_quat())
+
         return goal_pose
 
     def get_pre_grasp_transform(self):
         tf = np.zeros((4, 4))
         tf[:3, :3] = R.from_euler("xyz", [np.pi, 0, np.pi / 2]).as_matrix()
-        tf[:3, 3] = np.array([0.06, 0.0, 0.05])
+        tf[:3, 3] = np.array([0.07, -0.02, 0.1])
         tf[3, 3] = 1
         return tf
 
     def get_inside_bottom_transform(self):
         tf = self.get_pre_grasp_transform()
-        tf[2, 3] = 0.0
+        tf[2, 3] = 0.01
         return tf
 
     def get_inside_top_transform(self):
         tf = self.get_inside_bottom_transform()
-        tf[0, 3] = 0.09
+        tf[0, 3] = 0.115
         return tf
     
     def get_post_grasp_pose(self):
         tf = self.get_inside_top_transform()
-        tf[0, 3] = 0.15
-        return tf  
+        tf[0, 3] = 0.2
+        return tf
+    
+    def get_place_inside_bottom_transform(self):
+        tf = self.get_inside_bottom_transform()
+        # tf[1, 3] = 0.0
+        return tf
+
+    def get_place_pre_grasp_transform(self):
+        tf = self.get_pre_grasp_transform()
+        # tf[1, 3] = 0.0
+        return tf
 
     def pose_to_matrix(self, pose):
         position = pose[0]

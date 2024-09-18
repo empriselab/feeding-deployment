@@ -82,6 +82,7 @@ def move_to_joint_positions(
             held_object=sim.held_object_id,
             base_link_to_held_obj=sim.held_object_tf,
         )
+        plan = _plan_to_sim_state_trajectory(plan, sim)
         plan = remap_trajectory_to_constant_distance(plan, sim)
         robot_commands.extend(simulated_trajectory_to_kinova_commands(plan))
     
@@ -179,7 +180,8 @@ def move_to_ee_pose(
     plan = remap_trajectory_to_constant_distance(plan, sim, max_joint_space_distance=0.005)
 
     sim_states.extend(plan)
-    robot_commands.extend(simulated_trajectory_to_kinova_commands(plan))
+    kinova_commands = simulated_trajectory_to_kinova_commands(plan)
+    robot_commands.extend(kinova_commands)
 
     # Visualize the plan in RViz.
     if rviz_interface is not None:

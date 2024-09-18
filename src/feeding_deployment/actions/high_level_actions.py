@@ -194,6 +194,14 @@ class PickToolHLA(HighLevelAction):
 
             drink_poses = self._perception_interface.perceive_drink_pickup_poses()
 
+            # move_to_joint_positions(
+            #     self._sim,
+            #     self._sim.scene_description.drink_pre_staging_pos,
+            #     sim_states,
+            #     robot_commands,
+            #     rviz_interface=self._rviz_interface,
+            # )
+
             move_to_joint_positions(
                 self._sim,
                 self._sim.scene_description.drink_staging_pos,
@@ -204,6 +212,19 @@ class PickToolHLA(HighLevelAction):
 
             # close grippers
             robot_commands.append(CloseGripperCommand())
+
+            # NOTE: this just does nothing when executed and I don't know why
+
+            # move_to_ee_pose(
+            #     self._sim,
+            #     drink_poses['pre_grasp_pose'],
+            #     {self._sim.drink_id},
+            #     Pose.identity(),
+            #     max_motion_plan_time=10,
+            #     sim_states=sim_states,
+            #     robot_commands=robot_commands,
+            #     rviz_interface=self._rviz_interface,
+            # )
 
             teleport_to_ee_pose(
                 self._sim,
@@ -470,7 +491,7 @@ class StowToolHLA(HighLevelAction):
 
             teleport_to_ee_pose(
                 self._sim,
-                last_drink_poses['inside_bottom_pose'],
+                last_drink_poses['place_inside_bottom_pose'],
                 None,
                 sim_states,
                 robot_commands,
@@ -479,7 +500,7 @@ class StowToolHLA(HighLevelAction):
 
             teleport_to_ee_pose(
                 self._sim,
-                last_drink_poses['pre_grasp_pose'],
+                last_drink_poses['place_pre_grasp_pose'],
                 None,
                 sim_states,
                 robot_commands,
@@ -687,15 +708,16 @@ class TransferToolHLA(HighLevelAction):
             self._perception_interface.set_head_perception_tool("fork")
             self._robot_interface.set_tool("fork")
 
-            if self._run_on_robot:
-                input("Press enter to switch to task compliant mode")
-                self._robot_interface.switch_to_task_compliant_mode()
+            # Rajat Hack: Just to test interface
+            # if self._run_on_robot:
+            #     input("Press enter to switch to task compliant mode")
+            #     self._robot_interface.switch_to_task_compliant_mode()
                 
-                # Do inside-mouth transfer here
-                self.inside_mouth_transfer.execute_transfer_loop()
+            #     # Do inside-mouth transfer here
+            #     self.inside_mouth_transfer.execute_transfer_loop()
 
-                input("Press enter to switch out of compliant mode")
-                self._robot_interface.switch_out_of_compliant_mode()
+            #     input("Press enter to switch out of compliant mode")
+            #     self._robot_interface.switch_out_of_compliant_mode()
 
             return sim_states
         
@@ -720,15 +742,16 @@ class TransferToolHLA(HighLevelAction):
             self._perception_interface.set_head_perception_tool("drink")
             self._robot_interface.set_tool("drink")
 
-            if self._run_on_robot:
-                input("Press enter to switch to task compliant mode")
-                self._robot_interface.switch_to_task_compliant_mode()
+            # Rajat Hack: Just to test interface
+            # if self._run_on_robot:
+            #     input("Press enter to switch to task compliant mode")
+            #     self._robot_interface.switch_to_task_compliant_mode()
                 
-                # Do inside-mouth transfer here
-                self.inside_mouth_transfer.execute_transfer_loop()
+            #     # Do inside-mouth transfer here
+            #     self.inside_mouth_transfer.execute_transfer_loop()
 
-                input("Press enter to switch out of compliant mode")
-                self._robot_interface.switch_out_of_compliant_mode()
+            #     input("Press enter to switch out of compliant mode")
+            #     self._robot_interface.switch_out_of_compliant_mode()
 
             self._web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})
             return sim_states
@@ -754,15 +777,16 @@ class TransferToolHLA(HighLevelAction):
             self._perception_interface.set_head_perception_tool("wipe")
             self._robot_interface.set_tool("wipe")
 
-            if self._run_on_robot:
-                input("Press enter to switch to task compliant mode")
-                self._robot_interface.switch_to_task_compliant_mode()
+            # Rajat Hack: Just to test interface
+            # if self._run_on_robot:
+            #     input("Press enter to switch to task compliant mode")
+            #     self._robot_interface.switch_to_task_compliant_mode()
                 
-                # Do inside-mouth transfer here
-                self.inside_mouth_transfer.execute_transfer_loop()
+            #     # Do inside-mouth transfer here
+            #     self.inside_mouth_transfer.execute_transfer_loop()
 
-                input("Press enter to switch out of compliant mode")
-                self._robot_interface.switch_out_of_compliant_mode()
+            #     input("Press enter to switch out of compliant mode")
+            #     self._robot_interface.switch_out_of_compliant_mode()
 
             self._web_interface.send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})
             return sim_states
@@ -940,8 +964,24 @@ class AcquireBiteHLA(HighLevelAction):
 
                     detections = self.flair.get_items_detection()
                     plate_bounds = detections["plate_bounds"]
+                    pos = params["positions"][0]
 
-                    skewer_center = (int(params["positions"][0]["x"] + plate_bounds[0]), int(params["positions"][0]["y"] + plate_bounds[1]))
+                    point_x = int(pos["x"] * (plate_bounds[2] - plate_bounds[0]) + plate_bounds[0])
+                    point_y = int(pos["y"] * (plate_bounds[3] - plate_bounds[1]) + plate_bounds[1])
+
+                    print("Plate Bounds:", plate_bounds)
+                    print("Positions:", params["positions"])
+                    print("Point:", point_x, point_y)
+
+                    # visualize point on camera color image
+                    viz = camera_color_data.copy()
+                    for pos in params["positions"]:
+                        cv2.circle(viz, (point_x, point_y), 5, (0, 255, 0), -1)
+                    cv2.imshow("viz", viz)
+                    cv2.waitKey(0)
+                    cv2.destroyAllWindows()
+
+                    skewer_center = (point_x, point_y)
                     skewer_angle = 0
 
                     self.flair.skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_center, major_axis = skewer_angle)
