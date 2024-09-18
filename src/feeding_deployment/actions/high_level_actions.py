@@ -720,16 +720,15 @@ class TransferToolHLA(HighLevelAction):
             self._perception_interface.set_head_perception_tool("drink")
             self._robot_interface.set_tool("drink")
 
-            # Rajat Temp: Just for testing
-            # if self._run_on_robot:
-            #     input("Press enter to switch to task compliant mode")
-            #     self._robot_interface.switch_to_task_compliant_mode()
+            if self._run_on_robot:
+                input("Press enter to switch to task compliant mode")
+                self._robot_interface.switch_to_task_compliant_mode()
                 
-            #     # Do inside-mouth transfer here
-            #     self.inside_mouth_transfer.execute_transfer_loop()
+                # Do inside-mouth transfer here
+                self.inside_mouth_transfer.execute_transfer_loop()
 
-            #     input("Press enter to switch out of compliant mode")
-            #     self._robot_interface.switch_out_of_compliant_mode()
+                input("Press enter to switch out of compliant mode")
+                self._robot_interface.switch_out_of_compliant_mode()
 
             self._web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})
             return sim_states
