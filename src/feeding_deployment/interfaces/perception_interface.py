@@ -18,9 +18,10 @@ try:
     import tf2_ros
     from geometry_msgs.msg import TransformStamped
     from cv_bridge import CvBridge
-
+    from geometry_msgs.msg import Pose as PoseMsg
 
     from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
+    from feeding_deployment.aruco_perception.aruco_perception import ArUcoPerception
 except ModuleNotFoundError:
     pass
 
@@ -43,6 +44,7 @@ class PerceptionInterface:
         # run head perception
         if robot_interface is None:
             self._head_perception = None
+            self._aruco_perception = None
         else:
             # self._head_perception = None
             self._head_perception = HeadPerceptionROSWrapper(record_goal_pose)
@@ -51,6 +53,9 @@ class PerceptionInterface:
             self._head_perception.set_tool("fork")
             for _ in range(10):
                 self._head_perception.run_head_perception()
+
+            # Rajat ToDo: pass perception queues to all perception classes instead of having them use ros subscribers which spawn threads
+            self._aruco_perception = ArUcoPerception()
 
         # Head perception thread setup
         self.head_perception_thread = None
@@ -167,3 +172,71 @@ class PerceptionInterface:
 
         return T
 
+    def perceive_drink_pickup_poses(self):
+        
+        # Rajat Hack: Wait one second for the aruco mean to be correct, does this actually help though?
+        time.sleep(1)
+
+        aruco_pose_msg = rospy.wait_for_message("/aruco_pose", PoseMsg)
+        position = (aruco_pose_msg.position.x, aruco_pose_msg.position.y, aruco_pose_msg.position.z)
+        orientation = (aruco_pose_msg.orientation.x, aruco_pose_msg.orientation.y, aruco_pose_msg.orientation.z, aruco_pose_msg.orientation.w)
+        self.aruco_pose = (position, orientation)
+
+        drink_poses  = {}
+
+        drink_poses['pre_grasp_pose'] = self.get_aruco_relative_pose(self.get_pre_grasp_transform())
+        drink_poses['inside_bottom_pose'] = self.get_aruco_relative_pose(self.get_inside_bottom_transform())
+        drink_poses['inside_top_pose'] = self.get_aruco_relative_pose(self.get_inside_top_transform())
+        drink_poses['post_grasp_pose'] = self.get_aruco_relative_pose(self.get_post_grasp_pose())
+
+        self.last_drink_poses = drink_poses
+
+        return drink_poses
+    
+    def record_drink_pickup_joint_pos(self):
+        self.drink_pickup_joint_pos = self.get_robot_joints()[:7]
+
+    def get_last_drink_pickup_configs(self):
+        return self.last_drink_poses, self.drink_pickup_joint_pos
+
+    def get_aruco_relative_pose(self, transform):
+        aruco_pos_mat = self.pose_to_matrix(self.aruco_pose)
+        goal_frame = np.dot(aruco_pos_mat, transform)
+        goal_pose = self.matrix_to_pose(goal_frame)
+        return goal_pose
+
+    def get_pre_grasp_transform(self):
+        tf = np.zeros((4, 4))
+        tf[:3, :3] = R.from_euler("xyz", [np.pi, 0, np.pi / 2]).as_matrix()
+        tf[:3, 3] = np.array([0.06, 0.0, 0.05])
+        tf[3, 3] = 1
+        return tf
+
+    def get_inside_bottom_transform(self):
+        tf = self.get_pre_grasp_transform()
+        tf[2, 3] = 0.0
+        return tf
+
+    def get_inside_top_transform(self):
+        tf = self.get_inside_bottom_transform()
+        tf[0, 3] = 0.09
+        return tf
+    
+    def get_post_grasp_pose(self):
+        tf = self.get_inside_top_transform()
+        tf[0, 3] = 0.15
+        return tf  
+
+    def pose_to_matrix(self, pose):
+        position = pose[0]
+        orientation = pose[1]
+        pose_matrix = np.zeros((4, 4))
+        pose_matrix[:3, 3] = position
+        pose_matrix[:3, :3] = R.from_quat(orientation).as_matrix()
+        pose_matrix[3, 3] = 1
+        return pose_matrix
+    
+    def matrix_to_pose(self, mat):
+        position = mat[:3, 3]
+        orientation = R.from_matrix(mat[:3, :3]).as_quat()
+        return Pose(position, orientation) 
