@@ -777,15 +777,15 @@ class TransferToolHLA(HighLevelAction):
             self._robot_interface.set_tool("wipe")
 
             # Rajat Hack: Just to test interface
-            # if self._run_on_robot:
-            #     input("Press enter to switch to task compliant mode")
-            #     self._robot_interface.switch_to_task_compliant_mode()
+            if self._run_on_robot:
+                input("Press enter to switch to task compliant mode")
+                self._robot_interface.switch_to_task_compliant_mode()
                 
-            #     # Do inside-mouth transfer here
-            #     self.inside_mouth_transfer.execute_transfer_loop()
+                # Do inside-mouth transfer here
+                self.inside_mouth_transfer.execute_transfer_loop()
 
-            #     input("Press enter to switch out of compliant mode")
-            #     self._robot_interface.switch_out_of_compliant_mode()
+                input("Press enter to switch out of compliant mode")
+                self._robot_interface.switch_out_of_compliant_mode()
 
             self._web_interface.send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})
             return sim_states
@@ -837,7 +837,6 @@ class LookAtPlateHLA(HighLevelAction):
                 robot_commands,
                 rviz_interface=self._rviz_interface
             )
-            
 
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
@@ -883,8 +882,12 @@ class LookAtPlateHLA(HighLevelAction):
                     # Wait for web interface to report order selection.
                     print("WAITING TO GET PREFERENCE")
                     while self._web_interface.user_preference is None:
+                        print("user preference is still None")
                         time.sleep(1e-1)
                     print("FINISHED GETTING PREFERENCES")
+
+                    print("User Preference:", self._web_interface.user_preference)
+                    input("Received user preference. Press Enter to continue...")
 
                     self.flair.set_preferences(self._web_interface.user_preference)
                     self._preferences_set = True

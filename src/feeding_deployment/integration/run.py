@@ -184,7 +184,7 @@ class _Runner:
     def web_interface_callback(self, msg: "String") -> None:
         """Callback for the web interface."""
         msg_dict = json.loads(msg.data)
-        print("RECEIVED MESSAGE FROM WEB INTERFACE:")
+        print("(run.py) RECEIVED MESSAGE FROM WEB INTERFACE:")
         print(msg_dict)
         if msg_dict["status"] == "drink_pickup":
             user_cmd = GroundHighLevelAction(
