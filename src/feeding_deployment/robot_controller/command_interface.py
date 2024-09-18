@@ -29,8 +29,8 @@ class JointCommand(KinovaCommand):
 
     def __init__(self, pos):
         object.__setattr__(self, "pos", np.array(pos))  # convert list to numpy array
-        # num_dof = 7
-        # assert self.pos.shape == (num_dof,)
+        num_dof = 7
+        assert self.pos.shape == (num_dof,)
 
 
 @dataclass(frozen=True)

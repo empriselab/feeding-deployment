@@ -303,8 +303,8 @@ if __name__ == "__main__":
                      args.resume_from_last_save)
 
     # # Uncomment to test commands.
-    msg = namedtuple("String", ["data"])
-    runner.web_interface_callback(msg(json.dumps({"status": "drink_pickup"})))
+    # msg = namedtuple("String", ["data"])
+    # runner.web_interface_callback(msg(json.dumps({"status": "drink_pickup"})))
     # runner.web_interface_callback(msg(json.dumps({"status": "drink_transfer"})))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.utensil,)))

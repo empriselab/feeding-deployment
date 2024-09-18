@@ -22,9 +22,9 @@ class ArmInterfaceClient:
     def __init__(self):
 
         # make sure watchdog is running
-        # print("Waiting for Watchdog status...")
-        # rospy.wait_for_message("/watchdog_status", Bool)
-        # print("Watchdog is running, continuing...")
+        print("Waiting for Watchdog status...")
+        rospy.wait_for_message("/watchdog_status", Bool)
+        print("Watchdog is running, continuing...")
 
         # Register ArmInterface (no lambda needed on the client-side)
         ArmManager.register("ArmInterface")
@@ -47,19 +47,26 @@ class ArmInterfaceClient:
         self._arm_interface.switch_out_of_compliant_mode()
         self.in_compliant_mode = False
 
+    def get_state(self):
+        return self._arm_interface.get_state()
+
+    def set_tool(self, tool: str):
+        assert not self.in_compliant_mode, "Cannot set tool in compliant mode"
+        self._arm_interface.set_tool(tool)
+
     def execute_command(self, cmd: KinovaCommand) -> None:
 
         if cmd.__class__.__name__ == "JointTrajectoryCommand":
-            if self.in_compliant_mode:
-                return self._arm_interface.compliant_set_joint_trajectory(cmd.traj)
-            else:
-                return self._arm_interface.set_joint_trajectory(cmd.traj)
+            return self._arm_interface.set_joint_trajectory(cmd.traj)
 
         if cmd.__class__.__name__ == "JointCommand":
             return self._arm_interface.set_joint_position(cmd.pos)
 
         if cmd.__class__.__name__ == "CartesianCommand":
-            return self._arm_interface.set_ee_pose(cmd.pos, cmd.quat)
+            if self.in_compliant_mode:
+                return self._arm_interface.compliant_set_ee_pose(cmd.pos, cmd.quat)
+            else:
+                return self._arm_interface.set_ee_pose(cmd.pos, cmd.quat)
 
         if cmd.__class__.__name__ == "OpenGripperCommand":
             return self._arm_interface.open_gripper()

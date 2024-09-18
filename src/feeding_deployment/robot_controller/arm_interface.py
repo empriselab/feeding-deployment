@@ -12,13 +12,13 @@ import numpy as np
 from multiprocess.managers import BaseManager as MPBaseManager
 
 RPC_AUTHKEY = b"secret-key"
-NUC_HOSTNAME = "localhost"
+NUC_HOSTNAME = "192.168.1.3"
 ARM_RPC_PORT = 5000
 
 class ArmInterface:
     def __init__(self, arm_instance):
         self.arm = arm_instance
-        # self.arm.set_joint_limits(speed_limits=(7 * (30,)), acceleration_limits=(7 * (80,))) # Slows the arm down?
+        # self.arm.set_joint_limits(speed_limits=(7 * (30,)), acceleration_limits=(7 * (80,)))
         self.command_queue = queue.Queue(1)
         self.controller = None
         self.in_compliant_mode = False
@@ -27,15 +27,14 @@ class ArmInterface:
     def get_state(self):
         arm_pos, ee_pose, gripper_pos = self.arm.get_state()
         return arm_pos, ee_pose, gripper_pos
-    
-    def get_update_state(self):
-        arm_pos, arm_vel, _, gripper_pos = self.arm.get_update_state()
-        return arm_pos, arm_vel, gripper_pos
 
     def reset(self):
         # Go to home position
         print("Moving to home position")
         self.arm.home()
+
+    def set_tool(self, tool: str):
+        self.arm.set_tool(tool)
 
     def switch_to_task_compliant_mode(self):
 
