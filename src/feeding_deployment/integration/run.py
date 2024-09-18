@@ -19,6 +19,8 @@ FLAIR_PATH = "/home/isacc/deployment_ws/src/FLAIR/bite_acquisition/scripts"
 import sys
 
 sys.path.append(FLAIR_PATH)
+
+import os
 try:
     # raise ModuleNotFoundError  # Just to skip this block
     from wrist_controller import WristController
@@ -75,15 +77,22 @@ from pybullet_helpers.geometry import Pose
 # All the high level actions we want to consider.
 HLAS = {PickToolHLA, StowToolHLA, LookAtPlateHLA, AcquireBiteHLA, TransferToolHLA}
 
+assert os.environ.get("PYTHONHASHSEED") == "0", \
+        "Please add `export PYTHONHASHSEED=0` to your bash profile!"
 
 class _Runner:
     """A class for running the integrated system."""
 
     def __init__(self, run_on_robot: bool, max_motion_planning_time: float,
-                 resume_from_last_save: bool = False):
+                 resume_from_state: str = ""):
         self.run_on_robot = run_on_robot
         self.max_motion_planning_time = max_motion_planning_time
-        self._saved_state_outfile = Path(__file__).parent / "saved_state.p"
+
+        if resume_from_state == "":
+            self._saved_state_infile = None
+        else:
+            self._saved_state_infile = Path(__file__).parent / "saved_states" / (resume_from_state + ".p")
+        self._saved_state_outfile = Path(__file__).parent / "saved_states" / "last_state.p"
 
         # Initialize the interface to the robot.
         if run_on_robot:
@@ -162,8 +171,8 @@ class _Runner:
         # Record the full simulated trajectory for viz and debug.
         self.full_simulated_traj: list[FeedingDeploymentSimulatorState] = []
 
-        if resume_from_last_save:
-            self._load_from_last_state()
+        if self._saved_state_infile:
+            self._load_from_state()
             print("WARNING: The system state has been restored to:")
             print(" ", sorted(self.current_atoms))
             resp = input("Are you sure you want to continue from here? [y/n] ")
@@ -242,6 +251,7 @@ class _Runner:
             print(f"Refining {ground_hla}")
             operator = ground_hla.get_operator()
 
+            # import ipdb; ipdb.set_trace()
             assert operator.preconditions.issubset(self.current_atoms)
 
             # Execute the high-level plan in simulation
@@ -271,8 +281,8 @@ class _Runner:
             pickle.dump((sim_state, atoms), f)
         print(f"Saved system state to {self._saved_state_outfile}")
 
-    def _load_from_last_state(self) -> None:
-        with open(self._saved_state_outfile, "rb") as f:
+    def _load_from_state(self) -> None:
+        with open(self._saved_state_infile, "rb") as f:
             sim_state, self.current_atoms = pickle.load(f)
         if sim_state is not None:
             assert isinstance(sim_state, FeedingDeploymentSimulatorState)
@@ -281,7 +291,7 @@ class _Runner:
             if sim_state.held_object:
                 self.rviz_interface.tool_update(True, sim_state.held_object, Pose((0, 0, 0), (0, 0, 0, 1)))
                 
-        print(f"Loaded system state to {self._saved_state_outfile}")
+        print(f"Loaded system state from {self._saved_state_infile}")
 
 
 if __name__ == "__main__":
@@ -291,7 +301,7 @@ if __name__ == "__main__":
     parser.add_argument("--run_on_robot", action="store_true")
     parser.add_argument("--make_videos", action="store_true")
     parser.add_argument("--max_motion_planning_time", type=float, default=10.0)
-    parser.add_argument("--resume_from_last_save", action="store_true")
+    parser.add_argument("--resume_from_state", type=str, default="")
     args = parser.parse_args()
 
     if ROSPY_IMPORTED:
@@ -300,7 +310,7 @@ if __name__ == "__main__":
         assert not args.run_on_robot, "Need ROS to run on robot"
 
     runner = _Runner(args.run_on_robot, args.max_motion_planning_time,
-                     args.resume_from_last_save)
+                     args.resume_from_state)
 
     # # Uncomment to test commands.
     # msg = namedtuple("String", ["data"])
@@ -308,9 +318,9 @@ if __name__ == "__main__":
     # runner.web_interface_callback(msg(json.dumps({"status": "drink_transfer"})))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.utensil,)))
-    for _ in range(10):
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
+    # for _ in range(10):
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
 
