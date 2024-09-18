@@ -15,6 +15,8 @@ import numpy as np
 import time
 from enum import Enum
 import queue
+import signal
+import sys
 
 from sensor_msgs.msg import CameraInfo
 from geometry_msgs.msg import WrenchStamped
@@ -32,7 +34,7 @@ from feeding_deployment.robot_controller.arm_interface import ArmInterface, ArmM
 
 CAMERA_FREQUENCY_THRESHOLD = 20 # expected is 30 Hz
 FT_FREQUENCY_THRESHOLD = 800 # expected is 1000 Hz
-FT_THRESHOLD = [10.0, 10.0, 10.0, 0.5, 0.5, 0.5]
+FT_THRESHOLD = [30.0, 30.0, 30.0, 2.0, 2.0, 2.0]
 COLLISION_FREE_FREQUENCY_THRESHOLD = 100 # expected is 350 Hz (empirical)
 USER_ESTOP_FREQUENCY_THRESHOLD = 800 # expected is 1000 Hz
 experimentor_ESTOP_FREQUENCY_THRESHOLD = 800 # expected is 1000 Hz
@@ -75,9 +77,9 @@ class WatchDog:
         self._arm_interface = self.manager.ArmInterface()
 
         # bias FT sensor
-        # bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
-        # bias('bias')
-        # time.sleep(2.0) # wait for bias to complete
+        bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
+        bias('bias')
+        time.sleep(2.0) # wait for bias to complete
 
         queue_size = 1000
         self.camera_info_sub = rospy.Subscriber("/camera/color/camera_info", CameraInfo, self.cameraCallback, queue_size = queue_size, buff_size = 65536*queue_size)
@@ -143,44 +145,45 @@ class WatchDog:
     def check_status(self):
         self.second_counter += 1
         anomaly = AnomalyStatus.NO_ANOMALY
-        # start_time = time.time()
-        # frequencies = []
-        # for _queue, _threshold, _anomaly in [(self.camera_timestamps, CAMERA_FREQUENCY_THRESHOLD, AnomalyStatus.CAMERA_FREQUENCY), 
-        #                                     (self.ft_timestamps, FT_FREQUENCY_THRESHOLD, AnomalyStatus.FT_FREQUENCY),
-        #                                     (self.collision_free_timestamps, COLLISION_FREE_FREQUENCY_THRESHOLD, AnomalyStatus.COLLISION_FREE_FREQUENCY), 
-        #                                     (self.user_emergency_stop_timestamps, USER_ESTOP_FREQUENCY_THRESHOLD, AnomalyStatus.USER_ESTOP_FREQUENCY), 
-        #                                     (self.experimentor_emergency_stop_timestamps, experimentor_ESTOP_FREQUENCY_THRESHOLD, AnomalyStatus.experimentor_ESTOP_FREQUENCY)]:
-        #     while _queue.peek() < start_time - 1.0:
-        #         _queue.get()
-        #     queue_size = _queue.qsize()
-        #     if queue_size < _threshold:
-        #         print(f"Frequency: {queue_size} for {_anomaly}")
-        #         rospy.loginfo(f"Frequency: {queue_size} for {_anomaly}")
-        #         anomaly = _anomaly
-        #         break   
-        #     frequencies.append(queue_size)
+        start_time = time.time()
+        frequencies = []
+        for _queue, _threshold, _anomaly in [(self.camera_timestamps, CAMERA_FREQUENCY_THRESHOLD, AnomalyStatus.CAMERA_FREQUENCY), 
+                                            (self.ft_timestamps, FT_FREQUENCY_THRESHOLD, AnomalyStatus.FT_FREQUENCY),
+                                            # (self.collision_free_timestamps, COLLISION_FREE_FREQUENCY_THRESHOLD, AnomalyStatus.COLLISION_FREE_FREQUENCY), 
+                                            (self.user_emergency_stop_timestamps, USER_ESTOP_FREQUENCY_THRESHOLD, AnomalyStatus.USER_ESTOP_FREQUENCY), 
+                                            (self.experimentor_emergency_stop_timestamps, experimentor_ESTOP_FREQUENCY_THRESHOLD, AnomalyStatus.experimentor_ESTOP_FREQUENCY)]:
+            while _queue.peek() < start_time - 1.0:
+                _queue.get()
+            queue_size = _queue.qsize()
+            if queue_size < _threshold:
+                print(f"Frequency: {queue_size} for {_anomaly}")
+                rospy.loginfo(f"Frequency: {queue_size} for {_anomaly}")
+                anomaly = _anomaly
+                break   
+            frequencies.append(queue_size)
 
-        # if self.second_counter == WATCHDOG_RUN_FREQUENCY:
-        #     print("Watchdog running at expected frequency.")
-        #     print(f"Frequencies:  Camera: {frequencies[0]}, FT: {frequencies[1]}, Collision Free: {frequencies[2]}, User EStop: {frequencies[3]}, Experimentor EStop: {frequencies[4]}")
-        #     self.second_counter = 0
+        if self.second_counter == WATCHDOG_RUN_FREQUENCY:
+            print("Watchdog running at expected frequency.")
+            # print(f"Frequencies:  Camera: {frequencies[0]}, FT: {frequencies[1]}, Collision Free: {frequencies[2]}, User EStop: {frequencies[3]}, Experimentor EStop: {frequencies[4]}")
+            print(f"Frequencies:  Camera: {frequencies[0]}, FT: {frequencies[1]}, User EStop: {frequencies[2]}, Experimentor EStop: {frequencies[3]}")
+            self.second_counter = 0
 
-        # for _unexpected, _anomaly in [(self.camera_unexpected, AnomalyStatus.CAMERA_UNEXPECTED),
-        #                             # (self.ft_unexpected, AnomalyStatus.FT_UNEXPECTED),
-        #                             (self.collision_free_unexpected, AnomalyStatus.COLLISION_FREE_UNEXPECTED),
-        #                             (self.user_emergency_stop_pressed, AnomalyStatus.USER_ESTOP_PRESSED),
-        #                             (self.experimentor_emergency_stop_pressed, AnomalyStatus.experimentor_ESTOP_PRESSED)]:
-        #     if _unexpected:
-        #         print(f"Unexpected: {_anomaly}")
-        #         rospy.loginfo(f"Unexpected: {_anomaly}")
-        #         anomaly = _anomaly
-        #         break
+        for _unexpected, _anomaly in [(self.camera_unexpected, AnomalyStatus.CAMERA_UNEXPECTED),
+                                    (self.ft_unexpected, AnomalyStatus.FT_UNEXPECTED),
+                                    # (self.collision_free_unexpected, AnomalyStatus.COLLISION_FREE_UNEXPECTED),
+                                    (self.user_emergency_stop_pressed, AnomalyStatus.USER_ESTOP_PRESSED),
+                                    (self.experimentor_emergency_stop_pressed, AnomalyStatus.experimentor_ESTOP_PRESSED)]:
+            if _unexpected:
+                print(f"Unexpected: {_anomaly}")
+                rospy.loginfo(f"Unexpected: {_anomaly}")
+                anomaly = _anomaly
+                break
 
-        # if anomaly != AnomalyStatus.NO_ANOMALY:
-        #     print(f"AnomalyStatus detected: {anomaly}")
-        #     rospy.loginfo(f"AnomalyStatus detected: {anomaly}")
+        if anomaly != AnomalyStatus.NO_ANOMALY:
+            print(f"AnomalyStatus detected: {anomaly}")
+            rospy.loginfo(f"AnomalyStatus detected: {anomaly}")
 
-        #     self._arm_interface.stop()
+            self._arm_interface.stop()
 
         self.watchdog_status_pub.publish(Bool(data=anomaly == AnomalyStatus.NO_ANOMALY))
         return anomaly
@@ -196,9 +199,17 @@ class WatchDog:
             # print(f"Time taken: {end_time - start_time}")
             time.sleep(max(0, 1.0/WATCHDOG_RUN_FREQUENCY - (end_time - start_time)))
 
+    def signal_handler(self, signal, frame):
+
+        print("\nprogram exiting gracefully")
+        sys.exit(0)
+
 if __name__ == '__main__':
 
     rospy.init_node('WatchDog', anonymous=True)
+    
     watchdog = WatchDog()
+    signal.signal(signal.SIGINT, watchdog.signal_handler) # ctrl+c
+    
     watchdog.run()
     

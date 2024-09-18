@@ -6,10 +6,10 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /TF1
         - /TF1/Frames1
-        - /MarkerArray1/Status1
       Splitter Ratio: 0.47647058963775635
-    Tree Height: 747
+    Tree Height: 270
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -27,7 +27,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: Image
+    SyncSource: PointCloud2
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -228,177 +228,21 @@ Visualization Manager:
     - Alpha: 0.5
       Class: rviz/RobotModel
       Collision Enabled: false
-      Enabled: true
+      Enabled: false
       Links:
         All Links Enabled: true
         Expand Joint Details: false
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        bracelet_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        drink_tip:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        drinkbase:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        end_effector_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        feeding_tool_tip:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        finger_tip:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        forearm_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        fork_tip:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        forkbase:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        forkpitch:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        forkroll:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        half_arm_1_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        half_arm_2_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        inertia_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        left_inner_finger:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        left_inner_finger_pad:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        left_inner_knuckle:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        left_outer_finger:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        left_outer_knuckle:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        right_inner_finger:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        right_inner_finger_pad:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        right_inner_knuckle:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        right_outer_finger:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        right_outer_knuckle:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        robotiq_arg2f_base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        shoulder_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        spherical_wrist_1_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        spherical_wrist_2_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        tool_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        wipe_tip:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        wipebase:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        world:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
       Name: RobotModel
       Robot Description: sim/robot_description
       TF Prefix: sim
       Update Interval: 0
-      Value: true
+      Value: false
       Visual Enabled: true
     - Class: rviz/Image
-      Enabled: true
+      Enabled: false
       Image Topic: /camera/color/image_raw
       Max Value: 1
       Median window: 5
@@ -408,7 +252,7 @@ Visualization Manager:
       Queue Size: 2
       Transport Hint: raw
       Unreliable: false
-      Value: true
+      Value: false
     - Class: rviz/Marker
       Enabled: true
       Marker Topic: /visualization_marker
@@ -477,7 +321,7 @@ Visualization Manager:
         feeding_tool_tip:
           Value: false
         finger_tip:
-          Value: false
+          Value: true
         forearm_link:
           Value: false
         fork_tip:
@@ -488,14 +332,10 @@ Visualization Manager:
           Value: false
         forkroll:
           Value: false
-        forque_end_effector_target:
-          Value: true
         half_arm_1_link:
           Value: false
         half_arm_2_link:
           Value: false
-        head_pose:
-          Value: true
         inertia_link:
           Value: false
         left_inner_finger:
@@ -510,8 +350,6 @@ Visualization Manager:
           Value: false
         map:
           Value: false
-        reference_head_pose:
-          Value: true
         right_inner_finger:
           Value: false
         right_inner_finger_pad:
@@ -597,11 +435,9 @@ Visualization Manager:
         spherical_wrist_2_link:
           Value: false
         tool_frame:
-          Value: true
-        tool_tip_target:
-          Value: true
-        wipe_tip:
           Value: false
+        wipe_tip:
+          Value: true
         wipebase:
           Value: false
         world:
@@ -619,12 +455,6 @@ Visualization Manager:
               sim/drinkbase:
                 sim/drink_tip:
                   {}
-              sim/forkbase:
-                sim/forkpitch:
-                  sim/forkroll:
-                    sim/feeding_tool_tip:
-                      sim/fork_tip:
-                        {}
               sim/shoulder_link:
                 sim/half_arm_1_link:
                   sim/half_arm_2_link:
@@ -634,7 +464,12 @@ Visualization Manager:
                           sim/bracelet_link:
                             sim/end_effector_link:
                               sim/finger_tip:
-                                {}
+                                sim/forkbase:
+                                  sim/forkpitch:
+                                    sim/forkroll:
+                                      sim/feeding_tool_tip:
+                                        sim/fork_tip:
+                                          {}
                               sim/inertia_link:
                                 {}
                               sim/robotiq_arg2f_base_link:
@@ -659,15 +494,6 @@ Visualization Manager:
                   {}
           world:
             base_link:
-              drinkbase:
-                drink_tip:
-                  {}
-              forque_end_effector_target:
-                {}
-              head_pose:
-                {}
-              reference_head_pose:
-                {}
               shoulder_link:
                 half_arm_1_link:
                   half_arm_2_link:
@@ -679,20 +505,25 @@ Visualization Manager:
                               camera_link:
                                 camera_aligned_depth_to_color_frame:
                                   camera_color_optical_frame:
-                                    tool_tip_target:
-                                      {}
+                                    {}
                                 camera_color_frame:
                                   {}
                                 camera_depth_frame:
                                   camera_depth_optical_frame:
                                     {}
                               finger_tip:
+                                drinkbase:
+                                  drink_tip:
+                                    {}
                                 forkbase:
                                   forkpitch:
                                     forkroll:
                                       feeding_tool_tip:
                                         fork_tip:
                                           {}
+                                wipebase:
+                                  wipe_tip:
+                                    {}
                               inertia_link:
                                 {}
                               robotiq_arg2f_base_link:
@@ -712,9 +543,6 @@ Visualization Manager:
                                         {}
                               tool_frame:
                                 {}
-              wipebase:
-                wipe_tip:
-                  {}
       Update Interval: 0
       Value: true
     - Class: rviz/MarkerArray
@@ -722,7 +550,7 @@ Visualization Manager:
       Marker Topic: /head_perception/voxels/marker_array
       Name: MarkerArray
       Namespaces:
-        visualize_voxels: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -730,7 +558,7 @@ Visualization Manager:
       Marker Topic: /head_perception/tool/marker_array
       Name: MarkerArray
       Namespaces:
-        tool_marker: true
+        {}
       Queue Size: 100
       Value: true
   Enabled: true
@@ -761,7 +589,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.799002766609192
+      Distance: 1.9914076328277588
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -769,27 +597,27 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.22168254852294922
-        Y: 0.09114851802587509
-        Z: 0.42337164282798767
+        X: 0.12562589347362518
+        Y: 0.013534439727663994
+        Z: 0.04717697948217392
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.43039795756340027
+      Pitch: 0.2653983533382416
       Target Frame: <Fixed Frame>
-      Yaw: 1.6135683059692383
+      Yaw: 1.7235673666000366
     Saved: ~
 Window Geometry:
   Displays:
-    collapsed: false
-  Height: 1477
-  Hide Left Dock: false
-  Hide Right Dock: false
+    collapsed: true
+  Height: 1023
+  Hide Left Dock: true
+  Hide Right Dock: true
   Image:
-    collapsed: false
-  QMainWindow State: 000000ff00000000fd000000040000000000000354000004bffc0200000009fb0000001200530065006c0065006300740069006f006e00000001e10000009b000000b000fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000b0fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000006e000003e30000018200fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d006100670065010000045d000000d00000002600ffffff000000010000015f000004bffc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000006e000004bf0000013200fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000077d0000005efc0100000002fb0000000800540069006d006501000000000000077d000006dc00fffffffb0000000800540069006d00650100000000000004500000000000000000000002b2000004bf00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+    collapsed: true
+  QMainWindow State: 000000ff00000000fd000000040000000000000354000004bffc0200000009fb0000001200530065006c0065006300740069006f006e00000001e10000009b000000b000fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000b0fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073000000006e000003e30000018200fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d006100670065000000045d000000d00000002600ffffff000000010000015f00000367fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000006e000003670000013200fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000006dc0000005efc0100000002fb0000000800540069006d00650100000000000006dc000006dc00fffffffb0000000800540069006d00650100000000000004500000000000000000000006dc000002f900000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -797,7 +625,7 @@ Window Geometry:
   Tool Properties:
     collapsed: false
   Views:
-    collapsed: false
-  Width: 1917
-  X: 1491
-  Y: 75
+    collapsed: true
+  Width: 1756
+  X: 1752
+  Y: 1158

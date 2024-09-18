@@ -82,7 +82,7 @@ def _main(
     if record_rom:
         test = True
 
-    perception_interface = PerceptionInterface(robot_interface, not test)
+    perception_interface = PerceptionInterface(robot_interface = robot_interface, record_goal_pose = not test)
     
     wrist_controller = WristController()
 

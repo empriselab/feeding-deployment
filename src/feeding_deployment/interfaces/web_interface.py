@@ -43,7 +43,7 @@ class WebInterface:
         # The following is a hacky leaky abstraction to handle the one-time preference
         # setting step at the beginning of FLAIR.
         self.user_preference = None
-        self.web_interface_sub = rospy.Subscriber("WebAppCommPref", String, self._message_callback)
+        self.web_interface_sub = rospy.Subscriber("WebAppComm", String, self._message_callback)
 
     def update_web_interface_image(self, image):
         self.last_captured_ros_image = self.image_bridge.cv2_to_compressed_imgmsg(image)

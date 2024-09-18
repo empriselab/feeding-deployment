@@ -62,13 +62,28 @@ from feeding_deployment.simulation.simulator import (
 )
 from feeding_deployment.simulation.video import make_simulation_video
 
-def test_TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos):
+def test_TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos, tool):
 
     high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair)
-    utensil = Object("utensil", tool_type)
 
-    sim.held_object_name = "utensil"
-    sim.held_object_id = sim.utensil_id
+    if tool == "fork":
+        utensil = Object("utensil", tool_type)
+        sim.held_object_name = "utensil"
+        sim.held_object_id = sim.utensil_id
+        perception_interface.set_head_perception_tool("fork") # set the tool in the perception interface
+    elif tool == "drink":
+        utensil = Object("drink", tool_type)
+        sim.held_object_name = "drink"
+        sim.held_object_id = sim.drink_id
+        perception_interface.set_head_perception_tool("drink") # set the tool in the perception interface
+    elif tool == "wipe":
+        utensil = Object("wipe", tool_type)
+        sim.held_object_name = "wipe"
+        sim.held_object_id = sim.wipe_id
+        perception_interface.set_head_perception_tool("wipe") # set the tool in the perception interface
+    else:
+        raise ValueError(f"Tool {tool} not recognized")
+
     sim.robot.set_finger_state(sim.scene_description.tool_grasp_fingers_value)
     finger_frame_id = sim.robot.link_from_name("finger_tip")
     end_effector_link_id = sim.robot.link_from_name(sim.robot.tool_link_name)
@@ -76,11 +91,9 @@ def test_TransferToolHLA(sim, robot_interface, perception_interface, rviz_interf
         sim.robot.robot_id, finger_frame_id, end_effector_link_id, sim.physics_client_id
     )
     sim.held_object_tf = utensil_from_end_effector
-    print(f"utensil_from_end_effector: {utensil_from_end_effector}")
 
     rviz_interface.tool_update(True, sim.held_object_name, Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the tool in rviz
 
-    perception_interface._head_perception.set_tool("fork") # set the tool in the head perception
     sim_traj = high_level_action.execute_action(objects=[utensil], params={})
 
     if make_videos:
@@ -134,7 +147,7 @@ def test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interfa
     sim_traj = high_level_action.execute_action(objects=[utensil], params=msg_dict)
     
 def _main(
-    run_on_robot: bool, make_videos: bool, max_motion_planning_time: float = 10
+    run_on_robot: bool, simulate_head_perception: bool, make_videos: bool, max_motion_planning_time: float = 10, tool: str = "fork"
 ) -> None:
     """Testing components of the system."""
 
@@ -155,7 +168,7 @@ def _main(
         web_interface = None
 
     # Initialize the perceiver (e.g., get joint states or human head poses).
-    perception_interface = PerceptionInterface(robot_interface)
+    perception_interface = PerceptionInterface(robot_interface=robot_interface, simulate_head_perception=simulate_head_perception)
 
     # Initialize the FLAIR interface.
     if FLAIR_IMPORTED:
@@ -186,15 +199,17 @@ def _main(
 
     # test_LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos)
     # test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos)
-    test_TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos)
+    test_TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, flair, make_videos, tool)
 
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--run_on_robot", action="store_true")
+    parser.add_argument("--simulate_head_perception", action="store_true")
     parser.add_argument("--make_videos", action="store_true")
     parser.add_argument("--max_motion_planning_time", type=float, default=10.0)
+    parser.add_argument("--tool", type=str, default="fork")
     args = parser.parse_args()
 
-    _main(args.run_on_robot, args.make_videos, args.max_motion_planning_time)
+    _main(args.run_on_robot, args.simulate_head_perception, args.make_videos, args.max_motion_planning_time, args.tool)
