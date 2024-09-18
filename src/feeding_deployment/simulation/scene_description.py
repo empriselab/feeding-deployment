@@ -221,40 +221,16 @@ class SceneDescription:
     )
 
     # Constants for drink pick and place
-    drink_outside_mount: Pose = Pose(
-        (0.55, 0.46, 0.305),
-        (-0.2126311, -0.6743797, -0.6743797, 0.2126311),
-    )
-    drink_outside_mount_pos: JointPositions = field(
+    drink_gaze_pos: JointPositions = field(
         default_factory=lambda: [
-            -2.9457621628368873, -1.206488672845289, -1.0073524002312677, -1.3997867637176382, -1.0606635589324744, -0.7359768177844117, -3.048252585808042
+            -0.004187021865822871, 0.6034579885210962, -3.1259047705564633, -2.3538005746884725, 0.01149092320739253, 1.3411586039000891, 1.6825233913747728
         ]
     )
 
-    drink_inside_mount: Pose = Pose(
-        (0.55, 0.52, 0.305),
-        (-0.2126311, -0.6743797, -0.6743797, 0.2126311),
-    )
-    drink_inside_mount_pos: JointPositions = field(
+    drink_staging_pos: JointPositions = field(
         default_factory=lambda: [
-            -3.0706449768856463, -1.233024942579057, -1.0107718990709298, -1.3064307169693468, -1.0801286033398636, -0.6790118020676168, -3.0605814237584545
+            -2.66714970644385, -1.1667276777704059, -0.9741023013894106, -1.4808070482966826, -0.9401592480319145, -0.8664637217150242, -2.4832424542073377
         ]
-    )
-
-    drink_above_mount: Pose = Pose(
-        (0.55, 0.52, 0.405),
-        (-0.2126311, -0.6743797, -0.6743797, 0.2126311),
-    )
-    drink_above_mount_pos: JointPositions = field(
-        default_factory=lambda: [
-            -3.0822113518159693, -1.0554986243143745, -0.9943061066831875, -1.2514305815048123, -1.0634620086059297, -0.7145069457084112, 3.0023889570952424
-        ]
-    )
-
-    # Constants for drink transfer
-    drink_tip_from_end_effector: Pose = Pose(
-        (0.270, 0.095, -0.002),
-        (-0.000, 0.707, 0.000, 0.707),
     )
 
     ######### Wiping Utensil #########
@@ -345,13 +321,6 @@ class SceneDescription:
             -0.4648462461578422,
             -0.29495787389950756,
         ]
-    )
-
-    # Constants for wiping utensil transfer
-    # Rajat ToDo: Fix with correct values, copied from drinking utensil
-    wipe_tip_from_end_effector: Pose = Pose(
-        (0.270, 0.095, -0.002),
-        (-0.000, 0.707, 0.000, 0.707),
     )
 
     @property

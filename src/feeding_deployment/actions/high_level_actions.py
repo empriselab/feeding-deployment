@@ -13,6 +13,7 @@ from std_msgs.msg import String, Bool
 from sensor_msgs.msg import JointState
 from visualization_msgs.msg import Marker, MarkerArray
 import time
+from scipy.spatial.transform import Rotation
 
 
 from pybullet_helpers.geometry import Pose, multiply_poses
@@ -181,7 +182,33 @@ class PickToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.drink_outside_mount_pos,
+                self._sim.scene_description.drink_gaze_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface
+            )
+
+            if self._run_on_robot:
+                self.execute_robot_commands(robot_commands)
+            robot_commands = []
+
+            drink_poses = self._perception_interface.perceive_drink_pickup_poses()
+
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.drink_staging_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface
+            )
+
+            # close grippers
+            robot_commands.append(CloseGripperCommand())
+
+            teleport_to_ee_pose(
+                self._sim,
+                drink_poses['pre_grasp_pose'],
+                None,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface
@@ -189,8 +216,17 @@ class PickToolHLA(HighLevelAction):
 
             teleport_to_ee_pose(
                 self._sim,
-                self._sim.scene_description.drink_inside_mount,
-                self._sim.scene_description.drink_inside_mount_pos,
+                drink_poses['inside_bottom_pose'],
+                None,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface
+            )
+
+            teleport_to_ee_pose(
+                self._sim,
+                drink_poses['inside_top_pose'],
+                None,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface
@@ -204,8 +240,8 @@ class PickToolHLA(HighLevelAction):
 
             teleport_to_ee_pose(
                 self._sim,
-                self._sim.scene_description.drink_above_mount,
-                self._sim.scene_description.drink_above_mount_pos,
+                drink_poses['post_grasp_pose'],
+                None,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface
@@ -213,6 +249,8 @@ class PickToolHLA(HighLevelAction):
 
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
+
+            self._perception_interface.record_drink_pickup_joint_pos()
 
             # Send message to web interface.
             self._web_interface.send_web_interface_message({"state": "drink_pickup", "status": "completed"})
@@ -404,9 +442,11 @@ class StowToolHLA(HighLevelAction):
             sim_states: list[FeedingDeploymentSimulatorState] = []
             robot_commands = []
 
+            last_drink_poses, last_drink_pickup_joint_pos = self._perception_interface.get_last_drink_pickup_configs()
+
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.drink_above_mount_pos,
+                last_drink_pickup_joint_pos,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface
@@ -414,8 +454,8 @@ class StowToolHLA(HighLevelAction):
 
             teleport_to_ee_pose(
                 self._sim,
-                self._sim.scene_description.drink_inside_mount,
-                self._sim.scene_description.drink_inside_mount_pos,
+                last_drink_poses['inside_top_pose'],
+                None,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface
@@ -430,16 +470,17 @@ class StowToolHLA(HighLevelAction):
 
             teleport_to_ee_pose(
                 self._sim,
-                self._sim.scene_description.drink_outside_mount,
-                self._sim.scene_description.drink_outside_mount_pos,
+                last_drink_poses['inside_bottom_pose'],
+                None,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface
             )
 
-            move_to_joint_positions(
+            teleport_to_ee_pose(
                 self._sim,
-                self._sim.scene_description.retract_pos,
+                last_drink_poses['pre_grasp_pose'],
+                None,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface
@@ -679,15 +720,16 @@ class TransferToolHLA(HighLevelAction):
             self._perception_interface.set_head_perception_tool("drink")
             self._robot_interface.set_tool("drink")
 
-            if self._run_on_robot:
-                input("Press enter to switch to task compliant mode")
-                self._robot_interface.switch_to_task_compliant_mode()
+            # Rajat Temp: Just for testing
+            # if self._run_on_robot:
+            #     input("Press enter to switch to task compliant mode")
+            #     self._robot_interface.switch_to_task_compliant_mode()
                 
-                # Do inside-mouth transfer here
-                self.inside_mouth_transfer.execute_transfer_loop()
+            #     # Do inside-mouth transfer here
+            #     self.inside_mouth_transfer.execute_transfer_loop()
 
-                input("Press enter to switch out of compliant mode")
-                self._robot_interface.switch_out_of_compliant_mode()
+            #     input("Press enter to switch out of compliant mode")
+            #     self._robot_interface.switch_out_of_compliant_mode()
 
             self._web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})
             return sim_states
