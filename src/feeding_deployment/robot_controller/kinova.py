@@ -281,8 +281,7 @@ class KinovaArm:
             self.data = self.model.createData()
             self.q_pin = np.zeros(self.model.nq)
 
-            # Rajat ToDo: Actually add wiper tip frame
-            self.tool_frame_id = self.model.getFrameId("fork_tip")
+            self.tool_frame_id = self.model.getFrameId("wipe_tip")
         elif tool == "drink":
             # Pinocchio setup (only used in low-level servoing mode)
             self.file_path = os.path.dirname(os.path.realpath(__file__))
@@ -299,8 +298,7 @@ class KinovaArm:
             self.data = self.model.createData()
             self.q_pin = np.zeros(self.model.nq)
 
-            # Rajat ToDo: Actually add drink tip frame
-            self.tool_frame_id = self.model.getFrameId("fork_tip")
+            self.tool_frame_id = self.model.getFrameId("drink_tip")
         else:
             raise ValueError("Invalid tool")
 
