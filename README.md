@@ -16,6 +16,12 @@
 ## Run Feeding Demo on Real Robot
 1. Run the arm controller server on the NUC:
    - ssh to the NUC: `sshnuc` with lab password
+   - zero the arm torque offsets:
+        - Alias `set_zeros` on NUC
+        - Otherwise, run the following commands:
+             - `conda activate controller`
+             - `cd ~/feeding-deployment/src/feeding_deployment/robot_controller`
+             - `python kinova.py`
    - run the controller server:
         - Alias `run_server` on NUC
         - Otherwise, run the following commands:
@@ -35,14 +41,40 @@
         - `conda activate feed`
         - `source devel/setup.bash`
         - `rosrun wrist_driver_ros wrist_driver`  
-   - _Important Note:_ To shutdown this node, press Ctrl + / (Signal handling is setup to shutdown cleanly) 
-3. Run the feeding demo:
+   - _Important Note:_ To shutdown this node, press Ctrl + / (Signal handling is setup to shutdown cleanly)
+4. Start the web application:
+   - Alias `launch_app` on compute system
+   - Otherwise, run the following commands from the root of your ROS workspace:
+        - `conda activate feed`
+        - `source devel/setup.bash`
+        - `cd ~/deployment_ws/src/feedingpage/vue-ros-demo`
+        - `npm run serve` 
+5. Run the feeding demo:
    - Alias `run_demo` on compute system
    - Otherwise,run the following commands from the root of your ROS workspace:
         - `conda activate feed`
         - `source devel/setup.bash`
         - `cd src/feeding-deployment/src/feeding_deployment/integration`
         - `python demo.py --run_on_robot`
+
+### Calibrate tool offset for inside-mouth transfer
+
+1. Grasp the tool and move to before bite transfer position.
+2. Calibrate tool:
+   - Alias `cd_demo` on compute system
+   - Otherwise, run the following commands from the root of your ROS workspace:
+        - `conda activate feed`
+        - `source devel/setup.bash`
+        - `cd src/feeding-deployment/src/feeding_deployment/integration`
+   - `python transfer_calibration.py --tool <tool_name>` where <tool_name> is one of "fork", "drink" and "wipe"
+3. Manually (using buttons on the robot) move the robot to the intended inside-mouth transfer config, and press [ENTER] in the script above to record it. 
+4. To test the tool calibration:
+   - Alias `cd_demo` on compute system
+   - Otherwise, run the following commands from the root of your ROS workspace:
+        - `conda activate feed`
+        - `source devel/setup.bash`
+        - `cd src/feeding-deployment/src/feeding_deployment/integration` 
+   - `python transfer_calibration.py --tool <tool_name> --test` where <tool_name> is one of "fork", "drink" and "wipe"
   
 ## Run Feeding Demo in Simulation
 1. Launch the roslaunch for visualization / publish tfs:
