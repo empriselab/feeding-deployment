@@ -263,8 +263,9 @@ class KinovaArm:
                 )
             self.data = self.model.createData()
             self.q_pin = np.zeros(self.model.nq)
-
             self.tool_frame_id = self.model.getFrameId("fork_tip")
+            
+            print("Tool set to fork")
         elif tool == "wipe":
             # Pinocchio setup (only used in low-level servoing mode)
             self.file_path = os.path.dirname(os.path.realpath(__file__))
@@ -280,8 +281,9 @@ class KinovaArm:
                 )
             self.data = self.model.createData()
             self.q_pin = np.zeros(self.model.nq)
-
             self.tool_frame_id = self.model.getFrameId("wipe_tip")
+
+            print("Tool set to wipe")
         elif tool == "drink":
             # Pinocchio setup (only used in low-level servoing mode)
             self.file_path = os.path.dirname(os.path.realpath(__file__))
@@ -297,8 +299,9 @@ class KinovaArm:
                 )
             self.data = self.model.createData()
             self.q_pin = np.zeros(self.model.nq)
-
             self.tool_frame_id = self.model.getFrameId("drink_tip")
+
+            print("Tool set to drink")
         else:
             raise ValueError("Invalid tool")
 
