@@ -51,6 +51,8 @@ class InsideMouthTransfer:
         self.state_lock = threading.Lock()
         self.state_sub = rospy.Subscriber('/state', Int64, self.state_callback)
 
+        self.transfer_completed_sub = rospy.Subscriber('/transfer_complete', Bool, self.transfer_completed_callback)
+
         self.ft_sensor_sub = rospy.Subscriber('/forque/forqueSensor', WrenchStamped, self.ft_callback)
 
     def ft_callback(self, msg):
@@ -64,6 +66,12 @@ class InsideMouthTransfer:
         #         if self.state == 2:
         #             print(f"Bite detected with down torque: {down_torque}. Moving outside mouth")
         #             self.state = 3
+
+    def transfer_completed_callback(self, msg):
+        print("Complete transfer button pressed")
+        if self.state == 2:
+            with self.state_lock:
+                self.state = 3
     
     def state_callback(self, msg):
 
