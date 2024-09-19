@@ -303,6 +303,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--run_on_robot", action="store_true")
+    parser.add_argument("--simulate_head_perception", action="store_true")
     parser.add_argument("--make_videos", action="store_true")
     parser.add_argument("--max_motion_planning_time", type=float, default=10.0)
     parser.add_argument("--resume_from_state", type=str, default="")
@@ -313,7 +314,9 @@ if __name__ == "__main__":
     else:
         assert not args.run_on_robot, "Need ROS to run on robot"
 
-    runner = _Runner(args.run_on_robot, args.max_motion_planning_time,
+    runner = _Runner(args.run_on_robot, 
+                     args.simulate_head_perception,
+                     args.max_motion_planning_time,
                      args.resume_from_state)
 
     # # Uncomment to test commands.

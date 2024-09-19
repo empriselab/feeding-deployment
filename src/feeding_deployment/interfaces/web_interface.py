@@ -3,6 +3,8 @@
 import threading
 import time
 from typing import Any
+import pickle
+import cv2
 
 import numpy as np
 from pybullet_helpers.geometry import Pose
@@ -62,11 +64,10 @@ class WebInterface:
         """Callback for the web interface."""
         print("Received message on WebAppComm: ", msg.data)
         msg_dict = json.loads(msg.data)
-        print(f"Received message: {msg_dict}")
         if msg_dict["state"] == "order_selection" and msg_dict["status"] != "ready_for_initial_data":
             self.user_preference = msg_dict["status"]
             print("SETTING USER PREFERENCE: ", self.user_preference)
-        elif msg_dict["status"] in ["drink_pickup", "drink_transfer", "move_to_above_plate", "aquire_food", "bite_transfer", "mouth_wiping"]:
+        elif msg_dict["status"] in ["drink_pickup", "drink_transfer", "move_to_above_plate", "aquire_food", 0, "bite_skill_selection", "bite_transfer", "mouth_wiping"]:
             print("Received high-level action message from web interface.")
             self.hla_command_queue.put(msg_dict)
         else:
@@ -87,19 +88,48 @@ class WebInterface:
 
 if __name__ == "__main__":
     rospy.init_node("test_web_interface")
-    web_interface = WebInterface()
+    hla_command_queue = queue.Queue()
+    web_interface = WebInterface(hla_command_queue)
+
+    plate_log = pickle.load(open("../integration/plate_log.pkl", "rb"))
+    original_image = plate_log['original_image']
+    plate_image = plate_log['plate_image']
+    plate_bounds = plate_log['plate_bounds']
+    print("Original image shape: ", original_image.shape)
+    print("Plate image shape: ", plate_image.shape)
+    print("Plate bounds: ", plate_bounds)
+
+    cv2.imshow("plate_image", plate_image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
     web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
     time.sleep(1.0) # simulate delay, also needed for web interface
-    web_interface.update_web_interface_image(np.ones((512, 512, 3)))
+    web_interface.update_web_interface_image(plate_image)
     time.sleep(1.0)  # simulate delay, also needed for web interface
 
-    # Wait for web interface to report order selection.
-    print("WAITING TO GET PREFERENCE")
-    while web_interface.user_preference is None and not rospy.is_shutdown():
-        print("user preference is still None")
-        time.sleep(1e-1)
-    print("FINISHED GETTING PREFERENCES")
+    while not rospy.is_shutdown():
+        try:
+            msg_dict = hla_command_queue.get(timeout=1.0)
+            if msg_dict["status"] == 0:
+                pos = msg_dict["positions"][0]
 
-    print("User Preference:", web_interface.user_preference)
-    input("Received user preference. Press Enter to continue...")
+                point_x = int(pos["x"]*plate_bounds[2]) + plate_bounds[0]
+                point_y = int(pos["y"]*plate_bounds[3]) + plate_bounds[1]
+
+                print("Plate Bounds:", plate_bounds)
+                print("Positions:", msg_dict["positions"])
+                print("Point:", point_x, point_y)
+
+                # visualize point on camera color image
+                viz = original_image.copy()
+                for pos in msg_dict["positions"]:
+                    cv2.circle(viz, (point_x, point_y), 5, (0, 255, 0), -1)
+                
+                cv2.imshow("viz", viz)
+                cv2.waitKey(0)
+                cv2.destroyAllWindows()
+        except queue.Empty:
+            continue
+        
+
