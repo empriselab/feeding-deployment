@@ -53,6 +53,10 @@ class InsideMouthTransfer:
 
         self.transfer_completed_sub = rospy.Subscriber('/transfer_complete', Bool, self.transfer_completed_callback)
 
+        self.mouth_open = False
+        self.mouth_open_lock = threading.Lock()
+        self.mouth_state_sub = rospy.Subscriber('/head_perception/mouth_state', Bool, self.mouth_state_callback)
+        
         self.ft_sensor_sub = rospy.Subscriber('/forque/forqueSensor', WrenchStamped, self.ft_callback)
 
     def ft_callback(self, msg):
@@ -66,6 +70,10 @@ class InsideMouthTransfer:
         #         if self.state == 2:
         #             print(f"Bite detected with down torque: {down_torque}. Moving outside mouth")
         #             self.state = 3
+
+    def mouth_state_callback(self, msg):
+        with self.mouth_open_lock:
+            self.mouth_open = msg.data
 
     def transfer_completed_callback(self, msg):
         print("Complete transfer button pressed")
@@ -120,18 +128,29 @@ class InsideMouthTransfer:
 
     def execute_transfer_loop(self):
 
-        # start head perception thread
-        self.perception_interface.start_head_perception_thread()
-
         # bias the force torque sensor
         # bias FT sensor
         bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
         bias('bias')
-        time.sleep(2.0) # wait for bias to complete
+
+        # start head perception thread
+        self.perception_interface.start_head_perception_thread()
+        time.sleep(2.0) # wait for bias to complete + head perception to give reliable data
 
         closed_loop = True
         run_once = True
         paused_once = False
+
+        # wait until the mouth is open
+        while not rospy.is_shutdown():
+            with self.mouth_open_lock:
+                if self.mouth_open:
+                    break
+            self.control_rate.sleep()
+
+        # start at state 1
+        with self.state_lock:
+            self.state = 1
 
         # Assumption: No one will be updating state when this runs
         previous_state = self.state
