@@ -872,6 +872,16 @@ class LookAtPlateHLA(HighLevelAction):
                     ordering_options = [f"Eat all the {food_type}s first" for food_type in food_types]
                     ordering_options += ["No preference"]
 
+                    # # save plate image, plate bounds, and original image pickle
+                    # import pickle
+                    # with open("plate_log.pkl", "wb") as f:
+                    #     plate_log = {
+                    #         "plate_image": items_detection['plate_image'],
+                    #         "plate_bounds": items_detection['plate_bounds'],
+                    #         "original_image": camera_color_data,
+                    #     }
+                    #     pickle.dump(plate_log, f)
+
                     self._web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
                     time.sleep(1.0) # simulate delay, also needed for web interface
                     self._web_interface.update_web_interface_image(items_detection['plate_image'])
@@ -964,8 +974,8 @@ class AcquireBiteHLA(HighLevelAction):
                     plate_bounds = detections["plate_bounds"]
                     pos = params["positions"][0]
 
-                    point_x = int(pos["x"] * (plate_bounds[2] - plate_bounds[0]) + plate_bounds[0])
-                    point_y = int(pos["y"] * (plate_bounds[3] - plate_bounds[1]) + plate_bounds[1])
+                    point_x = int(pos["x"]*plate_bounds[2]) + plate_bounds[0]
+                    point_y = int(pos["y"]*plate_bounds[3]) + plate_bounds[1]
 
                     print("Plate Bounds:", plate_bounds)
                     print("Positions:", params["positions"])
@@ -976,17 +986,15 @@ class AcquireBiteHLA(HighLevelAction):
                     for pos in params["positions"]:
                         cv2.circle(viz, (point_x, point_y), 5, (0, 255, 0), -1)
                     cv2.imshow("viz", viz)
-                    cv2.waitKey(0)
-                    cv2.destroyAllWindows()
+                    # cv2.waitKey(
+                    # cv2.destroyAllWindows()
+
+                    import pdb; pdb.set_trace()
 
                     skewer_center = (point_x, point_y)
                     skewer_angle = 0
 
                     self.flair.skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_center, major_axis = skewer_angle)
-
-                    # Manual - execute action from web interface
-                    # action_type = "Skewer"
-                    # self.flair.execute_manual_action(action_type, camera_color_data, camera_depth_data, camera_info_data):
 
                 elif params["status"] == "aquire_food":
                     detections = self.flair.get_items_detection()
