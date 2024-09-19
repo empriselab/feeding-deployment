@@ -56,6 +56,9 @@ class ArmInterfaceClient:
 
     def execute_command(self, cmd: KinovaCommand) -> None:
 
+        if not self.in_compliant_mode:
+            input("Press enter to execute command...")
+
         if cmd.__class__.__name__ == "JointTrajectoryCommand":
             return self._arm_interface.set_joint_trajectory(cmd.traj)
 

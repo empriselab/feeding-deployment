@@ -520,7 +520,9 @@ class KinovaArm:
         self.end_or_abort_event.clear()
         self.base.ExecuteAction(action)
         if blocking:
+            print("Waiting for cartesian movement to finish ...")
             self.end_or_abort_event.wait(KinovaArm.ACTION_TIMEOUT_DURATION)
+            print("Cartesian movement completed")
 
     def _gripper_position_command(self, value, blocking=True, timeout=1.0):
         assert not self.cyclic_running, "Arm must be in high-level servoing mode"

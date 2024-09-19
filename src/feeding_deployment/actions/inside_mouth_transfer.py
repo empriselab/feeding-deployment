@@ -323,12 +323,21 @@ class InsideMouthTransfer:
                 
                 # current position
                 forque_base = self.perception_interface.get_tool_tip_pose()
+
+                distance = np.linalg.norm(forque_base[:3,3] - final_target[:3,3])
+
+                if distance < INTERMEDIATE_THRESHOLD_RELAXED:
+                    with self.state_lock:
+                        self.state = 0
+                    break
                 
                 target = self.getNextWaypoint(forque_base, final_target, distance_lookahead=INFRONT_DISTANCE_LOOKAHEAD)
 
                 self.publishTaskCommand(target)
                 self.rviz_interface.visualizeTransform("base_link", "next_target", target)
                 self.rviz_interface.visualizeTransform("base_link", "final_target", final_target)
+            
+        print("Exiting transfer loop")
 
     def signal_handler(self, signal, frame):
 

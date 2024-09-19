@@ -84,9 +84,10 @@ assert os.environ.get("PYTHONHASHSEED") == "0", \
 class _Runner:
     """A class for running the integrated system."""
 
-    def __init__(self, run_on_robot: bool, max_motion_planning_time: float,
+    def __init__(self, run_on_robot: bool, simulate_head_perception: bool, max_motion_planning_time: float,
                  resume_from_state: str = ""):
         self.run_on_robot = run_on_robot
+        self.simulate_head_perception = simulate_head_perception
         self.max_motion_planning_time = max_motion_planning_time
 
         if resume_from_state == "":
@@ -102,7 +103,7 @@ class _Runner:
             self.robot_interface = None
 
         # Initialize the perceiver (e.g., get joint states or human head poses).
-        self.perception_interface = PerceptionInterface(self.robot_interface)
+        self.perception_interface = PerceptionInterface(robot_interface=self.robot_interface, simulate_head_perception=self.simulate_head_perception)
 
         if ROSPY_IMPORTED:
             # Initialize the web interface.
@@ -179,7 +180,14 @@ class _Runner:
                 sys.exit(0)
 
         print("Runner is ready.")
-        
+
+        # # Uncomment to test commands.
+        # drink_pickup_msg = {"status": "drink_pickup"}
+        # self.hla_command_queue.put(drink_pickup_msg)
+
+        # drink_transfer_msg = {"status": "drink_transfer"}
+        # self.hla_command_queue.put(drink_transfer_msg)
+
         while not rospy.is_shutdown():
             try:
                 hla_interface_msg = self.hla_command_queue.get(timeout=1)
@@ -198,7 +206,9 @@ class _Runner:
             user_cmd = GroundHighLevelAction(
                 self.hla_name_to_hla["TransferTool"], (self.drink,)
             )
-        elif msg_dict["status"] == "move_to_above_plate":
+        elif msg_dict["status"] == "move_to_above_plate" \
+            or (msg_dict["status"] == "return_to_main" and msg_dict["state"] == "post_bite_pickup") \
+            or (msg_dict["status"] == "return_to_main" and msg_dict["state"] == "post_bite_transfer"): 
             user_cmd = GroundHighLevelAction(
                 self.hla_name_to_hla["LookAtPlate"], (self.utensil,)
             )
@@ -319,10 +329,13 @@ if __name__ == "__main__":
                      args.max_motion_planning_time,
                      args.resume_from_state)
 
-    # # Uncomment to test commands.
-    # msg = namedtuple("String", ["data"])
-    # runner.web_interface_callback(msg(json.dumps({"status": "drink_pickup"})))
-    # runner.web_interface_callback(msg(json.dumps({"status": "drink_transfer"})))
+    # Uncomment to test commands.
+    # drink_pickup_msg = {"status": "drink_pickup"}
+    # runner.hla_command_queue.put(drink_pickup_msg)
+
+    # drink_transfer_msg = {"status": "drink_transfer"}
+    # runner.hla_command_queue.put(drink_transfer_msg)
+
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.utensil,)))
     # for _ in range(10):

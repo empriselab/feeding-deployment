@@ -7,7 +7,7 @@ import rospy
 from std_msgs.msg import Bool
 
 from feeding_deployment.safety.button import Button as EStop
-ESTOP_FREQUENCY = 1200
+ESTOP_FREQUENCY = 100
 
 class EStopsPublisher:
     def __init__(self, user_estop_id: int, experimentor_estop_id: int):

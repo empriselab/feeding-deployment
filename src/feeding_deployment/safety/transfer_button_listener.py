@@ -7,7 +7,7 @@ import rospy
 from std_msgs.msg import Bool
 
 from feeding_deployment.safety.button import Button 
-BUTTON_CHECK_FREQUENCY = 1000
+BUTTON_CHECK_FREQUENCY = 100
 
 class TransferButtonListener:
     def __init__(self, button_id: int):
@@ -30,11 +30,11 @@ class TransferButtonListener:
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--button_id", type=int, default=0)
+    parser.add_argument("--button_id", type=int)
 
     args = parser.parse_args()
 
-    if args.button_id == 0:
+    if args.button_id is None:
         audio = pyaudio.PyAudio()
         device_indices = []
         for i in range(audio.get_device_count()):

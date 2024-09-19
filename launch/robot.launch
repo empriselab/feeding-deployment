@@ -41,9 +41,6 @@
     </include>
 
     <!-- Emergency Stops -->
-    <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_emergency_stop">
-        <param name="cmd" value="$(arg python_path) $(arg base_path)/src/feeding_deployment/safety/estops_publisher.py --user_estop -1 --exp_estop 0"/>
-    </node>
 
     <!-- Transfer Complete Button -->
 

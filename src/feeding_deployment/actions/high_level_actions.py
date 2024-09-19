@@ -109,7 +109,7 @@ class HighLevelAction(abc.ABC):
     def execute_robot_commands(self, robot_commands: list[KinovaCommand]) -> None:
         """Execute the given commands on the robot."""
         for robot_command in robot_commands:
-            input("Execute next command?")
+            # input("Execute next command?")
             self._robot_interface.execute_command(robot_command)
 
 @dataclass(frozen=True)
@@ -709,15 +709,18 @@ class TransferToolHLA(HighLevelAction):
             self._robot_interface.set_tool("fork")
 
             # Rajat Hack: Just to test interface
-            # if self._run_on_robot:
-            #     input("Press enter to switch to task compliant mode")
-            #     self._robot_interface.switch_to_task_compliant_mode()
+            if self._run_on_robot:
+                input("Press enter to switch to task compliant mode")
+                self._robot_interface.switch_to_task_compliant_mode()
                 
-            #     # Do inside-mouth transfer here
-            #     self.inside_mouth_transfer.execute_transfer_loop()
+                # Do inside-mouth transfer here
+                self.inside_mouth_transfer.execute_transfer_loop()
 
-            #     input("Press enter to switch out of compliant mode")
-            #     self._robot_interface.switch_out_of_compliant_mode()
+                input("Press enter to switch out of compliant mode")
+                self._robot_interface.switch_out_of_compliant_mode()
+
+            # Send message to web interface indicating transfer is done.
+            self._web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
 
             return sim_states
         
@@ -752,6 +755,7 @@ class TransferToolHLA(HighLevelAction):
                 input("Press enter to switch out of compliant mode")
                 self._robot_interface.switch_out_of_compliant_mode()
 
+            # Send message to web interface indicating transfer is done.
             self._web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})
             return sim_states
         
@@ -776,7 +780,6 @@ class TransferToolHLA(HighLevelAction):
             self._perception_interface.set_head_perception_tool("wipe")
             self._robot_interface.set_tool("wipe")
 
-            # Rajat Hack: Just to test interface
             if self._run_on_robot:
                 input("Press enter to switch to task compliant mode")
                 self._robot_interface.switch_to_task_compliant_mode()
@@ -787,6 +790,7 @@ class TransferToolHLA(HighLevelAction):
                 input("Press enter to switch out of compliant mode")
                 self._robot_interface.switch_out_of_compliant_mode()
 
+            # Send message to web interface indicating transfer is done.
             self._web_interface.send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})
             return sim_states
 
@@ -830,6 +834,10 @@ class LookAtPlateHLA(HighLevelAction):
             sim_states: list[FeedingDeploymentSimulatorState] = []
             robot_commands = []
 
+            # stop the keep horizontal thread (incase we're trying to re-acquire a bite)
+            if self.wrist_controller is not None:
+                self.wrist_controller.stop_horizontal_spoon_thread()
+
             move_to_joint_positions(
                 self._sim,
                 self._sim.scene_description.above_plate_pos,
@@ -855,7 +863,7 @@ class LookAtPlateHLA(HighLevelAction):
                 items = self.flair.identify_plate(camera_color_data)
                 # flair.set_food_items(items)
                 # self.flair.set_food_items(['banana', 'baby carrot'])
-                self.flair.set_food_items(['cantaloupe'])
+                self.flair.set_food_items(['cantaloupe', 'apple'])
                 items_detection = self.flair.detect_items(camera_color_data, camera_depth_data, camera_info_data, log_path=None)
                 
                 if not self._preferences_set:
@@ -897,6 +905,9 @@ class LookAtPlateHLA(HighLevelAction):
                     print("User Preference:", self._web_interface.user_preference)
                     self.flair.set_preferences(self._web_interface.user_preference)
                     self._preferences_set = True
+                else:
+                    self._web_interface.update_web_interface_image(items_detection['plate_image'])
+                    time.sleep(1.0)  # simulate delay, also needed for web interface
 
                 # Prepare for bite acquisition.
                 print("Doing Bite Acquisition")
@@ -917,6 +928,8 @@ class LookAtPlateHLA(HighLevelAction):
                 data = [{k: v} for k, v in food_type_to_data.items() if k != next_food_item]
                 current_bite = {next_food_item: food_type_to_data[next_food_item]}
 
+                self._web_interface.update_web_interface_image(items_detection['plate_image'])
+                time.sleep(1.0)  # simulate delay, also needed for web interface
                 self._web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data, "current_bite": current_bite})            
   
             else:
@@ -986,10 +999,10 @@ class AcquireBiteHLA(HighLevelAction):
                     for pos in params["positions"]:
                         cv2.circle(viz, (point_x, point_y), 5, (0, 255, 0), -1)
                     cv2.imshow("viz", viz)
-                    # cv2.waitKey(
-                    # cv2.destroyAllWindows()
+                    cv2.waitKey(0)
+                    cv2.destroyAllWindows()
 
-                    import pdb; pdb.set_trace()
+                    # import pdb; pdb.set_trace()
 
                     skewer_center = (point_x, point_y)
                     skewer_angle = 0

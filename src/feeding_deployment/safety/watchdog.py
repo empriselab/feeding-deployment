@@ -32,12 +32,12 @@ from netft_rdt_driver.srv import String_cmd
 
 from feeding_deployment.robot_controller.arm_interface import ArmInterface, ArmManager, NUC_HOSTNAME, ARM_RPC_PORT, RPC_AUTHKEY
 
-CAMERA_FREQUENCY_THRESHOLD = 20 # expected is 30 Hz
+CAMERA_FREQUENCY_THRESHOLD = 0 # expected is 30 Hz
 FT_FREQUENCY_THRESHOLD = 800 # expected is 1000 Hz
 FT_THRESHOLD = [30.0, 30.0, 30.0, 2.0, 2.0, 2.0]
 COLLISION_FREE_FREQUENCY_THRESHOLD = 100 # expected is 350 Hz (empirical)
-USER_ESTOP_FREQUENCY_THRESHOLD = 800 # expected is 1000 Hz
-experimentor_ESTOP_FREQUENCY_THRESHOLD = 800 # expected is 1000 Hz
+USER_ESTOP_FREQUENCY_THRESHOLD = 50 # expected is 60 Hz
+experimentor_ESTOP_FREQUENCY_THRESHOLD = 50 # expected is 60 Hz
 
 WATCHDOG_RUN_FREQUENCY = 1000
 
@@ -148,7 +148,7 @@ class WatchDog:
         start_time = time.time()
         frequencies = []
         for _queue, _threshold, _anomaly in [(self.camera_timestamps, CAMERA_FREQUENCY_THRESHOLD, AnomalyStatus.CAMERA_FREQUENCY), 
-                                            # (self.ft_timestamps, FT_FREQUENCY_THRESHOLD, AnomalyStatus.FT_FREQUENCY),
+                                            (self.ft_timestamps, FT_FREQUENCY_THRESHOLD, AnomalyStatus.FT_FREQUENCY),
                                             # (self.collision_free_timestamps, COLLISION_FREE_FREQUENCY_THRESHOLD, AnomalyStatus.COLLISION_FREE_FREQUENCY), 
                                             (self.user_emergency_stop_timestamps, USER_ESTOP_FREQUENCY_THRESHOLD, AnomalyStatus.USER_ESTOP_FREQUENCY), 
                                             (self.experimentor_emergency_stop_timestamps, experimentor_ESTOP_FREQUENCY_THRESHOLD, AnomalyStatus.experimentor_ESTOP_FREQUENCY)]:
@@ -165,11 +165,11 @@ class WatchDog:
         if self.second_counter == WATCHDOG_RUN_FREQUENCY:
             print("Watchdog running at expected frequency.")
             # print(f"Frequencies:  Camera: {frequencies[0]}, FT: {frequencies[1]}, Collision Free: {frequencies[2]}, User EStop: {frequencies[3]}, Experimentor EStop: {frequencies[4]}")
-            # print(f"Frequencies:  Camera: {frequencies[0]}, FT: {frequencies[1]}, User EStop: {frequencies[2]}, Experimentor EStop: {frequencies[3]}")
+            print(f"Frequencies:  Camera: {frequencies[0]}, FT: {frequencies[1]}, User EStop: {frequencies[2]}, Experimentor EStop: {frequencies[3]}")
             self.second_counter = 0
 
         for _unexpected, _anomaly in [(self.camera_unexpected, AnomalyStatus.CAMERA_UNEXPECTED),
-                                    # (self.ft_unexpected, AnomalyStatus.FT_UNEXPECTED),
+                                    (self.ft_unexpected, AnomalyStatus.FT_UNEXPECTED),
                                     # (self.collision_free_unexpected, AnomalyStatus.COLLISION_FREE_UNEXPECTED),
                                     (self.user_emergency_stop_pressed, AnomalyStatus.USER_ESTOP_PRESSED),
                                     (self.experimentor_emergency_stop_pressed, AnomalyStatus.experimentor_ESTOP_PRESSED)]:
