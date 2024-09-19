@@ -145,6 +145,9 @@ class InsideMouthTransfer:
         while not rospy.is_shutdown():
             with self.mouth_open_lock:
                 if self.mouth_open:
+                    # set it to false once (for the next time)
+                    with self.mouth_open_lock:
+                        self.mouth_open = False
                     break
             self.control_rate.sleep()
 

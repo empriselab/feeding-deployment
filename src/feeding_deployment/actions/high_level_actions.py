@@ -109,7 +109,7 @@ class HighLevelAction(abc.ABC):
     def execute_robot_commands(self, robot_commands: list[KinovaCommand]) -> None:
         """Execute the given commands on the robot."""
         for robot_command in robot_commands:
-            # input("Execute next command?")
+            input("Execute next command?")
             self._robot_interface.execute_command(robot_command)
 
 @dataclass(frozen=True)
@@ -1005,7 +1005,7 @@ class AcquireBiteHLA(HighLevelAction):
                     # import pdb; pdb.set_trace()
 
                     skewer_center = (point_x, point_y)
-                    skewer_angle = 0
+                    skewer_angle = 90
 
                     self.flair.skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_center, major_axis = skewer_angle)
 
