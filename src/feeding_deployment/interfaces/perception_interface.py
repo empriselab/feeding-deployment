@@ -142,12 +142,19 @@ class PerceptionInterface:
     
     def get_tool_tip_pose_at_staging(self) -> np.ndarray:
 
-        # Rajat ToDo: Update this to return Pose type
-        fork_tip_staging_pose = np.eye(4)
-        fork_tip_staging_pose[:3, 3] = [0.250, 0.272, 0.518]
-        fork_tip_staging_pose[:3, :3] = R.from_quat([0.523, -0.503, -0.469, 0.503]).as_matrix()
+        tool_tip_staging_pose = np.eye(4)
 
-        return fork_tip_staging_pose
+        if self._head_perception.head_perception.tool == "fork":
+            tool_tip_staging_pose[:3, 3] = [0.250, 0.272, 0.518]
+            tool_tip_staging_pose[:3, :3] = R.from_quat([0.523, -0.503, -0.469, 0.503]).as_matrix()
+        elif self._head_perception.head_perception.tool == "drink":
+            tool_tip_staging_pose[:3, 3] = [0.229, 0.304, 0.609]
+            tool_tip_staging_pose[:3, :3] = R.from_quat([0.523, -0.503, -0.469, 0.503]).as_matrix()
+        elif self._head_perception.head_perception.tool == "wipe":
+            tool_tip_staging_pose[:3, 3] = [0.417, 0.280, 0.509]
+            tool_tip_staging_pose[:3, :3] = R.from_quat([0.523, -0.503, -0.469, 0.503]).as_matrix()
+
+        return tool_tip_staging_pose
     
     def wait_for_user_continue_button(self) -> None:
         print("Waiting for transfer complete button press / ft sensor trigger ...")
