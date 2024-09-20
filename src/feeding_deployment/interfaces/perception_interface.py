@@ -49,10 +49,11 @@ class PerceptionInterface:
             # self._head_perception = None
             self._head_perception = HeadPerceptionROSWrapper(record_goal_pose)
             
-            # warm start head perception
-            self._head_perception.set_tool("fork")
-            for _ in range(10):
-                self._head_perception.run_head_perception()
+            # warm start head perception only if we're not recording the goal pose
+            if not record_goal_pose:
+                self._head_perception.set_tool("fork")
+                for _ in range(10):
+                    self._head_perception.run_head_perception()
 
             # Rajat ToDo: pass perception queues to all perception classes instead of having them use ros subscribers which spawn threads
             self._aruco_perception = ArUcoPerception()
