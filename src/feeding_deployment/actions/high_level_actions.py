@@ -911,10 +911,17 @@ class LookAtPlateHLA(HighLevelAction):
 
                     self._web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
                     time.sleep(1.0) # simulate delay, also needed for web interface
-                    self._web_interface.update_web_interface_image(items_detection['plate_image'])
+                    self._web_interface.send_web_interface_image(items_detection['plate_image'])
                     time.sleep(1.0)  # simulate delay, also needed for web interface
                     self._web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data})
                     self._web_interface.send_web_interface_message({"n_ordering": len(ordering_options), "data": ordering_options})
+
+                    # self._web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
+                    # time.sleep(1.0) # simulate delay, also needed for web interface
+                    # self._web_interface.update_web_interface_image(items_detection['plate_image'])
+                    # time.sleep(1.0)  # simulate delay, also needed for web interface
+                    # self._web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data})
+                    # self._web_interface.send_web_interface_message({"n_ordering": len(ordering_options), "data": ordering_options})
 
                     # Wait for web interface to report order selection.
                     print("WAITING TO GET PREFERENCE")
@@ -924,9 +931,9 @@ class LookAtPlateHLA(HighLevelAction):
                     print("User Preference:", self._web_interface.user_preference)
                     self.flair.set_preferences(self._web_interface.user_preference)
                     self._preferences_set = True
-                else:
-                    self._web_interface.update_web_interface_image(items_detection['plate_image'])
-                    time.sleep(1.0)  # simulate delay, also needed for web interface
+                # else:
+                #     self._web_interface.send_web_interface_image(items_detection['plate_image'])
+                #     time.sleep(1.0)  # simulate delay, also needed for web interface
 
                 # Prepare for bite acquisition.
                 print("Doing Bite Acquisition")
@@ -947,7 +954,8 @@ class LookAtPlateHLA(HighLevelAction):
                 data = [{k: v} for k, v in food_type_to_data.items() if k != next_food_item]
                 current_bite = {next_food_item: food_type_to_data[next_food_item]}
 
-                self._web_interface.update_web_interface_image(items_detection['plate_image'])
+                time.sleep(1.0) # maybe needed for web interface?
+                self._web_interface.send_web_interface_image(items_detection['plate_image'])
                 time.sleep(1.0)  # simulate delay, also needed for web interface
                 self._web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data, "current_bite": current_bite})            
   

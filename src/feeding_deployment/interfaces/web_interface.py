@@ -42,25 +42,25 @@ class WebInterface:
         self.web_interface_publisher = rospy.Publisher("/ServerComm", String, queue_size=10)
         self.web_interface_image_publisher = rospy.Publisher("/camera/image/compressed", CompressedImage, queue_size=10)
         self.image_bridge = CvBridge()
-        self.last_captured_ros_image = None
-        self.update_web_interface_image(np.zeros((512, 512, 3)))
-        self.web_interface_image_thread = threading.Thread(target=self._publish_web_interface_image)
-        self.web_interface_image_thread.start()
+        # self.last_captured_ros_image = None
+        # self.update_web_interface_image(np.zeros((512, 512, 3)))
+        # self.web_interface_image_thread = threading.Thread(target=self._publish_web_interface_image)
+        # self.web_interface_image_thread.start()
         # The following is a hacky leaky abstraction to handle the one-time preference
         # setting step at the beginning of FLAIR.
         self.user_preference = None
         self.web_interface_sub = rospy.Subscriber("WebAppComm", String, self._message_callback, queue_size=100)
         time.sleep(1.0)  # Wait for the subscriber to connect
 
-    def update_web_interface_image(self, image):
-        self.last_captured_ros_image = self.image_bridge.cv2_to_compressed_imgmsg(image)
+    # def update_web_interface_image(self, image):
+    #     self.last_captured_ros_image = self.image_bridge.cv2_to_compressed_imgmsg(image)
 
-    def _publish_web_interface_image(self):
-        rate = rospy.Rate(1)  # 1Hz
-        while not rospy.is_shutdown():
-            # print("(web interface) publishing image...")
-            self.web_interface_image_publisher.publish(self.last_captured_ros_image)
-            rate.sleep()
+    # def _publish_web_interface_image(self):
+    #     rate = rospy.Rate(1)  # 1Hz
+    #     while not rospy.is_shutdown():
+    #         # print("(web interface) publishing image...")
+    #         self.web_interface_image_publisher.publish(self.last_captured_ros_image)
+    #         rate.sleep()
 
     def _message_callback(self, msg: "String") -> None:
         """Callback for the web interface."""
@@ -82,8 +82,8 @@ class WebInterface:
             String(json.dumps(msg_dict))
         )
 
-    def _send_web_interface_image(self, image) -> None:
-        self._perception_interface.update_web_interface_image(image)
+    def send_web_interface_image(self, image) -> None:
+        self.web_interface_image_publisher.publish(self.image_bridge.cv2_to_compressed_imgmsg(image))
 
     # make sure thread is closed when object is deleted
     def __del__(self):
@@ -117,7 +117,7 @@ if __name__ == "__main__":
 
         web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
         time.sleep(1.0) # simulate delay, also needed for web interface
-        web_interface.update_web_interface_image(plate_image)
+        web_interface.send_web_interface_image(plate_image)
         time.sleep(1.0)  # simulate delay, also needed for web interface
 
         while not rospy.is_shutdown():
@@ -150,7 +150,7 @@ if __name__ == "__main__":
             image = cv2.imread(f"test_log/color_{i}.png")
             # Send the plate image to the web interface.
             input("Press Enter to send image to web interface.")
-            web_interface.update_web_interface_image(image)
+            web_interface.send_web_interface_image(image)
 
     
         
