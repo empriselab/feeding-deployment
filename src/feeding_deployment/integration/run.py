@@ -191,11 +191,11 @@ class _Runner:
         # drink_transfer_msg = {"status": "drink_transfer"}
         # self.hla_command_queue.put(drink_transfer_msg)
 
-        wipe_transfer_msg = {"status": "move_to_wiping_position", "state": "prepared_mouth_wiping"}
-        self.hla_command_queue.put(wipe_transfer_msg)
+        # wipe_transfer_msg = {"status": "move_to_wiping_position", "state": "prepared_mouth_wiping"}
+        # self.hla_command_queue.put(wipe_transfer_msg)
 
-        drink_pickup_msg = {"status": "drink_pickup", "state": "pre_bite_pickup"}
-        self.hla_command_queue.put(drink_pickup_msg)
+        # drink_pickup_msg = {"status": "drink_pickup", "state": "pre_bite_pickup"}
+        # self.hla_command_queue.put(drink_pickup_msg)
 
 
 
