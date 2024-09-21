@@ -44,7 +44,7 @@ class ArmInterfaceClient:
 
     def switch_out_of_compliant_mode(self):
         assert self.in_compliant_mode, "Not in compliant mode"
-        time.sleep(2.0) # Wait for the arm to settle
+        # time.sleep(2.0) # Wait for the arm to settle
         self._arm_interface.switch_out_of_compliant_mode()
         self.in_compliant_mode = False
 
@@ -114,7 +114,8 @@ if __name__ == "__main__":
     input("Press Enter to move to drop test pos")
     arm_client_interface.execute_command(drop_test_task_command)
 
-    input('Press Enter to switch out of compliant mode')
+    # input('Press Enter to switch out of compliant mode')
+    time.sleep(0.1)
     arm_client_interface.switch_out_of_compliant_mode()
 
     # utensil_inside_mount = (

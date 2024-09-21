@@ -640,8 +640,9 @@ class KinovaArm:
         else:
             self.base.Stop()
 
-    def apply_emergency_stop(self):
-        self.base.ApplyEmergencyStop()
+    # Not using this as we haven't tested it
+    # def apply_emergency_stop(self):
+    #     self.base.ApplyEmergencyStop()
 
     def clear_faults(self):
         if self.base.GetArmState().active_state == Base_pb2.ARMSTATE_IN_FAULT:
@@ -1043,18 +1044,18 @@ class KinovaArm:
 
         print("Arm is in gravity compensation mode")
 
-    def switch_to_joint_compliant_mode(self, command_queue, emergency_stop_event):
+    def switch_to_joint_compliant_mode(self, command_queue, gravity_compensation_event):
 
-        controller = CompliantController(command_queue, emergency_stop_event, control_type="joint", fix_joint_hack=self.fix_joint_hack)
+        controller = CompliantController(command_queue, gravity_compensation_event, control_type="joint", fix_joint_hack=self.fix_joint_hack)
         self.init_cyclic(controller.control_callback)
         while not self.cyclic_running:
             time.sleep(0.01)
 
         print("Arm is in joint compliant mode")
 
-    def switch_to_task_compliant_mode(self, command_queue, emergency_stop_event):
+    def switch_to_task_compliant_mode(self, command_queue, gravity_compensation_event):
 
-        controller = CompliantController(command_queue, emergency_stop_event, control_type="task", fix_joint_hack=self.fix_joint_hack)
+        controller = CompliantController(command_queue, gravity_compensation_event, control_type="task", fix_joint_hack=self.fix_joint_hack)
         self.init_cyclic(controller.control_callback)
         while not self.cyclic_running:
             time.sleep(0.01)
