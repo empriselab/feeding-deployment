@@ -20,9 +20,9 @@ class ArmInterface:
         self.arm = arm_instance
         # self.arm.set_joint_limits(speed_limits=(7 * (30,)), acceleration_limits=(7 * (80,)))
         self.command_queue = queue.Queue(1)
+        self.emergency_stop_event = threading.Event()
         self.controller = None
         self.in_compliant_mode = False
-        self.arm_stopped = False
 
     def get_state(self):
         arm_pos, ee_pose, gripper_pos = self.arm.get_state()
@@ -38,7 +38,7 @@ class ArmInterface:
 
     def switch_to_task_compliant_mode(self):
 
-        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.emergency_stop_event.is_set(), "Emergency stop is active"
         assert not self.in_compliant_mode, "Already in compliant mode"
 
         # clear command queue
@@ -48,12 +48,12 @@ class ArmInterface:
 
         # switch to joint compliant mode
         print("Switching to joint compliant mode")
-        self.arm.switch_to_task_compliant_mode(self.command_queue)
+        self.arm.switch_to_task_compliant_mode(self.command_queue, self.emergency_stop_event)
         self.in_compliant_mode = True
 
     def switch_out_of_compliant_mode(self):
 
-        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.emergency_stop_event.is_set(), "Emergency stop is active"
         assert self.in_compliant_mode, "Not in compliant mode"
 
         # switch out of joint compliant mode
@@ -63,7 +63,7 @@ class ArmInterface:
 
     def compliant_set_ee_pose(self, xyz, xyz_quat):
             
-        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.emergency_stop_event.is_set(), "Emergency stop is active"
         assert self.in_compliant_mode, "Not in compliant mode"
 
         command_pose = np.zeros(7)
@@ -128,7 +128,7 @@ class ArmInterface:
 
     def set_joint_position(self, command_pos):
         
-        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.emergency_stop_event.is_set(), "Emergency stop is active"
         assert not self.in_compliant_mode, "In compliant mode"
 
         print(f"Received joint pos command: {command_pos}")
@@ -136,7 +136,7 @@ class ArmInterface:
 
     def set_joint_trajectory(self, trajectory_command):
 
-        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.emergency_stop_event.is_set(), "Emergency stop is active"
         assert not self.in_compliant_mode, "In compliant mode"
 
         print(
@@ -146,7 +146,7 @@ class ArmInterface:
 
     def set_ee_pose(self, xyz, xyz_quat):
 
-        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.emergency_stop_event.is_set(), "Emergency stop is active"
         assert not self.in_compliant_mode, "In compliant mode"
 
         print(f"Received cartesian pose command: {xyz}, {xyz_quat}")
@@ -154,7 +154,7 @@ class ArmInterface:
 
     def set_gripper(self, gripper_pos):
 
-        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.emergency_stop_event.is_set(), "Emergency stop is active"
         assert not self.in_compliant_mode, "In compliant mode"
 
         print(f"Received gripper pos command: {gripper_pos}")
@@ -162,7 +162,7 @@ class ArmInterface:
 
     def open_gripper(self):
 
-        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.emergency_stop_event.is_set(), "Emergency stop is active"
         assert not self.in_compliant_mode, "In compliant mode"
 
         print("Received open gripper command")
@@ -170,7 +170,7 @@ class ArmInterface:
 
     def close_gripper(self):
 
-        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.emergency_stop_event.is_set(), "Emergency stop is active"
         assert not self.in_compliant_mode, "In compliant mode"
 
         print("Received close gripper command")
@@ -183,18 +183,15 @@ class ArmInterface:
 
     def retract(self):
 
-        assert not self.arm_stopped, "Arm is stopped"
+        assert not self.emergency_stop_event.is_set(), "Emergency stop is active"
         assert not self.in_compliant_mode, "In compliant mode"
 
         self.arm.retract()
 
     def stop(self):
-        self.arm_stopped = True
+        self.emergency_stop_event.set()
         print("No longer accepting commands")
-        if self.in_compliant_mode:
-            self.in_compliant_mode = False
-            self.arm.switch_to_gravity_compensation_mode()
-        else:
+        if not self.in_compliant_mode: # If not in compliant mode, stop arm (otherwise, arm is already stopped)
             self.arm.stop()
             print("Stopped arm")
 
