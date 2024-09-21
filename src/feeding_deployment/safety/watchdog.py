@@ -183,7 +183,7 @@ class WatchDog:
             print(f"AnomalyStatus detected: {anomaly}")
             rospy.loginfo(f"AnomalyStatus detected: {anomaly}")
 
-            self._arm_interface.stop()
+            self._arm_interface.emergency_stop()
 
         self.watchdog_status_pub.publish(Bool(data=anomaly == AnomalyStatus.NO_ANOMALY))
         return anomaly

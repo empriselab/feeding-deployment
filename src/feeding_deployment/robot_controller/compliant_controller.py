@@ -25,7 +25,7 @@ class LowPassFilter:
 
 
 class CompliantController:
-    def __init__(self, command_queue, control_type, fix_joint_hack):
+    def __init__(self, command_queue, gravity_compensation_event, control_type, fix_joint_hack):
         
         self.fix_joint_hack = fix_joint_hack
 
@@ -44,6 +44,7 @@ class CompliantController:
         self.x_d = None
         self.gripper_pos = None
         self.command_queue = command_queue
+        self.gravity_compensation_event = gravity_compensation_event
 
         # OTG
         self.last_command_time = None
@@ -126,6 +127,11 @@ class CompliantController:
         dq_s = arm.dq.copy()
         tau_s = arm.tau.copy()
         tau_s_f = self.tau_filter.filter(tau_s)
+
+        if self.gravity_compensation_event.is_set():
+            torque_command = arm.gravity()
+            gripper_command = arm.gripper_pos
+            return torque_command, gripper_command
 
         # Check for new command
         if not self.command_queue.empty():

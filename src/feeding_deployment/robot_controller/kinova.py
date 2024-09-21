@@ -369,17 +369,11 @@ class KinovaArm:
     def zero(self):
         self._execute_reference_action("Zero")
 
-    def set_before_transfer_config(self):
-        before_transfer_config = [
-            -2.8655331,  
-            -1.61973777, 
-            -2.6097253, 
-            -1.37301134, 
-            1.11781087,
-            -1.18039928,
-            2.05515662
+    def set_intermediate_zero_config(self):
+        intermediate_zero_config = [
+            0.0, 0.0, -3.12, 0.0, 0.0, 0.0, 0.0
         ]
-        self.move_angular(before_transfer_config)
+        self.move_angular(intermediate_zero_config)
 
     def get_state(self):
 
@@ -500,7 +494,14 @@ class KinovaArm:
         if blocking:
             print("Waiting for angular movement to finish ...")
             self.end_or_abort_event.wait(KinovaArm.ACTION_TIMEOUT_DURATION)
-            print("Angular movement completed")
+            # read states and check if the arm actually reached the desired position
+            q, _, _ = self.get_state()
+            if not np.allclose(q, joint_angles, atol=np.pi / 180): # 1 degree
+                print("Arm did not reach desired position")
+                raise Exception("Arm did not reach desired position")
+            else:
+                print("Angular movement completed")
+
 
     def move_cartesian(self, xyz, xyz_quat, blocking=True):
 
@@ -522,9 +523,15 @@ class KinovaArm:
         if blocking:
             print("Waiting for cartesian movement to finish ...")
             self.end_or_abort_event.wait(KinovaArm.ACTION_TIMEOUT_DURATION)
-            print("Cartesian movement completed")
+            # read states and check if the arm actually reached the desired position
+            _, x, _ = self.get_state()
+            if not np.allclose(x[:3], xyz, atol=0.01): # 1 cm
+                print("Arm did not reach desired position")
+                raise Exception("Arm did not reach desired position")
+            else:
+                print("Cartesian movement completed")
 
-    def _gripper_position_command(self, value, blocking=True, timeout=1.0):
+    def _gripper_position_command(self, value, blocking=True):
         assert not self.cyclic_running, "Arm must be in high-level servoing mode"
 
         # Send gripper command
@@ -534,16 +541,14 @@ class KinovaArm:
         finger.value = value
         self.base.SendGripperCommand(gripper_command)
 
-        if blocking:
-            # Wait for reported position to match value
-            gripper_request = Base_pb2.GripperRequest()
-            gripper_request.mode = Base_pb2.GRIPPER_POSITION
-            start_time = time.perf_counter()
-            while time.perf_counter() - start_time < timeout:
-                gripper_measure = self.base.GetMeasuredGripperMovement(gripper_request)
-                if abs(value - gripper_measure.finger[0].value) < 0.01:
-                    break
-                time.sleep(0.01)
+        # Wait for reported position to match value
+        gripper_request = Base_pb2.GripperRequest()
+        gripper_request.mode = Base_pb2.GRIPPER_POSITION
+        while True:
+            gripper_measure = self.base.GetMeasuredGripperMovement(gripper_request)
+            if abs(value - gripper_measure.finger[0].value) < 0.01:
+                break
+            time.sleep(0.01)
 
     def open_gripper(self, blocking=True):
         self._gripper_position_command(0, blocking)
@@ -640,8 +645,9 @@ class KinovaArm:
         else:
             self.base.Stop()
 
-    def apply_emergency_stop(self):
-        self.base.ApplyEmergencyStop()
+    # Not using this as we haven't tested it
+    # def apply_emergency_stop(self):
+    #     self.base.ApplyEmergencyStop()
 
     def clear_faults(self):
         if self.base.GetArmState().active_state == Base_pb2.ARMSTATE_IN_FAULT:
@@ -655,14 +661,19 @@ class KinovaArm:
         assert not self.cyclic_running, "Arm must be in high-level servoing mode"
 
         input(
-            "Arm will now be moved to before transfer configuration, press <Enter> to continue..."
+            "Arm will now be moved to retract configuration, press <Enter> to continue..."
         )
-        self.set_before_transfer_config()
+        self.retract()
+
+        input(
+            "Arm will now be moved to intermediate zero (candelstick with 3rd joint twisted) configuration. Please make sure arm is clear of obstacles and then press <Enter> to continue..."
+        )
+        self.set_intermediate_zero_config()
 
         # Move arm to zero configuration
         print("Arm will be moved to the candlestick configuration")
         input(
-            "Please make sure arm is clear of obstacles and then press <Enter> to continue..."
+            "Arm will be moved to the candlestick configuration. Press <Enter> to continue..."
         )
         self.zero()
 
@@ -679,9 +690,14 @@ class KinovaArm:
 
         # Move arm to home configuration
         input(
-            "Arm will now be moved to before transfer configuration, press <Enter> to continue..."
+            "Arm will now be moved to intermediate zero (candelstick with 3rd joint twisted) configuration, press <Enter> to continue..."
         )
-        self.set_before_transfer_config()
+        self.set_intermediate_zero_config()
+
+        input(
+            "Arm will now be moved to retract configuration, press <Enter> to continue..."
+        )
+        self.retract()
 
     def init_cyclic(self, control_callback):
         assert not self.cyclic_running, "Cyclic thread is already running"
@@ -1043,18 +1059,18 @@ class KinovaArm:
 
         print("Arm is in gravity compensation mode")
 
-    def switch_to_joint_compliant_mode(self, command_queue):
+    def switch_to_joint_compliant_mode(self, command_queue, gravity_compensation_event):
 
-        controller = CompliantController(command_queue, control_type="joint", fix_joint_hack=self.fix_joint_hack)
+        controller = CompliantController(command_queue, gravity_compensation_event, control_type="joint", fix_joint_hack=self.fix_joint_hack)
         self.init_cyclic(controller.control_callback)
         while not self.cyclic_running:
             time.sleep(0.01)
 
         print("Arm is in joint compliant mode")
 
-    def switch_to_task_compliant_mode(self, command_queue):
+    def switch_to_task_compliant_mode(self, command_queue, gravity_compensation_event):
 
-        controller = CompliantController(command_queue, control_type="task", fix_joint_hack=self.fix_joint_hack)
+        controller = CompliantController(command_queue, gravity_compensation_event, control_type="task", fix_joint_hack=self.fix_joint_hack)
         self.init_cyclic(controller.control_callback)
         while not self.cyclic_running:
             time.sleep(0.01)

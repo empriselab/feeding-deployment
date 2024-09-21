@@ -44,7 +44,7 @@ class ArmInterfaceClient:
 
     def switch_out_of_compliant_mode(self):
         assert self.in_compliant_mode, "Not in compliant mode"
-        time.sleep(2.0) # Wait for the arm to settle
+        # time.sleep(2.0) # Wait for the arm to settle
         self._arm_interface.switch_out_of_compliant_mode()
         self.in_compliant_mode = False
 
@@ -90,24 +90,65 @@ if __name__ == "__main__":
     if run_commands != "y":
         exit()
 
-    before_transfer_pos = [
-        -2.8655331,  
-        -1.61973777, 
-        -2.6097253, 
-        -1.37301134, 
-        1.11781087,
-        -1.18039928,
-        2.05515662
+    # close gripper
+    arm_client_interface.execute_command(CloseGripperCommand())
+
+    home_pos = [2.0099529289564592e-05, 0.26191187306569164, -3.1415742777782714, -2.269018308753582, -1.1185276577840852e-05, 0.9598948696060562, 1.5707649014940337]
+
+    print("Moving to home position...")
+    arm_client_interface.execute_command(JointCommand(home_pos))
+
+    test_positions = [
+        [1.5966822288586847e-05, -0.3490701114566095, -3.141557766179513, -2.548308539644045, 3.904089478140269e-06, -0.8726486470306245, 1.5709589127794459],
+        [-0.007946872692796703, -0.5015446059791344, 3.0858849162236246, -2.580108280956245, -0.025630794963140247, -0.9928940986732275, 1.5269496431336684],
+        [-0.00580569117637264, -0.5003387266375467, -3.070703566429628, -2.337005881906106, 0.0373198167840403, -1.3192836650222874, 1.6169241410878321],
+        [-0.01612437513599385, -0.5525894145926831, -3.0655101359878643, -2.5410106793089007, 0.04257673448947779, -1.0858053975194766, 1.6028609194775052]
     ]
 
-    input("Press enter to move to home position...")
-    arm_client_interface.execute_command(JointCommand(before_transfer_pos))
+    test_poses = [
+        [0.1338980495929718, -0.0005073380307294428, 0.21062198281288147, 0.712547437295058, 0.700687805660259, 0.025881994666155476, 0.02535490002657547],
+        [0.09481269866228104, 0.009776144288480282, 0.21593131124973297, 0.712496060477749, 0.7007277901717651, 0.02601313944266246, 0.025558647480240525],
+        [0.10039354115724564, -0.015133513137698174, 0.2866659164428711, -0.7132249227562583, -0.700909127758032, 0.0036400298249693623, 0.004832635686417539],
+        [0.08909790962934494, -0.01270302850753069, 0.23117974400520325, 0.7126763019999464, 0.7006222160108023, 0.025051701023530416, 0.024360034392870284]
+    ]
 
-    input("Press enter to go to compliance mode...")
-    arm_client_interface.switch_to_task_compliant_mode()
+    # print("Moving to retract position...")
+    # arm_client_interface.execute_command(JointCommand(test_positions[0]))
 
-    input("Press enter to go to non-compliance mode...")
-    arm_client_interface.switch_out_of_compliant_mode()
+    for i in range(4):
+        # send move to pose command
+        # arm_client_interface.execute_command(CartesianCommand(pos=test_poses[0][:3],quat=test_poses[0][3:]))
+        arm_client_interface.execute_command(JointCommand(test_positions[0]))
+
+        arm_client_interface.execute_command(JointCommand(home_pos))
+
+        # arm_client_interface.execute_command(JointCommand(home_pos))
+        # # send gripper open command
+        arm_client_interface.execute_command(OpenGripperCommand())
+
+        # send move to pose command
+        arm_client_interface.execute_command(JointCommand(test_positions[1]))
+        # arm_client_interface.execute_command(CartesianCommand(pos=test_poses[1][:3],quat=test_poses[1][3:]))
+
+        # arm_client_interface.execute_command(JointCommand(home_pos))
+
+        # send gripper close command
+        arm_client_interface.execute_command(CloseGripperCommand())
+
+    # print("Moving through test positions...")
+    # for i in range(20):
+    #     arm_client_interface.execute_command(JointCommand(test_positions[i % 4]))
+
+    # print("Moving through test poses...")
+    # for i in range(20):
+    #     arm_client_interface.execute_command(CartesianCommand(pos=test_poses[i % 4][:3],quat=test_poses[i % 4][3:]))
+
+    # print("Moving through test positions and poses...")
+    # for i in range(20):
+    #     if i % 4 < 2:
+    #         arm_client_interface.execute_command(JointCommand(test_positions[i % 4]))
+    #     else:
+    #         arm_client_interface.execute_command(CartesianCommand(pos=test_poses[i % 4][:3], quat=test_poses[i % 4][3:]))
 
     # utensil_inside_mount = (
     #     np.array([0.242, -0.077, 0.07]),
