@@ -369,17 +369,11 @@ class KinovaArm:
     def zero(self):
         self._execute_reference_action("Zero")
 
-    def set_before_transfer_config(self):
-        before_transfer_config = [
-            -2.8655331,  
-            -1.61973777, 
-            -2.6097253, 
-            -1.37301134, 
-            1.11781087,
-            -1.18039928,
-            2.05515662
+    def set_intermediate_zero_config(self):
+        intermediate_zero_config = [
+            0.0, 0.0, -3.12, 0.0, 0.0, 0.0, 0.0
         ]
-        self.move_angular(before_transfer_config)
+        self.move_angular(intermediate_zero_config)
 
     def get_state(self):
 
@@ -656,14 +650,19 @@ class KinovaArm:
         assert not self.cyclic_running, "Arm must be in high-level servoing mode"
 
         input(
-            "Arm will now be moved to before transfer configuration, press <Enter> to continue..."
+            "Arm will now be moved to retract configuration, press <Enter> to continue..."
         )
-        self.set_before_transfer_config()
+        self.retract()
+
+        input(
+            "Arm will now be moved to intermediate zero (candelstick with 3rd joint twisted) configuration. Please make sure arm is clear of obstacles and then press <Enter> to continue..."
+        )
+        self.set_intermediate_zero_config()
 
         # Move arm to zero configuration
         print("Arm will be moved to the candlestick configuration")
         input(
-            "Please make sure arm is clear of obstacles and then press <Enter> to continue..."
+            "Arm will be moved to the candlestick configuration. Press <Enter> to continue..."
         )
         self.zero()
 
@@ -680,9 +679,14 @@ class KinovaArm:
 
         # Move arm to home configuration
         input(
-            "Arm will now be moved to before transfer configuration, press <Enter> to continue..."
+            "Arm will now be moved to intermediate zero (candelstick with 3rd joint twisted) configuration, press <Enter> to continue..."
         )
-        self.set_before_transfer_config()
+        self.set_intermediate_zero_config()
+
+        input(
+            "Arm will now be moved to retract configuration, press <Enter> to continue..."
+        )
+        self.retract()
 
     def init_cyclic(self, control_callback):
         assert not self.cyclic_running, "Cyclic thread is already running"
