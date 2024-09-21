@@ -114,34 +114,7 @@ if __name__ == "__main__":
     input("Press Enter to move to drop test pos")
     arm_client_interface.execute_command(drop_test_task_command)
 
-    # input('Press Enter to switch out of compliant mode')
-    time.sleep(0.1)
-    arm_client_interface.switch_out_of_compliant_mode()
-
-    input("Press Enter to move back to before transfer pos")
-    arm_client_interface.execute_command(JointCommand(before_transfer_pos))
-
-    input("Press Enter to go to compliance mode...")
-    arm_client_interface.switch_to_task_compliant_mode()
-
-    input("Press Enter to move to drop test pos again")
-    arm_client_interface.execute_command(drop_test_task_command)
-
-    # input('Press Enter to switch out of compliant mode')
-    time.sleep(0.3)
-    arm_client_interface.switch_out_of_compliant_mode()
-
-    input("Press Enter to move back to before transfer pos")
-    arm_client_interface.execute_command(JointCommand(before_transfer_pos))
-
-    input("Press Enter to go to compliance mode...")
-    arm_client_interface.switch_to_task_compliant_mode()
-
-    input("Press Enter to move to drop test pos again")
-    arm_client_interface.execute_command(drop_test_task_command)
-
-    # input('Press Enter to switch out of compliant mode')
-    time.sleep(0.5)
+    input('Press enter to switch out of compliant mode...')
     arm_client_interface.switch_out_of_compliant_mode()
 
     # utensil_inside_mount = (

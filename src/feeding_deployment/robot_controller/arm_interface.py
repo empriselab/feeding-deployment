@@ -171,7 +171,7 @@ class ArmInterface:
             else: # If not in compliant mode, stop arm (otherwise, arm is already stopped)
                 self.arm.stop()
 
-            print("Emergency stop activated")
+            print("Emergency stop activated, will not take any more commands")
 
 class ArmManager(MPBaseManager):
     pass
