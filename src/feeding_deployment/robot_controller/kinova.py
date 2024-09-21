@@ -494,7 +494,14 @@ class KinovaArm:
         if blocking:
             print("Waiting for angular movement to finish ...")
             self.end_or_abort_event.wait(KinovaArm.ACTION_TIMEOUT_DURATION)
-            print("Angular movement completed")
+            # read states and check if the arm actually reached the desired position
+            q, _, _ = self.get_state()
+            if not np.allclose(q, joint_angles, atol=np.pi / 180): # 1 degree
+                print("Arm did not reach desired position")
+                raise Exception("Arm did not reach desired position")
+            else:
+                print("Angular movement completed")
+
 
     def move_cartesian(self, xyz, xyz_quat, blocking=True):
 
@@ -516,9 +523,15 @@ class KinovaArm:
         if blocking:
             print("Waiting for cartesian movement to finish ...")
             self.end_or_abort_event.wait(KinovaArm.ACTION_TIMEOUT_DURATION)
-            print("Cartesian movement completed")
+            # read states and check if the arm actually reached the desired position
+            _, x, _ = self.get_state()
+            if not np.allclose(x[:3], xyz, atol=0.01): # 1 cm
+                print("Arm did not reach desired position")
+                raise Exception("Arm did not reach desired position")
+            else:
+                print("Cartesian movement completed")
 
-    def _gripper_position_command(self, value, blocking=True, timeout=1.0):
+    def _gripper_position_command(self, value, blocking=True):
         assert not self.cyclic_running, "Arm must be in high-level servoing mode"
 
         # Send gripper command
@@ -528,16 +541,14 @@ class KinovaArm:
         finger.value = value
         self.base.SendGripperCommand(gripper_command)
 
-        if blocking:
-            # Wait for reported position to match value
-            gripper_request = Base_pb2.GripperRequest()
-            gripper_request.mode = Base_pb2.GRIPPER_POSITION
-            start_time = time.perf_counter()
-            while time.perf_counter() - start_time < timeout:
-                gripper_measure = self.base.GetMeasuredGripperMovement(gripper_request)
-                if abs(value - gripper_measure.finger[0].value) < 0.01:
-                    break
-                time.sleep(0.01)
+        # Wait for reported position to match value
+        gripper_request = Base_pb2.GripperRequest()
+        gripper_request.mode = Base_pb2.GRIPPER_POSITION
+        while True:
+            gripper_measure = self.base.GetMeasuredGripperMovement(gripper_request)
+            if abs(value - gripper_measure.finger[0].value) < 0.01:
+                break
+            time.sleep(0.01)
 
     def open_gripper(self, blocking=True):
         self._gripper_position_command(0, blocking)
