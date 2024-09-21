@@ -178,9 +178,14 @@ class ArmInterface:
         self.arm.close_gripper()
 
     def close(self):
-        print("Closing arm connection")
-        self.arm.stop()
+        print("Close command received")
+        self.stop()
+
+        time.sleep(2.0) # Wait for arm to stabilize in case it was in compliant mode
+
+        self.arm.stop() # Exit low level servoing mode incase it was in compliant mode
         self.arm.disconnect()
+        print("Arm disconnected")
 
     def retract(self):
 
@@ -190,11 +195,12 @@ class ArmInterface:
         self.arm.retract()
 
     def stop(self):
-        self.emergency_stop_event.set()
-        print("No longer accepting commands")
+        if self.in_compliant_mode:
+            self.emergency_stop_event.set()
         if not self.in_compliant_mode: # If not in compliant mode, stop arm (otherwise, arm is already stopped)
             self.arm.stop()
-            print("Stopped arm")
+        
+        print("Stopped arm - emergency stop")
 
 class ArmManager(MPBaseManager):
     pass
