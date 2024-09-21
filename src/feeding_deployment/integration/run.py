@@ -209,6 +209,10 @@ class _Runner:
 
     def parse_interface_msg(self, msg_dict: dict[str, Any]) -> None:
         """Pass high level action message from the web interface."""
+        if msg_dict["status"] == "finish_feeding":
+            user_cmd = GroundHighLevelAction(
+                self.hla_name_to_hla["Reset"], (self.drink,)
+            )
         if msg_dict["status"] == "drink_pickup":
             user_cmd = GroundHighLevelAction(
                 self.hla_name_to_hla["PickTool"], (self.drink,)
