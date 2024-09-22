@@ -521,6 +521,14 @@ class StowToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.drink_staging_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface if not self.no_waits else None
+            )
+
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
 
@@ -822,10 +830,6 @@ class TransferToolHLA(HighLevelAction):
 class LookAtPlateHLA(HighLevelAction):
     """Look at plate in preparation of bite acquisition."""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._preferences_set = False
-
     def get_name(self) -> str:
         return "LookAtPlate"
 
@@ -884,10 +888,11 @@ class LookAtPlateHLA(HighLevelAction):
                 # flair.set_food_items(items)
                 # self.flair.set_food_items(['banana', 'baby carrot'])
                 # self.flair.set_food_items(['cantaloupe', 'banana'])
-                self.flair.set_food_items(['chicken nugget'])
+                # self.flair.set_food_items(['chicken nugget'])
+                self.flair.set_food_items(['banana'])
                 items_detection = self.flair.detect_items(camera_color_data, camera_depth_data, camera_info_data, log_path=None)
                 
-                if not self._preferences_set:
+                if not self.flair.is_preference_set():
 
                     # Handle one-time preference setting.
     
@@ -931,8 +936,7 @@ class LookAtPlateHLA(HighLevelAction):
                         time.sleep(1e-1)
                     print("FINISHED GETTING PREFERENCES")
                     print("User Preference:", self._web_interface.user_preference)
-                    self.flair.set_preferences(self._web_interface.user_preference)
-                    self._preferences_set = True
+                    self.flair.set_preference(self._web_interface.user_preference)
                 # else:
                 #     self._web_interface.send_web_interface_image(items_detection['plate_image'])
                 #     time.sleep(1.0)  # simulate delay, also needed for web interface
@@ -1099,10 +1103,7 @@ class ResetHLA(HighLevelAction):
         objects: tuple[Object, ...],
         params: dict[str, Any],
     ) -> list[FeedingDeploymentSimulatorState]:
-        assert len(objects) == 1
-        tool = objects[0]
-
-
+        assert len(objects) == 0
         assert self._sim.held_object_name is None
         sim_states: list[FeedingDeploymentSimulatorState] = []
         robot_commands = []
@@ -1117,6 +1118,10 @@ class ResetHLA(HighLevelAction):
 
         if self._run_on_robot:
             self.execute_robot_commands(robot_commands)
+
+        # set FLAIR preferences to None
+        if self.flair is not None:
+            self.flair.clear_preference()
 
         return sim_states
         

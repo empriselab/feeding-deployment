@@ -239,7 +239,7 @@ class PerceptionInterface:
 
     def get_inside_top_transform(self):
         tf = self.get_inside_bottom_transform()
-        tf[0, 3] = 0.115
+        tf[0, 3] = 0.14
         return tf
     
     def get_post_grasp_pose(self):

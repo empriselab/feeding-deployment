@@ -42,31 +42,21 @@ class WebInterface:
         self.web_interface_publisher = rospy.Publisher("/ServerComm", String, queue_size=10)
         self.web_interface_image_publisher = rospy.Publisher("/camera/image/compressed", CompressedImage, queue_size=10)
         self.image_bridge = CvBridge()
-        # self.last_captured_ros_image = None
-        # self.update_web_interface_image(np.zeros((512, 512, 3)))
-        # self.web_interface_image_thread = threading.Thread(target=self._publish_web_interface_image)
-        # self.web_interface_image_thread.start()
-        # The following is a hacky leaky abstraction to handle the one-time preference
-        # setting step at the beginning of FLAIR.
         self.user_preference = None
         self.web_interface_sub = rospy.Subscriber("WebAppComm", String, self._message_callback, queue_size=100)
         time.sleep(1.0)  # Wait for the subscriber to connect
-
-    # def update_web_interface_image(self, image):
-    #     self.last_captured_ros_image = self.image_bridge.cv2_to_compressed_imgmsg(image)
-
-    # def _publish_web_interface_image(self):
-    #     rate = rospy.Rate(1)  # 1Hz
-    #     while not rospy.is_shutdown():
-    #         # print("(web interface) publishing image...")
-    #         self.web_interface_image_publisher.publish(self.last_captured_ros_image)
-    #         rate.sleep()
 
     def _message_callback(self, msg: "String") -> None:
         """Callback for the web interface."""
         print("Received message on WebAppComm: ", msg.data)
         msg_dict = json.loads(msg.data)
-        if msg_dict["state"] == "order_selection" and msg_dict["status"] != "ready_for_initial_data":
+
+        # hack to not run into errors when message does not contain state
+        if "state" not in msg_dict:
+            msg_dict["state"] = None
+
+        if (msg_dict["state"] == "order_selection" and msg_dict["status"] != "ready_for_initial_data") \
+            or (msg_dict["state"] == "voice"):
             self.user_preference = msg_dict["status"]
             print("SETTING USER PREFERENCE: ", self.user_preference)
         elif msg_dict["status"] in ["finish_feeding", "move_to_wiping_position", "drink_pickup", "drink_transfer", "move_to_above_plate", "aquire_food", 0, "bite_skill_selection", "bite_transfer", "mouth_wiping", "return_to_main"]:
@@ -84,10 +74,6 @@ class WebInterface:
 
     def send_web_interface_image(self, image) -> None:
         self.web_interface_image_publisher.publish(self.image_bridge.cv2_to_compressed_imgmsg(image))
-
-    # make sure thread is closed when object is deleted
-    def __del__(self):
-        self.web_interface_image_thread.join()
 
 if __name__ == "__main__":
     rospy.init_node("test_web_interface")
