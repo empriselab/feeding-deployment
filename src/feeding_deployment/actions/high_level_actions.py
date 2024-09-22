@@ -61,6 +61,7 @@ Holding = Predicate("Holding", [tool_type])  # holding tool
 ToolTransferDone = Predicate("ToolTransferDone", [tool_type])  # wiped, drank, or ate
 ToolPrepared = Predicate("ToolPrepared", [tool_type])  # e.g., bite acquired
 PlateInView = Predicate("PlateInView", [])  # of the hand camera
+ResetPos = Predicate("ResetPos", [])  # robot in reset position
 IsUtensil = Predicate("IsUtensil", [tool_type])
 
 # Define high-level actions.
@@ -970,7 +971,6 @@ class LookAtPlateHLA(HighLevelAction):
             pass
         return []
 
-
 class AcquireBiteHLA(HighLevelAction):
     """Bite acquisition; other tools are always prepared."""
 
@@ -1079,6 +1079,47 @@ class AcquireBiteHLA(HighLevelAction):
             pass
         return []
 
+class ResetHLA(HighLevelAction):
+    """Move the robot to retract position without any tool."""
+
+    def get_name(self) -> str:
+        return "Reset"
+
+    def get_operator(self) -> LiftedOperator:
+        return LiftedOperator(
+            self.get_name(),
+            parameters=[],
+            preconditions={LiftedAtom(GripperFree, [])},
+            add_effects={LiftedAtom(ResetPos, [])},
+            delete_effects=set(),
+        )
+
+    def execute_action(
+        self,
+        objects: tuple[Object, ...],
+        params: dict[str, Any],
+    ) -> list[FeedingDeploymentSimulatorState]:
+        assert len(objects) == 1
+        tool = objects[0]
+
+
+        assert self._sim.held_object_name is None
+        sim_states: list[FeedingDeploymentSimulatorState] = []
+        robot_commands = []
+
+        move_to_joint_positions(
+            self._sim,
+            self._sim.scene_description.retract_pos,
+            sim_states,
+            robot_commands,
+            rviz_interface=self._rviz_interface if not self.no_waits else None
+        )
+
+        if self._run_on_robot:
+            self.execute_robot_commands(robot_commands)
+
+        return sim_states
+        
 
 def pddl_plan_to_hla_plan(
     pddl_plan: list[GroundOperator], hlas: set[HighLevelAction]
