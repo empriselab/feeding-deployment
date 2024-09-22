@@ -33,16 +33,32 @@ class ArmInterface:
         self.gravity_compensation_event_lock = threading.Lock()  
 
     def get_state(self):
-        arm_pos, ee_pose, gripper_pos = self.arm.get_state()
+        try:
+            arm_pos, ee_pose, gripper_pos = self.arm.get_state()
+        except Exception as e:
+            print(f"Error in get_state: {e}")
+            # Re-raise a simplified exception to avoid pickling issues
+            raise Exception(f"Error in get_state: {str(e)}") from None # suppress original exception
         return arm_pos, ee_pose, gripper_pos
 
     def reset(self):
         # Go to home position
         print("Moving to home position")
-        self.arm.home()
+        try:
+            self.arm.home()
+        except Exception as e:
+            print(f"Error in reset: {e}")
+            # Re-raise a simplified exception to avoid pickling issues
+            raise Exception(f"Error in reset: {str(e)}") from None # suppress original exception
 
     def set_tool(self, tool: str):
-        self.arm.set_tool(tool)
+        print(f"Setting tool to {tool}")
+        try:
+            self.arm.set_tool(tool)
+        except Exception as e:
+            print(f"Error in set_tool: {e}")
+            # Re-raise a simplified exception to avoid pickling issues
+            raise Exception(f"Error in set_tool: {str(e)}") from None # suppress original exception
 
     def switch_to_task_compliant_mode(self):
 
@@ -56,7 +72,13 @@ class ArmInterface:
 
         # switch to joint compliant mode
         print("Switching to joint compliant mode")
-        self.arm.switch_to_task_compliant_mode(self.command_queue, self.gravity_compensation_event)
+
+        try:
+            self.arm.switch_to_task_compliant_mode(self.command_queue, self.gravity_compensation_event)
+        except Exception as e:
+            print(f"Error in switch_to_task_compliant_mode: {e}")
+            # Re-raise a simplified exception to avoid pickling issues
+            raise Exception(f"Error in switch_to_task_compliant_mode: {str(e)}") from None # suppress original exception
         self.in_compliant_mode = True
 
     def switch_out_of_compliant_mode(self):
@@ -74,9 +96,14 @@ class ArmInterface:
             if self.emergency_stop_active:
                 print("Cannot switch out of compliant mode due to emergency stop")
                 return
-
+    
             print("Switching out of joint compliant mode")
-            self.arm.switch_out_of_compliant_mode()
+            try:
+                self.arm.switch_out_of_compliant_mode()
+            except Exception as e:
+                print(f"Error in switch_out_of_compliant_mode: {e}")
+                # Re-raise a simplified exception to avoid pickling issues
+                raise Exception(f"Error in switch_out_of_compliant_mode: {str(e)}") from None # suppress original exception
             self.in_compliant_mode = False
 
             self.gravity_compensation_event.clear()
@@ -100,7 +127,13 @@ class ArmInterface:
         assert not self.in_compliant_mode, "In compliant mode"
 
         print(f"Received joint pos command: {command_pos}")
-        self.arm.move_angular(command_pos)
+
+        try:
+            self.arm.move_angular(command_pos)
+        except Exception as e:
+            print(f"Error in set_joint_position: {e}")
+            # Re-raise a simplified exception to avoid pickling issues
+            raise Exception(f"Error in set_joint_position: {str(e)}") from None # suppress original exception
 
     def set_joint_trajectory(self, trajectory_command):
 
@@ -110,7 +143,13 @@ class ArmInterface:
         print(
             f"Received joint trajectory command with {len(trajectory_command)} waypoints"
         )
-        self.arm.move_angular_trajectory(trajectory_command)
+
+        try:
+            self.arm.move_angular_trajectory(trajectory_command)
+        except Exception as e:
+            print(f"Error in set_joint_trajectory: {e}")
+            # Re-raise a simplified exception to avoid pickling issues
+            raise Exception(f"Error in set_joint_trajectory: {str(e)}") from None # suppress original exception
 
     def set_ee_pose(self, xyz, xyz_quat):
 
@@ -118,7 +157,13 @@ class ArmInterface:
         assert not self.in_compliant_mode, "In compliant mode"
 
         print(f"Received cartesian pose command: {xyz}, {xyz_quat}")
-        self.arm.move_cartesian(xyz, xyz_quat)
+
+        try:
+            self.arm.move_cartesian(xyz, xyz_quat)
+        except Exception as e:
+            print(f"Error in set_ee_pose: {e}")
+            # Re-raise a simplified exception to avoid pickling issues
+            raise Exception(f"Error in set_ee_pose: {str(e)}") from None # suppress original exception
 
     def set_gripper(self, gripper_pos):
 
@@ -126,7 +171,13 @@ class ArmInterface:
         assert not self.in_compliant_mode, "In compliant mode"
 
         print(f"Received gripper pos command: {gripper_pos}")
-        self.arm._gripper_position_command(gripper_pos)
+
+        try:
+            self.arm._gripper_position_command(gripper_pos)
+        except Exception as e:
+            print(f"Error in set_gripper: {e}")
+            # Re-raise a simplified exception to avoid pickling issues
+            raise Exception(f"Error in set_gripper: {str(e)}") from None # suppress original exception
 
     def open_gripper(self):
 
@@ -134,7 +185,13 @@ class ArmInterface:
         assert not self.in_compliant_mode, "In compliant mode"
 
         print("Received open gripper command")
-        self.arm.open_gripper()
+
+        try:
+            self.arm.open_gripper()
+        except Exception as e:
+            print(f"Error in open_gripper: {e}")
+            # Re-raise a simplified exception to avoid pickling issues
+            raise Exception(f"Error in open_gripper: {str(e)}") from None # suppress original exception
 
     def close_gripper(self):
 
@@ -142,7 +199,13 @@ class ArmInterface:
         assert not self.in_compliant_mode, "In compliant mode"
 
         print("Received close gripper command")
-        self.arm.close_gripper()
+
+        try:
+            self.arm.close_gripper()
+        except Exception as e:
+            print(f"Error in close_gripper: {e}")
+            # Re-raise a simplified exception to avoid pickling issues
+            raise Exception(f"Error in close_gripper: {str(e)}") from None # suppress original exception
 
     def close(self):
         print("Close arm command received")
@@ -151,17 +214,29 @@ class ArmInterface:
             self.emergency_stop()
             time.sleep(1.0) # Wait for the arm to settle
 
-        self.arm.stop() # Exit low level servoing mode incase it was in compliant mode, otherwise stop arm
-        print("Arm stopped")
-        self.arm.disconnect()
-        print("Arm disconnected")
+        try:
+            self.arm.stop() # Exit low level servoing mode incase it was in compliant mode, otherwise stop arm
+            print("Arm stopped")
+            self.arm.disconnect()
+            print("Arm disconnected")
+        except Exception as e:
+            print(f"Error in close: {e}")
+            # Re-raise a simplified exception to avoid pickling issues
+            raise Exception(f"Error in close: {str(e)}") from None # suppress original exception
 
     def retract(self):
 
         assert not self.emergency_stop_active, "Emergency stop is active"
         assert not self.in_compliant_mode, "In compliant mode"
 
-        self.arm.retract()
+        print("Received retract command")
+
+        try:
+            self.arm.retract()
+        except Exception as e:
+            print(f"Error in retract: {e}")
+            # Re-raise a simplified exception to avoid pickling issues
+            raise Exception(f"Error in retract: {str(e)}") from None # suppress original exception
 
     def emergency_stop(self):
         with self.gravity_compensation_event_lock:
@@ -169,7 +244,12 @@ class ArmInterface:
             if self.in_compliant_mode:
                 self.gravity_compensation_event.set()
             else: # If not in compliant mode, stop arm (otherwise, arm is already stopped)
-                self.arm.stop()
+                try:
+                    self.arm.stop()
+                except Exception as e:
+                    print(f"Error in emergency_stop: {e}")
+                    # Re-raise a simplified exception to avoid pickling issues
+                    raise Exception(f"Error in emergency_stop: {str(e)}") from None # suppress original exception
 
             print("Emergency stop activated, will not take any more commands")
 
