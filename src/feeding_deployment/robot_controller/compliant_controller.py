@@ -89,7 +89,8 @@ class CompliantController:
                 self.K_d = np.diag([3.0, 3.0, 3.0, 3.0, 2.0, 2.0])
             elif self.control_type == "task":
                 self.K_T_p = np.diag([100.0, 100.0, 100.0, 100.0, 100.0, 100.0])
-                self.K_T_d = np.diag([20, 20, 20, 20, 20, 20])
+                # self.K_T_d = np.diag([30, 30, 30, 30, 30, 30]) # slow
+                self.K_T_d = np.diag([20, 20, 20, 20, 20, 20]) # fast
 
     def control_callback(self, arm):
         # Initialize variables on first call
