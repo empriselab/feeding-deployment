@@ -812,7 +812,7 @@ class TransferToolHLA(HighLevelAction):
                 self._robot_interface.switch_to_task_compliant_mode()
                 
                 # Do inside-mouth transfer here
-                self.inside_mouth_transfer.execute_transfer_loop()
+                self.inside_mouth_transfer.execute_transfer_loop(maintain_position_at_goal=True)
 
                 if not self.no_waits:
                     input("Press enter to switch out of compliant mode")
