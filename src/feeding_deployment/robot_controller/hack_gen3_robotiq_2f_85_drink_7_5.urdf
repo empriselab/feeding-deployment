@@ -334,6 +334,7 @@
     <limit effort="2000" lower="0" upper="0" velocity="1"/>
     <!-- <origin rpy="0 0 0" xyz="0.095 0.007 0.0"/> -->
     <!-- <origin rpy="0 0 0" xyz="0.097 0.00 -0.002"/> -->
-    <origin rpy="0 1.570796 0" xyz="0.27 0.095 -0.045"/>
+    <!-- <origin rpy="0 1.570796 0" xyz="0.27 0.095 -0.045"/> -->
+    <origin rpy="0 1.570796 0" xyz="0.22 0.03 -0.037"/>
   </joint>
 </robot>
