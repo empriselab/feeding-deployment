@@ -272,6 +272,14 @@ class PickToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.before_transfer_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface if not self.no_waits else None
+            )
+
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
 
@@ -726,6 +734,8 @@ class TransferToolHLA(HighLevelAction):
                 self.wrist_controller.stop_horizontal_spoon_thread()
 
             self._perception_interface.set_head_perception_tool("fork")
+            self._perception_interface.start_head_perception_thread()
+            time.sleep(5.0) # let head perception thread warmstart / robot to stabilize
             self._robot_interface.set_tool("fork")
 
             # Rajat Hack: Just to test interface
@@ -765,7 +775,8 @@ class TransferToolHLA(HighLevelAction):
             robot_commands = []
 
             self._perception_interface.set_head_perception_tool("drink")
-            time.sleep(3.0) # wait for the robot to stabilize so that we can calculate ee force
+            self._perception_interface.start_head_perception_thread()
+            time.sleep(5.0) # let head perception thread warmstart / robot to stabilize
             self._robot_interface.set_tool("drink")
 
             if self._run_on_robot:
@@ -803,6 +814,8 @@ class TransferToolHLA(HighLevelAction):
             robot_commands = []
 
             self._perception_interface.set_head_perception_tool("wipe")
+            self._perception_interface.start_head_perception_thread()
+            time.sleep(5.0) # let head perception thread warmstart / robot to stabilize
             self._robot_interface.set_tool("wipe")
 
             if self._run_on_robot:

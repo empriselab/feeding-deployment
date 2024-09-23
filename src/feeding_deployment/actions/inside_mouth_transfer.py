@@ -127,16 +127,17 @@ class InsideMouthTransfer:
         command = CartesianCommand(pos=target[:3,3], quat=Rotation.from_matrix(target[:3,:3]).as_quat())
         self.robot_interface.execute_command(command)
 
-    def execute_transfer_loop(self, maintain_position_at_goal = False):
+    def start_head_perception_thread(self):
+        self.perception_interface.start_head_perception_thread()
 
+    def execute_transfer_loop(self, maintain_position_at_goal = False):
+        
+        assert self.perception_interface.head_perception_thread_is_running(), "Head perception thread is not running"
+        
         # bias the force torque sensor
         # bias FT sensor
         bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
         bias('bias')
-
-        # start head perception thread
-        self.perception_interface.start_head_perception_thread()
-        time.sleep(2.0) # wait for bias to complete + head perception to give reliable data
 
         closed_loop = True
         run_once = True

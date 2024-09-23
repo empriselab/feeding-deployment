@@ -87,6 +87,9 @@ class PerceptionInterface:
         if self._head_perception is not None:
             self._head_perception.set_tool(tool)
 
+    def head_perception_thread_is_running(self) -> bool:
+        return self.head_perception_running
+
     def start_head_perception_thread(self):
         assert not self.head_perception_running, "Head perception thread is already running"
 
