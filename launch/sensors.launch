@@ -1,0 +1,26 @@
+
+<launch>
+
+    <arg name="base_path" default="/home/isacc/deployment_ws/src/feeding-deployment" />
+    <arg name="python_path" default="/home/isacc/miniconda3/envs/feed/bin/python" />
+
+    <!-- Camera -->
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+        <arg name="align_depth" value="true"/>
+        <arg name="enable_sync" value="true"/>
+        <!-- <arg name="filters" value="pointcloud"/> -->
+    </include>
+
+    <!-- FT sensor -->
+    <include file="$(find netft_rdt_driver)/launch/ft_sensor.launch">
+        <arg name="ip_address" value="192.168.1.23"/>
+        <arg name="rate" value="1000"/>
+    </include>
+
+    <!-- RViz -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg base_path)/config/real.rviz" required="true" />
+
+    <!-- Rosbridge server to communicate with web app-->
+    <node pkg="rosbridge_server" type="rosbridge_websocket" name="rosbridge_websocket" output="screen" />
+
+</launch> 

@@ -775,7 +775,7 @@ class TransferToolHLA(HighLevelAction):
                 self._robot_interface.switch_to_task_compliant_mode()
                 
                 # Do inside-mouth transfer here
-                self.inside_mouth_transfer.execute_transfer_loop()
+                self.inside_mouth_transfer.execute_transfer_loop(maintain_position_at_goal=True)
 
                 if not self.no_waits:
                     input("Press enter to switch out of compliant mode")
@@ -887,9 +887,9 @@ class LookAtPlateHLA(HighLevelAction):
                 items = self.flair.identify_plate(camera_color_data)
                 # flair.set_food_items(items)
                 # self.flair.set_food_items(['banana', 'baby carrot'])
-                # self.flair.set_food_items(['cantaloupe', 'banana'])
+                self.flair.set_food_items(['cantaloupe', 'banana'])
                 # self.flair.set_food_items(['chicken nugget'])
-                self.flair.set_food_items(['banana'])
+                # self.flair.set_food_items(['banana'])
                 items_detection = self.flair.detect_items(camera_color_data, camera_depth_data, camera_info_data, log_path=None)
                 
                 if not self.flair.is_preference_set():
@@ -917,11 +917,21 @@ class LookAtPlateHLA(HighLevelAction):
                     #     pickle.dump(plate_log, f)
 
                     self._web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
-                    time.sleep(0.5) # simulate delay, also needed for web interface
+                    time.sleep(0.2) # simulate delay for web interface
                     self._web_interface.send_web_interface_image(items_detection['plate_image'])
-                    # time.sleep(1.0)  # simulate delay, also needed for web interface
                     self._web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data})
                     self._web_interface.send_web_interface_message({"n_ordering": len(ordering_options), "data": ordering_options})
+
+                    # save all of this in a pickle file:
+                    # import pickle
+                    # with open("meal_start_log.pkl", "wb") as f:
+                    #     meal_start_log = {
+                    #         "plate_image": items_detection['plate_image'],
+                    #         "plate_bounds": items_detection['plate_bounds'],
+                    #         "food_type_to_data": food_type_to_data,
+                    #         "ordering_options": ordering_options,
+                    #     }
+                    #     pickle.dump(meal_start_log, f)
 
                     # self._web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
                     # time.sleep(1.0) # simulate delay, also needed for web interface
@@ -960,8 +970,21 @@ class LookAtPlateHLA(HighLevelAction):
                 data = [{k: v} for k, v in food_type_to_data.items() if k != next_food_item]
                 current_bite = {next_food_item: food_type_to_data[next_food_item]}
 
+                self._web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
+                time.sleep(0.2) # simulate delay, needed for web interface
                 self._web_interface.send_web_interface_image(items_detection['plate_image'])
+                time.sleep(0.1)
                 self._web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data, "current_bite": current_bite})            
+
+                # import pickle
+                # with open("next_bite_log.pkl", "wb") as f:
+                #     next_bite_log = {
+                #         "plate_image": items_detection['plate_image'],
+                #         "plate_bounds": items_detection['plate_bounds'],
+                #         "food_type_to_data": food_type_to_data,
+                #         "next_food_item": next_food_item,
+                #     }
+                #     pickle.dump(next_bite_log, f)
   
             else:
                 # Test image.

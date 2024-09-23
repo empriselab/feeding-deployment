@@ -81,6 +81,27 @@ class ArmInterface:
             raise Exception(f"Error in switch_to_task_compliant_mode: {str(e)}") from None # suppress original exception
         self.in_compliant_mode = True
 
+    def switch_to_joint_compliant_mode(self):
+
+        assert not self.emergency_stop_active, "Emergency stop is active"
+        assert not self.in_compliant_mode, "Already in compliant mode"
+
+        # clear command queue
+        print("Clearing command queue")
+        while not self.command_queue.empty():
+            self.command_queue.get()
+
+        # switch to joint compliant mode
+        print("Switching to joint compliant mode")
+
+        try:
+            self.arm.switch_to_joint_compliant_mode(self.command_queue, self.gravity_compensation_event)
+        except Exception as e:
+            print(f"Error in switch_to_joint_compliant_mode: {e}")
+            # Re-raise a simplified exception to avoid pickling issues
+            raise Exception(f"Error in switch_to_joint_compliant_mode: {str(e)}") from None
+        self.in_compliant_mode = True
+
     def switch_out_of_compliant_mode(self):
 
         assert not self.emergency_stop_active, "Emergency stop is active"
@@ -107,6 +128,15 @@ class ArmInterface:
             self.in_compliant_mode = False
 
             self.gravity_compensation_event.clear()
+
+    def compliant_set_joint_position(self, command_pos):
+
+        assert not self.emergency_stop_active, "Emergency stop is active"
+        assert self.in_compliant_mode, "Not in compliant mode"
+
+        print(f"Received compliant joint pos command: {command_pos}")
+        gripper_pos = 0
+        self.command_queue.put((command_pos, gripper_pos))
 
     def compliant_set_ee_pose(self, xyz, xyz_quat):
             
@@ -207,9 +237,9 @@ class ArmInterface:
             # Re-raise a simplified exception to avoid pickling issues
             raise Exception(f"Error in close_gripper: {str(e)}") from None # suppress original exception
 
-    def close(self):
+    def close(self, no_grav_comp=False):
         print("Close arm command received")
-        if self.in_compliant_mode:
+        if self.in_compliant_mode and not no_grav_comp:
             print("Switching out of compliant mode through emergency stop")
             self.emergency_stop()
             time.sleep(1.0) # Wait for the arm to settle

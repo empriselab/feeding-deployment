@@ -19,7 +19,7 @@ from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
 class FeedingDeploymentPyBulletSimulator:
     """A PyBullet-based simulator for the feeding deployment environment."""
 
-    def __init__(self, scene_description: SceneDescription, use_gui: bool = True) -> None:
+    def __init__(self, scene_description: SceneDescription, use_gui: bool = True, ignore_user = False) -> None:
         self.scene_description = scene_description
 
         # Create the PyBullet client.
@@ -53,31 +53,35 @@ class FeedingDeploymentPyBulletSimulator:
             physicsClientId=self.physics_client_id,
         )
 
-        # Create wheelchair.
-        self._wheelchair_id = p.loadURDF(
-            str(scene_description.wheelchair_urdf_path),
-            useFixedBase=True,
-            physicsClientId=self.physics_client_id,
-        )
-        p.resetBasePositionAndOrientation(
-            self._wheelchair_id,
-            scene_description.wheelchair_pose.position,
-            scene_description.wheelchair_pose.orientation,
-            physicsClientId=self.physics_client_id,
-        )
+        if not ignore_user:
+            # Create wheelchair.
+            self._wheelchair_id = p.loadURDF(
+                str(scene_description.wheelchair_urdf_path),
+                useFixedBase=True,
+                physicsClientId=self.physics_client_id,
+            )
+            p.resetBasePositionAndOrientation(
+                self._wheelchair_id,
+                scene_description.wheelchair_pose.position,
+                scene_description.wheelchair_pose.orientation,
+                physicsClientId=self.physics_client_id,
+            )
 
-        # Create a conservative collision boundary around the wheelchair.
-        self.conservative_bb_id = create_pybullet_block(
-            scene_description.conservative_bb_rgba,
-            half_extents=scene_description.conservative_bb_half_extents,
-            physics_client_id=self.physics_client_id,
-        )
-        p.resetBasePositionAndOrientation(
-            self.conservative_bb_id,
-            scene_description.conservative_bb_pose.position,
-            scene_description.conservative_bb_pose.orientation,
-            physicsClientId=self.physics_client_id,
-        )
+            # Create a conservative collision boundary around the wheelchair.
+            self.conservative_bb_id = create_pybullet_block(
+                scene_description.conservative_bb_rgba,
+                half_extents=scene_description.conservative_bb_half_extents,
+                physics_client_id=self.physics_client_id,
+            )
+            p.resetBasePositionAndOrientation(
+                self.conservative_bb_id,
+                scene_description.conservative_bb_pose.position,
+                scene_description.conservative_bb_pose.orientation,
+                physicsClientId=self.physics_client_id,
+            )
+        else:
+            self._wheelchair_id = None
+            self.conservative_bb_id = None
 
         # Create drink.
         self.drink_id = p.loadURDF(
@@ -147,6 +151,10 @@ class FeedingDeploymentPyBulletSimulator:
             self.wipe_id,
             self.utensil_id,
         }
+
+        # filter none values (wheelchair and conservative_bb_id when ignore_user is True)
+        collision_ids = {x for x in collision_ids if x is not None}
+
         if self.held_object_name == "drink":
             collision_ids.remove(self.drink_id)
         if self.held_object_name == "wipe":

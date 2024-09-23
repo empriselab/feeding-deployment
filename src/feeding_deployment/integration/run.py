@@ -200,8 +200,6 @@ class _Runner:
         # drink_pickup_msg = {"status": "drink_pickup", "state": "pre_bite_pickup"}
         # self.hla_command_queue.put(drink_pickup_msg)
 
-
-
         while not rospy.is_shutdown():
             try:
                 hla_interface_msg = self.hla_command_queue.get(timeout=1)
@@ -227,7 +225,8 @@ class _Runner:
         elif msg_dict["status"] == "move_to_above_plate" \
             or (msg_dict["status"] == "return_to_main" and msg_dict["state"] == "post_bite_pickup") \
             or (msg_dict["status"] == "return_to_main" and msg_dict["state"] == "post_bite_transfer") \
-            or (msg_dict["status"] == "return_to_main" and msg_dict["state"] == "post_drink_transfer"): 
+            or (msg_dict["status"] == "return_to_main" and msg_dict["state"] == "post_drink_transfer") \
+            or (msg_dict["status"] == "back" and msg_dict["state"] == "bite_selection"): 
             user_cmd = GroundHighLevelAction(
                 self.hla_name_to_hla["LookAtPlate"], (self.utensil,)
             )

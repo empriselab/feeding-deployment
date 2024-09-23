@@ -28,18 +28,6 @@
     <!-- Feeding Utensil (Access does not work through roslaunch even after an immense number of tries :( ) -->
     <!-- <node pkg="wrist_driver_ros" type="wrist_driver" name="wrist_driver" output="screen"/> -->
 
-    <!-- Camera -->
-    <include file="$(find realsense2_camera)/launch/rs_rgbd.launch">
-        <arg name="filters" value="pointcloud"/>
-        <arg name="align_depth" value="true"/>
-    </include>
-
-    <!-- FT sensor -->
-    <include file="$(find netft_rdt_driver)/launch/ft_sensor.launch">
-        <arg name="ip_address" value="192.168.1.23"/>
-        <arg name="rate" value="1000"/>
-    </include>
-
     <!-- Emergency Stops -->
 
     <!-- Transfer Complete Button -->
@@ -52,9 +40,6 @@
     <!-- Collision Monitor -->
 
     <!-- Watchdog -->
-    <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_watchdog">
-        <param name="cmd" value="$(arg python_path) $(arg base_path)/src/feeding_deployment/safety/watchdog.py"/>
-    </node>
 
     <!-- Simulated Robot -->
     <group ns="sim">
@@ -77,11 +62,5 @@
         <node name="st_map2world" pkg="tf" type="static_transform_publisher" respawn="false" output="screen" args="0 0 0 0 0 0 1 map sim/world 10"/>
     
     </group>
-
-    <!-- RViz -->
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg base_path)/config/real.rviz" required="true" />
-
-    <!-- Rosbridge server to communicate with web app-->
-    <node pkg="rosbridge_server" type="rosbridge_websocket" name="rosbridge_websocket" output="screen" />
 
 </launch> 

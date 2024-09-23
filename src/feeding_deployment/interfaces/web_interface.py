@@ -59,7 +59,7 @@ class WebInterface:
             or (msg_dict["state"] == "voice"):
             self.user_preference = msg_dict["status"]
             print("SETTING USER PREFERENCE: ", self.user_preference)
-        elif msg_dict["status"] in ["finish_feeding", "move_to_wiping_position", "drink_pickup", "drink_transfer", "move_to_above_plate", "aquire_food", 0, "bite_skill_selection", "bite_transfer", "mouth_wiping", "return_to_main"]:
+        elif msg_dict["status"] in ["finish_feeding", "bite_selection", "move_to_wiping_position", "drink_pickup", "drink_transfer", "move_to_above_plate", "aquire_food", 0, "bite_skill_selection", "bite_transfer", "mouth_wiping", "return_to_main"]:
             print("Received high-level action message from web interface.")
             if self.hla_command_queue is not None:
                 self.hla_command_queue.put(msg_dict)
@@ -82,11 +82,78 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--test_manual_acquisition_pixels", action="store_true")
     parser.add_argument("--test_image_streaming", action="store_true")
+    parser.add_argument("--test_dry_run", action="store_true")
     args = parser.parse_args()
 
     hla_command_queue = queue.Queue()
     web_interface = WebInterface(hla_command_queue)
 
+    if args.test_dry_run:
+        meal_start_log = pickle.load(open("test_log/meal_start_log.pkl", "rb"))
+
+        plate_image = meal_start_log['plate_image']
+        plate_bounds = meal_start_log['plate_bounds']
+        food_type_to_data = meal_start_log['food_type_to_data']
+        ordering_options = meal_start_log['ordering_options']
+
+        n_food_types = len(food_type_to_data)
+        data = [{k: v} for k, v in food_type_to_data.items()]
+
+        input("Press Enter to send look at plate finished message")
+        web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
+        time.sleep(0.2) # simulate delay, also needed for web interface
+        web_interface.send_web_interface_image(plate_image)
+        # time.sleep(1.0)  # simulate delay, also needed for web interface
+        web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data})
+        web_interface.send_web_interface_message({"n_ordering": len(ordering_options), "data": ordering_options})
+
+
+        next_bite_log = pickle.load(open("test_log/next_bite_log.pkl", "rb"))
+        plate_image = next_bite_log['plate_image']
+        plate_bounds = next_bite_log['plate_bounds']
+        food_type_to_data = next_bite_log['food_type_to_data']
+        next_food_item = next_bite_log['next_food_item']
+        n_food_types = len(food_type_to_data)
+        data = [{k: v} for k, v in food_type_to_data.items() if k != next_food_item]
+        current_bite = {next_food_item: food_type_to_data[next_food_item]}
+
+        input("Press Enter to send bite acquisition ready message")
+        web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
+        time.sleep(0.2) # simulate delay, also needed for web interface
+        web_interface.send_web_interface_image(plate_image)
+        time.sleep(0.1)
+        web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data, "current_bite": current_bite})            
+
+        input("Press Enter to send bite acquisition completed message")
+        web_interface.send_web_interface_message({"state": "bite_pickup", "status": "completed"})
+
+        input("Press Enter to send bite transfer ready message")
+        web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
+
+        input("Press Enter to send bite acquisition ready message")
+        web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
+        time.sleep(0.2) # simulate delay, also needed for web interface
+        web_interface.send_web_interface_image(plate_image)
+        time.sleep(0.1)
+        web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data, "current_bite": current_bite})            
+
+        input("Press Enter to send bite acquisition completed message")
+        web_interface.send_web_interface_message({"state": "bite_pickup", "status": "completed"})
+
+        input("Press Enter to send bite transfer ready message")
+        web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
+
+        input("Press Enter to send drink pickup done message")
+        web_interface.send_web_interface_message({"state": "drink_pickup", "status": "completed"})
+
+        input("Press Enter to send drink transfer done message")
+        web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})
+
+        input("Press Enter to send mouth wiping picked up message")
+        web_interface.send_web_interface_message({"state": "prepare_mouth_wiping", "status": "completed"})
+
+        input("Press Enter to send mouth wiping done message")
+        web_interface.send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})
 
     if args.test_manual_acquisition_pixels:
         plate_log = pickle.load(open("test_log/plate_log.pkl", "rb"))
