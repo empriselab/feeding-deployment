@@ -20,7 +20,8 @@ INTERMEDIATE_THRESHOLD_RELAXED = 0.02
 INTERMEDIATE_ANGULAR_THRESHOLD_RELAXED = 5*np.pi/180
 INTERMEDIATE_THRESHOLD = 0.014
 INFRONT_DISTANCE_LOOKAHEAD = 0.04
-INSIDE_DISTANCE_LOOKAHEAD_Z = 0.045
+INSIDE_DISTANCE_LOOKAHEAD_Z = 0.04 # for slower inside mouth movement
+# INSIDE_DISTANCE_LOOKAHEAD_Z = 0.045
 INSIDE_DISTANCE_LOOKAHEAD_XY = 0.025
 ANGULAR_LOOKAHEAD = 5*np.pi/180
 MOVE_OUTSIDE_DISTANCE = 0.12
@@ -126,7 +127,7 @@ class InsideMouthTransfer:
         command = CartesianCommand(pos=target[:3,3], quat=Rotation.from_matrix(target[:3,:3]).as_quat())
         self.robot_interface.execute_command(command)
 
-    def execute_transfer_loop(self):
+    def execute_transfer_loop(self, maintain_position_at_goal = False):
 
         # bias the force torque sensor
         # bias FT sensor
@@ -293,10 +294,13 @@ class InsideMouthTransfer:
                     orientation_lookahead_update = ANGULAR_LOOKAHEAD - intermediate_angular_error
                     target = self.getNextWaypoint(intermediate_forque_target, forque_target_base, distance_lookahead = distance_lookahead_update)
                 
-                self.publishTaskCommand(target)
-                self.rviz_interface.visualizeTransform("base_link", "next_target", target)
-                self.rviz_interface.visualizeTransform("base_link", "final_target", forque_target_base)
-                self.rviz_interface.visualizeTransform("base_link", "intermediate_target", intermediate_forque_target)
+                if (not closed_loop) and maintain_position_at_goal: 
+                    pass # maintain position at goal, do not update target
+                else:
+                    self.publishTaskCommand(target)
+                    self.rviz_interface.visualizeTransform("base_link", "next_target", target)
+                    self.rviz_interface.visualizeTransform("base_link", "final_target", forque_target_base)
+                    self.rviz_interface.visualizeTransform("base_link", "intermediate_target", intermediate_forque_target)
 
             elif current_state == 3: # move outside mouth
 
