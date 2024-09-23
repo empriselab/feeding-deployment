@@ -134,7 +134,7 @@ class ArmInterface:
         assert not self.emergency_stop_active, "Emergency stop is active"
         assert self.in_compliant_mode, "Not in compliant mode"
 
-        print(f"Received compliant joint pos command: {command_pos}")
+        # print(f"Received compliant joint pos command: {command_pos}")
         gripper_pos = 0
         self.command_queue.put((command_pos, gripper_pos))
 
@@ -147,7 +147,7 @@ class ArmInterface:
         command_pose[:3] = xyz
         command_pose[3:] = xyz_quat
 
-        print(f"Received compliant cartesian pose command: {xyz}, {xyz_quat}")
+        # print(f"Received compliant cartesian pose command: {xyz}, {xyz_quat}")
         gripper_pos = 0
         self.command_queue.put((command_pose, gripper_pos))
 
@@ -272,7 +272,9 @@ class ArmInterface:
         with self.gravity_compensation_event_lock:
             self.emergency_stop_active = True
             if self.in_compliant_mode:
-                self.gravity_compensation_event.set()
+                self.in_compliant_mode = False
+                self.arm.switch_to_gravity_compensation_mode()
+                # self.gravity_compensation_event.set()
             else: # If not in compliant mode, stop arm (otherwise, arm is already stopped)
                 try:
                     self.arm.stop()

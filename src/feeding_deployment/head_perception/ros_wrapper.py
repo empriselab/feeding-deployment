@@ -259,8 +259,7 @@ class HeadPerceptionROSWrapper:
         elif self.head_perception.tool == "wipe":
             tool_marker.mesh_resource = "file:////home/isacc/deployment_ws/src/kortex_description/tools/wiping_tool/tool_tip.stl"
         elif self.head_perception.tool == "drink":
-            # Rajat ToDo: Add drink tool mesh
-            tool_marker.mesh_resource = "file:////home/isacc/deployment_ws/src/kortex_description/tools/feeding_tool/tool_tip.stl"
+            tool_marker.mesh_resource = "file:////home/isacc/deployment_ws/src/kortex_description/tools/drinking_tool/tool_tip.stl"
         else:
             raise ValueError(f"Mesh does not exist for tool: {self.head_perception}")
         

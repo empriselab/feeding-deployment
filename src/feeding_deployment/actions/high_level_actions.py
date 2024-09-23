@@ -114,8 +114,6 @@ class HighLevelAction(abc.ABC):
         for robot_command in robot_commands:
             if not self.no_waits:
                 input("Execute next command?")
-            else:
-                time.sleep(0.05) # to get around the weird non-blocking behavior of the robot interface
             self._robot_interface.execute_command(robot_command)
 
 @dataclass(frozen=True)
@@ -767,6 +765,7 @@ class TransferToolHLA(HighLevelAction):
             robot_commands = []
 
             self._perception_interface.set_head_perception_tool("drink")
+            time.sleep(3.0) # wait for the robot to stabilize so that we can calculate ee force
             self._robot_interface.set_tool("drink")
 
             if self._run_on_robot:

@@ -98,10 +98,31 @@ if __name__ == "__main__":
     if run_commands != "y":
         exit()
 
-    input("Press enter to switch to joint compliant mode...")
-    arm_client_interface.switch_to_joint_compliant_mode()
+    before_transfer_pos = [
+        -2.8655331,  
+        -1.61973777, 
+        -2.6097253, 
+        -1.37301134, 
+        1.11781087,
+        -1.18039928,
+        2.05515662
+    ]
 
-    input("Press enter to switch out of compliant mode...")
+    arm_client_interface.execute_command(JointCommand(before_transfer_pos))
+
+    input("Press enter to go to compliance mode...")
+    arm_client_interface.switch_to_task_compliant_mode()
+
+    arm_pos, ee_pose, gripper_pos = arm_client_interface.get_state()
+    drop_test_pose = np.zeros(7)
+    drop_test_pose[:3] = [0.45, 0.62, 0.6]
+    drop_test_pose[3:] = [-0.03083443277876381, 0.7132803649800029, 0.7001853591905794, -0.00456305428030798]
+    drop_test_task_command = CartesianCommand(pos=drop_test_pose[:3], quat=drop_test_pose[3:])
+    
+    input("Press Enter to move to drop test pos")
+    arm_client_interface.execute_command(drop_test_task_command)
+
+    input('Press Enter to switch out of compliant mode')
     arm_client_interface.switch_out_of_compliant_mode()
 
     # close gripper

@@ -228,7 +228,7 @@ class PerceptionInterface:
     def get_pre_grasp_transform(self):
         tf = np.zeros((4, 4))
         tf[:3, :3] = R.from_euler("xyz", [np.pi, 0, np.pi / 2]).as_matrix()
-        tf[:3, 3] = np.array([0.07, -0.02, 0.1])
+        tf[:3, 3] = np.array([0.06, -0.02, 0.1]) # smaller x is more outside
         tf[3, 3] = 1
         return tf
 
