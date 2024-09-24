@@ -151,7 +151,7 @@ class PerceptionInterface:
             tool_tip_staging_pose[:3, 3] = [0.250, 0.272, 0.518]
             tool_tip_staging_pose[:3, :3] = R.from_quat([0.523, -0.503, -0.469, 0.503]).as_matrix()
         elif self._head_perception.head_perception.tool == "drink":
-            tool_tip_staging_pose[:3, 3] = [0.229, 0.304, 0.609]
+            tool_tip_staging_pose[:3, 3] = [0.282, 0.314, 0.546]
             tool_tip_staging_pose[:3, :3] = R.from_quat([0.523, -0.503, -0.469, 0.503]).as_matrix()
         elif self._head_perception.head_perception.tool == "wipe":
             tool_tip_staging_pose[:3, 3] = [0.417, 0.280, 0.509]
