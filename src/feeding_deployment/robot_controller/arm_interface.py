@@ -237,9 +237,9 @@ class ArmInterface:
             # Re-raise a simplified exception to avoid pickling issues
             raise Exception(f"Error in close_gripper: {str(e)}") from None # suppress original exception
 
-    def close(self, no_grav_comp=False):
+    def close(self):
         print("Close arm command received")
-        if self.in_compliant_mode and not no_grav_comp:
+        if self.in_compliant_mode:
             print("Switching out of compliant mode through emergency stop")
             self.emergency_stop()
             time.sleep(1.0) # Wait for the arm to settle
@@ -273,8 +273,7 @@ class ArmInterface:
             self.emergency_stop_active = True
             if self.in_compliant_mode:
                 self.in_compliant_mode = False
-                self.arm.switch_to_gravity_compensation_mode()
-                # self.gravity_compensation_event.set()
+                self.gravity_compensation_event.set()
             else: # If not in compliant mode, stop arm (otherwise, arm is already stopped)
                 try:
                     self.arm.stop()
