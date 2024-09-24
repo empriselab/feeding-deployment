@@ -53,7 +53,41 @@ class CompliantController:
         self.otg_out = None
         self.otg_res = None
 
-        # self.data = []
+        #     "joint_2": {"lower": -2.24, "upper": 2.24},
+        #     "joint_3": {"lower": -math.inf, "upper": math.inf},
+        #     "joint_4": {"lower": -2.57, "upper": 2.57},
+        #     "joint_5": {"lower": -math.inf, "upper": math.inf},
+        #     "joint_6": {"lower": -2.09, "upper": 2.09},
+        #     "joint_7": {"lower": -math.inf, "upper": math.inf},
+        # }
+
+        # Safety checks
+        if not self.fix_joint_hack:
+            self.joint_limits = [
+                (-math.inf, math.inf),
+                (-2.24, 2.24),
+                (-math.inf, math.inf),
+                (-2.57, 2.57),
+                (-math.inf, math.inf),
+                (-2.09, 2.09),
+                (-math.inf, math.inf),
+            ]
+        else:
+            # remove the 6th joint
+            self.joint_limits = [
+                (-math.inf, math.inf),
+                (-2.24, 2.24),
+                (-math.inf, math.inf),
+                (-2.57, 2.57),
+                (-math.inf, math.inf),
+                (-math.inf, math.inf),
+            ]
+
+        # add padding of 15 degrees to the joint limits
+        padding = 15 * np.pi / 180
+        self.soft_joint_limits = []
+        for lower, upper in self.joint_limits:
+            self.soft_joint_limits.append((lower + padding, upper - padding))
 
     def set_contants(self):
 
@@ -161,6 +195,31 @@ class CompliantController:
                 self.otg_out.pass_to_input(self.otg_inp)
                 self.q_d[:] = self.otg_out.new_position
                 self.dq_d[:] = self.otg_out.new_velocity
+
+        # safety check - joint limits
+        within_limits = True
+        wrapped_q_s = np.mod(self.q_s + np.pi, 2 * np.pi) - np.pi
+        for i in range(arm.n_compliant_dofs):
+            if wrapped_q_s[i] < self.soft_joint_limits[i][0] or wrapped_q_s[i] > self.soft_joint_limits[i][1]:
+                within_limits = False
+                break
+
+        # safety check - delta in commands
+        within_range = True
+        if self.control_type == "joint":
+            for i in range(arm.n_compliant_dofs):
+                if np.abs(self.q_s[i] - self.q_d[i]) > 10 * np.pi / 180: # 10 degrees
+                    within_range = False
+                    break
+        elif self.control_type == "task":
+            if np.linalg.norm(self.x_s[:3] - self.x_d[:3]) > 0.1: # 10 cm
+                within_range = False
+
+        if not within_limits or not within_range:
+            self.gravity_compensation_event.set()
+            torque_command = arm.gravity()
+            gripper_command = arm.gripper_pos
+            return torque_command, gripper_command
 
         # self.data.append({
         #     'timestamp': time.time(),

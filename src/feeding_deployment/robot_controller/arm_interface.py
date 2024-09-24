@@ -39,6 +39,15 @@ class ArmInterface:
             print(f"Error in get_state: {e}")
             # Re-raise a simplified exception to avoid pickling issues
             raise Exception(f"Error in get_state: {str(e)}") from None # suppress original exception
+
+        # also check if gravity compensation has been set
+        with self.gravity_compensation_event_lock:
+            if self.gravity_compensation_event.is_set():
+                print("Emergency stop (gravity compensation) activated by controller, will not take any more commands")
+                self.emergency_stop_active = True
+                if self.in_compliant_mode:
+                    self.in_compliant_mode = False
+
         return arm_pos, ee_pose, gripper_pos
 
     def reset(self):
@@ -282,7 +291,7 @@ class ArmInterface:
                     # Re-raise a simplified exception to avoid pickling issues
                     raise Exception(f"Error in emergency_stop: {str(e)}") from None # suppress original exception
 
-            print("Emergency stop activated, will not take any more commands")
+            print("Emergency stop activated by user, will not take any more commands")
 
 class ArmManager(MPBaseManager):
     pass
