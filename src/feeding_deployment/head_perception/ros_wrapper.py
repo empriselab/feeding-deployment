@@ -54,8 +54,17 @@ class HeadPerceptionROSWrapper:
         self.mouth_state_publisher = rospy.Publisher(
             "/head_perception/mouth_state", Bool, queue_size=10
         )
+
         self.head_distance_publisher = rospy.Publisher(
-            "/head_distance", Float64MultiArray, queue_size=10
+            "/head_perception/head_distance", Float64MultiArray, queue_size=10
+        )
+
+        self.noisy_reading_publisher = rospy.Publisher(
+            "/head_perception/unexpected", Bool, queue_size=10
+        )
+
+        self.head_shake_publisher = rospy.Publisher(
+            "/head_perception/head_shake", Bool, queue_size=10
         )
 
         self.tf_buffer_lock = Lock()
@@ -180,6 +189,8 @@ class HeadPerceptionROSWrapper:
             visualization_points_world_frame,
             reference_neck_frame,
             neck_frame,
+            noisy_reading,
+            head_shake,
         ) = self.head_perception.run_deca(
             camera_color_data,
             camera_info_data,
@@ -192,7 +203,10 @@ class HeadPerceptionROSWrapper:
         print("Run DECA time: ", run_deca_end_time - run_deca_start_time)
 
         if visualization_points_world_frame is not None:
+
             self.mouth_state_publisher.publish(mouth_state)
+            self.noisy_reading_publisher.publish(noisy_reading)
+            self.head_shake_publisher.publish(head_shake)
 
             if average_head_point is not None:  
                 head_distance_msg = Float64MultiArray()
