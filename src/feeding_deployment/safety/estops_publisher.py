@@ -38,12 +38,12 @@ class EStopsPublisher:
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--user_estop", type=int)
-    parser.add_argument("--exp_estop", type=int)
+    parser.add_argument("--user_id", type=int)
+    parser.add_argument("--exp_id", type=int)
 
     args = parser.parse_args()
 
-    if args.user_estop is None or args.exp_estop is None:
+    if args.user_id is None or args.exp_id is None:
         audio = pyaudio.PyAudio()
         device_indices = []
         for i in range(audio.get_device_count()):
@@ -54,5 +54,5 @@ if __name__ == "__main__":
         raise ValueError("Please provide the input device index")
     
     rospy.init_node("estop_publisher")
-    estop_publisher = EStopsPublisher(user_estop_id=args.user_estop, experimentor_estop_id=args.exp_estop)
+    estop_publisher = EStopsPublisher(user_estop_id=args.user_id, experimentor_estop_id=args.exp_id)
     estop_publisher.run()

@@ -6,7 +6,6 @@ It validates the following:
     a. The ft sensor is not exceeding the threshold.
     b. The camera perception outputs are within the expected range (ToDo)
     c. The robot's current state is not near collision.
-3. The robot is not in a state of emergency stop (from the user / experimentor emergency stop button).
 If any of the above is not true, the watchdog will return the corresponding AnomalyStatus.
 '''
 
@@ -37,34 +36,10 @@ FT_FREQUENCY_THRESHOLD = 800 # expected is 1000 Hz
 FT_THRESHOLD = [30.0, 30.0, 30.0, 2.0, 2.0, 2.0]
 WITHIN_JOINT_LIMITS_FREQUENCY = 100 # expected is 100 Hz
 COLLISION_FREE_FREQUENCY_THRESHOLD = 100 # expected is 350 Hz (empirical)
-USER_ESTOP_FREQUENCY_THRESHOLD = 50 # expected is 60 Hz
-EXPERIMENTOR_ESTOP_FREQUENCY_THRESHOLD = 50 # expected is 60 Hz
 
 WATCHDOG_RUN_FREQUENCY = 1000
 
-class AnomalyStatus(Enum):
-    UNEXPECTED_ERROR = -1
-    NO_ANOMALY = 0
-    CAMERA_FREQUENCY = 1
-    CAMERA_UNEXPECTED = 2
-    FT_FREQUENCY = 3
-    FT_UNEXPECTED = 4
-    COLLISION_FREE_FREQUENCY = 5
-    COLLISION_FREE_UNEXPECTED = 6
-    USER_ESTOP_FREQUENCY = 7
-    USER_ESTOP_PRESSED = 8
-    EXPERIMENTOR_ESTOP_FREQUENCY = 9
-    EXPERIMENTOR_ESTOP_PRESSED = 10
-    OUTSIDE_JOINT_LIMITS_FREQUENCY = 11
-    OUTSIDE_JOINT_LIMITS_ERROR = 12
-
-class PeekableQueue(queue.Queue):
-    def peek(self):
-        with self.mutex:  # Lock the queue to ensure thread safety
-            if len(self.queue) > 0:
-                return self.queue[0]  # Safely access the first element
-            else:
-                return float('inf') # Handle the case when the queue is empty: Do not pop from an empty queue
+from feeding_deployment.safety.utils import PeekableQueue, AnomalyStatus
 
 class WatchDog:
     def __init__(self):
@@ -101,14 +76,6 @@ class WatchDog:
         self.within_joint_limits_timestamps = PeekableQueue()
         self.within_joint_limits_unexpected = False
 
-        self.user_emergency_stop_sub = rospy.Subscriber('/user_estop', Bool, self.userEmergencyStopCallback, queue_size = queue_size, buff_size = 65536*queue_size)
-        self.user_emergency_stop_timestamps = PeekableQueue()
-        self.user_emergency_stop_pressed = False
-
-        self.experimentor_emergency_stop_sub = rospy.Subscriber('/experimentor_estop', Bool, self.experimentorEmergencyStopCallback, queue_size = queue_size, buff_size = 65536*queue_size)
-        self.experimentor_emergency_stop_timestamps = PeekableQueue()
-        self.experimentor_emergency_stop_pressed = False
-
         self.watchdog_status_pub = rospy.Publisher("/watchdog_status", Bool, queue_size=1)
 
         self.soft_anomaly = False
@@ -143,18 +110,6 @@ class WatchDog:
         self.collision_free_timestamps.put(time.time())
         if not msg.data:
             self.collision_free_unexpected = True
-
-    def userEmergencyStopCallback(self, msg):
-
-        self.user_emergency_stop_timestamps.put(time.time())
-        if msg.data:
-            self.user_emergency_stop_pressed = True
-
-    def experimentorEmergencyStopCallback(self, msg):
-
-        self.experimentor_emergency_stop_timestamps.put(time.time())
-        if msg.data:
-            self.experimentor_emergency_stop_pressed = True
 
     def check_status(self):
         self.second_counter += 1

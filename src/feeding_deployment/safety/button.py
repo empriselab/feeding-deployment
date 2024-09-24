@@ -189,14 +189,14 @@ if __name__ == "__main__":
 
     # add argument parser
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input_device_index", type=int, help="The index of the input device")
+    parser.add_argument("--id", type=int, help="The index of the input device")
     args = parser.parse_args()
 
     # -1 is user emergency stop button
     # 9 is experimentor emergency stop button
     # 7 is transfer button
 
-    if args.input_device_index is None:
+    if args.id is None:
         audio = pyaudio.PyAudio()
         device_indices = []
         for i in range(audio.get_device_count()):
@@ -206,7 +206,7 @@ if __name__ == "__main__":
                 print(f"Device {i}: {device_info['name']}")
         raise ValueError("Please provide the input device index")
 
-    button = Button(args.input_device_index)
+    button = Button(args.id)
     while True:
         if button.check():
             print("E-stop pressed!")
