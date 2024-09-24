@@ -102,6 +102,9 @@ class HeadPerception:
         self.min_rotation_threshold = np.array([np.pi / 18, np.pi / 18, np.pi / 18])
         self.min_distance_threshold = np.array([0.01, 0.01, 0.01])
 
+        self.head_shake_detected = False
+        self.head_shake_threshold = 10 # in degrees
+
         self.current_filepath = os.path.dirname(os.path.abspath(__file__))
 
     def save_tool_tip_transform(self, tool, tool_tip_transform):
@@ -143,6 +146,9 @@ class HeadPerception:
             self.reference_head_points = np.load(self.current_filepath + "/config/" + tool + "/head_points.npy")
             self.reference_neck_frame = np.load(self.current_filepath + "/config/" + tool + "/reference_neck_frame.npy")
 
+    def reset_head_shake_detection(self):
+        self.head_shake_detected = False
+
     def run_deca(
         self,
         image,
@@ -170,6 +176,8 @@ class HeadPerception:
         def get_deca_codedict(image):
 
             input_image = self.getInputImage(image, iscrop=True)
+            if input_image is None:
+                return None, None, None, None
 
             images = input_image["image"].to(self.device)[None, ...]
             tform = input_image["tform"][None, ...]
@@ -183,7 +191,7 @@ class HeadPerception:
         codedict, tform, images, src_pts = get_deca_codedict(image)
 
         if codedict is None:
-            return (None, None, None, None, None, None, None, None, None)
+            return (None, None, None, None, None, None, None, None, None, None, None)
 
         # original_images = torch.tensor(image/255).float().to(self.device)[None,...]
 
@@ -227,7 +235,7 @@ class HeadPerception:
 
         if len(valid_landmarks_selected_world) < 4:
             print("Not enough landmarks to fit model.")
-            return (None, None, None, None, None, None, None, None, None)
+            return (None, None, None, None, None, None, None, None, None, None, None)
 
         valid_landmarks_selected_model = np.array(valid_landmarks_selected_model)
         valid_landmarks_selected_world = np.array(valid_landmarks_selected_world)
@@ -358,6 +366,8 @@ class HeadPerception:
                 visualization_points_world_frame,
                 neck_frame,
                 neck_frame,
+                False,
+                False,
             )
 
         else:
@@ -464,10 +474,26 @@ class HeadPerception:
                         visualization_points_world_frame,
                         self.reference_neck_frame,
                         self.last_neck_frame,
+                        True,
+                        self.head_shake_detected,
                     )
 
             if self.last_trans is not None:
+                current_rotation = trans[:3, :3]
+                last_rotation = self.last_trans[:3, :3]
+
+                relative_rotation = current_rotation.T @ last_rotation
+                relative_rotation = Rotation.from_matrix(relative_rotation)
+                relative_euler = relative_rotation.as_euler("xyz", degrees=True)
+                
+                head_shake_angle = relative_euler[1]
+                
+                if head_shake_angle > self.head_shake_threshold:
+                    self.head_shake_detected = True
+
                 if debug_print:
+                    print("Relative Rotation: ", relative_euler)
+                    print("Head Shake Angle: ", head_shake_angle)
                     print("Unfiltered Movement: ")
                     print(
                         "[x, y, z]: ",
@@ -529,6 +555,8 @@ class HeadPerception:
                         self.last_visualization_points_world_frame,
                         self.reference_neck_frame,
                         self.last_neck_frame,
+                        False,
+                        self.head_shake_detected,
                     )
 
             self.last_trans = trans
@@ -574,6 +602,8 @@ class HeadPerception:
                 visualization_points_world_frame,
                 self.reference_neck_frame,
                 neck_frame,
+                False,
+                self.head_shake_detected,
             )
 
     def is_mouth_open(self, keypoints):
@@ -647,7 +677,8 @@ class HeadPerception:
         if iscrop:
             bbox, bbox_type = self.face_detector_model.run(image)
             if len(bbox) < 4:
-                print("no face detected! run original image")
+                print("no face detected! returning none")
+                return None
                 left = 0
                 right = h - 1
                 top = 0
