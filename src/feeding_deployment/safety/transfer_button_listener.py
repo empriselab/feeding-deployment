@@ -13,7 +13,7 @@ class TransferButtonListener:
     def __init__(self, button_id: int):
 
         self.button = Button(button_id)
-        self.button_pub = rospy.Publisher("/transfer_complete", Bool, queue_size=1)
+        self.button_pub = rospy.Publisher("/transfer_button", Bool, queue_size=1)
 
     def run(self):
         while not rospy.is_shutdown():

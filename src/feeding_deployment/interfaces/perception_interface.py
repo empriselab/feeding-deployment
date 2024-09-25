@@ -158,12 +158,6 @@ class PerceptionInterface:
             tool_tip_staging_pose[:3, :3] = R.from_quat([0.523, -0.503, -0.469, 0.503]).as_matrix()
 
         return tool_tip_staging_pose
-    
-    def wait_for_user_continue_button(self) -> None:
-        print("Waiting for transfer complete button press / ft sensor trigger ...")
-        msg = rospy.wait_for_message("/transfer_complete", Bool)
-        assert msg.data
-        print("Received message, continuing ...")
 
     def getTransformationFromTF(self, source_frame, target_frame):
 

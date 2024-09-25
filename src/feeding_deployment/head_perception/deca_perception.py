@@ -146,9 +146,6 @@ class HeadPerception:
             self.reference_head_points = np.load(self.current_filepath + "/config/" + tool + "/head_points.npy")
             self.reference_neck_frame = np.load(self.current_filepath + "/config/" + tool + "/reference_neck_frame.npy")
 
-    def reset_head_shake_detection(self):
-        self.head_shake_detected = False
-
     def run_deca(
         self,
         image,
@@ -157,6 +154,7 @@ class HeadPerception:
         base_to_camera,
         debug_print=False,
         visualize=False,
+        filter_noisy_readings=False,
     ):
         '''
         The realsense camera is inverted vertically, leading to flipped images.
@@ -360,14 +358,14 @@ class HeadPerception:
                 landmark2d,
                 landmarks3d,
                 viz_image,
-                mouth_state,
+                None,
                 average_head_point,
                 self.reference_tool_tip_transform,
                 visualization_points_world_frame,
                 neck_frame,
                 neck_frame,
-                False,
-                False,
+                None,
+                None,
             )
 
         else:
@@ -460,47 +458,33 @@ class HeadPerception:
             )
 
             if self.last_trans is not None:
-                if (np.any(np.abs(translation_from_reference) > self.max_distance_threshold)
+                if (filter_noisy_readings and np.any(np.abs(translation_from_reference) > self.max_distance_threshold)
                      or np.any( np.abs(rotation_from_reference) > self.max_rotation_threshold)):
-                    print("Noisy reading!")
+                    # print("Noisy reading!")
 
                     return (
                         landmark2d,
                         landmarks3d,
                         viz_image,
-                        mouth_state,
+                        None,
                         average_head_point,
                         self.last_forque_target_pose,
                         visualization_points_world_frame,
                         self.reference_neck_frame,
                         self.last_neck_frame,
                         True,
-                        self.head_shake_detected,
+                        None,
                     )
 
-            if self.last_trans is not None:
-                current_rotation = trans[:3, :3]
-                last_rotation = self.last_trans[:3, :3]
+            if self.last_neck_frame is not None:
+                current_rotation = neck_frame[:3, :3]
+                last_rotation = self.last_neck_frame[:3, :3]
 
                 relative_rotation = current_rotation.T @ last_rotation
                 relative_rotation = Rotation.from_matrix(relative_rotation)
-                relative_euler = relative_rotation.as_euler("xyz", degrees=True)
-                
-                head_shake_angle = relative_euler[1]
-                
-                if head_shake_angle > self.head_shake_threshold:
-                    self.head_shake_detected = True
-
-                if debug_print:
-                    print("Relative Rotation: ", relative_euler)
-                    print("Head Shake Angle: ", head_shake_angle)
-                    print("Unfiltered Movement: ")
-                    print(
-                        "[x, y, z]: ",
-                        (trans[:3, 3] - self.last_trans[:3, 3]).reshape(
-                            3,
-                        ),
-                    )
+                neck_rotation = relative_rotation.as_euler("xyz", degrees=True)
+            else:
+                neck_rotation = None
 
             self.trans_perception_buffer.append(trans)
             self.neck_frame_perception_buffer.append(neck_frame)
@@ -556,7 +540,7 @@ class HeadPerception:
                         self.reference_neck_frame,
                         self.last_neck_frame,
                         False,
-                        self.head_shake_detected,
+                        neck_rotation,
                     )
 
             self.last_trans = trans
@@ -603,7 +587,7 @@ class HeadPerception:
                 self.reference_neck_frame,
                 neck_frame,
                 False,
-                self.head_shake_detected,
+                neck_rotation,
             )
 
     def is_mouth_open(self, keypoints):
@@ -677,14 +661,14 @@ class HeadPerception:
         if iscrop:
             bbox, bbox_type = self.face_detector_model.run(image)
             if len(bbox) < 4:
-                print("no face detected! returning none")
+                # print("no face detected! returning none")
                 return None
                 left = 0
                 right = h - 1
                 top = 0
                 bottom = w - 1
             else:
-                print("face detected!")
+                # print("face detected!")
                 left = bbox[0]
                 right = bbox[2]
                 top = bbox[1]
