@@ -63,8 +63,8 @@ class HeadPerceptionROSWrapper:
             "/head_perception/unexpected", Bool, queue_size=10
         )
 
-        self.head_shake_publisher = rospy.Publisher(
-            "/head_perception/head_shake", Bool, queue_size=10
+        self.neck_rotation_publisher = rospy.Publisher(
+            "/head_perception/neck_rotation", Point, queue_size=10
         )
 
         self.tf_buffer_lock = Lock()
@@ -99,7 +99,15 @@ class HeadPerceptionROSWrapper:
         ts_top.registerCallback(self.rgbdCallback)
         ts_top.enable_reset = True
 
+        self.filter_noisy_readings = False
+        self.filter_noisy_readings_sub = rospy.Subscriber(
+            "/head_perception/set_filter_noisy_readings", Bool, self.setFilterNoisyReadingsCallback, queue_size=1
+        )
+    
         time.sleep(2.0) # sleep until all subscribers are registered
+
+    def setFilterNoisyReadingsCallback(self, msg):
+        self.filter_noisy_readings = msg.data
 
     def rgbdCallback(self, rgb_image_msg, camera_info_msg, depth_image_msg):
         # print("RGB Callback")
@@ -142,19 +150,19 @@ class HeadPerceptionROSWrapper:
             tf2_ros.ConnectivityException,
             tf2_ros.ExtrapolationException,
         ):
-            print("Exception finding transform between base_link and", target_frame)
+            # print("Exception finding transform between base_link and", target_frame)
             return None
 
     def run_head_perception(self, visualize=False):
 
-        print("Running Head Perception")
+        # print("Running Head Perception")
         transform = None
         while transform is None:
             camera_color_data, camera_info_data, camera_depth_data, _ = (
                 self.get_camera_data()
             )
             if camera_info_data is None:
-                print("No camera data")
+                # print("No camera data")
                 time.sleep(0.01)
                 continue
             transform = self.get_base_to_camera_transform(camera_info_data)
@@ -178,7 +186,7 @@ class HeadPerceptionROSWrapper:
         base_to_camera[3, 3] = 1
 
         run_deca_start_time = time.time()
-        print("Calling DECA")
+        # print("Calling DECA")
         (
             landmarks2d,
             landmarks3d,
@@ -190,7 +198,7 @@ class HeadPerceptionROSWrapper:
             reference_neck_frame,
             neck_frame,
             noisy_reading,
-            head_shake,
+            neck_rotation,
         ) = self.head_perception.run_deca(
             camera_color_data,
             camera_info_data,
@@ -198,15 +206,24 @@ class HeadPerceptionROSWrapper:
             base_to_camera,
             debug_print=False,
             visualize=visualize,
+            filter_noisy_readings=self.filter_noisy_readings,
         )
         run_deca_end_time = time.time()
-        print("Run DECA time: ", run_deca_end_time - run_deca_start_time)
+        # print("Run DECA time: ", run_deca_end_time - run_deca_start_time)
 
         if visualization_points_world_frame is not None:
 
-            self.mouth_state_publisher.publish(mouth_state)
-            self.noisy_reading_publisher.publish(noisy_reading)
-            self.head_shake_publisher.publish(head_shake)
+            if mouth_state is not None:
+                self.mouth_state_publisher.publish(mouth_state)
+            if self.filter_noisy_readings: # do not shutdown robot if warm starting / kill_on_noisy_reading is False
+                if noisy_reading is not None:
+                    self.noisy_reading_publisher.publish(noisy_reading)
+            if neck_rotation is not None:
+                neck_rotation_msg = Point()
+                neck_rotation_msg.x = neck_rotation[0]
+                neck_rotation_msg.y = neck_rotation[1]
+                neck_rotation_msg.z = neck_rotation[2]
+                self.neck_rotation_publisher.publish(neck_rotation_msg)
 
             if average_head_point is not None:  
                 head_distance_msg = Float64MultiArray()
@@ -226,6 +243,9 @@ class HeadPerceptionROSWrapper:
                 self.updateTF("base_link", "tool_tip_target", tool_tip_target_pose)
             self.updateTF("base_link", "head_pose", neck_frame)
             self.updateTF("base_link", "reference_head_pose", reference_neck_frame)
+        else:
+            if self.filter_noisy_readings:
+                self.noisy_reading_publisher.publish(Bool(data=True))
 
         return tool_tip_target_pose
 
@@ -264,7 +284,7 @@ class HeadPerceptionROSWrapper:
             tool_marker.header.frame_id = "camera_color_optical_frame"
         else:
             tool_marker.header.frame_id = "base_link"
-        print(" --- Header frame id: ", tool_marker.header.frame_id)
+        # print(" --- Header frame id: ", tool_marker.header.frame_id)
         tool_marker.ns = "tool_marker"
         tool_marker.id = 1
         tool_marker.type = tool_marker.MESH_RESOURCE  # CUBE LIST

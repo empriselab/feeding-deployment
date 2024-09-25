@@ -10,6 +10,7 @@ class Speak:
         rospy.init_node('Speak', anonymous=True)
         rospy.Subscriber("/speak", String, self.callback, queue_size=10)
         self.engine = pyttsx3.init()
+        self.engine.setProperty('volume', 1.0)  # Set volume to 100%
         print("Speak node initialized")
 
     # Speak the text

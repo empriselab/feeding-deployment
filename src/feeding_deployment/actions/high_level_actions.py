@@ -737,6 +737,7 @@ class TransferToolHLA(HighLevelAction):
             self._perception_interface.start_head_perception_thread()
             time.sleep(5.0) # let head perception thread warmstart / robot to stabilize
             self._robot_interface.set_tool("fork")
+            self.inside_mouth_transfer.set_tool("fork")
 
             # Rajat Hack: Just to test interface
             if self._run_on_robot:
@@ -778,6 +779,7 @@ class TransferToolHLA(HighLevelAction):
             self._perception_interface.start_head_perception_thread()
             time.sleep(5.0) # let head perception thread warmstart / robot to stabilize
             self._robot_interface.set_tool("drink")
+            self.inside_mouth_transfer.set_tool("drink")
 
             if self._run_on_robot:
                 if not self.no_waits:
@@ -817,6 +819,7 @@ class TransferToolHLA(HighLevelAction):
             self._perception_interface.start_head_perception_thread()
             time.sleep(5.0) # let head perception thread warmstart / robot to stabilize
             self._robot_interface.set_tool("wipe")
+            self.inside_mouth_transfer.set_tool("wipe")
 
             if self._run_on_robot:
                 if not self.no_waits:
