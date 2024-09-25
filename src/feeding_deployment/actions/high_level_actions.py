@@ -272,6 +272,12 @@ class PickToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
+            if self._run_on_robot:
+                self.execute_robot_commands(robot_commands)
+            robot_commands = []
+
+            self._perception_interface.record_drink_pickup_joint_pos()
+
             move_to_joint_positions(
                 self._sim,
                 self._sim.scene_description.before_transfer_pos,
@@ -282,8 +288,6 @@ class PickToolHLA(HighLevelAction):
 
             if self._run_on_robot:
                 self.execute_robot_commands(robot_commands)
-
-            self._perception_interface.record_drink_pickup_joint_pos()
 
             # Send message to web interface.
             self._web_interface.send_web_interface_message({"state": "drink_pickup", "status": "completed"})
@@ -483,7 +487,15 @@ class StowToolHLA(HighLevelAction):
             sim_states: list[FeedingDeploymentSimulatorState] = []
             robot_commands = []
 
-            last_drink_poses, last_drink_pickup_joint_pos = self._perception_interface.get_last_drink_pickup_configs()
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.before_transfer_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface if not self.no_waits else None
+            )
+
+            last_drink_poses, last_drink_pickup_joint_pos = self._perception_interface.get_last_drink_pickup_configs(study_poses=True)
 
             move_to_joint_positions(
                 self._sim,
@@ -530,6 +542,14 @@ class StowToolHLA(HighLevelAction):
             move_to_joint_positions(
                 self._sim,
                 self._sim.scene_description.drink_staging_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface if not self.no_waits else None
+            )
+
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface if not self.no_waits else None

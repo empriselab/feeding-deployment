@@ -59,7 +59,7 @@ class WebInterface:
             or (msg_dict["state"] == "voice"):
             self.user_preference = msg_dict["status"]
             print("SETTING USER PREFERENCE: ", self.user_preference)
-        elif msg_dict["status"] in ["finish_feeding", "bite_selection", "move_to_wiping_position", "drink_pickup", "drink_transfer", "move_to_above_plate", "aquire_food", 0, "bite_skill_selection", "bite_transfer", "mouth_wiping", "return_to_main"]:
+        elif msg_dict["status"] in ["finish_feeding", "back", "move_to_wiping_position", "drink_pickup", "drink_transfer", "move_to_above_plate", "aquire_food", 0, "bite_skill_selection", "bite_transfer", "mouth_wiping", "return_to_main"]:
             print("Received high-level action message from web interface.")
             if self.hla_command_queue is not None:
                 self.hla_command_queue.put(msg_dict)

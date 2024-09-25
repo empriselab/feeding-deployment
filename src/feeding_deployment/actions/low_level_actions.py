@@ -70,7 +70,7 @@ def move_to_joint_positions(
         robot_commands.append(JointCommand(pos=target_joint_positions[:7]))
  
     else:
-
+        raise NotImplementedError("No direct path found. But motion planning is not implemented yet.")
         print("No direct path found. Running motion planning.")
         plan = run_motion_planning(
             robot=sim.robot,

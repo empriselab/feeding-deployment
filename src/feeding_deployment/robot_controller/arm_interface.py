@@ -43,7 +43,7 @@ class ArmInterface:
         # also check if gravity compensation has been set
         with self.gravity_compensation_event_lock:
             if self.gravity_compensation_event.is_set():
-                print("Emergency stop (gravity compensation) activated by controller, will not take any more commands")
+                # print("Emergency stop (gravity compensation) activated by controller, will not take any more commands")
                 self.emergency_stop_active = True
                 if self.in_compliant_mode:
                     self.in_compliant_mode = False
