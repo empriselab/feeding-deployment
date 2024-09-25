@@ -226,7 +226,7 @@ class HeadPerception:
             landmarks_selected_world.append(point)
 
         if len(valid_landmarks_selected_world) < 4:
-            print("Not enough landmarks to fit model.")
+            # print("Not enough landmarks to fit model.")
             return (None, None, None, None, None, None, None, None, None, None, None)
 
         valid_landmarks_selected_model = np.array(valid_landmarks_selected_model)

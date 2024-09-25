@@ -72,8 +72,8 @@ class InsideMouthTransfer:
         self.neck_rotation_sub = rospy.Subscriber('/head_perception/neck_rotation', Point, self.neck_rotation_callback)
 
         self.ready_for_transfer_interaction = "voice" # "silent", "voice" or "led"
-        self.initiate_transfer_interaction = "button" # "button", "open_mouth" or "auto_timeout"
-        self.transfer_complete_interaction = "button" # "button", "sense" or "auto_timeout"
+        self.initiate_transfer_interaction = "open_mouth" # "button", "open_mouth" or "auto_timeout"
+        self.transfer_complete_interaction = "sense" # "button", "sense" or "auto_timeout"
 
         self.tool = None
 
