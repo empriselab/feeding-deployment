@@ -202,9 +202,28 @@ class PerceptionInterface:
     
     def record_drink_pickup_joint_pos(self):
         self.drink_pickup_joint_pos = self.get_robot_joints()[:7]
+        # save them in a pickle file
+        import pickle
+        drink_pickup_pos = {
+            "last_drink_poses": self.last_drink_poses,
+            "drink_pickup_joint_pos": self.drink_pickup_joint_pos
+        }
+        with open('drink_pickup_pos.pkl', 'wb') as f:
+            pickle.dump(drink_pickup_pos, f)
+        print("Drink pickup poses recorded")
 
     def get_last_drink_pickup_configs(self):
-        return self.last_drink_poses, self.drink_pickup_joint_pos
+        try:
+            last_drink_poses = self.last_drink_poses
+            drink_pickup_joint_pos = self.drink_pickup_joint_pos
+        except Exception as e:
+            print("Error loading drink pickup poses from file")
+            with open('drink_pickup_pos.pkl', 'rb') as f:
+                drink_pickup_pos = pickle.load(f)
+            last_drink_poses = drink_pickup_pos["last_drink_poses"]
+            drink_pickup_joint_pos = drink_pickup_pos["drink_pickup_joint_pos"]
+        
+        return last_drink_poses, drink_pickup_joint_pos
 
     def get_aruco_relative_pose(self, transform, override_angles = True):
         aruco_pos_mat = self.pose_to_matrix(self.aruco_pose)
