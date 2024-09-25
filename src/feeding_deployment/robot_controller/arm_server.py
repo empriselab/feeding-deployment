@@ -4,6 +4,10 @@ import sys
 from feeding_deployment.robot_controller.kinova import KinovaArm
 from feeding_deployment.robot_controller.arm_interface import ArmInterface, ArmManager, NUC_HOSTNAME, ARM_RPC_PORT, RPC_AUTHKEY
 
+y = input("Is bulldog ready to be run again? (y/n): ")
+if y != 'y':
+    sys.exit(0)
+
 # Create a single instance of KinovaArm and ArmInterface
 kinova_arm_instance = KinovaArm()
 arm_interface_instance = ArmInterface(kinova_arm_instance)
