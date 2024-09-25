@@ -22,7 +22,8 @@ class ArmInterface:
         # self.arm.set_joint_limits(speed_limits=(7 * (30,)), acceleration_limits=(7 * (80,)))
         
         self.command_queue = queue.Queue(1)
-        self.gravity_compensation_event = threading.Event()
+        self.gravity_compensation_external_event = threading.Event()
+        self.gravity_compensation_internal_event = threading.Event()
         self.in_compliant_mode = False
 
         self.emergency_stop_active = False
@@ -30,7 +31,7 @@ class ArmInterface:
 
         # Lock to handle a corner case where the gravity compensation event is set by self.emergency_stop(),
         # but cleared by self.switch_out_of_compliant_mode().
-        self.gravity_compensation_event_lock = threading.Lock()  
+        self.gravity_compensation_external_event_lock = threading.Lock()  
 
     def is_alive(self):
         return True
@@ -43,13 +44,12 @@ class ArmInterface:
             # Re-raise a simplified exception to avoid pickling issues
             raise Exception(f"Error in get_state: {str(e)}") from None # suppress original exception
 
-        # also check if gravity compensation has been set
-        with self.gravity_compensation_event_lock:
-            if self.gravity_compensation_event.is_set():
-                # print("Emergency stop (gravity compensation) activated by controller, will not take any more commands")
-                self.emergency_stop_active = True
-                if self.in_compliant_mode:
-                    self.in_compliant_mode = False
+        # also check if gravity compensation has been set by the controller
+        if self.gravity_compensation_internal_event.is_set():
+            print("Emergency stop (gravity compensation) activated by controller, will not take any more commands")
+            self.emergency_stop_active = True
+            if self.in_compliant_mode:
+                self.in_compliant_mode = False
 
         return arm_pos, ee_pose, gripper_pos
 
@@ -86,7 +86,7 @@ class ArmInterface:
         print("Switching to joint compliant mode")
 
         try:
-            self.arm.switch_to_task_compliant_mode(self.command_queue, self.gravity_compensation_event)
+            self.arm.switch_to_task_compliant_mode(self.command_queue, self.gravity_compensation_external_event, self.gravity_compensation_internal_event)
         except Exception as e:
             print(f"Error in switch_to_task_compliant_mode: {e}")
             # Re-raise a simplified exception to avoid pickling issues
@@ -107,7 +107,7 @@ class ArmInterface:
         print("Switching to joint compliant mode")
 
         try:
-            self.arm.switch_to_joint_compliant_mode(self.command_queue, self.gravity_compensation_event)
+            self.arm.switch_to_joint_compliant_mode(self.command_queue, self.gravity_compensation_external_event, self.gravity_compensation_internal_event)
         except Exception as e:
             print(f"Error in switch_to_joint_compliant_mode: {e}")
             # Re-raise a simplified exception to avoid pickling issues
@@ -119,11 +119,12 @@ class ArmInterface:
         assert not self.emergency_stop_active, "Emergency stop is active"
         assert self.in_compliant_mode, "Not in compliant mode"
 
-        with self.gravity_compensation_event_lock:
-            # first move to gravity compensation 
-            print("Moving to gravity compensation")
-            self.gravity_compensation_event.set()
-            time.sleep(1.0) # Wait for the arm to settle
+        # first move to gravity compensation 
+        print("Moving to gravity compensation")
+        self.gravity_compensation_external_event.set()
+        time.sleep(1.0) # Wait for the arm to settle
+
+        with self.gravity_compensation_external_event_lock:
 
             # switch out of joint compliant mode
             if self.emergency_stop_active:
@@ -139,7 +140,7 @@ class ArmInterface:
                 raise Exception(f"Error in switch_out_of_compliant_mode: {str(e)}") from None # suppress original exception
             self.in_compliant_mode = False
 
-            self.gravity_compensation_event.clear()
+            self.gravity_compensation_external_event.clear()
 
     def compliant_set_joint_position(self, command_pos):
 
@@ -281,11 +282,11 @@ class ArmInterface:
             raise Exception(f"Error in retract: {str(e)}") from None # suppress original exception
 
     def emergency_stop(self):
-        with self.gravity_compensation_event_lock:
+        with self.gravity_compensation_external_event_lock:
             self.emergency_stop_active = True
             if self.in_compliant_mode:
                 self.in_compliant_mode = False
-                self.gravity_compensation_event.set()
+                self.gravity_compensation_external_event.set()
             else: # If not in compliant mode, stop arm (otherwise, arm is already stopped)
                 try:
                     self.arm.stop()
