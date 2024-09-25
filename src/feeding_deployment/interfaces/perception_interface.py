@@ -8,7 +8,7 @@ from pybullet_helpers.geometry import Pose
 from pybullet_helpers.joint import JointPositions
 from scipy.spatial.transform import Rotation as R
 import json
-
+import pickle
 
 try:
     import rospy
@@ -203,7 +203,6 @@ class PerceptionInterface:
     def record_drink_pickup_joint_pos(self):
         self.drink_pickup_joint_pos = self.get_robot_joints()[:7]
         # save them in a pickle file
-        import pickle
         drink_pickup_pos = {
             "last_drink_poses": self.last_drink_poses,
             "drink_pickup_joint_pos": self.drink_pickup_joint_pos
@@ -212,16 +211,22 @@ class PerceptionInterface:
             pickle.dump(drink_pickup_pos, f)
         print("Drink pickup poses recorded")
 
-    def get_last_drink_pickup_configs(self):
-        try:
-            last_drink_poses = self.last_drink_poses
-            drink_pickup_joint_pos = self.drink_pickup_joint_pos
-        except Exception as e:
-            print("Error loading drink pickup poses from file")
-            with open('drink_pickup_pos.pkl', 'rb') as f:
+    def get_last_drink_pickup_configs(self, study_poses = False):
+        if study_poses:
+            with open('study_drink_pickup_pos.pkl', 'rb') as f:
                 drink_pickup_pos = pickle.load(f)
             last_drink_poses = drink_pickup_pos["last_drink_poses"]
             drink_pickup_joint_pos = drink_pickup_pos["drink_pickup_joint_pos"]
+        else:
+            try:
+                last_drink_poses = self.last_drink_poses
+                drink_pickup_joint_pos = self.drink_pickup_joint_pos
+            except Exception as e:
+                print("Error loading drink pickup poses from script, using values from file instead")
+                with open('drink_pickup_pos.pkl', 'rb') as f:
+                    drink_pickup_pos = pickle.load(f)
+                last_drink_poses = drink_pickup_pos["last_drink_poses"]
+                drink_pickup_joint_pos = drink_pickup_pos["drink_pickup_joint_pos"]
         
         return last_drink_poses, drink_pickup_joint_pos
 
@@ -244,7 +249,7 @@ class PerceptionInterface:
     def get_pre_grasp_transform(self):
         tf = np.zeros((4, 4))
         tf[:3, :3] = R.from_euler("xyz", [np.pi, 0, np.pi / 2]).as_matrix()
-        tf[:3, 3] = np.array([0.06, -0.02, 0.1]) # smaller x is more outside
+        tf[:3, 3] = np.array([0.09, -0.02, 0.1]) 
         tf[3, 3] = 1
         return tf
 
@@ -260,7 +265,7 @@ class PerceptionInterface:
     
     def get_post_grasp_pose(self):
         tf = self.get_inside_top_transform()
-        tf[0, 3] = 0.2
+        tf[0, 3] = 0.25
         return tf
     
     def get_place_inside_bottom_transform(self):

@@ -99,12 +99,6 @@ class HeadPerception:
         )
         self.max_distance_threshold = np.array([0.4, 0.4, 0.4])  # m
 
-        self.min_rotation_threshold = np.array([np.pi / 18, np.pi / 18, np.pi / 18])
-        self.min_distance_threshold = np.array([0.01, 0.01, 0.01])
-
-        self.head_shake_detected = False
-        self.head_shake_threshold = 10 # in degrees
-
         self.current_filepath = os.path.dirname(os.path.abspath(__file__))
 
     def save_tool_tip_transform(self, tool, tool_tip_transform):
