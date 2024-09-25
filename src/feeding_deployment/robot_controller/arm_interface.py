@@ -282,6 +282,8 @@ class ArmInterface:
             raise Exception(f"Error in retract: {str(e)}") from None # suppress original exception
 
     def emergency_stop(self):
+        assert not self.emergency_stop_active, "Emergency stop is already active"
+
         with self.gravity_compensation_external_event_lock:
             self.emergency_stop_active = True
             if self.in_compliant_mode:

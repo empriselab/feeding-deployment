@@ -32,7 +32,7 @@ from netft_rdt_driver.srv import String_cmd
 from feeding_deployment.robot_controller.arm_interface import ArmInterface, ArmManager, NUC_HOSTNAME, ARM_RPC_PORT, RPC_AUTHKEY
 
 
-CAMERA_FREQUENCY_THRESHOLD = 0 # expected is 30 Hz
+CAMERA_FREQUENCY_THRESHOLD = 10 # expected is 30 Hz
 FT_FREQUENCY_THRESHOLD = 800 # expected is 1000 Hz
 FT_THRESHOLD = [30.0, 30.0, 30.0, 2.0, 2.0, 2.0]
 WITHIN_JOINT_LIMITS_FREQUENCY = 100 # expected is 100 Hz
@@ -110,6 +110,7 @@ class WatchDog:
 
     def check_status(self):
         self.second_counter += 1
+        self._arm_interface.is_alive()
         anomaly = AnomalyStatus.NO_ANOMALY
         start_time = time.time()
         frequencies = []
