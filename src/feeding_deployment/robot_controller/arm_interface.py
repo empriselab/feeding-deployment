@@ -32,6 +32,9 @@ class ArmInterface:
         # but cleared by self.switch_out_of_compliant_mode().
         self.gravity_compensation_event_lock = threading.Lock()  
 
+    def is_alive(self):
+        return True
+
     def get_state(self):
         try:
             arm_pos, ee_pose, gripper_pos = self.arm.get_state()
