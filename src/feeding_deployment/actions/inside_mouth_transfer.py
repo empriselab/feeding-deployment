@@ -72,8 +72,8 @@ class InsideMouthTransfer:
         self.neck_rotation_sub = rospy.Subscriber('/head_perception/neck_rotation', Point, self.neck_rotation_callback)
 
         self.ready_for_transfer_interaction = "voice" # "silent", "voice" or "led"
-        self.initiate_transfer_interaction = "auto_timeout" # "button", "open_mouth" or "auto_timeout"
-        self.transfer_complete_interaction = "auto_timeout" # "button", "sense" or "auto_timeout"
+        self.initiate_transfer_interaction = "button" # "button", "open_mouth" or "auto_timeout"
+        self.transfer_complete_interaction = "button" # "button", "sense" or "auto_timeout"
 
         self.tool = None
 
@@ -217,7 +217,7 @@ class InsideMouthTransfer:
 
             interp_rotations = slerp([angular_lookahead/orientation_error]) #second last is also aligned
             next_waypoint[:3,:3] = interp_rotations[0].as_matrix()
-
+        
         return next_waypoint
 
     # def publishTaskMode(self, mode):
