@@ -69,6 +69,7 @@ class BullDog:
 
     def check_status(self):
         self.second_counter += 1
+        self._arm_interface.is_alive()
         anomaly = AnomalyStatus.NO_ANOMALY
         start_time = time.time()
         frequencies = []
