@@ -220,7 +220,6 @@ class CompliantController:
                 print("[Compliant Controller] Command is too far from current position: Switching to gravity compensation")
                 print(f"Current position: {self.x_s[:3]}")
                 print(f"Commanded position: {self.x_d[:3]}")
-                break
 
         if not within_limits or not within_range:
             self.gravity_compensation_internal_event.set()

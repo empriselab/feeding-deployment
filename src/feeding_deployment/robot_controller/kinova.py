@@ -1110,18 +1110,18 @@ class KinovaArm:
 
         print("Arm is in gravity compensation mode")
 
-    def switch_to_joint_compliant_mode(self, command_queue, gravity_compensation_event):
+    def switch_to_joint_compliant_mode(self, command_queue, gravity_compensation_external_event, gravity_compensation_internal_event):
 
-        controller = CompliantController(command_queue, gravity_compensation_event, control_type="joint", fix_joint_hack=self.fix_joint_hack)
+        controller = CompliantController(command_queue, gravity_compensation_external_event, gravity_compensation_internal_event, control_type="joint", fix_joint_hack=self.fix_joint_hack)
         self.init_cyclic(controller.control_callback)
         while not self.cyclic_running:
             time.sleep(0.01)
 
         print("Arm is in joint compliant mode")
 
-    def switch_to_task_compliant_mode(self, command_queue, gravity_compensation_event):
+    def switch_to_task_compliant_mode(self, command_queue, gravity_compensation_external_event, gravity_compensation_internal_event):
 
-        controller = CompliantController(command_queue, gravity_compensation_event, control_type="task", fix_joint_hack=self.fix_joint_hack)
+        controller = CompliantController(command_queue, gravity_compensation_external_event, gravity_compensation_internal_event, control_type="task", fix_joint_hack=self.fix_joint_hack)
         self.init_cyclic(controller.control_callback)
         while not self.cyclic_running:
             time.sleep(0.01)
