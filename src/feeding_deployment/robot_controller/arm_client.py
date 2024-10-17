@@ -185,8 +185,9 @@ if __name__ == "__main__":
     #     else:
     #         arm_client_interface.execute_command(CartesianCommand(pos=test_poses[i % 4][:3], quat=test_poses[i % 4][3:]))
 
+
     utensil_inside_mount = (
-        np.array([-0.286, -0.133, 0.065]),
+        np.array([-0.444, -0.139, 0.065]),
         np.array([0.7071068, -0.7071068, 0, 0 ]),
     )
 
@@ -208,12 +209,12 @@ if __name__ == "__main__":
     )
     utensil_above_mount[0][2] += 0.1
 
-    utensil_inside_mount_pos = [2.2467215251591117, 0.5836147086598885, -2.535738152982762, -2.2963045246503158, -0.7542663428866403, -0.4699185027700077, 1.9096838418235886]
+    utensil_inside_mount_pos = [2.4024543972753483, 0.7942983146024386, -2.472859055433228, -1.8032721804634013, -0.6638818512826585, -0.7855201361753741, 1.851469670397492]
 
     # # depend on the offsets set above
-    utensil_above_mount_pos = [1.9755942824839052, 0.3527602540420511, -2.2270956258218817, -2.1930039680755593, -0.39397207269978196, -0.7730064748453094, 1.5904074455880766]
-    utensil_outside_mount_pos = [1.9202113176126718, 0.6917033625584985, -2.4682459277929927, -2.063521874824234, -0.7181986196114787, -0.6391235078926281, 1.523472620014461]
-    # utensil_outside_above_mount_pos = [-0.2692035082617874, 0.4127082432063301, -2.513398492494741, -1.9930522355357558, -0.31928105676741936, -0.8392446174777604, 0.5472652562309106]
+    utensil_above_mount_pos = [2.323328152863568, 0.6356845013979816, -2.3499581658677062, -1.7172542077827142, -0.5122867325520781, -1.011576173720134, 1.7346615607738536]
+    utensil_outside_mount_pos = [2.188196829149912, 0.882908608288209, -2.4520760126023586, -1.6022200297611775, -0.6621619818506854, -0.905755467805835, 1.5558217714595446]
+    utensil_outside_above_mount_pos = [2.141991250553146, 0.7403159727275052, -2.361341048998923, -1.5166649144779463, -0.546357617641898, -1.1156594333392649, 1.4704801085376829]
 
     retract_pos = [0.0, -0.34908342726206065, 3.1415748104104897, -2.548278978555945, 0.0, -0.8726901923436294, 1.5707848752022093]
 
@@ -258,6 +259,9 @@ if __name__ == "__main__":
     input("Press enter to move outside the mount...")
     arm_client_interface.execute_command(CartesianCommand(utensil_outside_mount[0], utensil_outside_mount[1]))
 
+    input("Press enter to move to outside above mount pos...")
+    arm_client_interface.execute_command(CartesianCommand(utensil_outside_above_mount[0], utensil_outside_above_mount[1]))
+
     input("Press enter to move to retract pos...")
     arm_client_interface.execute_command(JointCommand(retract_pos))
 
@@ -267,11 +271,11 @@ if __name__ == "__main__":
     # input("Press enter to move to above plate pose...")
     # arm_client_interface.execute_command(JointCommand(above_plate_pos))
 
-    # input("Press enter to move to above outside utensil mount pos...")
-    # arm_client_interface.execute_command(JointCommand(utensil_outside_above_mount_pos))
+    input("Press enter to move to above outside utensil mount pos...")
+    arm_client_interface.execute_command(JointCommand(utensil_outside_above_mount_pos))
 
-    input("Press enter to move outside the mount...")
-    arm_client_interface.execute_command(JointCommand(utensil_outside_mount_pos))
+    input("Press enter to move outside the mount pose...")
+    arm_client_interface.execute_command(CartesianCommand(utensil_outside_mount[0], utensil_outside_mount[1]))
 
     input("Press enter to move to inside utensil mount pose...")
     arm_client_interface.execute_command(CartesianCommand(utensil_inside_mount[0], utensil_inside_mount[1]))
