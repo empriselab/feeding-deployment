@@ -358,10 +358,17 @@ class PickToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            teleport_to_ee_pose(
+            move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.utensil_outside_above_mount,
-                self._sim.scene_description.utensil_outside_above_mount_pos,
+                self._sim.scene_description.retract_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface if not self.no_waits else None
+            )
+
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.before_transfer_pos,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface if not self.no_waits else None
@@ -387,14 +394,6 @@ class PickToolHLA(HighLevelAction):
             )
             # close grippers
             robot_commands.append(CloseGripperCommand())
-
-            move_to_joint_positions(
-                self._sim,
-                self._sim.scene_description.wipe_infront_mount_pos,
-                sim_states,
-                robot_commands,
-                rviz_interface=self._rviz_interface if not self.no_waits else None
-            )
 
             move_to_joint_positions(
                 self._sim,
@@ -429,9 +428,10 @@ class PickToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            move_to_joint_positions(
+            teleport_to_ee_pose(
                 self._sim,
-                self._sim.scene_description.wipe_neutral_pos,
+                self._sim.scene_description.wipe_outside_above_mount,
+                self._sim.scene_description.wipe_outside_above_mount_pos,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface if not self.no_waits else None
@@ -577,7 +577,7 @@ class StowToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.before_transfer_pos,
+                self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface if not self.no_waits else None
@@ -585,15 +585,6 @@ class StowToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.utensil_outside_above_mount_pos,
-                sim_states,
-                robot_commands,
-                rviz_interface=self._rviz_interface if not self.no_waits else None
-            )
-
-            teleport_to_ee_pose(
-                self._sim,
-                self._sim.scene_description.utensil_outside_mount,
                 self._sim.scene_description.utensil_outside_mount_pos,
                 sim_states,
                 robot_commands,
@@ -646,14 +637,6 @@ class StowToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.before_transfer_pos,
-                sim_states,
-                robot_commands,
-                rviz_interface=self._rviz_interface if not self.no_waits else None
-            )
-
-            move_to_joint_positions(
-                self._sim,
                 self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
@@ -662,14 +645,15 @@ class StowToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.wipe_neutral_pos,
+                self._sim.scene_description.wipe_outside_above_mount_pos,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            move_to_joint_positions(
+            teleport_to_ee_pose(
                 self._sim,
+                self._sim.scene_description.wipe_outside_mount,
                 self._sim.scene_description.wipe_outside_mount_pos,
                 sim_states,
                 robot_commands,
@@ -696,15 +680,6 @@ class StowToolHLA(HighLevelAction):
                 self._sim,
                 self._sim.scene_description.wipe_above_mount,
                 self._sim.scene_description.wipe_above_mount_pos,
-                sim_states,
-                robot_commands,
-                rviz_interface=self._rviz_interface if not self.no_waits else None
-            )
-
-            teleport_to_ee_pose(
-                self._sim,
-                self._sim.scene_description.wipe_infront_mount,
-                self._sim.scene_description.wipe_infront_mount_pos,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface if not self.no_waits else None
