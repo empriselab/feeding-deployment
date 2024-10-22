@@ -36,6 +36,7 @@ from feeding_deployment.actions.low_level_actions import (
     move_to_ee_pose,
 )
 from feeding_deployment.actions.inside_mouth_transfer import InsideMouthTransfer
+from feeding_deployment.actions.outside_mouth_transfer import OutsideMouthTransfer
 
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
 from feeding_deployment.interfaces.web_interface import WebInterface
@@ -63,6 +64,9 @@ ToolPrepared = Predicate("ToolPrepared", [tool_type])  # e.g., bite acquired
 PlateInView = Predicate("PlateInView", [])  # of the hand camera
 ResetPos = Predicate("ResetPos", [])  # robot in reset position
 IsUtensil = Predicate("IsUtensil", [tool_type])
+
+# Rajat ToDo: Move this to a config file
+INSIDE_MOUTH_TRANSFER = False 
 
 # Define high-level actions.
 class HighLevelAction(abc.ABC):
@@ -183,6 +187,10 @@ class PickToolHLA(HighLevelAction):
                 robot_commands,
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
+            # close grippers
+            robot_commands.append(CloseGripperCommand())
+
+
 
             move_to_joint_positions(
                 self._sim,
@@ -213,9 +221,6 @@ class PickToolHLA(HighLevelAction):
                 robot_commands,
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
-
-            # close grippers
-            robot_commands.append(CloseGripperCommand())
 
             # NOTE: this just does nothing when executed and I don't know why
 
@@ -307,6 +312,8 @@ class PickToolHLA(HighLevelAction):
                 robot_commands,
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
+            # close grippers
+            robot_commands.append(CloseGripperCommand())
 
             move_to_joint_positions(
                 self._sim,
@@ -351,10 +358,17 @@ class PickToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            teleport_to_ee_pose(
+            move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.utensil_outside_above_mount,
-                self._sim.scene_description.utensil_outside_above_mount_pos,
+                self._sim.scene_description.retract_pos,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface if not self.no_waits else None
+            )
+
+            move_to_joint_positions(
+                self._sim,
+                self._sim.scene_description.before_transfer_pos,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface if not self.no_waits else None
@@ -378,14 +392,8 @@ class PickToolHLA(HighLevelAction):
                 robot_commands,
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
-
-            move_to_joint_positions(
-                self._sim,
-                self._sim.scene_description.wipe_infront_mount_pos,
-                sim_states,
-                robot_commands,
-                rviz_interface=self._rviz_interface if not self.no_waits else None
-            )
+            # close grippers
+            robot_commands.append(CloseGripperCommand())
 
             move_to_joint_positions(
                 self._sim,
@@ -420,9 +428,10 @@ class PickToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            move_to_joint_positions(
+            teleport_to_ee_pose(
                 self._sim,
-                self._sim.scene_description.wipe_neutral_pos,
+                self._sim.scene_description.wipe_outside_above_mount,
+                self._sim.scene_description.wipe_outside_above_mount_pos,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface if not self.no_waits else None
@@ -568,15 +577,14 @@ class StowToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.utensil_outside_above_mount_pos,
+                self._sim.scene_description.retract_pos,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            teleport_to_ee_pose(
+            move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.utensil_outside_mount,
                 self._sim.scene_description.utensil_outside_mount_pos,
                 sim_states,
                 robot_commands,
@@ -637,14 +645,15 @@ class StowToolHLA(HighLevelAction):
 
             move_to_joint_positions(
                 self._sim,
-                self._sim.scene_description.wipe_neutral_pos,
+                self._sim.scene_description.wipe_outside_above_mount_pos,
                 sim_states,
                 robot_commands,
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            move_to_joint_positions(
+            teleport_to_ee_pose(
                 self._sim,
+                self._sim.scene_description.wipe_outside_mount,
                 self._sim.scene_description.wipe_outside_mount_pos,
                 sim_states,
                 robot_commands,
@@ -676,15 +685,6 @@ class StowToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            teleport_to_ee_pose(
-                self._sim,
-                self._sim.scene_description.wipe_infront_mount,
-                self._sim.scene_description.wipe_infront_mount_pos,
-                sim_states,
-                robot_commands,
-                rviz_interface=self._rviz_interface if not self.no_waits else None
-            )
-
             move_to_joint_positions(
                 self._sim,
                 self._sim.scene_description.retract_pos,
@@ -708,7 +708,11 @@ class TransferToolHLA(HighLevelAction):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.inside_mouth_transfer = InsideMouthTransfer(perception_interface=self._perception_interface, robot_interface=self._robot_interface, rviz_interface=self._rviz_interface)
+
+        if INSIDE_MOUTH_TRANSFER:
+            self.transfer = InsideMouthTransfer(perception_interface=self._perception_interface, robot_interface=self._robot_interface, rviz_interface=self._rviz_interface)
+        else:
+            self.transfer = OutsideMouthTransfer(perception_interface=self._perception_interface, robot_interface=self._robot_interface, rviz_interface=self._rviz_interface)
 
     def get_name(self) -> str:
         return "TransferTool"
@@ -757,20 +761,23 @@ class TransferToolHLA(HighLevelAction):
             self._perception_interface.start_head_perception_thread()
             time.sleep(5.0) # let head perception thread warmstart / robot to stabilize
             self._robot_interface.set_tool("fork")
-            self.inside_mouth_transfer.set_tool("fork")
+            self.transfer.set_tool("fork")
 
             # Rajat Hack: Just to test interface
             if self._run_on_robot:
-                if not self.no_waits:
-                    input("Press enter to switch to task compliant mode")
-                self._robot_interface.switch_to_task_compliant_mode()
+
+                if INSIDE_MOUTH_TRANSFER:
+                    if not self.no_waits:
+                        input("Press enter to switch to task compliant mode")
+                    self._robot_interface.switch_to_task_compliant_mode()
                 
                 # Do inside-mouth transfer here
-                self.inside_mouth_transfer.execute_transfer_loop()
-                
-                if not self.no_waits:
-                    input("Press enter to switch out of compliant mode")
-                self._robot_interface.switch_out_of_compliant_mode()
+                self.transfer.execute_transfer_loop()
+
+                if INSIDE_MOUTH_TRANSFER:                
+                    if not self.no_waits:
+                        input("Press enter to switch out of compliant mode")
+                    self._robot_interface.switch_out_of_compliant_mode()
 
             # Send message to web interface indicating transfer is done.
             self._web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
@@ -799,19 +806,21 @@ class TransferToolHLA(HighLevelAction):
             self._perception_interface.start_head_perception_thread()
             time.sleep(5.0) # let head perception thread warmstart / robot to stabilize
             self._robot_interface.set_tool("drink")
-            self.inside_mouth_transfer.set_tool("drink")
+            self.transfer.set_tool("drink")
 
             if self._run_on_robot:
-                if not self.no_waits:
-                    input("Press enter to switch to task compliant mode")
-                self._robot_interface.switch_to_task_compliant_mode()
+                if INSIDE_MOUTH_TRANSFER:
+                    if not self.no_waits:
+                        input("Press enter to switch to task compliant mode")
+                    self._robot_interface.switch_to_task_compliant_mode()
                 
                 # Do inside-mouth transfer here
-                self.inside_mouth_transfer.execute_transfer_loop(maintain_position_at_goal=True)
+                self.transfer.execute_transfer_loop(maintain_position_at_goal=True)
 
-                if not self.no_waits:
-                    input("Press enter to switch out of compliant mode")
-                self._robot_interface.switch_out_of_compliant_mode()
+                if INSIDE_MOUTH_TRANSFER:
+                    if not self.no_waits:
+                        input("Press enter to switch out of compliant mode")
+                    self._robot_interface.switch_out_of_compliant_mode()
 
             # Send message to web interface indicating transfer is done.
             self._web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})
@@ -839,19 +848,21 @@ class TransferToolHLA(HighLevelAction):
             self._perception_interface.start_head_perception_thread()
             time.sleep(5.0) # let head perception thread warmstart / robot to stabilize
             self._robot_interface.set_tool("wipe")
-            self.inside_mouth_transfer.set_tool("wipe")
+            self.transfer.set_tool("wipe")
 
             if self._run_on_robot:
-                if not self.no_waits:
-                    input("Press enter to switch to task compliant mode")
-                self._robot_interface.switch_to_task_compliant_mode()
+                if INSIDE_MOUTH_TRANSFER:
+                    if not self.no_waits:
+                        input("Press enter to switch to task compliant mode")
+                    self._robot_interface.switch_to_task_compliant_mode()
                 
                 # Do inside-mouth transfer here
-                self.inside_mouth_transfer.execute_transfer_loop(maintain_position_at_goal=True)
+                self.transfer.execute_transfer_loop(maintain_position_at_goal=True)
 
-                if not self.no_waits:
-                    input("Press enter to switch out of compliant mode")
-                self._robot_interface.switch_out_of_compliant_mode()
+                if INSIDE_MOUTH_TRANSFER:
+                    if not self.no_waits:
+                        input("Press enter to switch out of compliant mode")
+                    self._robot_interface.switch_out_of_compliant_mode()
 
             # Send message to web interface indicating transfer is done.
             self._web_interface.send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})

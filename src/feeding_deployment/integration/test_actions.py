@@ -169,14 +169,19 @@ def _main(
 
     # Initialize the perceiver (e.g., get joint states or human head poses).
     perception_interface = PerceptionInterface(robot_interface=robot_interface, simulate_head_perception=simulate_head_perception)
+    print("Perception Interface Loaded")
 
     # Initialize the FLAIR interface.
     if FLAIR_IMPORTED:
         wrist_controller = WristController()
+        print("wrist controller init")
         flair = FLAIR(robot_interface, wrist_controller)
+        print("FLAIR init")
     else:
         wrist_controller = None
         flair = None
+
+    print("FLAIR loaded")
 
     # Initialize the simulator.
     kwargs: dict[str, Any] = {}
@@ -186,7 +191,11 @@ def _main(
     else:
         print("Running in simulation mode.")
     scene_description = SceneDescription(**kwargs)
+
+    print("Scene Description loaded")
     sim = FeedingDeploymentPyBulletSimulator(scene_description, use_gui=False)
+
+    print("Feeding Deployment Simulator loaded")
 
     if ROSPY_IMPORTED:
         # Initialize the interface to RViz.

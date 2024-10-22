@@ -148,14 +148,14 @@ class PerceptionInterface:
         tool_tip_staging_pose = np.eye(4)
 
         if self._head_perception.head_perception.tool == "fork":
-            tool_tip_staging_pose[:3, 3] = [0.250, 0.272, 0.518]
-            tool_tip_staging_pose[:3, :3] = R.from_quat([0.523, -0.503, -0.469, 0.503]).as_matrix()
+            tool_tip_staging_pose[:3, 3] = [0.091, 0.292, 0.402]
+            tool_tip_staging_pose[:3, :3] = R.from_quat([0.478, -0.505, -0.515, 0.502]).as_matrix()
         elif self._head_perception.head_perception.tool == "drink":
-            tool_tip_staging_pose[:3, 3] = [0.282, 0.314, 0.546]
-            tool_tip_staging_pose[:3, :3] = R.from_quat([0.523, -0.503, -0.469, 0.503]).as_matrix()
+            tool_tip_staging_pose[:3, 3] = [0.140, 0.331, 0.468]
+            tool_tip_staging_pose[:3, :3] = R.from_quat([0.478, -0.505, -0.515, 0.502]).as_matrix()
         elif self._head_perception.head_perception.tool == "wipe":
-            tool_tip_staging_pose[:3, 3] = [0.417, 0.280, 0.509]
-            tool_tip_staging_pose[:3, :3] = R.from_quat([0.523, -0.503, -0.469, 0.503]).as_matrix()
+            tool_tip_staging_pose[:3, 3] = [0.256, 0.284, 0.380]
+            tool_tip_staging_pose[:3, :3] = R.from_quat([0.478, -0.505, -0.515, 0.502]).as_matrix()
 
         return tool_tip_staging_pose
 
