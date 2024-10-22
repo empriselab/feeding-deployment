@@ -28,7 +28,11 @@
              - `conda activate controller`
              - `cd feeding-deployment/src/feeding_deployment/robot_controller`
              - `python arm_server.py`
+2. Run bulldog on the NUC:
+   - ssh to the NUC: `sshnuc` with lab password
+   - run bulldog with alias `run_bulldog`
 2. Run a roscore on the compute system: `roscore`
+3. Launch all the sensors on the compute system using `launch_sensors`
 3. Launch the roslaunch on compute system for visualization / publish tfs:
    - Alias `launch_robot` on compute system
    - Otherwise,run the following commands from the root of your ROS workspace:
@@ -84,6 +88,12 @@
 2. Run the feeding demo:
    - Navigate to integration scripts: `cd src/feeding_deployment/integration`
    - Run demo: `python demo.py`
+
+## Random
+
+- To check FT readings: `rostopic echo /forque/forqueSensor`
+- IP for robot: 192.168..10
+- IP for webapp:" http://192.168.1.2:8080/#/home
 
 ## Check Installation
 
