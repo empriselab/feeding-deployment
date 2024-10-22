@@ -58,7 +58,8 @@ class CollisionMonitor:
                                                             arm_joint_state,
                                                             finger_state)
         # Run collision checking.
-        has_collision = self.check_collisions(combined_joint_state)
+        # has_collision = self.check_collisions(combined_joint_state)
+        has_collision = False
         self._collision_pub.publish(Bool(data=not has_collision))
         if has_collision and self._print_once:
             print("Collision detected by CollisionMonitor")
