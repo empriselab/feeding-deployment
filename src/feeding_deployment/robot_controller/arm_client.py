@@ -99,19 +99,29 @@ if __name__ == "__main__":
         exit()
 
     # before_transfer_pos = [
-    #     -2.8655331,  
-    #     -1.61973777, 
-    #     -2.6097253, 
-    #     -1.37301134, 
-    #     1.11781087,
-    #     -1.18039928,
-    #     2.05515662
+    #     -2.2918810140796944, 
+    #     -1.3007262259143966, 
+    #     -1.7207919509747756, 
+    #     -2.208494777188223, 
+    #     -0.4778078511832584, 
+    #     -0.16136412624120933, 
+    #     -2.998179564676263
     # ]
 
-    # arm_client_interface.execute_command(JointCommand(before_transfer_pos))
+    before_transfer_pos = [
+        -2.86554642,
+        -1.61951779,
+        -2.60986085,
+        -1.37302839,
+        1.11779249,
+        -1.18028264,
+        2.05515862,
+    ]
 
-    # input("Press enter to go to compliance mode...")
-    # arm_client_interface.switch_to_task_compliant_mode()
+    arm_client_interface.execute_command(JointCommand(before_transfer_pos))
+
+    input("Press enter to go to compliance mode...")
+    arm_client_interface.switch_to_task_compliant_mode()
 
     # arm_pos, ee_pose, gripper_pos = arm_client_interface.get_state()
     # drop_test_pose = np.zeros(7)
@@ -122,169 +132,5 @@ if __name__ == "__main__":
     # input("Press Enter to move to drop test pos")
     # arm_client_interface.execute_command(drop_test_task_command)
 
-    # input('Press Enter to switch out of compliant mode')
-    # arm_client_interface.switch_out_of_compliant_mode()
-
-    # close gripper
-    # arm_client_interface.execute_command(CloseGripperCommand())
-
-    # home_pos = [2.0099529289564592e-05, 0.26191187306569164, -3.1415742777782714, -2.269018308753582, -1.1185276577840852e-05, 0.9598948696060562, 1.5707649014940337]
-
-    # print("Moving to home position...")
-    # arm_client_interface.execute_command(JointCommand(home_pos))
-
-    # test_positions = [
-    #     [1.5966822288586847e-05, -0.3490701114566095, -3.141557766179513, -2.548308539644045, 3.904089478140269e-06, -0.8726486470306245, 1.5709589127794459],
-    #     [-0.007946872692796703, -0.5015446059791344, 3.0858849162236246, -2.580108280956245, -0.025630794963140247, -0.9928940986732275, 1.5269496431336684],
-    #     [-0.00580569117637264, -0.5003387266375467, -3.070703566429628, -2.337005881906106, 0.0373198167840403, -1.3192836650222874, 1.6169241410878321],
-    #     [-0.01612437513599385, -0.5525894145926831, -3.0655101359878643, -2.5410106793089007, 0.04257673448947779, -1.0858053975194766, 1.6028609194775052]
-    # ]
-
-    # test_poses = [
-    #     [0.1338980495929718, -0.0005073380307294428, 0.21062198281288147, 0.712547437295058, 0.700687805660259, 0.025881994666155476, 0.02535490002657547],
-    #     [0.09481269866228104, 0.009776144288480282, 0.21593131124973297, 0.712496060477749, 0.7007277901717651, 0.02601313944266246, 0.025558647480240525],
-    #     [0.10039354115724564, -0.015133513137698174, 0.2866659164428711, -0.7132249227562583, -0.700909127758032, 0.0036400298249693623, 0.004832635686417539],
-    #     [0.08909790962934494, -0.01270302850753069, 0.23117974400520325, 0.7126763019999464, 0.7006222160108023, 0.025051701023530416, 0.024360034392870284]
-    # ]
-
-    # # print("Moving to retract position...")
-    # # arm_client_interface.execute_command(JointCommand(test_positions[0]))
-
-    # for i in range(4):
-    #     # send move to pose command
-    #     # arm_client_interface.execute_command(CartesianCommand(pos=test_poses[0][:3],quat=test_poses[0][3:]))
-    #     arm_client_interface.execute_command(JointCommand(test_positions[0]))
-
-    #     arm_client_interface.execute_command(JointCommand(home_pos))
-
-    #     # arm_client_interface.execute_command(JointCommand(home_pos))
-    #     # # send gripper open command
-    #     arm_client_interface.execute_command(OpenGripperCommand())
-
-    #     # send move to pose command
-    #     arm_client_interface.execute_command(JointCommand(test_positions[1]))
-    #     # arm_client_interface.execute_command(CartesianCommand(pos=test_poses[1][:3],quat=test_poses[1][3:]))
-
-    #     # arm_client_interface.execute_command(JointCommand(home_pos))
-
-    #     # send gripper close command
-    #     arm_client_interface.execute_command(CloseGripperCommand())
-
-    # print("Moving through test positions...")
-    # for i in range(20):
-    #     arm_client_interface.execute_command(JointCommand(test_positions[i % 4]))
-
-    # print("Moving through test poses...")
-    # for i in range(20):
-    #     arm_client_interface.execute_command(CartesianCommand(pos=test_poses[i % 4][:3],quat=test_poses[i % 4][3:]))
-
-    # print("Moving through test positions and poses...")
-    # for i in range(20):
-    #     if i % 4 < 2:
-    #         arm_client_interface.execute_command(JointCommand(test_positions[i % 4]))
-    #     else:
-    #         arm_client_interface.execute_command(CartesianCommand(pos=test_poses[i % 4][:3], quat=test_poses[i % 4][3:]))
-
-
-    utensil_inside_mount = (
-        np.array([-0.444, -0.139, 0.065]),
-        np.array([0.7071068, -0.7071068, 0, 0 ]),
-    )
-
-    utensil_outside_mount = (
-        utensil_inside_mount[0].copy(),
-        utensil_inside_mount[1].copy(),
-    )
-    utensil_outside_mount[0][1] -= 0.13
-
-    utensil_outside_above_mount = (
-        utensil_outside_mount[0].copy(),
-        utensil_outside_mount[1].copy(),
-    )
-    utensil_outside_above_mount[0][2] += 0.1
-
-    utensil_above_mount = (
-        utensil_inside_mount[0].copy(),
-        utensil_inside_mount[1].copy(),
-    )
-    utensil_above_mount[0][2] += 0.1
-
-    utensil_inside_mount_pos = [2.4024543972753483, 0.7942983146024386, -2.472859055433228, -1.8032721804634013, -0.6638818512826585, -0.7855201361753741, 1.851469670397492]
-
-    # # depend on the offsets set above
-    utensil_above_mount_pos = [2.323328152863568, 0.6356845013979816, -2.3499581658677062, -1.7172542077827142, -0.5122867325520781, -1.011576173720134, 1.7346615607738536]
-    utensil_outside_mount_pos = [2.188196829149912, 0.882908608288209, -2.4520760126023586, -1.6022200297611775, -0.6621619818506854, -0.905755467805835, 1.5558217714595446]
-    utensil_outside_above_mount_pos = [2.141991250553146, 0.7403159727275052, -2.361341048998923, -1.5166649144779463, -0.546357617641898, -1.1156594333392649, 1.4704801085376829]
-
-    retract_pos = [0.0, -0.34908342726206065, 3.1415748104104897, -2.548278978555945, 0.0, -0.8726901923436294, 1.5707848752022093]
-
-    # above_plate_pos = [
-    #     -2.86495014,
-    #     -1.61460533,
-    #     -2.6115943,
-    #     -1.37673391,
-    #     1.11842806,
-    #     -1.17904586,
-    #     -2.6957422,
-    # ]
-
-    # before_transfer_pos = [
-    #     -2.86554642,
-    #     -1.61951779,
-    #     -2.60986085,
-    #     -1.37302839,
-    #     1.11779249,
-    #     -1.18028264,
-    #     2.05515862,
-    # ]
-
-    input("Press enter to move to close fingers...")
-    arm_client_interface.execute_command(CloseGripperCommand())
-
-    # input("Press enter to move to inside utensil pos...")
-    # arm_client_interface.execute_command(CartesianCommand(utensil_inside_mount[0], utensil_inside_mount[1]))
-
-    # input("Press enter to move to above utensil mount pose...")
-    # arm_client_interface.execute_command(CartesianCommand(utensil_above_mount[0], utensil_above_mount[1]))
-
-    input("Press enter to move to above utensil pos...")
-    arm_client_interface.execute_command(JointCommand(utensil_above_mount_pos))
-
-    input("Press enter to move to inside utensil mount pose...")
-    arm_client_interface.execute_command(CartesianCommand(utensil_inside_mount[0], utensil_inside_mount[1]))
-
-    input("Press enter to grasp the utensil...")
-    arm_client_interface.execute_command(OpenGripperCommand())
-
-    input("Press enter to move outside the mount...")
-    arm_client_interface.execute_command(CartesianCommand(utensil_outside_mount[0], utensil_outside_mount[1]))
-
-    input("Press enter to move to outside above mount pos...")
-    arm_client_interface.execute_command(CartesianCommand(utensil_outside_above_mount[0], utensil_outside_above_mount[1]))
-
-    input("Press enter to move to retract pos...")
-    arm_client_interface.execute_command(JointCommand(retract_pos))
-
-    # # input("Press enter to move to before transfer pose...")
-    # # arm_client_interface.execute_command(JointCommand(before_transfer_pos))
-
-    # input("Press enter to move to above plate pose...")
-    # arm_client_interface.execute_command(JointCommand(above_plate_pos))
-
-    input("Press enter to move to above outside utensil mount pos...")
-    arm_client_interface.execute_command(JointCommand(utensil_outside_above_mount_pos))
-
-    input("Press enter to move outside the mount pose...")
-    arm_client_interface.execute_command(CartesianCommand(utensil_outside_mount[0], utensil_outside_mount[1]))
-
-    input("Press enter to move to inside utensil mount pose...")
-    arm_client_interface.execute_command(CartesianCommand(utensil_inside_mount[0], utensil_inside_mount[1]))
-
-    input("Press enter to ungrasp the utensil...")
-    arm_client_interface.execute_command(CloseGripperCommand())
-
-    input("Press enter to move to above utensil pose...")
-    arm_client_interface.execute_command(CartesianCommand(utensil_above_mount[0], utensil_above_mount[1]))
-
-    input("Press enter to move to retract pos...")
-    arm_client_interface.execute_command(JointCommand(retract_pos))
+    input('Press Enter to switch out of compliant mode')
+    arm_client_interface.switch_out_of_compliant_mode()
