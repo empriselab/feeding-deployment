@@ -230,7 +230,7 @@ class OutsideMouthTransfer:
         # shutdown the head perception thread
         self.perception_interface.stop_head_perception_thread()
 
-        # move to transfer position
+        # move to before transfer position
         final_target = self.perception_interface.get_tool_tip_pose_at_staging()
         self.publishTaskCommand(final_target)
 
