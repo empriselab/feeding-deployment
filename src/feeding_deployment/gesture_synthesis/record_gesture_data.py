@@ -7,6 +7,7 @@ import rospy
 import imageio
 import time
 from pynput import keyboard
+import pickle
 
 from rs_ros import RealSenseROS
 
@@ -21,7 +22,10 @@ def on_press(key):
 
 def record_example(camera, command, example_type, index):
     global recording_stopped
-    example_video = []
+    header_stream = []
+    color_stream = []
+    depth_stream = []
+    info_stream = []
 
     # Start listener for key press detection
     listener = keyboard.Listener(on_press=on_press)
@@ -30,7 +34,11 @@ def record_example(camera, command, example_type, index):
     print(f"Recording {example_type} example {index}, press 'Space' to stop.")
     while not recording_stopped:
         header, color_data, info_data, depth_data = camera.get_camera_data()
-        example_video.append(color_data)
+        
+        header_stream.append(header)
+        color_stream.append(color_data)
+        depth_stream.append(depth_data)
+        info_stream.append(info_data)
 
         # Control the frame rate
         time.sleep(0.1)
@@ -40,14 +48,18 @@ def record_example(camera, command, example_type, index):
 
     # Stop the listener
     listener.stop()
+    
+    datapoint = {
+        "header": header_stream,
+        "color": color_stream,
+        "depth": depth_stream,
+        "info": info_stream
+    }
 
-    # Save the video using imageio
-    print(f"Saving {len(example_video)} frames")
-    with imageio.get_writer(f"gesture_data/{command}/{example_type}_examples/{index}.mp4", fps=10, codec='libx264') as writer:
-        for frame in example_video:
-            # Convert to RGB format for imageio if needed
-            frame_rgb = frame[:, :, ::-1]  # Convert from BGR to RGB
-            writer.append_data(frame_rgb)
+    # Save the video using pickle
+    print(f"Saving {len(color_stream)} frames")
+    with open(f"gesture_data/{command}/{example_type}_examples/{index}.pkl", "wb") as f:
+        pickle.dump(datapoint, f)
 
     print(f"Saved {example_type} example {index}")
 
@@ -66,12 +78,12 @@ if __name__ == "__main__":
 
     # Record 5 positive examples
     print(" -- Record positive examples --")
-    for i in range(5):
+    for i in range(1):
         input(f"Press enter to record positive example {i}")
         record_example(camera, command, "positive", i)
 
     # Record 5 negative examples
     print(" -- Record negative examples --")
-    for i in range(5):
+    for i in range(1):
         input(f"Press enter to record negative example {i}")
         record_example(camera, command, "negative", i)
