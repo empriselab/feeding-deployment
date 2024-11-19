@@ -1,0 +1,57 @@
+Using the given language description, create a corresponding gesture detection function that utilizes the appropriate parameters. You have access to these low-level functions:
+
+def get_head_pose():
+    '''
+    Detects the current head pose of the user in the camera frame (z forward, x up). 
+    Execution time: 0.1 sec.
+    Args: None
+    Returns: (x, y, z, roll, yaw, pitch) - tuple of ints
+    '''
+    pass
+
+def get_face_keypoints():
+    '''
+    Detects face keypoints. Execution time: 0.1 sec.
+    Args: None
+    Returns: keypoints (list): 68 face keypoints (x, y) in dlib format
+    '''
+    pass
+
+
+In-Context Example:
+
+Input:
+##################
+Language Description: "up-down head nod"
+##################
+
+Output:
+##################
+def gesture_detector(threshold, timeout=20.0):
+    start_time = time.time()
+    pitch_data = []
+    direction_changes = 0  # Counts the number of up-down or down-up changes
+
+    while time.time() - start_time < timeout:
+        (head_x, head_y, head_z, head_roll, head_yaw, head_pitch) = get_head_pose()
+        pitch_data.append(head_pitch)
+
+        if len(pitch_data) > 3:
+            if (pitch_data[-2] - pitch_data[-3] > threshold and pitch_data[-2] - pitch_data[-1] > threshold) or \
+               (pitch_data[-3] - pitch_data[-2] > threshold and pitch_data[-1] - pitch_data[-2] > threshold):
+                direction_changes += 1
+
+        if direction_changes == 2:
+            return True
+
+    return False
+##################
+
+Using the In-Contect Example as reference, generate a detector for the following input. Generate output in the same format as the in-context example - without any additional explaination. 
+
+Input:
+##################
+Language Description: %s
+##################
+
+Output:
