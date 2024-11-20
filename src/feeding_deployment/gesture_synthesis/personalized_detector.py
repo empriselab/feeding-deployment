@@ -4,6 +4,7 @@ import numpy as np
 import math
 import os
 import pickle
+from scipy.spatial.transform import Rotation as R
 
 import base64
 import requests
@@ -40,6 +41,46 @@ class GPTInterface:
 class Robot:
     def __init__(self):
         self.head_perception = HeadPerception(record_goal_pose=False)
+        self.head_perception.set_tool("fork")
+
+    def warmup(self):
+        """
+        Run DECA 10 times to warm up the model
+        """
+        
+        with open('warmup.pkl', 'rb') as f:
+            warmup_data = pickle.load(f)
+
+        print("Keys: ", warmup_data.keys())
+
+        camera_color_data = warmup_data['color']
+        camera_info_data = warmup_data['info']
+        camera_depth_data = warmup_data['depth']
+
+        for i in range(10):
+            base_to_camera = np.ones((4, 4))
+            (
+                landmarks2d,
+                landmarks3d,
+                viz_image,
+                mouth_state,
+                average_head_point,
+                tool_tip_target_pose,
+                visualization_points_world_frame,
+                reference_neck_frame,
+                neck_frame,
+                noisy_reading,
+                neck_rotation,
+            ) = self.head_perception.run_deca(
+                camera_color_data,
+                camera_info_data,
+                camera_depth_data,
+                base_to_camera,
+                debug_print=False,
+                visualize=False,
+                filter_noisy_readings=False,
+            )
+            print("Warmup: ", i)
     
     def get_head_pose(self):
         _, camera_color_data, camera_info_data, camera_depth_data = self.get_camera_data()
@@ -122,6 +163,8 @@ class Robot:
         with open(data_path, 'rb') as f:
             self.data = pickle.load(f)
 
+        print("Number of frames: ", len(self.data['color']))
+
     def set_start_time(self):
         self.start_time = time.time()
     
@@ -130,25 +173,27 @@ class Robot:
         timestamp = current_time - self.start_time
         index = int(timestamp*10) # data is at 10Hz
 
-        if index < len(self.data):
-            camera_header = self.data['camera_header'][index]
-            camera_color_data = self.data['camera_color_data'][index]
-            camera_info_data = self.data['camera_info_data'][index]
-            camera_depth_data = self.data['camera_depth_data'][index]
+        if index < len(self.data['color']):
+            camera_header = self.data['header'][index]
+            camera_color_data = self.data['color'][index]
+            camera_info_data = self.data['info'][index]
+            camera_depth_data = self.data['depth'][index]
             return camera_header, camera_color_data, camera_info_data, camera_depth_data
         
         return None, None, None, None
     
-def in_context_example(robot, timeout=20.0, threshold=0.1):
+def in_context_example1(robot, timeout=20.0, threshold=0.1):
     """
-    Verifies the in-context example code provided in the prompt
+    Verifies the in-context example 1 code provided in the prompt
     """
     start_time = time.time()
     pitch_data = []
     direction_changes = 0  # Counts the number of up-down or down-up changes
 
     while time.time() - start_time < timeout:
-        (head_x, head_y, head_z, head_roll, head_yaw, head_pitch) = robot.get_head_pose()
+        head_x, head_y, head_z, head_roll, head_yaw, head_pitch = robot.get_head_pose()
+        if head_x is None:
+            return False
         pitch_data.append(head_pitch)
 
         if len(pitch_data) > 3:
@@ -161,12 +206,70 @@ def in_context_example(robot, timeout=20.0, threshold=0.1):
 
     return False
 
-def main():
+def in_context_example2(robot, timeout=20.0, threshold=0.6):
+    """
+    Verifies the in-context example 2 code provided in the prompt
+    """
+
+    def euclidean_distance(p1, p2):
+        """Calculate Euclidean distance between two points."""
+        return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5
+
+    start_time = time.time()
+
+    max_mar = 0.0
+
+    # check for mouth open
+    while time.time() - start_time < timeout:
+        face_keypoints = robot.get_face_keypoints()
+
+        if face_keypoints is not None:
+            # Indices for mouth landmarks
+            mouth_points = face_keypoints[48:68]
+            
+            # Calculate vertical distances
+            A = euclidean_distance(mouth_points[2], mouth_points[10])  # 51, 59
+            B = euclidean_distance(mouth_points[4], mouth_points[8])   # 53, 57
+        
+            # Calculate horizontal distance
+            C = euclidean_distance(mouth_points[0], mouth_points[6])   # 49, 55
+
+            mar = (A + B) / (2.0 * C)
+            # print("MAR: ", mar, "Threshold: ", threshold)
+            max_mar = max(max_mar, mar)
+            if mar > threshold:
+                print("Max MAR: ", max_mar, "Detection: ", True)
+                return True
+    print("Max MAR: ", max_mar, "Detection: ", False)
+    return False
+
+def validate_in_context_examples():
 
     robot = Robot()
-    robot.set_sample('src/feeding_deployment/gesture_synthesis/gesture_data/shake_my_head_from_left_to_right/positive_examples/0.pkl')
-    robot.set_start_time()
-    in_context_example(robot)
+    robot.warmup()
+    data_path = 'gesture_data/open_mouth'
+    
+    for i in range(5):
+        robot.set_sample(data_path + f'/positive_examples/{i}.pkl')
+        robot.set_start_time()
+        assert in_context_example2(robot)
+
+    for i in range(5):
+        robot.set_sample(data_path + f'/negative_examples/{i}.pkl')
+        robot.set_start_time()
+        assert not in_context_example2(robot)
+
+    data_path = 'gesture_data/shake_my_head_from_left_to_right'
+
+    for i in range(5):
+        robot.set_sample(data_path + f'/positive_examples/{i}.pkl')
+        robot.set_start_time()
+        print("Positive example output: ",in_context_example2(robot))
+
+    for i in range(5):
+        robot.set_sample(data_path + f'/negative_examples/{i}.pkl')
+        robot.set_start_time()
+        print("Negative example output: ",in_context_example2(robot))
 
     # gpt = GPTInterface()
     # with open('prompt.txt', 'r') as f:
@@ -201,4 +304,5 @@ def main():
 #     return False
 
 if __name__ == '__main__':
-    main()
+    validate_in_context_examples()
+    # main()

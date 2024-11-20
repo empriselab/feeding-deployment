@@ -78,12 +78,12 @@ if __name__ == "__main__":
 
     # Record 5 positive examples
     print(" -- Record positive examples --")
-    for i in range(1):
+    for i in range(5):
         input(f"Press enter to record positive example {i}")
         record_example(camera, command, "positive", i)
 
     # Record 5 negative examples
     print(" -- Record negative examples --")
-    for i in range(1):
+    for i in range(5):
         input(f"Press enter to record negative example {i}")
         record_example(camera, command, "negative", i)

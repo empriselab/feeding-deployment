@@ -3,7 +3,9 @@
 *.traj
 .python-version
 *.mp4
+*.zip
 
+src/feeding_deployment/gesture_synthesis/gesture_data/*
 # Rajat ToDo: Remove this line
 src/feeding_deployment/head_perception/DECA/*
 src/feeding_deployment/integration/log/*
