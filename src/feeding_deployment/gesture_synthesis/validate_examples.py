@@ -1,34 +1,11 @@
-Using the given language description, create a corresponding gesture detection function that utilizes the appropriate parameters. You have access to these low-level functions:
-
-def get_head_pose():
-    '''
-    Detects the current head pose of the user in the camera frame (z forward, x up). 
-    Execution time: 0.1 sec.
-    Args: None
-    Returns: (x, y, z, roll, pitch, yaw) - tuple of ints
-    '''
-    pass
-
-def get_face_keypoints():
-    '''
-    Detects face keypoints. Execution time: 0.1 sec.
-    Args: None
-    Returns: keypoints (list): 68 face keypoints (x, y) in dlib format
-    '''
-    pass
+import time
+from feeding_deployment.gesture_synthesis.robot import Robot, run_detector, search_threshold
 
 
-In-Context Example 1:
-
-Input:
-##################
-Language Description: "left to right head shake"
-##################
-
-Output:
-##################
-def gesture_detector(robot, threshold, timeout):
-
+def in_context_example1(robot, timeout=20.0, threshold=0.5):
+    """
+    Verifies the in-context example 1 code provided in the prompt
+    """
     start_time = time.time()
     yaw_data = []
     direction_changes = 0  # Counts the number of left-right or right-left changes
@@ -36,8 +13,11 @@ def gesture_detector(robot, threshold, timeout):
     id = 0
     while time.time() - start_time < timeout:
         head_pose = robot.get_head_pose()
+        # print("Head Rotation: ", head_roll, head_pitch, head_yaw)
+        # id+= 1
+        # time.sleep(0.5)
         if head_pose is None:
-            break 
+            break # Handle case where head pose data is unavailable
 
         (head_x, head_y, head_z, head_roll, head_pitch, head_yaw) = head_pose
         yaw_data.append(head_yaw)
@@ -58,18 +38,11 @@ def gesture_detector(robot, threshold, timeout):
     
     # If timeout expires without detecting the gesture, return False
     return False
-##################
 
-In-Context Example 2:
-
-Input:
-##################
-Language Description: "mouth open"
-##################
-
-Output:
-##################
-def gesture_detector(robot, threshold, timeout):
+def in_context_example2(robot, timeout=20.0, threshold=0.6):
+    """
+    Verifies the in-context example 2 code provided in the prompt
+    """
 
     def euclidean_distance(p1, p2):
         """Calculate Euclidean distance between two points."""
@@ -77,8 +50,12 @@ def gesture_detector(robot, threshold, timeout):
 
     start_time = time.time()
 
+    max_mar = 0.0
+
+    # check for mouth open
     while time.time() - start_time < timeout:
         face_keypoints = robot.get_face_keypoints()
+
         if face_keypoints is None:
             break
         
@@ -93,17 +70,22 @@ def gesture_detector(robot, threshold, timeout):
         C = euclidean_distance(mouth_points[0], mouth_points[6])   # 49, 55
 
         mar = (A + B) / (2.0 * C)
+        # print("MAR: ", mar, "Threshold: ", threshold)
+        max_mar = max(max_mar, mar)
         if mar > threshold:
+            # print("Max MAR: ", max_mar, "Detection: ", True)
             return True
     
+    # print("Max MAR: ", max_mar, "Detection: ", False)
     return False
-##################
 
-Using the In-Contect Examples as reference, generate a detector for the following input. Generate output in the same format as the in-context examples - just the code with comments, and without any additional text explaination. 
+if __name__ == '__main__':
+    threshold1, accuracy1 = search_threshold('gesture_data/shake_my_head_from_left_to_right', in_context_example1)
+    print("In-Context Example 1")
+    print("Best Threshold: ", threshold1)
+    print("Best Accuracy: ", accuracy1)
 
-Input:
-##################
-Language Description: %s
-##################
-
-Output:
+    threshold2, accuracy2 = search_threshold('gesture_data/open_mouth', in_context_example2)
+    print("In-Context Example 2")
+    print("Best Threshold: ", threshold2)
+    print("Best Accuracy: ", accuracy2)
