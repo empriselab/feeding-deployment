@@ -33,10 +33,10 @@ def main():
         source_prompt = f.read()
 
     gestures = {
-        "blinking": "eyes blinking",
-        "eyebrows_raised": "eyebrows raised",
-        "head_nod": "up-down head nod",
-        "head_still_atleast_three_secs": "head is still for atleast three seconds",
+        # "blinking": "eyes blinking",
+        # "eyebrows_raised": "eyebrows raised",
+        # "head_nod": "up-down head nod",
+        # "head_still_atleast_three_secs": "head is still for atleast three seconds",
         "look_at_robot_atleast_three_secs": "looking at robot with head still for atleast three seconds",
         "talking": "talking",
     }

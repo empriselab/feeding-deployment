@@ -266,11 +266,6 @@ class HeadPerception:
                 radius * 2,
             )
 
-            # allow window size to be adjusted
-            cv2.namedWindow("viz_image", cv2.WINDOW_NORMAL)
-            cv2.imshow("viz_image",viz_image)
-            cv2.waitKey(10)
-
         if self.record_goal_pose:
 
             if self.tool is None:
@@ -452,7 +447,7 @@ class HeadPerception:
             )
 
             if self.last_trans is not None:
-                if (filter_noisy_readings and np.any(np.abs(translation_from_reference) > self.max_distance_threshold)
+                if filter_noisy_readings and (np.any(np.abs(translation_from_reference) > self.max_distance_threshold)
                      or np.any( np.abs(rotation_from_reference) > self.max_rotation_threshold)):
                     # print("Noisy reading!")
 
@@ -569,6 +564,51 @@ class HeadPerception:
             self.last_landmarks3d = landmarks3d
             self.last_viz_image = viz_image
             self.last_visualization_points_world_frame = visualization_points_world_frame
+
+            if visualize:
+
+                # visualize neck frame on image
+                # Extract the 3D origin and axis from the transform
+                
+                origin_3d = neck_frame[:3, 3]  # Translation part (origin in 3D)
+
+                # Define the axis vectors in 3D space (relative to the origin)
+                x_axis_3d = origin_3d + 0.2*neck_frame[:3, 0]  # X-axis
+                y_axis_3d = origin_3d + 0.2*neck_frame[:3, 1]  # Y-axis
+                z_axis_3d = origin_3d + 0.2*neck_frame[:3, 2]  # Z-axis
+
+                origin_2d_x, origin_2d_y = self.world2Pixel(
+                    camera_info_msg, origin_3d[0], origin_3d[1], origin_3d[2], image.shape[0], image.shape[1]
+                )
+                origin_2d = (int(origin_2d_x), int(origin_2d_y))
+
+                x_axis_2d_x, x_axis_2d_y = self.world2Pixel(
+                    camera_info_msg, x_axis_3d[0], x_axis_3d[1], x_axis_3d[2], image.shape[0], image.shape[1]
+                )
+                x_axis_2d = (int(x_axis_2d_x), int(x_axis_2d_y))
+
+                y_axis_2d_x, y_axis_2d_y = self.world2Pixel(
+                    camera_info_msg, y_axis_3d[0], y_axis_3d[1], y_axis_3d[2], image.shape[0], image.shape[1]
+                )
+                y_axis_2d = (int(y_axis_2d_x), int(y_axis_2d_y))
+
+                z_axis_2d_x, z_axis_2d_y = self.world2Pixel(
+                    camera_info_msg, z_axis_3d[0], z_axis_3d[1], z_axis_3d[2],  image.shape[0], image.shape[1]
+                )
+                z_axis_2d = (int(z_axis_2d_x), int(z_axis_2d_y))
+
+                # Draw the origin
+                cv2.circle(viz_image, origin_2d, 5, (0, 255, 255), -1)  # Yellow circle for the origin
+
+                # Draw the axes XYZ - RGB
+                cv2.line(viz_image, origin_2d, x_axis_2d, (0, 255, 0), 4)  # X-axis
+                cv2.line(viz_image, origin_2d, y_axis_2d, (255, 0, 0), 4)  # Y-axis
+                cv2.line(viz_image, origin_2d, z_axis_2d, (0, 0, 255), 4)  # Z-axis
+
+                # allow window size to be adjusted
+                cv2.namedWindow("viz_image", cv2.WINDOW_NORMAL)
+                cv2.imshow("viz_image",viz_image)
+                cv2.waitKey(10)
 
             return (
                 landmark2d,
@@ -789,7 +829,7 @@ class HeadPerception:
 
         return True, (world_x, world_y, world_z)
 
-    def world2Pixel(self, camera_info, world_x, world_y, world_z):
+    def world2Pixel(self, camera_info, world_x, world_y, world_z, image_height, image_width):
 
         fx = camera_info.K[0]
         fy = camera_info.K[4]
@@ -798,6 +838,10 @@ class HeadPerception:
 
         image_x = world_x * (fx / world_z) + cx
         image_y = world_y * (fy / world_z) + cy
+
+        # flip back image_x and image_y for inverted form
+        image_x = image_width - image_x
+        image_y = image_height - image_y
 
         return image_x, image_y
 
