@@ -2,6 +2,9 @@ import pickle
 import numpy as np
 
 class Robot:
+    """
+    Simulate the robot with get_head_pose and get_face_keypoints methods
+    """
     def __init__(self, data_path):
 
         # load data from pickle file data_path
@@ -25,20 +28,20 @@ class Robot:
             return self.face_keypoints[self.current_frame-1]
         return None
     
-def run_detector(data_path, gesture_detector, **thresholds):
+def run_detector(data_path, gesture_detector, **kwargs):
     """
     Run the gesture detector on the given data_path
     """
     positive_correct = 0
     for i in range(5):
         robot = Robot(data_path + f'/positive_examples/{i}_parsed.pkl')
-        if gesture_detector(robot, **thresholds):
+        if gesture_detector(robot, **kwargs):
             positive_correct += 1
     
     negative_correct = 0
     for i in range(5):
         robot = Robot(data_path + f'/negative_examples/{i}_parsed.pkl')
-        if not gesture_detector(robot, **thresholds):
+        if not gesture_detector(robot, **kwargs):
             negative_correct += 1
     
     return positive_correct/5.0, negative_correct/5.0
@@ -52,6 +55,7 @@ def search_threshold(data_path, gesture_detector, timeout=20.0, threshold_range=
 
     for threshold in np.arange(threshold_range[0], threshold_range[1], step):
         positive_accuracy, negative_accuracy = run_detector(data_path, gesture_detector, timeout=timeout, threshold=threshold)
+        # print("Threshold: ", threshold, "Positive Accuracy: ", positive_accuracy, "Negative Accuracy: ", negative_accuracy)
         accuracy = (positive_accuracy + negative_accuracy) / 2.0
         if accuracy > best_accuracy:
             best_accuracy = accuracy
