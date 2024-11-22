@@ -99,7 +99,7 @@ def gesture_detector(robot, threshold, timeout):
     return False
 ##################
 
-Using the In-Contect Examples as reference, generate a detector for the following input. Generate output in the same format as the in-context examples - just the code with comments, and without any additional text explainations, as additional text will render the output unexecutable in python. Absolutely make sure that there are no time.sleep() calls in the function. If using a while loop, make sure that you have the code lines for breaking out if face_keypoints or head_pose is None.
+Using the In-Context Examples as reference, generate a detector for the following input. Generate output in the same format as the in-context examples - just the code with comments, and without any additional text explanations, as additional text will render the output unexecutable in python. Absolutely make sure that there are no time.sleep() calls in the function. If using a while loop, make sure that you have the code lines for breaking out if face_keypoints or head_pose is None.
 
 Input:
 ##################
