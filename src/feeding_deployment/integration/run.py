@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Any
 import pickle
 import queue
+import os
+import sys
 
 try:
     import rospy
@@ -15,23 +17,17 @@ try:
 except ModuleNotFoundError:
     ROSPY_IMPORTED = False
 
-# Rajat ToDo: Remove this hacky addition
-FLAIR_PATH = "/home/isacc/deployment_ws/src/FLAIR/bite_acquisition/scripts"
-import sys
-
-sys.path.append(FLAIR_PATH)
-
-import os
 try:
+    FLAIR_PATH = "/home/isacc/deployment_ws/src/FLAIR/bite_acquisition/scripts"
+    sys.path.append(FLAIR_PATH)
+
     # raise ModuleNotFoundError  # Just to skip this block
     from wrist_controller import WristController
     from flair import FLAIR
 
     FLAIR_IMPORTED = True
-    print("FLAIR imported successfully")
 except ModuleNotFoundError:
     FLAIR_IMPORTED = False
-    pass
 
 from relational_structs import (
     GroundAtom,
@@ -86,9 +82,10 @@ assert os.environ.get("PYTHONHASHSEED") == "0", \
 class _Runner:
     """A class for running the integrated system."""
 
-    def __init__(self, run_on_robot: bool, simulate_head_perception: bool, max_motion_planning_time: float,
+    def __init__(self, run_on_robot: bool, use_interface: bool, simulate_head_perception: bool, max_motion_planning_time: float,
                  resume_from_state: str = "", no_waits: bool = False) -> None:
         self.run_on_robot = run_on_robot
+        self.use_interface = use_interface  
         self.simulate_head_perception = simulate_head_perception
         self.max_motion_planning_time = max_motion_planning_time
         self.no_waits = no_waits
@@ -108,19 +105,6 @@ class _Runner:
         # Initialize the perceiver (e.g., get joint states or human head poses).
         self.perception_interface = PerceptionInterface(robot_interface=self.robot_interface, simulate_head_perception=self.simulate_head_perception)
 
-        if ROSPY_IMPORTED:
-            # Initialize the web interface.
-            self.hla_command_queue = queue.Queue()
-            self.web_interface = WebInterface(self.hla_command_queue)
-
-        # Initialize the FLAIR interface.
-        if FLAIR_IMPORTED:
-            wrist_controller = WristController()
-            flair = FLAIR(self.robot_interface, wrist_controller, self.no_waits)
-        else:
-            wrist_controller = None
-            flair = None
-
         # Initialize the simulator.
         kwargs: dict[str, Any] = {}
         if run_on_robot:
@@ -131,7 +115,22 @@ class _Runner:
 
         self.scene_description = SceneDescription(**kwargs)
 
-        self.rviz_interface = RVizInterface(self.scene_description)
+
+        if self.use_interface:
+            # Initialize the web interface.
+            self.hla_command_queue = queue.Queue()
+            self.web_interface = WebInterface(self.hla_command_queue)
+        else:
+            self.web_interface = None
+
+        if self.run_on_robot:
+            self.rviz_interface = RVizInterface(self.scene_description)
+            wrist_controller = WristController()
+            flair = FLAIR(self.robot_interface, wrist_controller, self.no_waits)
+        else:
+            self.rviz_interface = None
+            wrist_controller = None
+            flair = None
 
         # self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description)
         self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description, use_gui=False)
@@ -333,6 +332,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--run_on_robot", action="store_true")
+    parser.add_argument("--use_interface", action="store_true")
     parser.add_argument("--simulate_head_perception", action="store_true")
     parser.add_argument("--make_videos", action="store_true")
     parser.add_argument("--max_motion_planning_time", type=float, default=10.0)
@@ -340,12 +340,22 @@ if __name__ == "__main__":
     parser.add_argument("--no_waits", action="store_true")
     args = parser.parse_args()
 
-    if ROSPY_IMPORTED:
-        rospy.init_node("feeding_deployment_integration")
-    else:
-        assert not args.run_on_robot, "Need ROS to run on robot"
+    if args.run_on_robot or args.use_interface:
+        if not ROSPY_IMPORTED:
+            raise ModuleNotFoundError("Need ROS to run on robot or use interface")
+        else:
+            rospy.init_node("feeding_deployment", anonymous=True)
+    
+    if args.run_on_robot:
+        if not FLAIR_IMPORTED:
+            raise ModuleNotFoundError("Need FLAIR to run on robot")
+        
+    # Rajat ToDo: have run on robot without interface functionality
+    if args.run_on_robot:
+        args.use_interface = True
 
     runner = _Runner(args.run_on_robot, 
+                     args.use_interface,
                      args.simulate_head_perception,
                      args.max_motion_planning_time,
                      args.resume_from_state,

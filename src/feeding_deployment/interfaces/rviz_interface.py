@@ -8,7 +8,6 @@ from pybullet_helpers.geometry import Pose
 from pybullet_helpers.joint import JointPositions
 from scipy.spatial.transform import Rotation as R
 
-
 try:
     import rospy
     from sensor_msgs.msg import JointState
@@ -16,10 +15,9 @@ try:
     from visualization_msgs.msg import MarkerArray, Marker
     import tf2_ros
     from geometry_msgs.msg import TransformStamped
-
     from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
 except ModuleNotFoundError:
-    pass
+    ROSPY_IMPORTED = False
 
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 from feeding_deployment.simulation.scene_description import SceneDescription
@@ -28,6 +26,9 @@ class RVizInterface:
     """An interface for visualization on rviz"""
 
     def __init__(self, scene_description: SceneDescription) -> None:
+
+        if not ROSPY_IMPORTED:
+            raise ImportError("Please install ROS to use rviz interface.")
 
         self._scene_description = scene_description
 

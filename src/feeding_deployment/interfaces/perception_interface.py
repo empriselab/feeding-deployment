@@ -23,7 +23,7 @@ try:
     from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
     from feeding_deployment.aruco_perception.aruco_perception import ArUcoPerception
 except ModuleNotFoundError:
-    pass
+    ROSPY_IMPORTED = False
 
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 
@@ -34,18 +34,18 @@ class PerceptionInterface:
         self._robot_interface = robot_interface
         self._simulate_head_perception = simulate_head_perception
 
-        self.tfBuffer = tf2_ros.Buffer()
-        self.listener = tf2_ros.TransformListener(self.tfBuffer)
-
-        self.tool_tip_target_lock = threading.Lock()
-        # this term is updated in the run_head_perception method and read in the get_tool_tip_pose method
-        self.tool_tip_target_pose = None
-
         # run head perception
-        if robot_interface is None:
+        if self._robot_interface is None:
             self._head_perception = None
             self._aruco_perception = None
         else:
+            self.tfBuffer = tf2_ros.Buffer()
+            self.listener = tf2_ros.TransformListener(self.tfBuffer)
+
+            self.tool_tip_target_lock = threading.Lock()
+            # this term is updated in the run_head_perception method and read in the get_tool_tip_pose method
+            self.tool_tip_target_pose = None
+
             # self._head_perception = None
             self._head_perception = HeadPerceptionROSWrapper(record_goal_pose)
             
@@ -58,10 +58,10 @@ class PerceptionInterface:
             # Rajat ToDo: pass perception queues to all perception classes instead of having them use ros subscribers which spawn threads
             self._aruco_perception = ArUcoPerception()
 
-        # Head perception thread setup
-        self.head_perception_thread = None
-        self.kill_the_thread = False
-        self.head_perception_running = False
+            # Head perception thread setup
+            self.head_perception_thread = None
+            self.kill_the_thread = False
+            self.head_perception_running = False
         
     def get_robot_joints(self) -> "JointState":
         """Get the current robot joint state."""

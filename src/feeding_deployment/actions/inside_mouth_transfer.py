@@ -3,15 +3,18 @@
 import sys
 import numpy as np
 from scipy.spatial.transform import Rotation, Slerp
-from std_msgs.msg import Int64, String
 import threading
 import time
 import signal
 
-import rospy
-from std_msgs.msg import Bool
-from geometry_msgs.msg import WrenchStamped, Point
-from netft_rdt_driver.srv import String_cmd
+try:
+    import rospy
+    from std_msgs.msg import Int64, String
+    from std_msgs.msg import Bool
+    from geometry_msgs.msg import WrenchStamped, Point
+    from netft_rdt_driver.srv import String_cmd
+except ModuleNotFoundError:
+    ROSPY_IMPORTED = False
 
 # Parameters
 OPEN_LOOP_RADIUS = 0.02

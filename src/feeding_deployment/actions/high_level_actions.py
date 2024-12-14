@@ -7,14 +7,8 @@ from typing import Any
 
 import cv2
 import numpy as np
-import json
-import rospy
-from std_msgs.msg import String, Bool
-from sensor_msgs.msg import JointState
-from visualization_msgs.msg import Marker, MarkerArray
 import time
 from scipy.spatial.transform import Rotation
-
 
 from pybullet_helpers.geometry import Pose, multiply_poses
 from pybullet_helpers.joint import JointPositions
