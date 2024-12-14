@@ -746,6 +746,7 @@ class TransferToolHLA(HighLevelAction):
 
         tip_pose[:3, :3] = Rotation.from_quat([0.478, -0.505, -0.515, 0.502]).as_matrix()
 
+        # Rajat ToDo: Get this transform from pybullet (remove ROS dependency)
         if self.tool == "fork":
             tip_to_wrist = self.tf_utils.getTransformationFromTF('fork_tip', 'tool_frame')
         elif self.tool == "drink":

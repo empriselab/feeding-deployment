@@ -162,6 +162,12 @@ class FeedingDeploymentPyBulletSimulator:
         if self.held_object_name == "utensil":
             collision_ids.remove(self.utensil_id)
         return collision_ids
+    
+    def set_motors(self, target_positions: list[float]) -> None:
+        """Move the simulator to a given state."""
+        self.robot.set_motors(target_positions)
+        p.stepSimulation(physicsClientId=self.physics_client_id)
+        # Rajat TODO: Update all the other objects in the scene as well.
 
     def sync(self, state: FeedingDeploymentSimulatorState) -> None:
         """Sync the simulator to a given state."""
