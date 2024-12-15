@@ -59,11 +59,11 @@ def _main(
     scene_description = SceneDescription(**kwargs)
 
     print("Scene Description loaded")
-    sim = FeedingDeploymentPyBulletSimulator(scene_description, use_gui=True)
+    sim = FeedingDeploymentPyBulletSimulator(scene_description, use_gui=True, ignore_user=True)
 
     print("Feeding Deployment Simulator loaded")
     
-    target_pose = Pose(position=[-0.282, 0.540, 0.619], orientation=[-0.490, 0.510, 0.511, -0.489])
+    target_pose = Pose(position=[-0.282, 0.540, 0.619], orientation=[0, 0.7071068, 0.7071068, 0 ])
 
     _get_trajectory_to_pose(target_pose=target_pose, sim=sim, max_control_time=10.0)
 
