@@ -134,6 +134,11 @@ class FeedingDeploymentPyBulletSimulator:
             scene_description.utensil_pose.orientation,
             physicsClientId=self.physics_client_id,
         )
+        self.utensil_joints = []
+        for i in range(p.getNumJoints(self.utensil_id)):
+            joint_info = p.getJointInfo(self.utensil_id, i)
+            if joint_info[2] != 4: # Skip fixed joints.
+                self.utensil_joints.append(i)
 
         # Track held objects.
         self.held_object_name: str | None = None
@@ -163,11 +168,25 @@ class FeedingDeploymentPyBulletSimulator:
             collision_ids.remove(self.utensil_id)
         return collision_ids
     
-    def set_motors(self, target_positions: list[float]) -> None:
-        """Move the simulator to a given state."""
+    def set_robot_motors(self, target_positions: list[float]) -> None:
+        """Move the robot to a given state."""
         self.robot.set_motors(target_positions)
         p.stepSimulation(physicsClientId=self.physics_client_id)
         # Rajat TODO: Update all the other objects in the scene as well.
+    
+    def set_utensil_motors(self, target_positions: list[float]) -> None:
+        """Move the utensil to a given state."""
+        assert len(target_positions) == len(self.utensil_joints)
+
+        p.setJointMotorControlArray(
+            bodyUniqueId=self.utensil_id,
+            jointIndices=self.utensil_joints,
+            controlMode=p.POSITION_CONTROL,
+            targetPositions=target_positions,
+            physicsClientId=self.physics_client_id,
+        )
+        for _ in range(100):
+            p.stepSimulation(physicsClientId=self.physics_client_id)
 
     def sync(self, state: FeedingDeploymentSimulatorState) -> None:
         """Sync the simulator to a given state."""

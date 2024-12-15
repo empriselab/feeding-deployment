@@ -65,7 +65,16 @@ def _main(
     
     target_pose = Pose(position=[-0.282, 0.540, 0.619], orientation=[0, 0.7071068, 0.7071068, 0 ])
 
-    _get_trajectory_to_pose(target_pose=target_pose, sim=sim, max_control_time=10.0)
+    input("Press Enter to set utensil motors to 0.5, 0.5")
+    sim.set_utensil_motors([0.5, 0.5])
+
+    input("Press Enter to set utensil motors to 0.0, 0.0")
+    sim.set_utensil_motors([0.0, 0.0])
+
+    input("Press Enter to set utensil motors to -0.5, -0.5")
+    sim.set_utensil_motors([-0.5, -0.5])
+
+    # _get_trajectory_to_pose(target_pose=target_pose, sim=sim, max_control_time=10.0)
 
 if __name__ == "__main__":
     import argparse

@@ -131,6 +131,6 @@ def _get_trajectory_to_pose(
             break
         target_positions = compute_next_step(sim, target_pose)
         target_positions = np.concatenate((target_positions, [0, 0, 0, 0, 0, 0])) # Rajat ToDo: Remove hardcoding
-        sim.set_motors(target_positions)
+        sim.set_robot_motors(target_positions)
 
     return sim_states
