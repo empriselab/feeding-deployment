@@ -930,7 +930,7 @@ class LookAtPlateHLA(HighLevelAction):
                     self._perception_interface.get_camera_data()
                 )
 
-                items = self.flair.identify_plate(camera_color_data)
+                # items = self.flair.identify_plate(camera_color_data)
                 # flair.set_food_items(items)
                 # self.flair.set_food_items(['banana', 'baby carrot'])
                 self.flair.set_food_items(['cantaloupe', 'banana'])
