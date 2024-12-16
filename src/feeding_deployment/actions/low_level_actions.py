@@ -114,6 +114,7 @@ def teleport_to_ee_pose(
     NOTE: expected_joint_positions does NOT include finger joints.
     """
     command = CartesianCommand(pos=pose.position, quat=pose.orientation)
+    robot_commands.append(command)
 
     drink_pose = sim.scene_description.drink_pose
     wipe_pose = sim.scene_description.wipe_pose
@@ -140,7 +141,7 @@ def teleport_to_ee_pose(
         # Visualize the plan in PyBullet.
         for sim_state in plan:
             sim.sync(sim_state)
-            time.sleep(1/240.0) # Default timestep in PyBullet
+            # time.sleep(1/240.0) # Default timestep in PyBullet
 
 def move_to_ee_pose(
     sim: FeedingDeploymentPyBulletSimulator,

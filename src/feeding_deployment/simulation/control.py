@@ -36,11 +36,9 @@ def _get_joint_trajectory_to_pose(
     # visualize the target pose
     visualize_pose(target_pose, sim.physics_client_id)
     visualize_pose(sim.robot.get_end_effector_pose(), sim.physics_client_id)
-    input("Press Enter to continue...")
+    # input("Press Enter to continue...")
         
     # Rajat ToDo: make sure the controller is working
-
-    sim_states: list[FeedingDeploymentSimulatorState] = []
 
     def compute_next_step(sim, target_pose):
         current_pose = sim.robot.get_end_effector_pose()
@@ -123,6 +121,8 @@ def _get_joint_trajectory_to_pose(
         target_positions = sim.robot.get_joint_positions()[:n_dof] + joint_velocities * TIMESTEP
 
         return target_positions
+    
+    joint_positions: list[JointPositions] = []
         
     start_time = time.time()
     target_reached = False
@@ -130,7 +130,7 @@ def _get_joint_trajectory_to_pose(
         if target_pose.allclose(sim.robot.get_end_effector_pose()):
             target_reached = True
             break
-        
+        joint_positions.append(sim.robot.get_joint_positions())
         target_positions = compute_next_step(sim, target_pose)
         target_positions = np.concatenate((target_positions, [0, 0, 0, 0, 0, 0])) # Rajat ToDo: Remove hardcoding
         sim.set_robot_motors(target_positions)
@@ -138,4 +138,4 @@ def _get_joint_trajectory_to_pose(
     if not target_reached:
         raise RuntimeError("Sim cartesian controller: Failed to reach target pose in time")
 
-    return sim_states
+    return joint_positions

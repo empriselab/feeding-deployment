@@ -44,11 +44,6 @@ class PerceptionInterface:
             self.tfBuffer = tf2_ros.Buffer()
             self.listener = tf2_ros.TransformListener(self.tfBuffer)
 
-            self.tool_tip_target_lock = threading.Lock()
-            # this term is updated in the run_head_perception method and read in the get_tool_tip_pose method
-            self.tool_tip_target_pose = None
-
-            # self._head_perception = None
             self._head_perception = HeadPerceptionROSWrapper(record_goal_pose)
             
             # warm start head perception only if we're not recording the goal pose
@@ -59,11 +54,6 @@ class PerceptionInterface:
 
             # Rajat ToDo: pass perception queues to all perception classes instead of having them use ros subscribers which spawn threads
             self._aruco_perception = ArUcoPerception()
-
-            # Head perception thread setup
-            self.head_perception_thread = None
-            self.kill_the_thread = False
-            self.head_perception_running = False
 
             self.speak_pub = rospy.Publisher('/speak', String, queue_size=1)
 
@@ -81,6 +71,15 @@ class PerceptionInterface:
             self.head_shake_detected = False
             self.head_still_detected = False
             self.neck_rotation_sub = rospy.Subscriber('/head_perception/neck_rotation', Point, self.neck_rotation_callback)
+
+        self.tool_tip_target_lock = threading.Lock()
+        # this term is updated in the run_head_perception method and read in the get_tool_tip_pose method
+        self.tool_tip_target_pose = None
+
+        # Head perception thread setup
+        self.head_perception_thread = None
+        self.kill_the_thread = False
+        self.head_perception_running = False
 
     def zero_ft_sensor(self):
         print("Zeroing FT sensor")
@@ -182,6 +181,8 @@ class PerceptionInterface:
     
     def auto_timeout(self, timeout=5.0):
         print("Waiting for auto timeout")
+        if self.simulation:
+            return True
         time.sleep(timeout)
         return True
 
@@ -229,13 +230,9 @@ class PerceptionInterface:
             self._head_perception.set_tool(tool)
 
     def head_perception_thread_is_running(self) -> bool:
-        if self.simulation:
-            return True
         return self.head_perception_running
 
     def start_head_perception_thread(self):
-        if self.simulation:
-            return
         assert not self.head_perception_running, "Head perception thread is already running"
 
         # Start head perception thread
@@ -247,8 +244,6 @@ class PerceptionInterface:
         print("Head perception thread started")
 
     def run_head_perception_thread(self):
-        if self.simulation:
-            return
         self.head_perception_running = True
 
         t_init = time.time()
@@ -256,7 +251,7 @@ class PerceptionInterface:
             t_now = time.time()
             step_time = t_now - t_init
             if step_time >= 0.02:  # 50 Hz
-                if not self._simulate_head_perception:
+                if self._head_perception is not None and not self._simulate_head_perception:
                     tool_tip_target_pose = self._head_perception.run_head_perception()
                 else:
                     tool_tip_target_pose = np.eye(4)
@@ -267,8 +262,6 @@ class PerceptionInterface:
         self.head_perception_running = False
 
     def stop_head_perception_thread(self):
-        if self.simulation:
-            return
         if self.head_perception_running:
             self.kill_the_thread = True
             self.head_perception_thread.join()
