@@ -197,7 +197,7 @@ def _main(
     scene_description = SceneDescription(**kwargs)
 
     print("Scene Description loaded")
-    sim = FeedingDeploymentPyBulletSimulator(scene_description, use_gui=use_gui)
+    sim = FeedingDeploymentPyBulletSimulator(scene_description, use_gui=use_gui, ignore_user=True)
 
     print("Feeding Deployment Simulator loaded")
 

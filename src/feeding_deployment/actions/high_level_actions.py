@@ -757,12 +757,12 @@ class TransferToolHLA(HighLevelAction):
 
         # self.visualizer.visualize_fork(tip_pose)
         self.tf_utils.publishTransformationToTF('base_link', 'tool_frame_target_viz', tool_frame_target)
-      
+    
         tool_frame_pos = tool_frame_target[:3,3].reshape(1,3).tolist()[0] # one dimensional list
         tool_frame_quat = Rotation.from_matrix(tool_frame_target[:3,:3]).as_quat()
         self.robot_interface.execute_command(CartesianCommand(tool_frame_pos, tool_frame_quat))
 
-    def execute_transfer_loop(self, maintain_position_at_goal = False):
+    def execute_transfer_loop(self, sim_states, robot_commands, maintain_position_at_goal = False):
         
         assert self._perception_interface.head_perception_thread_is_running(), "Head perception thread is not running"
         assert self.tool is not None, "Tool is not set"
@@ -777,7 +777,23 @@ class TransferToolHLA(HighLevelAction):
         servo_point_forque_target = np.identity(4)
         servo_point_forque_target[:3,3] = np.array([0, 0, -DISTANCE_INFRONT_MOUTH]).reshape(1,3)
         infront_mouth_target = forque_target_base @ servo_point_forque_target
-        self.publishTaskCommand(infront_mouth_target)
+
+        if self._robot_interface is not None:
+            self.publishTaskCommand(infront_mouth_target)
+        else:
+            infront_mouth_target[:3, :3] = Rotation.from_quat([0, 0.7071068, 0.7071068, 0 ]).as_matrix()
+
+            tool_frame_pos = infront_mouth_target[:3,3].reshape(1,3).tolist()[0] # one dimensional list
+            tool_frame_quat = Rotation.from_matrix(infront_mouth_target[:3,:3]).as_quat()
+
+            teleport_to_ee_pose(
+                self._sim,
+                Pose(tool_frame_pos, tool_frame_quat),
+                None,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface if not self.no_waits else None
+            )
 
         self.detect_transfer_complete()
         # shutdown the head perception thread
@@ -785,7 +801,22 @@ class TransferToolHLA(HighLevelAction):
 
         # move to before transfer position
         final_target = self._perception_interface.get_tool_tip_pose_at_staging()
-        self.publishTaskCommand(final_target)
+        if self._robot_interface is not None:
+            self.publishTaskCommand(final_target)
+        else:
+            final_target[:3, :3] = Rotation.from_quat([0, 0.7071068, 0.7071068, 0 ]).as_matrix()
+
+            tool_frame_pos = final_target[:3,3].reshape(1,3).tolist()[0]
+            tool_frame_quat = Rotation.from_matrix(final_target[:3,:3]).as_quat()
+
+            teleport_to_ee_pose(
+                self._sim,
+                Pose(tool_frame_pos, tool_frame_quat),
+                None,
+                sim_states,
+                robot_commands,
+                rviz_interface=self._rviz_interface if not self.no_waits else None
+            )
 
         # incase for some reason the head perception thread is still running
         self._perception_interface.stop_head_perception_thread()            
@@ -841,23 +872,17 @@ class TransferToolHLA(HighLevelAction):
                 self._robot_interface.set_tool("fork")
             self.set_tool("fork")
 
-            # Rajat Hack: Just to test interface
-            if self._robot_interface is not None:
-
-                if INSIDE_MOUTH_TRANSFER:
-                    if not self.no_waits:
-                        input("Press enter to switch to task compliant mode")
-                    if self._robot_interface is not None:
-                        self._robot_interface.switch_to_task_compliant_mode()
+            if INSIDE_MOUTH_TRANSFER and self._robot_interface is not None:
+                if not self.no_waits:
+                    input("Press enter to switch to task compliant mode")
+                self._robot_interface.switch_to_task_compliant_mode()
                 
-                # Do inside-mouth transfer here
-                self.execute_transfer_loop()
+            self.execute_transfer_loop(sim_states, robot_commands)
 
-                if INSIDE_MOUTH_TRANSFER:                
-                    if not self.no_waits:
-                        input("Press enter to switch out of compliant mode")
-                    if self._robot_interface is not None:
-                        self._robot_interface.switch_out_of_compliant_mode()
+            if INSIDE_MOUTH_TRANSFER and self._robot_interface is not None:                
+                if not self.no_waits:
+                    input("Press enter to switch out of compliant mode")
+                self._robot_interface.switch_out_of_compliant_mode()
 
             # Send message to web interface indicating transfer is done.
             if self._web_interface is not None:
@@ -898,7 +923,7 @@ class TransferToolHLA(HighLevelAction):
                         self._robot_interface.switch_to_task_compliant_mode()
                 
                 # Do inside-mouth transfer here
-                self.execute_transfer_loop(maintain_position_at_goal=True)
+                self.execute_transfer_loop(sim_states, robot_commands, maintain_position_at_goal=True)
 
                 if INSIDE_MOUTH_TRANSFER:
                     if not self.no_waits:
@@ -944,7 +969,7 @@ class TransferToolHLA(HighLevelAction):
                         self._robot_interface.switch_to_task_compliant_mode()
                 
                 # Do inside-mouth transfer here
-                self.execute_transfer_loop(maintain_position_at_goal=True)
+                self.execute_transfer_loop(sim_states, robot_commands, maintain_position_at_goal=True)
 
                 if INSIDE_MOUTH_TRANSFER:
                     if not self.no_waits:
