@@ -13,6 +13,7 @@ from scipy.spatial.transform import Slerp
 
 from pybullet_helpers.geometry import Pose
 from pybullet_helpers.gui import visualize_pose
+from pybullet_helpers.joint import JointPositions
 
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
@@ -23,12 +24,11 @@ DISTANCE_LOOKAHEAD = 0.04
 ANGULAR_LOOKAHEAD = 5*np.pi/180
 TIMESTEP = 1/240 # Default timestep in pybullet
 
-def _get_trajectory_to_pose(
-    target_pose: Pose,
+def _get_joint_trajectory_to_pose(
     sim: FeedingDeploymentPyBulletSimulator,
+    target_pose: Pose,
     max_control_time: float,
-    exclude_collision_ids: set[int] | None = None,
-) -> list[FeedingDeploymentSimulatorState]:
+) -> list[JointPositions]:
     """
     Returns a joint trajectory to move the robot to a target pose as the actual robot controller would.
     """
@@ -125,12 +125,17 @@ def _get_trajectory_to_pose(
         return target_positions
         
     start_time = time.time()
-    # while time.time() - start_time < max_control_time:
-    while True:
+    target_reached = False
+    while time.time() - start_time < max_control_time:
         if target_pose.allclose(sim.robot.get_end_effector_pose()):
+            target_reached = True
             break
+        
         target_positions = compute_next_step(sim, target_pose)
         target_positions = np.concatenate((target_positions, [0, 0, 0, 0, 0, 0])) # Rajat ToDo: Remove hardcoding
         sim.set_robot_motors(target_positions)
+    
+    if not target_reached:
+        raise RuntimeError("Sim cartesian controller: Failed to reach target pose in time")
 
     return sim_states

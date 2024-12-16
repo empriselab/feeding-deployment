@@ -139,7 +139,7 @@ class _Runner:
         hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
         print("Creating HLAs...")
         self.hlas = {
-            cls(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.web_interface, hla_hyperparams, run_on_robot,
+            cls(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.web_interface, hla_hyperparams,
                 wrist_controller, flair, self.no_waits) for cls in HLAS  # type: ignore
         }
         print("HLAs created.")

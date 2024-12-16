@@ -36,9 +36,11 @@ class PerceptionInterface:
 
         # run head perception
         if self._robot_interface is None:
+            self.simulation = True
             self._head_perception = None
             self._aruco_perception = None
         else:
+            self.simulation = False
             self.tfBuffer = tf2_ros.Buffer()
             self.listener = tf2_ros.TransformListener(self.tfBuffer)
 
@@ -81,12 +83,16 @@ class PerceptionInterface:
             self.neck_rotation_sub = rospy.Subscriber('/head_perception/neck_rotation', Point, self.neck_rotation_callback)
 
     def zero_ft_sensor(self):
-        # bias FT sensor
+        print("Zeroing FT sensor")
+        if self.simulation:
+            return
         bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
         bias('bias')
         
     def speak(self, text):
         print("Speaking: ", text)
+        if self.simulation:
+            return
         self.speak_pub.publish(String(data=text))
 
     def neck_rotation_callback(self, msg):
@@ -100,6 +106,10 @@ class PerceptionInterface:
             self.head_still_detected = False
 
     def detect_mouth_open(self):
+        print("Waiting for mouth open")
+        if self.simulation:
+            return True
+        
         self.mouth_open = False
         # wait for mouth to open
         while not rospy.is_shutdown() and not self.mouth_open:
@@ -108,28 +118,37 @@ class PerceptionInterface:
         return True
 
     def detect_button_press(self):
+        print("Waiting for button press")
+        if self.simulation:
+            return True
+        
         self.transfer_button = False
         # wait for button press
-        print("Waiting for button press")
         while not rospy.is_shutdown() and not self.transfer_button:
             time.sleep(0.05)
         self.transfer_button = False
         return True
     
     def detect_force_trigger(self):
+        print("Waiting for force torque threshold to be exceeded")
+        if self.simulation:
+            return True
+        
         self.ft_threshold_exceeded = False
         # wait for force torque threshold to be exceeded
-        print("Waiting for force torque threshold to be exceeded")
         while not rospy.is_shutdown() and not self.ft_threshold_exceeded:
             time.sleep(0.05)
         self.ft_threshold_exceeded = False
         return True
     
     def detect_head_shake(self):
+        print("Waiting for head shake")
+        if self.simulation:
+            return True
+        
         self.set_filter_noisy_readings_pub.publish(Bool(data=False))
         self.head_shake_detected = False
         # wait for head shake
-        print("Waiting for head shake")
         while not rospy.is_shutdown() and not self.head_shake_detected:
             time.sleep(0.05)
         self.set_filter_noisy_readings_pub.publish(Bool(data=True))
@@ -137,9 +156,11 @@ class PerceptionInterface:
         return True
     
     def detect_head_still(self):
+        print("Waiting for head still to be detected for 4 seconds")
+        if self.simulation:
+            return True
         self.head_shake_detected = True
         self.set_filter_noisy_readings_pub.publish(Bool(data=False))
-        print("Waiting for head still to be detected for 4 seconds")
         while not rospy.is_shutdown():
             head_still_start_time = time.time()
             while not rospy.is_shutdown():
@@ -208,9 +229,13 @@ class PerceptionInterface:
             self._head_perception.set_tool(tool)
 
     def head_perception_thread_is_running(self) -> bool:
+        if self.simulation:
+            return True
         return self.head_perception_running
 
     def start_head_perception_thread(self):
+        if self.simulation:
+            return
         assert not self.head_perception_running, "Head perception thread is already running"
 
         # Start head perception thread
@@ -222,6 +247,8 @@ class PerceptionInterface:
         print("Head perception thread started")
 
     def run_head_perception_thread(self):
+        if self.simulation:
+            return
         self.head_perception_running = True
 
         t_init = time.time()
@@ -240,6 +267,8 @@ class PerceptionInterface:
         self.head_perception_running = False
 
     def stop_head_perception_thread(self):
+        if self.simulation:
+            return
         if self.head_perception_running:
             self.kill_the_thread = True
             self.head_perception_thread.join()

@@ -36,6 +36,7 @@ from feeding_deployment.simulation.planning import (
 )
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
+from feeding_deployment.simulation.control import _get_joint_trajectory_to_pose
 
 def move_to_joint_positions(
     sim: FeedingDeploymentPyBulletSimulator,
@@ -88,11 +89,17 @@ def move_to_joint_positions(
     
     sim_states.extend(plan)
 
-    # Visualize the plan in RViz.
     if rviz_interface is not None:
+        # Visualize the plan in RViz.
         for sim_state in plan:
             rviz_interface.joint_state_update(sim_state.robot_joints)
             time.sleep(0.1)
+    else:
+        # Visualize the plan in PyBullet.
+        for sim_state in plan:
+            sim.sync(sim_state)
+            time.sleep(0.1)
+
 
 
 def teleport_to_ee_pose(
@@ -104,10 +111,6 @@ def teleport_to_ee_pose(
     rviz_interface: RVizInterface | None = None,
 ) -> None:
     """Call Kinova's move_to_ee_pose to move the robot to the specified pose.
-
-    We do not yet know the implementation of move_to_ee_pose, so we we
-    teleport in simulation.
-
     NOTE: expected_joint_positions does NOT include finger joints.
     """
     command = CartesianCommand(pos=pose.position, quat=pose.orientation)
@@ -124,31 +127,20 @@ def teleport_to_ee_pose(
         elif sim.held_object_name == "utensil":
             utensil_pose = None
 
-    # Rajat ToDo: Change visualization to only show the end effector pose
-    if expected_joint_positions is None:
-        # Run IK to show one possible joint position consistent with end effector.
-        target_joint_positions = inverse_kinematics(sim.robot, pose)
-    else:
-        target_joint_positions = add_fingers_to_joint_positions(
-            sim.robot, expected_joint_positions
-        )
-    sim_state = FeedingDeploymentSimulatorState(
-        robot_joints=target_joint_positions,
-        drink_pose=drink_pose,
-        wipe_pose=wipe_pose,
-        utensil_pose=utensil_pose,
-        held_object=sim.held_object_name,
-        held_object_tf=sim.held_object_tf,
-    )
-    sim.sync(sim_state)
+    joint_trajectory = _get_joint_trajectory_to_pose(sim, pose, max_control_time=30.0)
+    plan = _plan_to_sim_state_trajectory(joint_trajectory, sim)
+    sim_states.extend(plan)
 
-    # Visualize the state in RViz.
     if rviz_interface is not None:
-        rviz_interface.joint_state_update(sim_state.robot_joints)
-        time.sleep(1.0) # long because we are teleporting
-
-    sim_states.append(sim_state)
-    robot_commands.append(command)
+        # Visualize the plan in RViz.
+        for sim_state in plan:
+            rviz_interface.joint_state_update(sim_state.robot_joints)
+            time.sleep(1/240.0) # Default timestep in PyBullet
+    else:
+        # Visualize the plan in PyBullet.
+        for sim_state in plan:
+            sim.sync(sim_state)
+            time.sleep(1/240.0) # Default timestep in PyBullet
 
 def move_to_ee_pose(
     sim: FeedingDeploymentPyBulletSimulator,
@@ -184,10 +176,15 @@ def move_to_ee_pose(
     kinova_commands = simulated_trajectory_to_kinova_commands(plan)
     robot_commands.extend(kinova_commands)
 
-    # Visualize the plan in RViz.
     if rviz_interface is not None:
+        # Visualize the plan in RViz.
         for sim_state in plan:
             rviz_interface.joint_state_update(sim_state.robot_joints)
+            time.sleep(0.005)
+    else:
+        # Visualize the plan in PyBullet.
+        for sim_state in plan:
+            sim.sync(sim_state)
             time.sleep(0.005)
 
 

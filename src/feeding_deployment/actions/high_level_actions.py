@@ -29,8 +29,6 @@ from feeding_deployment.actions.low_level_actions import (
     teleport_to_ee_pose,
     move_to_ee_pose,
 )
-from feeding_deployment.actions.inside_mouth_transfer import InsideMouthTransfer
-from feeding_deployment.actions.outside_mouth_transfer import OutsideMouthTransfer
 
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
 from feeding_deployment.interfaces.web_interface import WebInterface
@@ -75,7 +73,6 @@ class HighLevelAction(abc.ABC):
         rviz_interface: RVizInterface,
         web_interface: WebInterface,
         hla_hyperparams: dict[str, Any],
-        run_on_robot: bool,
         wrist_controller,
         flair,
         no_waits=False,
@@ -86,7 +83,6 @@ class HighLevelAction(abc.ABC):
         self._rviz_interface = rviz_interface
         self._web_interface = web_interface
         self._hla_hyperparams = hla_hyperparams
-        self._run_on_robot = run_on_robot
         self.wrist_controller = wrist_controller
         self.flair = flair
         self.no_waits = no_waits
@@ -195,7 +191,7 @@ class PickToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            if self._run_on_robot:
+            if self._robot_interface is not None:
                 self.execute_robot_commands(robot_commands)
             robot_commands = []
 
@@ -272,7 +268,7 @@ class PickToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            if self._run_on_robot:
+            if self._robot_interface is not None:
                 self.execute_robot_commands(robot_commands)
             robot_commands = []
 
@@ -286,11 +282,12 @@ class PickToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            if self._run_on_robot:
+            if self._robot_interface is not None:
                 self.execute_robot_commands(robot_commands)
 
             # Send message to web interface.
-            self._web_interface.send_web_interface_message({"state": "drink_pickup", "status": "completed"})
+            if self._web_interface is not None:
+                self._web_interface.send_web_interface_message({"state": "drink_pickup", "status": "completed"})
 
             return sim_states
 
@@ -334,7 +331,7 @@ class PickToolHLA(HighLevelAction):
             # input("Press Enter to continue...")
             self._rviz_interface.tool_update(True, "utensil", Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the utensil
 
-            if self._run_on_robot:
+            if self._robot_interface is not None:
                 self.execute_robot_commands(robot_commands)
             robot_commands = []
 
@@ -369,7 +366,7 @@ class PickToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            if self._run_on_robot:
+            if self._robot_interface is not None:
                 self.execute_robot_commands(robot_commands)
 
             return sim_states
@@ -448,11 +445,12 @@ class PickToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            if self._run_on_robot:
+            if self._robot_interface is not None:
                 self.execute_robot_commands(robot_commands)
 
             # Send message to web interface.
-            self._web_interface.send_web_interface_message({"state": "prepare_mouth_wiping", "status": "completed"})
+            if self._web_interface is not None:
+                self._web_interface.send_web_interface_message({"state": "prepare_mouth_wiping", "status": "completed"})
 
             return sim_states
 
@@ -559,7 +557,7 @@ class StowToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            if self._run_on_robot:
+            if self._robot_interface is not None:
                 self.execute_robot_commands(robot_commands)
 
             return sim_states
@@ -619,7 +617,7 @@ class StowToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            if self._run_on_robot:
+            if self._robot_interface is not None:
                 self.execute_robot_commands(robot_commands)
 
             return sim_states
@@ -688,7 +686,7 @@ class StowToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            if self._run_on_robot:
+            if self._robot_interface is not None:
                 self.execute_robot_commands(robot_commands)
 
             return sim_states
@@ -828,7 +826,7 @@ class TransferToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            if self._run_on_robot:
+            if self._robot_interface is not None:
                 self.execute_robot_commands(robot_commands)
             robot_commands = []
 
@@ -839,16 +837,18 @@ class TransferToolHLA(HighLevelAction):
             self._perception_interface.set_head_perception_tool("fork")
             self._perception_interface.start_head_perception_thread()
             time.sleep(5.0) # let head perception thread warmstart / robot to stabilize
-            self._robot_interface.set_tool("fork")
+            if self._robot_interface is not None:
+                self._robot_interface.set_tool("fork")
             self.set_tool("fork")
 
             # Rajat Hack: Just to test interface
-            if self._run_on_robot:
+            if self._robot_interface is not None:
 
                 if INSIDE_MOUTH_TRANSFER:
                     if not self.no_waits:
                         input("Press enter to switch to task compliant mode")
-                    self._robot_interface.switch_to_task_compliant_mode()
+                    if self._robot_interface is not None:
+                        self._robot_interface.switch_to_task_compliant_mode()
                 
                 # Do inside-mouth transfer here
                 self.execute_transfer_loop()
@@ -856,10 +856,12 @@ class TransferToolHLA(HighLevelAction):
                 if INSIDE_MOUTH_TRANSFER:                
                     if not self.no_waits:
                         input("Press enter to switch out of compliant mode")
-                    self._robot_interface.switch_out_of_compliant_mode()
+                    if self._robot_interface is not None:
+                        self._robot_interface.switch_out_of_compliant_mode()
 
             # Send message to web interface indicating transfer is done.
-            self._web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
+            if self._web_interface is not None:
+                self._web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
 
             return sim_states
         
@@ -877,21 +879,23 @@ class TransferToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            if self._run_on_robot:
+            if self._robot_interface is not None:
                 self.execute_robot_commands(robot_commands)
             robot_commands = []
 
             self._perception_interface.set_head_perception_tool("drink")
             self._perception_interface.start_head_perception_thread()
             time.sleep(5.0) # let head perception thread warmstart / robot to stabilize
-            self._robot_interface.set_tool("drink")
+            if self._robot_interface is not None:
+                self._robot_interface.set_tool("drink")
             self.set_tool("drink")
 
-            if self._run_on_robot:
+            if self._robot_interface is not None:
                 if INSIDE_MOUTH_TRANSFER:
                     if not self.no_waits:
                         input("Press enter to switch to task compliant mode")
-                    self._robot_interface.switch_to_task_compliant_mode()
+                    if self._robot_interface is not None:
+                        self._robot_interface.switch_to_task_compliant_mode()
                 
                 # Do inside-mouth transfer here
                 self.execute_transfer_loop(maintain_position_at_goal=True)
@@ -899,10 +903,12 @@ class TransferToolHLA(HighLevelAction):
                 if INSIDE_MOUTH_TRANSFER:
                     if not self.no_waits:
                         input("Press enter to switch out of compliant mode")
-                    self._robot_interface.switch_out_of_compliant_mode()
+                    if self._robot_interface is not None:
+                        self._robot_interface.switch_out_of_compliant_mode()
 
             # Send message to web interface indicating transfer is done.
-            self._web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})
+            if self._web_interface is not None:
+                self._web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})
             return sim_states
         
         elif tool.name == "wipe":
@@ -919,21 +925,23 @@ class TransferToolHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            if self._run_on_robot:
+            if self._robot_interface is not None:
                 self.execute_robot_commands(robot_commands)
             robot_commands = []
 
             self._perception_interface.set_head_perception_tool("wipe")
             self._perception_interface.start_head_perception_thread()
             time.sleep(5.0) # let head perception thread warmstart / robot to stabilize
-            self._robot_interface.set_tool("wipe")
+            if self._robot_interface is not None:
+                self._robot_interface.set_tool("wipe")
             self.set_tool("wipe")
 
-            if self._run_on_robot:
+            if self._robot_interface is not None:
                 if INSIDE_MOUTH_TRANSFER:
                     if not self.no_waits:
                         input("Press enter to switch to task compliant mode")
-                    self._robot_interface.switch_to_task_compliant_mode()
+                    if self._robot_interface is not None:
+                        self._robot_interface.switch_to_task_compliant_mode()
                 
                 # Do inside-mouth transfer here
                 self.execute_transfer_loop(maintain_position_at_goal=True)
@@ -941,10 +949,12 @@ class TransferToolHLA(HighLevelAction):
                 if INSIDE_MOUTH_TRANSFER:
                     if not self.no_waits:
                         input("Press enter to switch out of compliant mode")
-                    self._robot_interface.switch_out_of_compliant_mode()
+                    if self._robot_interface is not None:
+                        self._robot_interface.switch_out_of_compliant_mode()
 
             # Send message to web interface indicating transfer is done.
-            self._web_interface.send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})
+            if self._web_interface is not None:
+                self._web_interface.send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})
             return sim_states
 
         else:
@@ -995,7 +1005,7 @@ class LookAtPlateHLA(HighLevelAction):
                 rviz_interface=self._rviz_interface if not self.no_waits else None
             )
 
-            if self._run_on_robot:
+            if self._robot_interface is not None:
                 self.execute_robot_commands(robot_commands)
             
             if self.wrist_controller is not None:
@@ -1041,37 +1051,38 @@ class LookAtPlateHLA(HighLevelAction):
                     #     }
                     #     pickle.dump(plate_log, f)
 
-                    self._web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
-                    time.sleep(0.2) # simulate delay for web interface
-                    self._web_interface.send_web_interface_image(items_detection['plate_image'])
-                    self._web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data})
-                    self._web_interface.send_web_interface_message({"n_ordering": len(ordering_options), "data": ordering_options})
+                    if self._web_interface is not None:
+                        self._web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
+                        time.sleep(0.2) # simulate delay for web interface
+                        self._web_interface.send_web_interface_image(items_detection['plate_image'])
+                        self._web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data})
+                        self._web_interface.send_web_interface_message({"n_ordering": len(ordering_options), "data": ordering_options})
 
-                    # save all of this in a pickle file:
-                    # import pickle
-                    # with open("meal_start_log.pkl", "wb") as f:
-                    #     meal_start_log = {
-                    #         "plate_image": items_detection['plate_image'],
-                    #         "plate_bounds": items_detection['plate_bounds'],
-                    #         "food_type_to_data": food_type_to_data,
-                    #         "ordering_options": ordering_options,
-                    #     }
-                    #     pickle.dump(meal_start_log, f)
+                        # save all of this in a pickle file:
+                        # import pickle
+                        # with open("meal_start_log.pkl", "wb") as f:
+                        #     meal_start_log = {
+                        #         "plate_image": items_detection['plate_image'],
+                        #         "plate_bounds": items_detection['plate_bounds'],
+                        #         "food_type_to_data": food_type_to_data,
+                        #         "ordering_options": ordering_options,
+                        #     }
+                        #     pickle.dump(meal_start_log, f)
 
-                    # self._web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
-                    # time.sleep(1.0) # simulate delay, also needed for web interface
-                    # self._web_interface.update_web_interface_image(items_detection['plate_image'])
-                    # time.sleep(1.0)  # simulate delay, also needed for web interface
-                    # self._web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data})
-                    # self._web_interface.send_web_interface_message({"n_ordering": len(ordering_options), "data": ordering_options})
+                        # self._web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
+                        # time.sleep(1.0) # simulate delay, also needed for web interface
+                        # self._web_interface.update_web_interface_image(items_detection['plate_image'])
+                        # time.sleep(1.0)  # simulate delay, also needed for web interface
+                        # self._web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data})
+                        # self._web_interface.send_web_interface_message({"n_ordering": len(ordering_options), "data": ordering_options})
 
-                    # Wait for web interface to report order selection.
-                    print("WAITING TO GET PREFERENCE")
-                    while self._web_interface.user_preference is None:
-                        time.sleep(1e-1)
-                    print("FINISHED GETTING PREFERENCES")
-                    print("User Preference:", self._web_interface.user_preference)
-                    self.flair.set_preference(self._web_interface.user_preference)
+                        # Wait for web interface to report order selection.
+                        print("WAITING TO GET PREFERENCE")
+                        while self._web_interface.user_preference is None:
+                            time.sleep(1e-1)
+                        print("FINISHED GETTING PREFERENCES")
+                        print("User Preference:", self._web_interface.user_preference)
+                        self.flair.set_preference(self._web_interface.user_preference)
                 # else:
                 #     self._web_interface.send_web_interface_image(items_detection['plate_image'])
                 #     time.sleep(1.0)  # simulate delay, also needed for web interface
@@ -1095,11 +1106,12 @@ class LookAtPlateHLA(HighLevelAction):
                 data = [{k: v} for k, v in food_type_to_data.items() if k != next_food_item]
                 current_bite = {next_food_item: food_type_to_data[next_food_item]}
 
-                self._web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
-                time.sleep(0.2) # simulate delay, needed for web interface
-                self._web_interface.send_web_interface_image(items_detection['plate_image'])
-                time.sleep(0.1)
-                self._web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data, "current_bite": current_bite})            
+                if self._web_interface is not None:
+                    self._web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
+                    time.sleep(0.2) # simulate delay, needed for web interface
+                    self._web_interface.send_web_interface_image(items_detection['plate_image'])
+                    time.sleep(0.1)
+                    self._web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data, "current_bite": current_bite})            
 
                 # import pickle
                 # with open("next_bite_log.pkl", "wb") as f:
@@ -1211,7 +1223,7 @@ class AcquireBiteHLA(HighLevelAction):
                     rviz_interface=self._rviz_interface if not self.no_waits else None
                 )
 
-                if self._run_on_robot:
+                if self._robot_interface is not None:
                     self.execute_robot_commands(robot_commands)
 
                 # set the wrist controller to always keep utensil horizontal
@@ -1222,7 +1234,8 @@ class AcquireBiteHLA(HighLevelAction):
                 time.sleep(2.0)  # simulate delay, also needed for web interface
 
             # Send message to web interface indicating that robot is done with acquisition.
-            self._web_interface.send_web_interface_message({"state": "bite_pickup", "status": "completed"})
+            if self._web_interface is not None:
+                self._web_interface.send_web_interface_message({"state": "bite_pickup", "status": "completed"})
 
             return []
 
@@ -1264,7 +1277,7 @@ class ResetHLA(HighLevelAction):
             rviz_interface=self._rviz_interface if not self.no_waits else None
         )
 
-        if self._run_on_robot:
+        if self._robot_interface is not None:
             self.execute_robot_commands(robot_commands)
 
         # set FLAIR preferences to None
