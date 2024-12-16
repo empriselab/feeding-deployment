@@ -8,6 +8,7 @@ import pickle
 import queue
 import os
 import sys
+import signal
 
 try:
     import rospy
@@ -82,7 +83,7 @@ assert os.environ.get("PYTHONHASHSEED") == "0", \
 class _Runner:
     """A class for running the integrated system."""
 
-    def __init__(self, run_on_robot: bool, use_interface: bool, simulate_head_perception: bool, max_motion_planning_time: float,
+    def __init__(self, run_on_robot: bool, use_interface: bool, use_gui: bool, simulate_head_perception: bool, max_motion_planning_time: float,
                  resume_from_state: str = "", no_waits: bool = False) -> None:
         self.run_on_robot = run_on_robot
         self.use_interface = use_interface  
@@ -133,7 +134,7 @@ class _Runner:
             flair = None
 
         # self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description)
-        self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description, use_gui=False)
+        self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description, use_gui=use_gui, ignore_user=True)
 
         # Create skills for high-level planning.
         hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
@@ -185,6 +186,9 @@ class _Runner:
                     sys.exit(0)
 
         print("Runner is ready.")
+        self.active = True
+
+    def run(self) -> None:
 
         # for i in range(2):
         #     # # Uncomment to test commands.
@@ -192,18 +196,26 @@ class _Runner:
         #     self.hla_command_queue.put(drink_pickup_msg)
 
         # wipe_transfer_msg = {"status": "move_to_wiping_position", "state": "prepared_mouth_wiping"}
-        # self.hla_command_queue.put(wipe_transfer_msg)
+        # self.parse_interface_msg(wipe_transfer_msg)
 
         # drink_pickup_msg = {"status": "drink_pickup", "state": "pre_bite_pickup"}
-        # self.hla_command_queue.put(drink_pickup_msg)
+        # self.parse_interface_msg(drink_pickup_msg)
 
-        while not rospy.is_shutdown():
-            try:
-                hla_interface_msg = self.hla_command_queue.get(timeout=1)
-                self.parse_interface_msg(hla_interface_msg)
-                print("Ready for next user command.")
-            except queue.Empty:
-                continue
+        if self.use_interface:
+            while self.active:
+                try:
+                    hla_interface_msg = self.hla_command_queue.get(timeout=1)
+                    self.parse_interface_msg(hla_interface_msg)
+                    print("Ready for next user command.")
+                except queue.Empty:
+                    continue
+        else:
+            print("No commands can be processed without the web interface.")
+
+    def signal_handler(self, signal, frame):
+        self.active = False
+        print("\nprogram exiting gracefully")
+        sys.exit(0)
 
     def parse_interface_msg(self, msg_dict: dict[str, Any]) -> None:
         """Pass high level action message from the web interface."""
@@ -333,6 +345,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--run_on_robot", action="store_true")
     parser.add_argument("--use_interface", action="store_true")
+    parser.add_argument("--use_gui", action="store_true")
     parser.add_argument("--simulate_head_perception", action="store_true")
     parser.add_argument("--make_videos", action="store_true")
     parser.add_argument("--max_motion_planning_time", type=float, default=10.0)
@@ -356,10 +369,14 @@ if __name__ == "__main__":
 
     runner = _Runner(args.run_on_robot, 
                      args.use_interface,
+                     args.use_gui,
                      args.simulate_head_perception,
                      args.max_motion_planning_time,
                      args.resume_from_state,
                      args.no_waits)
+    
+    # Handle Ctrl+C gracefully
+    signal.signal(signal.SIGINT, runner.signal_handler)
 
     # Uncomment to test commands.
     # drink_pickup_msg = {"status": "drink_pickup"}
@@ -368,13 +385,16 @@ if __name__ == "__main__":
     # drink_transfer_msg = {"status": "drink_transfer"}
     # runner.hla_command_queue.put(drink_transfer_msg)
 
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+    print("Processed transfer command")
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.utensil,)))
     # for _ in range(10):
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
+
+    runner.run()
 
     if args.make_videos:
         runner.make_video(Path("full.mp4"))

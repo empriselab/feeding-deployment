@@ -257,7 +257,8 @@ class PickToolHLA(HighLevelAction):
             robot_commands.append(OpenGripperCommand())
             # only for sim: set held object
             sim_states.extend(_get_plan_to_execute_grasp(self._sim, "drink"))
-            self._rviz_interface.tool_update(True, "drink", Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the drink
+            if self._rviz_interface is not None:
+                self._rviz_interface.tool_update(True, "drink", Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the drink
 
             teleport_to_ee_pose(
                 self._sim,
@@ -329,7 +330,8 @@ class PickToolHLA(HighLevelAction):
             # only for sim: set held object
             sim_states.extend(_get_plan_to_execute_grasp(self._sim, "utensil"))
             # input("Press Enter to continue...")
-            self._rviz_interface.tool_update(True, "utensil", Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the utensil
+            if self._rviz_interface is not None:
+                self._rviz_interface.tool_update(True, "utensil", Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the utensil
 
             if self._robot_interface is not None:
                 self.execute_robot_commands(robot_commands)
@@ -409,7 +411,8 @@ class PickToolHLA(HighLevelAction):
             # only for sim: set held object
             sim_states.extend(_get_plan_to_execute_grasp(self._sim, "wipe"))
             # input("Press Enter to continue...")
-            self._rviz_interface.tool_update(True, "wipe", Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the wipe
+            if self._rviz_interface is not None:
+                self._rviz_interface.tool_update(True, "wipe", Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the wipe
 
             teleport_to_ee_pose(
                 self._sim,
@@ -521,7 +524,8 @@ class StowToolHLA(HighLevelAction):
             # only for sim: unset held object
             sim_states.extend(_get_plan_to_execute_ungrasp(self._sim))
             # update rviz
-            self._rviz_interface.tool_update(False, "drink", self._sim.scene_description.drink_pose) # stow the drink
+            if self._rviz_interface is not None:
+                self._rviz_interface.tool_update(False, "drink", self._sim.scene_description.drink_pose) # stow the drink
 
             teleport_to_ee_pose(
                 self._sim,
@@ -598,7 +602,8 @@ class StowToolHLA(HighLevelAction):
             # only for sim: unset held object
             sim_states.extend(_get_plan_to_execute_ungrasp(self._sim))
             # input("Press Enter to continue...")
-            self._rviz_interface.tool_update(False, "utensil", self._sim.scene_description.utensil_pose) # stow the utensil
+            if self._rviz_interface is not None:
+                self._rviz_interface.tool_update(False, "utensil", self._sim.scene_description.utensil_pose) # stow the utensil
 
             teleport_to_ee_pose(
                 self._sim,
@@ -667,7 +672,8 @@ class StowToolHLA(HighLevelAction):
             # only for sim: unset held object
             sim_states.extend(_get_plan_to_execute_ungrasp(self._sim))
             # input("Press Enter to continue...")
-            self._rviz_interface.tool_update(False, "wipe", self._sim.scene_description.wipe_pose) # stow the wipe
+            if self._rviz_interface is not None:
+                self._rviz_interface.tool_update(False, "wipe", self._sim.scene_description.wipe_pose) # stow the wipe
 
             teleport_to_ee_pose(
                 self._sim,

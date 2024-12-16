@@ -127,12 +127,12 @@ def _get_joint_trajectory_to_pose(
     start_time = time.time()
     target_reached = False
     while time.time() - start_time < max_control_time:
-        if target_pose.allclose(sim.robot.get_end_effector_pose()):
+        if target_pose.allclose(sim.robot.get_end_effector_pose(), atol=1e-2):
             target_reached = True
             break
         joint_positions.append(sim.robot.get_joint_positions())
         target_positions = compute_next_step(sim, target_pose)
-        target_positions = np.concatenate((target_positions, [0, 0, 0, 0, 0, 0])) # Rajat ToDo: Remove hardcoding
+        target_positions = np.concatenate((target_positions, sim.robot.finger_state_to_joints(sim.scene_description.tool_grasp_fingers_value))) # Rajat ToDo: Remove hardcoding
         sim.set_robot_motors(target_positions)
     
     if not target_reached:
