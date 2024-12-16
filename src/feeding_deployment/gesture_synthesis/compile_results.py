@@ -42,13 +42,21 @@ def parse_dataset(source_path):
 
 if __name__ == "__main__":
     source_paths = ['blinking', 'eyebrows_raised', 'head_nod', 'head_still_atleast_three_secs', 'look_at_robot_atleast_three_secs', 'talking']
-    
-    means = []
-    stds = []
-    for source_path in source_paths:
-        mean, std = parse_dataset( 'gesture_data/' + source_path)
-        print(f"Gestures: {source_path}, Mean: {mean}, Std: {std}")
-        means.append(mean)
-        stds.append(std)
 
-    print(f"Overall Mean: {sum(means)/len(means)}, Std of Means: {(sum([(mean - sum(means)/len(means))**2 for mean in means]) / len(means))**0.5}")
+    for source_path in source_paths:
+        if not os.path.exists(f"gesture_data/results/{source_path}"):
+            os.makedirs(f"gesture_data/results/{source_path}")
+        for i in range(10):
+            result_path = 'gesture_data/' + source_path + f'/results/{i}.txt'
+            # copy result files to new directory
+            os.system(f"cp {result_path} gesture_data/results/{source_path}/{i}.txt")
+    
+    # means = []
+    # stds = []
+    # for source_path in source_paths:
+    #     mean, std = parse_dataset( 'gesture_data/' + source_path)
+    #     print(f"Gestures: {source_path}, Mean: {mean}, Std: {std}")
+    #     means.append(mean)
+    #     stds.append(std)
+
+    # print(f"Overall Mean: {sum(means)/len(means)}, Std of Means: {(sum([(mean - sum(means)/len(means))**2 for mean in means]) / len(means))**0.5}")
