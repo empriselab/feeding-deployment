@@ -226,6 +226,7 @@ class PerceptionInterface:
     
     def set_head_perception_tool(self, tool: str) -> None:
         """Set the tool for head perception."""
+        self.tool = tool
         if self._head_perception is not None:
             self._head_perception.set_tool(tool)
 
@@ -289,13 +290,13 @@ class PerceptionInterface:
 
         tool_tip_staging_pose = np.eye(4)
 
-        if self._head_perception.head_perception.tool == "fork":
+        if self.tool == "fork":
             tool_tip_staging_pose[:3, 3] = [0.091, 0.292, 0.402]
             tool_tip_staging_pose[:3, :3] = R.from_quat([0.478, -0.505, -0.515, 0.502]).as_matrix()
-        elif self._head_perception.head_perception.tool == "drink":
+        elif self.tool == "drink":
             tool_tip_staging_pose[:3, 3] = [0.140, 0.331, 0.468]
             tool_tip_staging_pose[:3, :3] = R.from_quat([0.478, -0.505, -0.515, 0.502]).as_matrix()
-        elif self._head_perception.head_perception.tool == "wipe":
+        elif self.tool == "wipe":
             tool_tip_staging_pose[:3, 3] = [0.256, 0.284, 0.380]
             tool_tip_staging_pose[:3, :3] = R.from_quat([0.478, -0.505, -0.515, 0.502]).as_matrix()
 

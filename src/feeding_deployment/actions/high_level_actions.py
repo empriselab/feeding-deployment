@@ -800,18 +800,15 @@ class TransferToolHLA(HighLevelAction):
         self._perception_interface.stop_head_perception_thread()
 
         # move to before transfer position
-        final_target = self._perception_interface.get_tool_tip_pose_at_staging()
         if self._robot_interface is not None:
+            final_target = self._perception_interface.get_tool_tip_pose_at_staging()
             self.publishTaskCommand(final_target)
         else:
-            final_target[:3, :3] = Rotation.from_quat([0, 0.7071068, 0.7071068, 0 ]).as_matrix()
-
-            tool_frame_pos = final_target[:3,3].reshape(1,3).tolist()[0]
-            tool_frame_quat = Rotation.from_matrix(final_target[:3,:3]).as_quat()
-
+            before_transfer_pose = Pose(position=(0.34608936309814453, 0.29957517981529236, 0.39175164699554443), orientation=(0.026013847440481186, 0.711905300617218, 0.7017908692359924, 0.0019354750402271748))
+            
             teleport_to_ee_pose(
                 self._sim,
-                Pose(tool_frame_pos, tool_frame_quat),
+                before_transfer_pose,
                 None,
                 sim_states,
                 robot_commands,

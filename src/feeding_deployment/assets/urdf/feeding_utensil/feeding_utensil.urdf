@@ -24,12 +24,12 @@
         <color rgba="0.75294 1 0.75294 1"/>
       </material>
     </visual>
-    <collision>
+    <!-- <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <mesh filename="utensil_base.stl"/>
       </geometry>
-    </collision>
+    </collision> -->
   </link>
   <link name="forkpitch">
     <inertial>
@@ -46,12 +46,12 @@
         <color rgba="1 0.50196 0.50196 1"/>
       </material>
     </visual>
-    <collision>
+    <!-- <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <mesh filename="pitch_link.stl"/>
       </geometry>
-    </collision>
+    </collision> -->
   </link>
   <joint name="forkpitch_joint" type="revolute">
     <origin rpy="0 0 0" xyz="0.11 0.0 -0.087"/>
@@ -75,12 +75,12 @@
         <color rgba="1 1 1 1"/>
       </material>
     </visual>
-    <collision>
+    <!-- <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <mesh filename="roll_link.stl"/>
       </geometry>
-    </collision>
+    </collision> -->
   </link>
   <joint name="forkroll_joint" type="continuous">
     <origin rpy="-1.570796 0 0" xyz="0.0151 0.0 0.0095  "/>
