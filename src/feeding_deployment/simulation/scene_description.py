@@ -82,6 +82,18 @@ class SceneDescription:
         / "wheelchair"
         / "wheelchair.urdf"
     )
+    
+    user_head_pose: Pose = Pose(
+        (-0.4, 0.5, 0.67), (0.5, 0.5, 0.5, 0.5)
+    )
+
+    user_head_urdf_path: Path = (
+        Path(__file__).parent.parent
+        / "assets"
+        / "urdf"
+        / "head_models"
+        / "mouth_open.urdf"
+    )
 
     # Conservative bounding box around the wheel chair.
     conservative_bb_pose: Pose = Pose((-0.4, 0.7, -0.25))
