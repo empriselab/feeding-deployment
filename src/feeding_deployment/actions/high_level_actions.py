@@ -273,7 +273,7 @@ class PickToolHLA(HighLevelAction):
                 self.execute_robot_commands(robot_commands)
             robot_commands = []
 
-            self._perception_interface.record_drink_pickup_joint_pos()
+            self._perception_interface.record_drink_pickup_joint_pos(sim_states[-1].robot_joints)
 
             move_to_joint_positions(
                 self._sim,

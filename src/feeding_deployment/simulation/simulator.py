@@ -83,6 +83,18 @@ class FeedingDeploymentPyBulletSimulator:
             self._wheelchair_id = None
             self.conservative_bb_id = None
 
+        self._user_head = p.loadURDF(
+            str(scene_description.user_head_urdf_path),
+            useFixedBase=True,
+            physicsClientId=self.physics_client_id,
+        )
+        p.resetBasePositionAndOrientation(
+            self._user_head,
+            scene_description.user_head_pose.position,
+            scene_description.user_head_pose.orientation,
+            physicsClientId=self.physics_client_id,
+        )
+
         # Create drink.
         self.drink_id = p.loadURDF(
             str(scene_description.drink_urdf_path),

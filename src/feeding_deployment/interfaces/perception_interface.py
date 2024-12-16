@@ -322,13 +322,16 @@ class PerceptionInterface:
 
     def perceive_drink_pickup_poses(self):
         
-        # Rajat Hack: Wait one second for the aruco mean to be correct, does this actually help though?
-        time.sleep(1)
+        if self.simulation:
+            self.aruco_pose = (np.array([0.5, 0.4, 0.25]), np.array([0.0, 0.0, 0.0, 1.0]))
+        else:
+            # Rajat Hack: Wait one second for the aruco mean to be correct, does this actually help though?
+            time.sleep(1)
 
-        aruco_pose_msg = rospy.wait_for_message("/aruco_pose", PoseMsg)
-        position = (aruco_pose_msg.position.x, aruco_pose_msg.position.y, aruco_pose_msg.position.z)
-        orientation = (aruco_pose_msg.orientation.x, aruco_pose_msg.orientation.y, aruco_pose_msg.orientation.z, aruco_pose_msg.orientation.w)
-        self.aruco_pose = (position, orientation)
+            aruco_pose_msg = rospy.wait_for_message("/aruco_pose", PoseMsg)
+            position = (aruco_pose_msg.position.x, aruco_pose_msg.position.y, aruco_pose_msg.position.z)
+            orientation = (aruco_pose_msg.orientation.x, aruco_pose_msg.orientation.y, aruco_pose_msg.orientation.z, aruco_pose_msg.orientation.w)
+            self.aruco_pose = (position, orientation)
 
         drink_poses  = {}
 
@@ -343,8 +346,11 @@ class PerceptionInterface:
 
         return drink_poses
     
-    def record_drink_pickup_joint_pos(self):
-        self.drink_pickup_joint_pos = self.get_robot_joints()[:7]
+    def record_drink_pickup_joint_pos(self, sim_joint_pos=None):
+        if self.simulation:
+            self.drink_pickup_joint_pos = sim_joint_pos
+        else:
+            self.drink_pickup_joint_pos = self.get_robot_joints()[:7]
         # save them in a pickle file
         drink_pickup_pos = {
             "last_drink_poses": self.last_drink_poses,
