@@ -12,7 +12,7 @@ from relational_structs import (
     Type,
     Variable,
 )
-from base import (
+from feeding_deployment.actions.base import (
     HighLevelAction,
     tool_type,
     GripperFree,

@@ -41,24 +41,23 @@ from relational_structs import (
 from relational_structs.utils import parse_pddl_plan
 from tomsutils.pddl_planning import run_pyperplan_planning
 
-from feeding_deployment.actions.high_level_actions import (
+from feeding_deployment.actions.base import (
     GripperFree,
-    GroundHighLevelAction,
     Holding,
     IsUtensil,
     PlateInView,
-    PickToolHLA,
-    LookAtPlateHLA,
-    AcquireBiteHLA,
-    StowToolHLA,
     ToolPrepared,
     ToolTransferDone,
-    TransferToolHLA,
     ResetPos,
+    tool_type,
+    GroundHighLevelAction,
     ResetHLA,
     pddl_plan_to_hla_plan,
-    tool_type,
 )
+from feeding_deployment.actions.pick_tool import PickToolHLA
+from feeding_deployment.actions.stow_tool import StowToolHLA
+from feeding_deployment.actions.transfer_tool import TransferToolHLA
+from feeding_deployment.actions.acquisition import LookAtPlateHLA, AcquireBiteHLA
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
 from feeding_deployment.interfaces.web_interface import WebInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
@@ -69,9 +68,8 @@ from feeding_deployment.simulation.scene_description import (
 )
 from feeding_deployment.simulation.simulator import (
     FeedingDeploymentPyBulletSimulator,
-    FeedingDeploymentSimulatorState,
+    FeedingDeploymentWorldState,
 )
-from feeding_deployment.simulation.video import make_simulation_video
 from pybullet_helpers.geometry import Pose
 
 # All the high level actions we want to consider.
@@ -176,7 +174,7 @@ class _Runner:
         }
 
         # Record the full simulated trajectory for viz and debug.
-        self.full_simulated_traj: list[FeedingDeploymentSimulatorState] = []
+        self.full_simulated_traj: list[FeedingDeploymentWorldState] = []
 
         if self._saved_state_infile:
             self._load_from_state()
@@ -303,6 +301,7 @@ class _Runner:
             assert operator.preconditions.issubset(self.current_atoms)
 
             # Execute the high-level plan in simulation
+            ## Rajat Todo: execute_action returns None now, so need to rewrite saving trajectories
             sim_traj = ground_hla.execute_action()
 
             if sim_traj:
@@ -321,10 +320,10 @@ class _Runner:
 
     def make_video(self, outfile: Path) -> None:
         """Create a video of the simulated trajectory."""
-        make_simulation_video(self.sim, self.full_simulated_traj, outfile)
+        self.sim.make_simulation_video(outfile)
         print(f"Saved video to {outfile}")
 
-    def _save_state(self, sim_state: FeedingDeploymentSimulatorState, atoms: set[GroundAtom]) -> None:
+    def _save_state(self, sim_state: FeedingDeploymentWorldState, atoms: set[GroundAtom]) -> None:
         with open(self._saved_state_outfile, "wb") as f:
             pickle.dump((sim_state, atoms), f)
         print(f"Saved system state to {self._saved_state_outfile}")
@@ -333,7 +332,7 @@ class _Runner:
         with open(self._saved_state_infile, "rb") as f:
             sim_state, self.current_atoms = pickle.load(f)
         if sim_state is not None:
-            assert isinstance(sim_state, FeedingDeploymentSimulatorState)
+            assert isinstance(sim_state, FeedingDeploymentWorldState)
             self.sim.sync(sim_state)
             self.rviz_interface.joint_state_update(sim_state.robot_joints)
             if sim_state.held_object:
@@ -390,14 +389,13 @@ if __name__ == "__main__":
 
     if not args.use_interface:
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.utensil,)))
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
-        print("Processed transfer command")
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.utensil,)))
         # for _ in range(10):
             # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
             # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))

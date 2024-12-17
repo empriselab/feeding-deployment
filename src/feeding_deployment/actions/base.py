@@ -39,7 +39,7 @@ from feeding_deployment.simulation.planning import (
     _get_plan_to_execute_ungrasp,
 )
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
-from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
+from feeding_deployment.simulation.state import FeedingDeploymentWorldState
 
 # Define some predicates that can be used for sequencing the high-level actions.
 tool_type = Type("tool")  # utensil, drink, or wiping tool
@@ -96,31 +96,48 @@ class HighLevelAction(abc.ABC):
         """Execute the action on the robot and return simulated trajectory."""
 
     def move_to_joint_positions(self, joint_positions: list[float]) -> None:
-        plan = self._sim.move_to_joint_positions(self._sim.scene_description.retract_pos)
-        self.execute_robot_command(JointCommand(pos=self._sim.scene_description.retract_pos[:7]), plan)
+        plan = self._sim.plan_to_joint_positions(joint_positions)
+        print("Plan has length", len(plan))
+        if self._robot_interface is None:
+            self._sim.visualize_plan(plan)
+        else:
+            self.execute_robot_command(JointCommand(pos=self._sim.scene_description.retract_pos[:7]), plan)
             
     def move_to_ee_pose(self, pose: Pose) -> None:
-        plan = self._sim.move_to_ee_pose(pose)
-        self.execute_robot_command(CartesianCommand(pos=pose.position, quat=pose.orientation), plan)
+        plan = self._sim.plan_to_ee_pose(pose)
+        if self._robot_interface is None:
+            self._sim.visualize_plan(plan)
+        else:
+            self.execute_robot_command(CartesianCommand(pos=pose.position, quat=pose.orientation), plan)
     
     def grasp_tool(self, tool: str) -> None:
-        plan = self._sim.grasp_object(tool)
-        self.execute_robot_command(OpenGripperCommand(), plan, tool)
+        if self._robot_interface is None:
+            self._sim.grasp_object(tool)
+        else:
+            self.execute_robot_command(OpenGripperCommand(), tool_update=tool)
 
     def ungrasp_tool(self, tool: str) -> None:
-        plan = _get_plan_to_execute_ungrasp(self._sim)
-        self.execute_robot_command(CloseGripperCommand(), plan, tool)
+        if self._robot_interface is None:
+            self._sim.ungrasp_object()
+        else:
+            self.execute_robot_command(CloseGripperCommand(), tool_update=tool)
 
     def open_gripper(self) -> None:
-        plan = self._sim.open_gripper()
-        self.execute_robot_command(OpenGripperCommand(), plan)
+        if self._robot_interface is None:
+            self._sim.robot.open_fingers()
+        else:
+            self.execute_robot_command(OpenGripperCommand())
     
     def close_gripper(self) -> None:
-        plan = self._sim.close_gripper()
-        self.execute_robot_command(CloseGripperCommand(), plan)
+        if self._robot_interface is None:
+            self._sim.robot.close_fingers()
+        else:
+            self.execute_robot_command(CloseGripperCommand())
 
-    def execute_robot_command(self, robot_command: KinovaCommand, plan_viz: list[FeedingDeploymentSimulatorState] = None, tool_update: str = None) -> None:
+    def execute_robot_command(self, robot_command: KinovaCommand, plan_viz: list[FeedingDeploymentWorldState] = None, tool_update: str = None) -> None:
         """Execute the given commands on the robot."""
+        if self._robot_interface is None:
+            return
         if not self.no_waits:
             if tool_update is not None:
                 self._rviz_interface.tool_update(True, tool_update, Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the drink
@@ -180,7 +197,7 @@ class ResetHLA(HighLevelAction):
     ) -> None:
         assert len(objects) == 0
         assert self._sim.held_object_name is None
-        sim_states: list[FeedingDeploymentSimulatorState] = []
+        sim_states: list[FeedingDeploymentWorldState] = []
         robot_commands = []
 
         self.move_to_joint_positions(self._sim.scene_description.retract_pos)

@@ -58,7 +58,7 @@ from feeding_deployment.simulation.scene_description import (
 )
 from feeding_deployment.simulation.simulator import (
     FeedingDeploymentPyBulletSimulator,
-    FeedingDeploymentSimulatorState,
+    FeedingDeploymentWorldState,
 )
 from feeding_deployment.simulation.video import make_simulation_video
 

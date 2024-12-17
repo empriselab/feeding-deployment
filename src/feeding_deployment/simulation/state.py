@@ -7,7 +7,7 @@ from pybullet_helpers.joint import JointPositions
 
 
 @dataclass(frozen=True)
-class FeedingDeploymentSimulatorState:
+class FeedingDeploymentWorldState:
     """The state of a feeding deployment simulated environment."""
 
     robot_joints: JointPositions
