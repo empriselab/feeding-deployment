@@ -16,7 +16,7 @@ try:
     # from netft_rdt_driver.srv import String_cmd
     ROSPY_IMPORTED = True
 except ModuleNotFoundError as e:
-    print(f"ROS not imported: {e}")
+    # print(f"ROS not imported: {e}")
     ROSPY_IMPORTED = False
 
 from feeding_deployment.robot_controller.arm_interface import ArmInterface, ArmManager, NUC_HOSTNAME, ARM_RPC_PORT, RPC_AUTHKEY

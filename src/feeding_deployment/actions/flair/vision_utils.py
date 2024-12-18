@@ -4,12 +4,16 @@ import math
 import cmath
 
 from scipy.spatial import Delaunay
-
-import torch
-from torchvision.transforms import ToTensor
-
 from sklearn.neighbors import NearestNeighbors
 from scipy.stats import entropy
+
+try:
+    import torch
+    from torchvision.transforms import ToTensor
+    FOOD_MODELS_IMPORTED = True
+except ModuleNotFoundError as e:
+    # print("Module not found: ", e)
+    FOOD_MODELS_IMPORTED = False
 
 # IS_NOODLE = True
 
@@ -43,6 +47,9 @@ def calculate_heatmap_entropy(heatmap):
     return heatmap_entropy
 
 def efficient_sam_box_prompt_segment(image, pts_sampled, model):
+
+    assert FOOD_MODELS_IMPORTED, "torch and torchvision required for this function"
+
     bbox = torch.reshape(torch.tensor(pts_sampled), [1, 1, 2, 2])
     bbox_labels = torch.reshape(torch.tensor([2, 3]), [1, 1, 2])
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)

@@ -2,237 +2,122 @@ import cv2
 import time
 import os
 import numpy as np
-import supervision as sv
-
-import torch
-import torch.nn.functional as F
-import torchvision
-from torchvision.transforms import ToTensor, Compose
-
-from groundingdino.util.inference import Model
-from segment_anything import sam_model_registry, SamPredictor
-
-from feeding_deployment.actions.flair.vision_utils import detect_densest, new_detect_densest, detect_sparsest, detect_centroid, detect_angular_bbox, detect_convex_hull, detect_filling_push_noodles, detect_filling_push_semisolid, efficient_sam_box_prompt_segment, outpaint_masks, detect_blue, proj_pix2mask, cleanup_mask, visualize_keypoints, visualize_skewer, visualize_push, detect_plate, mask_weight, nearest_neighbor, nearest_point_to_mask, detect_furthest_unobstructed_boundary_point, calculate_heatmap_density, calculate_heatmap_entropy, resize_to_square, fill_enclosing_polygon, detect_fillings_in_mask, expanded_detect_furthest_unobstructed_boundary_point
-
-from feeding_deployment.actions.flair.preference_planner import PreferencePlanner
-
 import os
 from openai import OpenAI
 import ast
 import sys
-
-import base64
-import requests
 import cmath
 import math
-
-from feeding_deployment.actions.flair.src.food_pos_ori_net.model.minispanet import MiniSPANet
-from feeding_deployment.actions.flair.src.spaghetti_segmentation.model import SegModel
-import torchvision.transforms as transforms
-
-PATH_TO_GROUNDED_SAM = '/home/isacc/Grounded-Segment-Anything'
-PATH_TO_DEPTH_ANYTHING = '/home/isacc/Depth-Anything'
-PATH_TO_SPAGHETTI_CHECKPOINTS = '/home/isacc/deployment_ws/src/FLAIR/bite_acquisition/spaghetti_checkpoints'
-USE_EFFICIENT_SAM = False
-
-sys.path.append(PATH_TO_DEPTH_ANYTHING)
-
-from depth_anything.dpt import DepthAnything
-# from depth_anything.dpt import DPT_DINOv2
-from depth_anything.util.transform import Resize, NormalizeImage, PrepareForNet
-
 import random
 
-class GPT4VFoodIdentification:
-    def __init__(self, api_key, prompt_dir):
+try:
+    import supervision as sv
+    import torch
+    import torch.nn.functional as F
+    import torchvision
+    import torchvision.transforms as transforms
+    from groundingdino.util.inference import Model
+    from segment_anything import sam_model_registry, SamPredictor
+    PATH_TO_GROUNDED_SAM = '/home/isacc/Grounded-Segment-Anything'
+    PATH_TO_DEPTH_ANYTHING = '/home/isacc/Depth-Anything'
+    PATH_TO_SPAGHETTI_CHECKPOINTS = '/home/isacc/deployment_ws/src/FLAIR/bite_acquisition/spaghetti_checkpoints'
+    USE_EFFICIENT_SAM = False
 
-        self.api_key = api_key
-        self.headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.api_key}"
-            }
-        self.prompt_dir = prompt_dir
-        
-        with open("%s/prompt.txt"%self.prompt_dir, 'r') as f:
-            self.prompt_text = f.read()
-        
-        self.detection_prompt_img1 = cv2.imread("%s/11.jpg"%self.prompt_dir)
-        self.detection_prompt_img2 = cv2.imread("%s/12.jpg"%self.prompt_dir)
-        self.detection_prompt_img3 = cv2.imread("%s/13.jpg"%self.prompt_dir)
+    sys.path.append(PATH_TO_DEPTH_ANYTHING)
 
-        self.detection_prompt_img1 = self.encode_image(self.detection_prompt_img1)
-        self.detection_prompt_img2 = self.encode_image(self.detection_prompt_img2)
-        self.detection_prompt_img3 = self.encode_image(self.detection_prompt_img3)
+    from depth_anything.dpt import DepthAnything
+    # from depth_anything.dpt import DPT_DINOv2
+    from depth_anything.util.transform import Resize, NormalizeImage, PrepareForNet
 
-        self.mode = 'ours' # ['ours', 'preference', 'efficiency']
+    from feeding_deployment.actions.flair.src.food_pos_ori_net.model.minispanet import MiniSPANet
+    from feeding_deployment.actions.flair.src.spaghetti_segmentation.model import SegModel
 
-    def encode_image(self, openCV_image):
-        retval, buffer = cv2.imencode('.jpg', openCV_image)
-        return base64.b64encode(buffer).decode('utf-8')
+    FOOD_MODELS_IMPORTS = True
+except ModuleNotFoundError as e:
+    # print(f"Module not found: {e}")
+    FOOD_MODELS_IMPORTS = False
 
-    def prompt_zero_shot(self, image, prompt):
-        # Getting the base64 string
-        base64_image = self.encode_image(image)
-
-        payload = {
-        "model": "gpt-4o",
-        "messages": [
-            {
-            "role": "user",
-            "content": [
-                {
-                "type": "text",
-                "text": prompt
-                },
-                {
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/jpeg;base64,{base64_image}"
-                }
-                }
-            ]
-            }
-        ],
-        "max_tokens": 300
-        }
-
-        response = requests.post("https://api.openai.com/v1/chat/completions", headers=self.headers, json=payload)
-        response_text =  response.json()['choices'][0]["message"]["content"]
-        return response_text
-        
-    def prompt(self, image):
-        
-        # Getting the base64 string
-        base64_image = self.encode_image(image)
-
-        payload = {
-        "model": "gpt-4o",
-        "messages": [
-            {
-            "role": "user",
-            "content": [
-                {
-                "type": "text",
-                "text": self.prompt_text
-                },
-                {
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/jpeg;base64,{self.detection_prompt_img1}"
-                }
-                },
-                {
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/jpeg;base64,{self.detection_prompt_img2}"
-                }
-                },
-                {
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/jpeg;base64,{self.detection_prompt_img3}"
-                }
-                },
-                {
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/jpeg;base64,{base64_image}"
-                }
-                }
-            ]
-            }
-        ],
-        "max_tokens": 300
-        }
-
-        response = requests.post("https://api.openai.com/v1/chat/completions", headers=self.headers, json=payload)
-        response_text =  response.json()['choices'][0]["message"]["content"]
-
-        return response_text
+from feeding_deployment.actions.flair.vision_utils import detect_densest, new_detect_densest, detect_sparsest, detect_centroid, detect_angular_bbox, detect_convex_hull, detect_filling_push_noodles, detect_filling_push_semisolid, efficient_sam_box_prompt_segment, outpaint_masks, detect_blue, proj_pix2mask, cleanup_mask, visualize_keypoints, visualize_skewer, visualize_push, detect_plate, mask_weight, nearest_neighbor, nearest_point_to_mask, detect_furthest_unobstructed_boundary_point, calculate_heatmap_density, calculate_heatmap_entropy, resize_to_square, fill_enclosing_polygon, detect_fillings_in_mask, expanded_detect_furthest_unobstructed_boundary_point
+from feeding_deployment.actions.flair.preference_planner import PreferencePlanner
+from feeding_deployment.actions.flair.food_identification import GPT4VFoodIdentification
 
 class BiteAcquisitionInference:
     def __init__(self, mode):
-        self.DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-        # GroundingDINO config and checkpoint
-        self.GROUNDING_DINO_CONFIG_PATH = PATH_TO_GROUNDED_SAM + "/GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py"
-        self.GROUNDING_DINO_CHECKPOINT_PATH = PATH_TO_GROUNDED_SAM + "/groundingdino_swint_ogc.pth"
+        if FOOD_MODELS_IMPORTS:
+            self.DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-        print("Grounding Dino")        
-        # Building GroundingDINO inference model
-        self.grounding_dino_model = Model(model_config_path=self.GROUNDING_DINO_CONFIG_PATH, model_checkpoint_path=self.GROUNDING_DINO_CHECKPOINT_PATH)
-        print("DIno done")
-        self.use_efficient_sam = USE_EFFICIENT_SAM
+            # GroundingDINO config and checkpoint
+            self.GROUNDING_DINO_CONFIG_PATH = PATH_TO_GROUNDED_SAM + "/GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py"
+            self.GROUNDING_DINO_CHECKPOINT_PATH = PATH_TO_GROUNDED_SAM + "/groundingdino_swint_ogc.pth"
 
-        if self.use_efficient_sam:
-            # Building MobileSAM predictor
-            self.EFFICIENT_SAM_CHECKPOINT_PATH = PATH_TO_GROUNDED_SAM + "/efficientsam_s_gpu.jit"
-            self.efficientsam = torch.jit.load(self.EFFICIENT_SAM_CHECKPOINT_PATH)
-        else:
-            # Segment-Anything checkpoint
-            SAM_ENCODER_VERSION = "vit_h"
-            SAM_CHECKPOINT_PATH = PATH_TO_GROUNDED_SAM + "/sam_vit_h_4b8939.pth"
+            print("Initializing Grounding Dino")        
+            # Building GroundingDINO inference model
+            self.grounding_dino_model = Model(model_config_path=self.GROUNDING_DINO_CONFIG_PATH, model_checkpoint_path=self.GROUNDING_DINO_CHECKPOINT_PATH)
+            self.use_efficient_sam = USE_EFFICIENT_SAM
 
-            print("SAM")
-            # Building SAM Model and SAM Predictor
-            sam = sam_model_registry[SAM_ENCODER_VERSION](checkpoint=SAM_CHECKPOINT_PATH)
-            sam.to(device=self.DEVICE)
-            self.sam_predictor = SamPredictor(sam)
-            print("done")
+            if self.use_efficient_sam:
+                # Building MobileSAM predictor
+                self.EFFICIENT_SAM_CHECKPOINT_PATH = PATH_TO_GROUNDED_SAM + "/efficientsam_s_gpu.jit"
+                self.efficientsam = torch.jit.load(self.EFFICIENT_SAM_CHECKPOINT_PATH)
+            else:
+                # Segment-Anything checkpoint
+                SAM_ENCODER_VERSION = "vit_h"
+                SAM_CHECKPOINT_PATH = PATH_TO_GROUNDED_SAM + "/sam_vit_h_4b8939.pth"
 
-        print("DEpth anything")
-        self.depth_anything = DepthAnything.from_pretrained('LiheYoung/depth_anything_vitl14').to(self.DEVICE).eval()
+                print("Initializing SAM")
+                # Building SAM Model and SAM Predictor
+                sam = sam_model_registry[SAM_ENCODER_VERSION](checkpoint=SAM_CHECKPOINT_PATH)
+                sam.to(device=self.DEVICE)
+                self.sam_predictor = SamPredictor(sam)
 
-        # self.depth_anything = DPT_DINOv2(encoder='vitl', features=256, out_channels=[256, 512, 1024, 1024], localhub=True).cuda()
-        # self.depth_anything.load_state_dict(torch.load(PATH_TO_DEPTH_ANYTHING + "/checkpoints/depth_anything_vitl14.pth", map_location='cpu'), strict=True)
-        # self.depth_anything.eval()
-        self.depth_anything_transform = Compose([
-            Resize(
-                width=518,
-                height=518,
-                resize_target=False,
-                keep_aspect_ratio=True,
-                ensure_multiple_of=14,
-                resize_method='lower_bound',
-                image_interpolation_method=cv2.INTER_CUBIC,
-            ),
-            NormalizeImage(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-            PrepareForNet(),
-        ])
-        print("done")
+            print("Initializing Depth Anything")
+            self.depth_anything = DepthAnything.from_pretrained('LiheYoung/depth_anything_vitl14').to(self.DEVICE).eval()
 
-        self.FOOD_CLASSES = ["spaghetti", "meatball"]
-        self.BOX_THRESHOLD = 0.3
-        self.TEXT_THRESHOLD = 0.2
-        self.NMS_THRESHOLD = 0.4
+            self.depth_anything_transform = transforms.Compose([
+                Resize(
+                    width=518,
+                    height=518,
+                    resize_target=False,
+                    keep_aspect_ratio=True,
+                    ensure_multiple_of=14,
+                    resize_method='lower_bound',
+                    image_interpolation_method=cv2.INTER_CUBIC,
+                ),
+                NormalizeImage(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                PrepareForNet(),
+            ])
 
-        self.CATEGORIES = ['meat/seafood', 'vegetable', 'noodles', 'fruit', 'dip', 'plate']
+            self.FOOD_CLASSES = ["spaghetti", "meatball"]
+            self.BOX_THRESHOLD = 0.3
+            self.TEXT_THRESHOLD = 0.2
+            self.NMS_THRESHOLD = 0.4
 
-        print("API key start")
-        # read API key from command line argument
+            self.CATEGORIES = ['meat/seafood', 'vegetable', 'noodles', 'fruit', 'dip', 'plate']
+
+            torch.set_flush_denormal(True)
+            checkpoint_dir = PATH_TO_SPAGHETTI_CHECKPOINTS
+            
+            self.minispanet = MiniSPANet(out_features=1)
+            self.minispanet_crop_size = 100
+            checkpoint = torch.load('%s/spaghetti_ori_net.pth'%checkpoint_dir, map_location=self.DEVICE)
+            self.minispanet.load_state_dict(checkpoint)
+            self.minispanet.eval()
+            self.minispanet_transform = transforms.Compose([transforms.ToTensor()])
+
+            self.seg_net = SegModel("FPN", "resnet34", in_channels=3, out_classes=1)
+            ckpt = torch.load('%s/spaghetti_seg_resnet.pth'%checkpoint_dir, map_location=self.DEVICE)
+            self.seg_net.load_state_dict(ckpt)
+            self.seg_net.eval()
+            self.seg_net.to(self.DEVICE)
+            self.seg_net_transform = transforms.Compose([transforms.ToTensor()])
+
+        print("Initializing GPT4V Food Identification")
         self.api_key =  os.environ['OPENAI_API_KEY']
-
-        self.gpt4v_client = GPT4VFoodIdentification(self.api_key, '/home/isacc/bite_acquisition/scripts/prompts/identification')
+        self.gpt4v_client = GPT4VFoodIdentification(self.api_key, os.path.dirname(os.path.realpath(__file__)) + '/prompts/identification')
         self.client = OpenAI(api_key=self.api_key)
-        print("API key end")
-
-        torch.set_flush_denormal(True)
-        checkpoint_dir = PATH_TO_SPAGHETTI_CHECKPOINTS
-
-        self.minispanet = MiniSPANet(out_features=1)
-        self.minispanet_crop_size = 100
-        checkpoint = torch.load('%s/spaghetti_ori_net.pth'%checkpoint_dir, map_location=self.DEVICE)
-        self.minispanet.load_state_dict(checkpoint)
-        self.minispanet.eval()
-        self.minispanet_transform = transforms.Compose([transforms.ToTensor()])
-
-        self.seg_net = SegModel("FPN", "resnet34", in_channels=3, out_classes=1)
-        ckpt = torch.load('%s/spaghetti_seg_resnet.pth'%checkpoint_dir, map_location=self.DEVICE)
-        self.seg_net.load_state_dict(ckpt)
-        self.seg_net.eval()
-        self.seg_net.to(self.DEVICE)
-        self.seg_net_transform = transforms.Compose([transforms.ToTensor()])
-
+        
+        print("Initializing Preference Planner")
         self.preference_planner = PreferencePlanner()
 
         self.mode = mode
@@ -262,6 +147,9 @@ class BiteAcquisitionInference:
         return chatbot_response.strip()
 
     def run_minispanet_inference(self, u, v, cv_img, crop_dim=15):
+
+        assert FOOD_MODELS_IMPORTS, "MiniSPANet model required to run this function"
+
         cv_crop = cv_img[v-crop_dim:v+crop_dim, u-crop_dim:u+crop_dim]
         cv_crop_resized = cv2.resize(cv_crop, (self.minispanet_crop_size, self.minispanet_crop_size))
         rescale_factor = cv_crop.shape[0]/self.minispanet_crop_size
@@ -664,6 +552,8 @@ class BiteAcquisitionInference:
         return True
 
     def detect_items(self, image, log_path = None):
+
+        assert FOOD_MODELS_IMPORTS, "Food detection imports (Grounding DINO, Segment Anything, Depth Anything) required to run this function"
         
         plate_mask = detect_plate(image, multiplier=2.0)
         plate_mask_vis = np.repeat(plate_mask[:,:,np.newaxis], 3, axis=2)
