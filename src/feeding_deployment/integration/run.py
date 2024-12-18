@@ -18,15 +18,6 @@ try:
 except ModuleNotFoundError:
     ROSPY_IMPORTED = False
 
-try:
-    FLAIR_PATH = "/home/isacc/deployment_ws/src/FLAIR/bite_acquisition/scripts"
-    sys.path.append(FLAIR_PATH)
-
-    from flair import FLAIR
-    FLAIR_IMPORTED = True
-except ModuleNotFoundError:
-    FLAIR_IMPORTED = False
-
 from relational_structs import (
     GroundAtom,
     LiftedAtom,
@@ -37,6 +28,7 @@ from relational_structs import (
 )
 from relational_structs.utils import parse_pddl_plan
 from tomsutils.pddl_planning import run_pyperplan_planning
+from pybullet_helpers.geometry import Pose
 
 from feeding_deployment.actions.base import (
     GripperFree,
@@ -68,7 +60,8 @@ from feeding_deployment.simulation.simulator import (
     FeedingDeploymentPyBulletSimulator,
     FeedingDeploymentWorldState,
 )
-from pybullet_helpers.geometry import Pose
+from feeding_deployment.actions.flair.flair import FLAIR
+
 
 # All the high level actions we want to consider.
 HLAS = {PickToolHLA, StowToolHLA, LookAtPlateHLA, AcquireBiteHLA, TransferToolHLA, ResetHLA}
@@ -127,7 +120,7 @@ class _Runner:
         if self.run_on_robot:
             self.rviz_interface = RVizInterface(self.scene_description)
             # Rajat ToDo: remove before pushing
-            self.flair = FLAIR(self.robot_interface, self.wrist_interface)
+            self.flair = FLAIR()
         else:
             self.rviz_interface = None
             self.flair = None
@@ -353,10 +346,6 @@ if __name__ == "__main__":
             raise ModuleNotFoundError("Need ROS to run on robot or use interface")
         else:
             rospy.init_node("feeding_deployment", anonymous=True)
-    
-    if args.run_on_robot:
-        if not FLAIR_IMPORTED:
-            raise ModuleNotFoundError("Need FLAIR to run on robot")
         
     # Rajat ToDo: have run on robot without interface functionality
     if args.run_on_robot:

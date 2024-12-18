@@ -25,7 +25,7 @@ from feeding_deployment.actions.base import (
     ToolPrepared
 )
 
-from feeding_deployment.actions.food_manipulation_skill_library import FoodManipulationSkillLibrary
+from feeding_deployment.actions.flair.food_manipulation_skill_library import FoodManipulationSkillLibrary
 
 class LookAtPlateHLA(HighLevelAction):
     """Look at plate in preparation of bite acquisition."""
