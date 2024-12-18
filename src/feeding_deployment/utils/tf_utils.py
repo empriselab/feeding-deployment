@@ -9,7 +9,7 @@ try:
     from geometry_msgs.msg import Pose, TransformStamped
     ROSPY_IMPORTED = True
 except ModuleNotFoundError as e:
-    print(f"ROS not imported: {e}")
+    # print(f"ROS not imported: {e}")
     ROSPY_IMPORTED = False
 
 

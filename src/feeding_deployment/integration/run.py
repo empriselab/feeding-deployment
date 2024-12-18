@@ -119,11 +119,11 @@ class _Runner:
 
         if self.run_on_robot:
             self.rviz_interface = RVizInterface(self.scene_description)
-            # Rajat ToDo: remove before pushing
-            self.flair = FLAIR()
         else:
             self.rviz_interface = None
-            self.flair = None
+        
+        # For Bite Acquisition
+        self.flair = FLAIR()
 
         # self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description)
         self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description, use_gui=use_gui, ignore_user=True)

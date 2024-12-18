@@ -17,6 +17,7 @@ dependencies = [
    "relational_structs@git+https://github.com/tomsilver/relational-structs.git",
    "opencv-python",
    "multiprocess",
+   "scikit-learn"
 ]
 
 [project.optional-dependencies]

@@ -227,7 +227,7 @@ class FLAIR:
     def get_items_detection(self):
         return self.items_detection
     
-    def update_items_detection(self, items_detection):
+    def set_items_detection(self, items_detection):
         self.items_detection = items_detection
 
     def predict_next_action(self, camera_color_data, items_detection, log_path):

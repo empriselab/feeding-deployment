@@ -254,18 +254,21 @@ class PerceptionInterface:
                 if self._head_perception is not None and not self._simulate_head_perception:
                     tool_tip_target_pose = self._head_perception.run_head_perception()
                 else:
-                    # read from logged data
-                    if self.tool == "fork":
-                        with open(self.log_dir / 'head_perception_pose_fork.pkl', 'rb') as f:
-                            tool_tip_target_pose = pickle.load(f)
-                    elif self.tool == "drink":
-                        with open(self.log_dir / 'head_perception_pose_drink.pkl', 'rb') as f:
-                            tool_tip_target_pose = pickle.load(f)
-                    elif self.tool == "wipe":
-                        with open(self.log_dir / 'head_perception_pose_wipe.pkl', 'rb') as f:
-                            tool_tip_target_pose = pickle.load(f)
-                    else:
-                        raise ValueError("Invalid tool")
+                    try:
+                        # read from logged data
+                        if self.tool == "fork":
+                            with open(self.log_dir / 'head_perception_pose_fork.pkl', 'rb') as f:
+                                tool_tip_target_pose = pickle.load(f)
+                        elif self.tool == "drink":
+                            with open(self.log_dir / 'head_perception_pose_drink.pkl', 'rb') as f:
+                                tool_tip_target_pose = pickle.load(f)
+                        elif self.tool == "wipe":
+                            with open(self.log_dir / 'head_perception_pose_wipe.pkl', 'rb') as f:
+                                tool_tip_target_pose = pickle.load(f)
+                        else:
+                            raise ValueError("Invalid tool")
+                    except FileNotFoundError:
+                        raise FileNotFoundError("No transfer logged data found for tool: ", self.tool)
                 with self.tool_tip_target_lock:
                     self.tool_tip_target_pose = tool_tip_target_pose
         self.head_perception_running = False

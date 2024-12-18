@@ -25,6 +25,7 @@ from feeding_deployment.actions.base import (
     ToolPrepared
 )
 
+from feeding_deployment.actions.flair.flair import FLAIR
 from feeding_deployment.actions.flair.food_manipulation_skill_library import FoodManipulationSkillLibrary
 
 class LookAtPlateHLA(HighLevelAction):
@@ -75,32 +76,40 @@ class LookAtPlateHLA(HighLevelAction):
                     )
                     # log the data
                     if self.log_path is not None:
-                        # save the data
-                        acq_data = {
+
+                        items = self.flair.identify_plate(camera_color_data)
+                        items = ['cantaloupe', 'banana']
+                        self.flair.set_food_items(items)
+                        items_detection = self.flair.detect_items(camera_color_data, camera_depth_data, camera_info_data, log_path=None)
+
+                        # save food detection data
+                        food_detection_data = {
                             "camera_color_data": camera_color_data,
                             "camera_info_data": camera_info_data,
                             "camera_depth_data": camera_depth_data,
+                            "items": items,
+                            "items_detection": items_detection,
                         }
-                        with open(self.log_path / "acq_data.pkl", "wb") as f:
-                            pickle.dump(acq_data, f)
+                        with open(self.log_path / "food_detection_data.pkl", "wb") as f:
+                            pickle.dump(food_detection_data, f)
+
                 else:
                     # read last logged data
                     try:
-                        with open(self.log_path / "acq_data.pkl", "rb") as f:
-                            acq_data = pickle.load(f)
-                        camera_color_data = acq_data["camera_color_data"]
-                        camera_info_data = acq_data["camera_info_data"]
-                        camera_depth_data = acq_data["camera_depth_data"]
-                    except FileNotFoundError:
-                        raise FileNotFoundError("No logged data found")
+                        with open(self.log_path / "food_detection_data.pkl", "rb") as f:
+                            food_detection_data = pickle.load(f)
 
-                items = self.flair.identify_plate(camera_color_data)
-                # flair.set_food_items(items)
-                # self.flair.set_food_items(['banana', 'baby carrot'])
-                self.flair.set_food_items(['cantaloupe', 'banana'])
-                # self.flair.set_food_items(['chicken nugget'])
-                # self.flair.set_food_items(['banana'])
-                items_detection = self.flair.detect_items(camera_color_data, camera_depth_data, camera_info_data, log_path=None)
+                        camera_color_data = food_detection_data["camera_color_data"]
+                        camera_info_data = food_detection_data["camera_info_data"]
+                        camera_depth_data = food_detection_data["camera_depth_data"]
+                        items = food_detection_data["items"]
+                        items_detection = food_detection_data["items_detection"]
+
+                        self.flair.set_food_items(items)
+                        self.flair.set_items_detection(items_detection)
+
+                    except FileNotFoundError:
+                        raise FileNotFoundError("No logged data found for bite acquisition")
                 
                 if not self.flair.is_preference_set():
 

@@ -11,7 +11,7 @@ try:
     from wrist_driver_interfaces.srv import SetWristMode, SetWristModeRequest, SetWristModeResponse
     ROSPY_IMPORTED = True
 except ModuleNotFoundError as e:
-    print(f"ROS not imported: {e}")
+    # print(f"ROS not imported: {e}")
     ROSPY_IMPORTED = False
 
 from feeding_deployment.wrist_controller.horizontal_spoon import HorizontalSpoon
