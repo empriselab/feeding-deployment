@@ -87,9 +87,10 @@ class FeedingDeploymentPyBulletSimulator(FeedingDeploymentPyBulletWorld):
             raise RuntimeError("Sim cartesian controller: Failed to reach target pose in time")
 
         plan = _plan_to_sim_state_trajectory(joint_trajectory, self)
-        plan_states = remap_trajectory_to_constant_distance(plan, self)
+        plan = remap_trajectory_to_constant_distance(plan, self)
         
-        return plan_states
+        self.recorded_states.extend(plan)
+        return plan
 
     def plan_to_joint_positions(self, joint_positions: list[float], max_control_time: float = 30.0) -> list[FeedingDeploymentWorldState]:
         """Move the robot to the specified joint positions."""
@@ -131,6 +132,7 @@ class FeedingDeploymentPyBulletSimulator(FeedingDeploymentPyBulletWorld):
             plan = remap_trajectory_to_constant_distance(plan, sim)
             robot_commands.extend(simulated_trajectory_to_kinova_commands(plan))
         
+        self.recorded_states.extend(plan)
         return plan
     
     def visualize_plan(self, plan: list[FeedingDeploymentWorldState]) -> None:
@@ -138,7 +140,6 @@ class FeedingDeploymentPyBulletSimulator(FeedingDeploymentPyBulletWorld):
         for sim_state in plan:
             self.sync(sim_state)
             time.sleep(0.1)
-        self.recorded_states.extend(plan)
 
     def grasp_object(self, object_name: str) -> list[FeedingDeploymentWorldState]:
         plan = _get_plan_to_execute_grasp(self, object_name)

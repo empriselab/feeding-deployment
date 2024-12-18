@@ -126,10 +126,11 @@ class _Runner:
 
         if self.run_on_robot:
             self.rviz_interface = RVizInterface(self.scene_description)
-            self.flair = FLAIR()
+            # Rajat ToDo: remove before pushing
+            self.flair = FLAIR(self.robot_interface, self.wrist_interface)
         else:
             self.rviz_interface = None
-            flair = None
+            self.flair = None
 
         # self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description)
         self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description, use_gui=use_gui, ignore_user=True)
@@ -139,7 +140,7 @@ class _Runner:
         print("Creating HLAs...")
         self.hlas = {
             cls(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.web_interface, hla_hyperparams,
-                self.wrist_interface, flair, self.no_waits, self.log_dir) for cls in HLAS  # type: ignore
+                self.wrist_interface, self.flair, self.no_waits, self.log_dir) for cls in HLAS  # type: ignore
         }
         print("HLAs created.")
         self.hla_name_to_hla = {hla.get_name(): hla for hla in self.hlas}

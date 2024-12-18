@@ -14,7 +14,7 @@ try:
     from std_msgs.msg import String
     from visualization_msgs.msg import MarkerArray, Marker
     import tf2_ros
-    from geometry_msgs.msg import TransformStamped
+    from geometry_msgs.msg import TransformStamped, Pose as PoseMsg
     from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
     ROSPY_IMPORTED = True
 except ModuleNotFoundError as e:
@@ -175,6 +175,26 @@ class RVizInterface:
 
         self.publishTransformationToTF(source_frame, target_frame, transform)
 
+    def visualize_plan(self, plan):
+        for sim_state in plan:
+            self.joint_state_update(sim_state.robot_joints)
+            time.sleep(0.1)
+
+    def get_pose_msg_from_transform(self, transform):
+
+        pose = PoseMsg()
+        pose.position.x = transform[0,3]
+        pose.position.y = transform[1,3]
+        pose.position.z = transform[2,3]
+
+        quat = R.from_matrix(transform[:3,:3]).as_quat()
+        pose.orientation.x = quat[0]
+        pose.orientation.y = quat[1]
+        pose.orientation.z = quat[2]
+        pose.orientation.w = quat[3]
+
+        return pose
+
     def visualize_fork(self, transform):
         print("Visualizing fork")
         # visualize fork mesh in rviz
@@ -195,7 +215,7 @@ class RVizInterface:
         marker.color.g = 0.5
         marker.color.b = 0.5
         
-        pose = self.tf_utils.get_pose_msg_from_transform(transform)
+        pose = self.get_pose_msg_from_transform(transform)
         marker.pose = pose
 
         marker.mesh_resource = "package://kortex_description/tools/feeding_utensil/fork_tip.stl"
@@ -223,7 +243,7 @@ class RVizInterface:
         marker.color.g = 0.0
         marker.color.b = 0.0
 
-        pose = self.tf_utils.get_pose_msg_from_transform(transform)
+        pose = self.get_pose_msg_from_transform(transform)
         marker.pose = pose
 
         marker_array.markers.append(marker)

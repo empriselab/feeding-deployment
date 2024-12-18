@@ -102,7 +102,7 @@ class HighLevelAction(abc.ABC):
         if self.robot_interface is None:
             self.sim.visualize_plan(plan)
         else:
-            self.execute_robot_command(JointCommand(pos=self.sim.scene_description.retract_pos[:7]), plan)
+            self.execute_robot_command(JointCommand(pos=joint_positions), plan)
             
     def move_to_ee_pose(self, pose: Pose) -> None:
         plan = self.sim.plan_to_ee_pose(pose)
@@ -112,15 +112,13 @@ class HighLevelAction(abc.ABC):
             self.execute_robot_command(CartesianCommand(pos=pose.position, quat=pose.orientation), plan)
     
     def grasp_tool(self, tool: str) -> None:
-        if self.robot_interface is None:
-            self.sim.grasp_object(tool)
-        else:
+        self.sim.grasp_object(tool)
+        if self.robot_interface is not None:
             self.execute_robot_command(OpenGripperCommand(), tool_update=tool)
 
     def ungrasp_tool(self, tool: str) -> None:
-        if self.robot_interface is None:
-            self.sim.ungrasp_object()
-        else:
+        self.sim.ungrasp_object()
+        if self.robot_interface is not None:
             self.execute_robot_command(CloseGripperCommand(), tool_update=tool)
 
     def open_gripper(self) -> None:

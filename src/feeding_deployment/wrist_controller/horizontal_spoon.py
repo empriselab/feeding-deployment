@@ -11,6 +11,8 @@ try:
 
     from wrist_driver_interfaces.msg import SimpleJointAngleCommand
     from wrist_driver_interfaces.srv import SetWristMode, SetWristModeRequest, SetWristModeResponse
+
+    ROSPY_IMPORTED = True
 except ModuleNotFoundError as e:
     print(f"ROS not imported: {e}")
     ROSPY_IMPORTED = False

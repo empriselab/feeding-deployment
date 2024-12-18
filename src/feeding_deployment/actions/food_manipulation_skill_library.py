@@ -59,15 +59,16 @@ class FoodManipulationSkillLibrary:
         if self.robot_interface is None:
             self.sim.visualize_plan(plan)
         else:
-            self.robot_interface.execute_command(JointCommand(pos=self.sim.scene_description.retract_pos[:7]), plan)
+            self.robot_interface.execute_command(JointCommand(pos=self.sim.scene_description.retract_pos[:7]))
 
-    def move_to_ee_pose(self, pose):
+    def move_to_ee_pose(self, pose, plan_override=False):
 
-        plan = self.sim.plan_to_ee_pose(pose)
+        if not plan_override:
+            plan = self.sim.plan_to_ee_pose(pose)
         if self.robot_interface is None:
             self.sim.visualize_plan(plan)
         else:
-            self.robot_interface.execute_command(CartesianCommand(pos=pose.position, quat=pose.orientation), plan)
+            self.robot_interface.execute_command(CartesianCommand(pos=pose.position, quat=pose.orientation))
 
     def set_wrist_state(self, pitch_angle, roll_angle):
         if self.robot_interface is None:
@@ -94,7 +95,7 @@ class FoodManipulationSkillLibrary:
             self.tf_utils.publishTransformationToTF('base_link', 'tool_frame_target', tool_frame_target)
             
             if not self.no_waits:
-                input("Press enter to actually move utensil.")
+                input("Execute command?")
 
             pose = Pose.from_matrix(tool_frame_target)
             self.move_to_ee_pose(pose)
@@ -193,13 +194,13 @@ class FoodManipulationSkillLibrary:
         # input("Press enter to start scooping pickup")
 
         if self.robot_interface is not None:
-            scoop_thread = threading.Thread(target=self.wrist_controller.scoop_wrist)
+            scoop_thread = threading.Thread(target=self.wrist_interface.scoop_wrist)
             scoop_thread.start()
         else:
             raise NotImplementedError("Scooping pickup not implemented for simulation")
 
         # input("Press enter to also move the robot...")
-        self.move_to_ee_pose(Pose.from_matrix(tool_frame_target))
+        self.move_to_ee_pose(Pose.from_matrix(tool_frame_target), plan_override=True) # Necessary so that robot doesn't spend time planning in simulation
 
         # wait for scoop thread to finish
         if self.robot_interface is not None:
