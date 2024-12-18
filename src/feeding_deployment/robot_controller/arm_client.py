@@ -26,7 +26,7 @@ from feeding_deployment.robot_controller.command_interface import KinovaCommand,
 class ArmInterfaceClient:
     def __init__(self):
 
-        print(ROSPY_IMPORTED)
+        assert ROSPY_IMPORTED, "ROS is required to run on the real robot"
 
         # make sure watchdog is running
         print("Waiting for Watchdog status...")

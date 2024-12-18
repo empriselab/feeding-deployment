@@ -22,10 +22,7 @@ try:
     FLAIR_PATH = "/home/isacc/deployment_ws/src/FLAIR/bite_acquisition/scripts"
     sys.path.append(FLAIR_PATH)
 
-    # raise ModuleNotFoundError  # Just to skip this block
-    from wrist_controller import WristController
     from flair import FLAIR
-
     FLAIR_IMPORTED = True
 except ModuleNotFoundError:
     FLAIR_IMPORTED = False
@@ -62,6 +59,7 @@ from feeding_deployment.interfaces.perception_interface import PerceptionInterfa
 from feeding_deployment.interfaces.web_interface import WebInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
+from feeding_deployment.wrist_controller.wrist_controller import WristInterface
 from feeding_deployment.simulation.scene_description import (
     SceneDescription,
     create_scene_description_from_config,
@@ -98,8 +96,10 @@ class _Runner:
         # Initialize the interface to the robot.
         if run_on_robot:
             self.robot_interface = ArmInterfaceClient()  # type: ignore  # pylint: disable=no-member
+            self.wrist_interface = WristInterface()
         else:
             self.robot_interface = None
+            self.wrist_interface = None
 
         self.log_dir = Path(__file__).parent / "sensor_log"
         self.log_dir.mkdir(exist_ok=True)
@@ -117,7 +117,6 @@ class _Runner:
 
         self.scene_description = SceneDescription(**kwargs)
 
-
         if self.use_interface:
             # Initialize the web interface.
             self.hla_command_queue = queue.Queue()
@@ -127,11 +126,9 @@ class _Runner:
 
         if self.run_on_robot:
             self.rviz_interface = RVizInterface(self.scene_description)
-            wrist_controller = WristController()
-            flair = FLAIR(self.robot_interface, wrist_controller, self.no_waits)
+            self.flair = FLAIR()
         else:
             self.rviz_interface = None
-            wrist_controller = None
             flair = None
 
         # self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description)
@@ -142,7 +139,7 @@ class _Runner:
         print("Creating HLAs...")
         self.hlas = {
             cls(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.web_interface, hla_hyperparams,
-                wrist_controller, flair, self.no_waits, self.log_dir) for cls in HLAS  # type: ignore
+                self.wrist_interface, flair, self.no_waits, self.log_dir) for cls in HLAS  # type: ignore
         }
         print("HLAs created.")
         self.hla_name_to_hla = {hla.get_name(): hla for hla in self.hlas}

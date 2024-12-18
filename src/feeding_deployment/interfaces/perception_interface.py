@@ -29,12 +29,12 @@ class PerceptionInterface:
     """An interface for perception (robot joints, human head poses, etc.)."""
 
     def __init__(self, robot_interface: ArmInterfaceClient | None, record_goal_pose: bool = False, simulate_head_perception: bool = False, log_dir: str | None = None) -> None:
-        self._robot_interface = robot_interface
+        self.robot_interface = robot_interface
         self._simulate_head_perception = simulate_head_perception
         self.log_dir = log_dir
 
         # run head perception
-        if self._robot_interface is None:
+        if self.robot_interface is None:
             self.simulation = True
             self._head_perception = None
             self._aruco_perception = None
@@ -286,7 +286,7 @@ class PerceptionInterface:
             tool_tip_target_pose = self.tool_tip_target_pose
 
         # save them in a pickle file
-        if self._robot_interface is not None:
+        if self.robot_interface is not None:
             if self.tool == "fork":
                 with open(self.log_dir / 'head_perception_pose_fork.pkl', 'wb') as f:
                     pickle.dump(tool_tip_target_pose, f)
@@ -303,7 +303,7 @@ class PerceptionInterface:
         
     def get_tool_tip_pose(self) -> np.ndarray:
 
-        arm_pos, ee_pose, gripper_pos = self._robot_interface.get_state()
+        arm_pos, ee_pose, gripper_pos = self.robot_interface.get_state()
 
         tool_tip_pose = np.eye(4)
         tool_tip_pose[:3, 3] = ee_pose[:3]

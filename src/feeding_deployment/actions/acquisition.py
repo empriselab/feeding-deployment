@@ -25,6 +25,8 @@ from feeding_deployment.actions.base import (
     ToolPrepared
 )
 
+from feeding_deployment.actions.food_manipulation_skill_library import FoodManipulationSkillLibrary
+
 class LookAtPlateHLA(HighLevelAction):
     """Look at plate in preparation of bite acquisition."""
 
@@ -52,24 +54,24 @@ class LookAtPlateHLA(HighLevelAction):
         if tool.name == "utensil":
             
             print("In LookAtPlateHLA")
-            assert self._sim.held_object_name == "utensil"
+            assert self.sim.held_object_name == "utensil"
 
             # stop the keep horizontal thread (incase we're trying to re-acquire a bite)
-            if self.wrist_controller is not None:
-                self.wrist_controller.stop_horizontal_spoon_thread()
+            if self.wrist_interface is not None:
+                self.wrist_interface.stop_horizontal_spoon_thread()
 
-            self.move_to_joint_positions(self._sim.scene_description.above_plate_pos)
+            self.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
             
-            if self.wrist_controller is not None:
-                self.wrist_controller.set_velocity_mode()
-                self.wrist_controller.reset()
+            if self.wrist_interface is not None:
+                self.wrist_interface.set_velocity_mode()
+                self.wrist_interface.reset()
 
             if self.flair is not None:
 
-                if self._robot_interface is not None:
+                if self.robot_interface is not None:
                     # Run FLAIR perception.
                     camera_color_data, camera_info_data, camera_depth_data, _ = (
-                        self._perception_interface.get_camera_data()
+                        self.perception_interface.get_camera_data()
                     )
                     # log the data
                     if self.log_path is not None:
@@ -124,12 +126,12 @@ class LookAtPlateHLA(HighLevelAction):
                     #     }
                     #     pickle.dump(plate_log, f)
 
-                    if self._web_interface is not None:
-                        self._web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
+                    if self.web_interface is not None:
+                        self.web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
                         time.sleep(0.2) # simulate delay for web interface
-                        self._web_interface.send_web_interface_image(items_detection['plate_image'])
-                        self._web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data})
-                        self._web_interface.send_web_interface_message({"n_ordering": len(ordering_options), "data": ordering_options})
+                        self.web_interface.send_web_interface_image(items_detection['plate_image'])
+                        self.web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data})
+                        self.web_interface.send_web_interface_message({"n_ordering": len(ordering_options), "data": ordering_options})
 
                         # save all of this in a pickle file:
                         # import pickle
@@ -142,28 +144,28 @@ class LookAtPlateHLA(HighLevelAction):
                         #     }
                         #     pickle.dump(meal_start_log, f)
 
-                        # self._web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
+                        # self.web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
                         # time.sleep(1.0) # simulate delay, also needed for web interface
-                        # self._web_interface.update_web_interface_image(items_detection['plate_image'])
+                        # self.web_interface.update_web_interface_image(items_detection['plate_image'])
                         # time.sleep(1.0)  # simulate delay, also needed for web interface
-                        # self._web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data})
-                        # self._web_interface.send_web_interface_message({"n_ordering": len(ordering_options), "data": ordering_options})
+                        # self.web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data})
+                        # self.web_interface.send_web_interface_message({"n_ordering": len(ordering_options), "data": ordering_options})
 
                         # Wait for web interface to report order selection.
                         print("WAITING TO GET PREFERENCE")
-                        while self._web_interface.user_preference is None:
+                        while self.web_interface.user_preference is None:
                             time.sleep(1e-1)
                         print("FINISHED GETTING PREFERENCES")
-                        print("User Preference:", self._web_interface.user_preference)
-                        self.flair.set_preference(self._web_interface.user_preference)
+                        print("User Preference:", self.web_interface.user_preference)
+                        self.flair.set_preference(self.web_interface.user_preference)
                 # else:
-                #     self._web_interface.send_web_interface_image(items_detection['plate_image'])
+                #     self.web_interface.send_web_interface_image(items_detection['plate_image'])
                 #     time.sleep(1.0)  # simulate delay, also needed for web interface
 
                 # Prepare for bite acquisition.
                 print("Doing Bite Acquisition")
-                self.wrist_controller.set_velocity_mode()
-                self.wrist_controller.reset()
+                self.wrist_interface.set_velocity_mode()
+                self.wrist_interface.reset()
 
                 next_action_prediction = self.flair.predict_next_action(camera_color_data, items_detection=None, log_path=None)
 
@@ -179,12 +181,12 @@ class LookAtPlateHLA(HighLevelAction):
                 data = [{k: v} for k, v in food_type_to_data.items() if k != next_food_item]
                 current_bite = {next_food_item: food_type_to_data[next_food_item]}
 
-                if self._web_interface is not None:
-                    self._web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
+                if self.web_interface is not None:
+                    self.web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
                     time.sleep(0.2) # simulate delay, needed for web interface
-                    self._web_interface.send_web_interface_image(items_detection['plate_image'])
+                    self.web_interface.send_web_interface_image(items_detection['plate_image'])
                     time.sleep(0.1)
-                    self._web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data, "current_bite": current_bite})            
+                    self.web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data, "current_bite": current_bite})            
 
                 # import pickle
                 # with open("next_bite_log.pkl", "wb") as f:
@@ -208,6 +210,11 @@ class LookAtPlateHLA(HighLevelAction):
 
 class AcquireBiteHLA(HighLevelAction):
     """Bite acquisition; other tools are always prepared."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.food_manipulation_skill_library = FoodManipulationSkillLibrary(self.sim, self.robot_interface, self.wrist_interface, self.perception_interface, self.rviz_interface, self.no_waits)
 
     def get_name(self) -> str:
         return "AcquireBite"
@@ -236,7 +243,7 @@ class AcquireBiteHLA(HighLevelAction):
 
                 print("Doing Bite Acquisition")
                 camera_color_data, camera_info_data, camera_depth_data, _ = (
-                    self._perception_interface.get_camera_data()
+                    self.perception_interface.get_camera_data()
                 )
 
                 if params["status"] == 0:
@@ -264,7 +271,7 @@ class AcquireBiteHLA(HighLevelAction):
                     skewer_center = (point_x, point_y)
                     skewer_angle = -np.pi/2
 
-                    self.flair.skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_center, major_axis = skewer_angle)
+                    self.food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_center, major_axis = skewer_angle)
 
                 elif params["status"] == "aquire_food":
                     detections = self.flair.get_items_detection()
@@ -279,22 +286,22 @@ class AcquireBiteHLA(HighLevelAction):
 
                     if skill == "Skewer":
                         skewer_point, skewer_angle = self.flair.inference_server.get_skewer_action(mask)
-                        self.flair.skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_point, major_axis = skewer_angle)
+                        self.food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_point, major_axis = skewer_angle)
                     elif skill == "Scoop":
                         raise NotImplementedError("Scoop skill not yet implemented")
 
-                self.move_to_joint_positions(self._sim.scene_description.above_plate_pos)
+                self.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
 
                 # set the wrist controller to always keep utensil horizontal
-                if self.wrist_controller is not None:
-                    self.wrist_controller.start_horizontal_spoon_thread()
+                if self.wrist_interface is not None:
+                    self.wrist_interface.start_horizontal_spoon_thread()
     
             else:
                 time.sleep(2.0)  # simulate delay, also needed for web interface
 
             # Send message to web interface indicating that robot is done with acquisition.
-            if self._web_interface is not None:
-                self._web_interface.send_web_interface_message({"state": "bite_pickup", "status": "completed"})
+            if self.web_interface is not None:
+                self.web_interface.send_web_interface_message({"state": "bite_pickup", "status": "completed"})
 
             return []
 

@@ -45,66 +45,66 @@ class PickToolHLA(HighLevelAction):
 
         if tool.name == "drink":
 
-            assert self._sim.held_object_name is None
+            assert self.sim.held_object_name is None
 
-            self.move_to_joint_positions(self._sim.scene_description.retract_pos)
+            self.move_to_joint_positions(self.sim.scene_description.retract_pos)
             self.close_gripper()
-            self.move_to_joint_positions(self._sim.scene_description.drink_gaze_pos)
+            self.move_to_joint_positions(self.sim.scene_description.drink_gaze_pos)
 
-            drink_poses = self._perception_interface.perceive_drink_pickup_poses()
+            drink_poses = self.perception_interface.perceive_drink_pickup_poses()
 
-            self.move_to_joint_positions(self._sim.scene_description.drink_staging_pos)
+            self.move_to_joint_positions(self.sim.scene_description.drink_staging_pos)
             self.move_to_ee_pose(drink_poses['pre_grasp_pose'])
             self.move_to_ee_pose(drink_poses['inside_bottom_pose'])
             self.move_to_ee_pose(drink_poses['inside_top_pose'])
             self.grasp_tool("drink")
             self.move_to_ee_pose(drink_poses['post_grasp_pose'])
 
-            self._perception_interface.record_drink_pickup_joint_pos()
+            self.perception_interface.record_drink_pickup_joint_pos()
 
-            self.move_to_joint_positions(self._sim.scene_description.before_transfer_pos)
+            self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
             # Send message to web interface.
-            if self._web_interface is not None:
-                self._web_interface.send_web_interface_message({"state": "drink_pickup", "status": "completed"})
+            if self.web_interface is not None:
+                self.web_interface.send_web_interface_message({"state": "drink_pickup", "status": "completed"})
 
         if tool.name == "utensil":
 
-            assert self._sim.held_object_name is None
+            assert self.sim.held_object_name is None
             
-            self.move_to_joint_positions(self._sim.scene_description.retract_pos)
+            self.move_to_joint_positions(self.sim.scene_description.retract_pos)
             self.close_gripper()
-            self.move_to_joint_positions(self._sim.scene_description.utensil_above_mount_pos)
-            self.move_to_ee_pose(self._sim.scene_description.utensil_inside_mount)
+            self.move_to_joint_positions(self.sim.scene_description.utensil_above_mount_pos)
+            self.move_to_ee_pose(self.sim.scene_description.utensil_inside_mount)
             self.grasp_tool("utensil")
 
-            if self.wrist_controller is not None:
+            if self.wrist_interface is not None:
                 time.sleep(1.0) # wait for the utensil to be connected
                 print("Resetting wrist controller ...")
-                self.wrist_controller.set_velocity_mode()
-                self.wrist_controller.reset()
+                self.wrist_interface.set_velocity_mode()
+                self.wrist_interface.reset()
 
-            self.move_to_ee_pose(self._sim.scene_description.utensil_outside_mount)
-            self.move_to_joint_positions(self._sim.scene_description.retract_pos)
-            self.move_to_joint_positions(self._sim.scene_description.before_transfer_pos)
+            self.move_to_ee_pose(self.sim.scene_description.utensil_outside_mount)
+            self.move_to_joint_positions(self.sim.scene_description.retract_pos)
+            self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
             
         if tool.name == "wipe":
 
-            assert self._sim.held_object_name is None
+            assert self.sim.held_object_name is None
             
-            self.move_to_joint_positions(self._sim.scene_description.retract_pos)
+            self.move_to_joint_positions(self.sim.scene_description.retract_pos)
             self.close_gripper()
-            self.move_to_joint_positions(self._sim.scene_description.wipe_above_mount_pos)
-            self.move_to_ee_pose(self._sim.scene_description.wipe_inside_mount)
+            self.move_to_joint_positions(self.sim.scene_description.wipe_above_mount_pos)
+            self.move_to_ee_pose(self.sim.scene_description.wipe_inside_mount)
             self.grasp_tool("wipe")
-            self.move_to_ee_pose(self._sim.scene_description.wipe_outside_mount)
-            self.move_to_ee_pose(self._sim.scene_description.wipe_outside_above_mount)
-            self.move_to_joint_positions(self._sim.scene_description.retract_pos)
-            self.move_to_joint_positions(self._sim.scene_description.before_transfer_pos)
+            self.move_to_ee_pose(self.sim.scene_description.wipe_outside_mount)
+            self.move_to_ee_pose(self.sim.scene_description.wipe_outside_above_mount)
+            self.move_to_joint_positions(self.sim.scene_description.retract_pos)
+            self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
             # Send message to web interface.
-            if self._web_interface is not None:
-                self._web_interface.send_web_interface_message({"state": "prepare_mouth_wiping", "status": "completed"})
+            if self.web_interface is not None:
+                self.web_interface.send_web_interface_message({"state": "prepare_mouth_wiping", "status": "completed"})
 
         else:
             print(f"PickTool not yet implemented for {tool}")

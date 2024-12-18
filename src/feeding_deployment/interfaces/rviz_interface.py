@@ -29,14 +29,15 @@ class RVizInterface:
 
     def __init__(self, scene_description: SceneDescription) -> None:
 
-        if not ROSPY_IMPORTED:
-            raise ImportError("Please install ROS to use rviz interface.")
+        assert ROSPY_IMPORTED, "ROS is required to run RVizInterface"
 
         self._scene_description = scene_description
 
         # Create publishers for rviz simulation.
         self.sim_joint_publishers = rospy.Publisher("/sim/robot_joint_states", JointState, queue_size=10)
         self.marker_pub = rospy.Publisher("/visualization_marker", Marker, queue_size=10)
+        self.utensil_visualization_pub = rospy.Publisher('utensil_visualization_marker_array', MarkerArray, queue_size=10)
+        self.food_visualization_pub = rospy.Publisher('food_visualization_marker_array', MarkerArray, queue_size=10)
         
         # Create a static transform broadcaster for rviz simulation.
         self.static_transform_broadcaster = tf2_ros.StaticTransformBroadcaster()
@@ -173,5 +174,60 @@ class RVizInterface:
     def visualizeTransform(self, source_frame, target_frame, transform):
 
         self.publishTransformationToTF(source_frame, target_frame, transform)
+
+    def visualize_fork(self, transform):
+        print("Visualizing fork")
+        # visualize fork mesh in rviz
+        marker_array = MarkerArray()
+        marker = Marker()
+        marker.id = 0
+        marker.header.stamp = rospy.Time.now()
+        marker.header.frame_id = "base_link"
+        marker.type = marker.MESH_RESOURCE
+        marker.action = marker.ADD
+        marker.scale.x = 0.001
+        marker.scale.y = 0.001
+        marker.scale.z = 0.001
+        marker.color.a = 1.0
+        
+        # marker color is grey
+        marker.color.r = 0.5
+        marker.color.g = 0.5
+        marker.color.b = 0.5
+        
+        pose = self.tf_utils.get_pose_msg_from_transform(transform)
+        marker.pose = pose
+
+        marker.mesh_resource = "package://kortex_description/tools/feeding_utensil/fork_tip.stl"
+        marker_array.markers.append(marker)
+
+        self.utensil_visualization_pub.publish(marker_array)
+
+    def visualize_food(self, transform, id = 0):
+
+        # publish a cube marker
+        marker_array = MarkerArray()
+        marker = Marker()
+        marker.id = id
+        marker.header.stamp = rospy.Time.now()
+        marker.header.frame_id = "base_link"
+        marker.type = marker.CUBE
+        marker.action = marker.ADD
+        marker.scale.x = 0.01
+        marker.scale.y = 0.01
+        marker.scale.z = 0.01
+        marker.color.a = 1.0
+
+        # marker color is red
+        marker.color.r = 1.0
+        marker.color.g = 0.0
+        marker.color.b = 0.0
+
+        pose = self.tf_utils.get_pose_msg_from_transform(transform)
+        marker.pose = pose
+
+        marker_array.markers.append(marker)
+
+        self.food_visualization_pub.publish(marker_array)
 
     

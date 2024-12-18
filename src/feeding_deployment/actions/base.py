@@ -26,6 +26,7 @@ from feeding_deployment.interfaces.perception_interface import PerceptionInterfa
 from feeding_deployment.interfaces.web_interface import WebInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
+from feeding_deployment.wrist_controller.wrist_controller import WristInterface
 from feeding_deployment.robot_controller.command_interface import (
     CartesianCommand,
     CloseGripperCommand,
@@ -63,18 +64,18 @@ class HighLevelAction(abc.ABC):
         rviz_interface: RVizInterface,
         web_interface: WebInterface,
         hla_hyperparams: dict[str, Any],
-        wrist_controller,
+        wrist_interface: WristInterface,
         flair,
         no_waits=False,
         log_path=None
     ) -> None:
-        self._sim = sim
-        self._robot_interface = robot_interface
-        self._perception_interface = perception_interface
-        self._rviz_interface = rviz_interface
-        self._web_interface = web_interface
-        self._hla_hyperparams = hla_hyperparams
-        self.wrist_controller = wrist_controller
+        self.sim = sim
+        self.robot_interface = robot_interface
+        self.perception_interface = perception_interface
+        self.rviz_interface = rviz_interface
+        self.web_interface = web_interface
+        self.hla_hyperparams = hla_hyperparams
+        self.wrist_interface = wrist_interface
         self.flair = flair
         self.no_waits = no_waits
         self.log_path = log_path
@@ -96,55 +97,55 @@ class HighLevelAction(abc.ABC):
         """Execute the action on the robot and return simulated trajectory."""
 
     def move_to_joint_positions(self, joint_positions: list[float]) -> None:
-        plan = self._sim.plan_to_joint_positions(joint_positions)
+        plan = self.sim.plan_to_joint_positions(joint_positions)
         print("Plan has length", len(plan))
-        if self._robot_interface is None:
-            self._sim.visualize_plan(plan)
+        if self.robot_interface is None:
+            self.sim.visualize_plan(plan)
         else:
-            self.execute_robot_command(JointCommand(pos=self._sim.scene_description.retract_pos[:7]), plan)
+            self.execute_robot_command(JointCommand(pos=self.sim.scene_description.retract_pos[:7]), plan)
             
     def move_to_ee_pose(self, pose: Pose) -> None:
-        plan = self._sim.plan_to_ee_pose(pose)
-        if self._robot_interface is None:
-            self._sim.visualize_plan(plan)
+        plan = self.sim.plan_to_ee_pose(pose)
+        if self.robot_interface is None:
+            self.sim.visualize_plan(plan)
         else:
             self.execute_robot_command(CartesianCommand(pos=pose.position, quat=pose.orientation), plan)
     
     def grasp_tool(self, tool: str) -> None:
-        if self._robot_interface is None:
-            self._sim.grasp_object(tool)
+        if self.robot_interface is None:
+            self.sim.grasp_object(tool)
         else:
             self.execute_robot_command(OpenGripperCommand(), tool_update=tool)
 
     def ungrasp_tool(self, tool: str) -> None:
-        if self._robot_interface is None:
-            self._sim.ungrasp_object()
+        if self.robot_interface is None:
+            self.sim.ungrasp_object()
         else:
             self.execute_robot_command(CloseGripperCommand(), tool_update=tool)
 
     def open_gripper(self) -> None:
-        if self._robot_interface is None:
-            self._sim.robot.open_fingers()
+        if self.robot_interface is None:
+            self.sim.robot.open_fingers()
         else:
             self.execute_robot_command(OpenGripperCommand())
     
     def close_gripper(self) -> None:
-        if self._robot_interface is None:
-            self._sim.robot.close_fingers()
+        if self.robot_interface is None:
+            self.sim.robot.close_fingers()
         else:
             self.execute_robot_command(CloseGripperCommand())
 
     def execute_robot_command(self, robot_command: KinovaCommand, plan_viz: list[FeedingDeploymentWorldState] = None, tool_update: str = None) -> None:
         """Execute the given commands on the robot."""
-        if self._robot_interface is None:
+        if self.robot_interface is None:
             return
         if not self.no_waits:
             if tool_update is not None:
-                self._rviz_interface.tool_update(True, tool_update, Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the drink
+                self.rviz_interface.tool_update(True, tool_update, Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the drink
             if plan_viz is not None:
-                self._rviz_interface.visualize_plan(plan_viz)
+                self.rviz_interface.visualize_plan(plan_viz)
             input("Execute next command?")
-        self._robot_interface.execute_command(robot_command)
+        self.robot_interface.execute_command(robot_command)
 
 @dataclass(frozen=True)
 class GroundHighLevelAction:
@@ -196,11 +197,11 @@ class ResetHLA(HighLevelAction):
         params: dict[str, Any],
     ) -> None:
         assert len(objects) == 0
-        assert self._sim.held_object_name is None
+        assert self.sim.held_object_name is None
         sim_states: list[FeedingDeploymentWorldState] = []
         robot_commands = []
 
-        self.move_to_joint_positions(self._sim.scene_description.retract_pos)
+        self.move_to_joint_positions(self.sim.scene_description.retract_pos)
 
         # set FLAIR preferences to None
         if self.flair is not None:
