@@ -8,7 +8,7 @@ from pathlib import Path
 import imageio.v2 as iio
 
 import pybullet as p
-from pybullet_helpers.geometry import Pose
+from pybullet_helpers.geometry import Pose, get_pose
 from pybullet_helpers.gui import create_gui_connection
 from pybullet_helpers.inverse_kinematics import set_robot_joints_with_held_object
 from pybullet_helpers.robots import create_pybullet_robot
@@ -155,6 +155,17 @@ class FeedingDeploymentPyBulletSimulator(FeedingDeploymentPyBulletWorld):
     def open_gripper(self) -> None:
         raise NotImplementedError("TODO")
         self.robot.open_fingers()
+
+    def get_current_state(self) -> FeedingDeploymentWorldState:
+
+        return FeedingDeploymentWorldState(
+            robot_joints=self.robot.get_joint_positions(),
+            drink_pose=get_pose(self.drink_id, self.physics_client_id),
+            wipe_pose=get_pose(self.wipe_id, self.physics_client_id),
+            utensil_pose=get_pose(self.utensil_id, self.physics_client_id),
+            held_object=self.held_object_name,
+            held_object_tf=self.held_object_tf,
+        )
 
     def make_simulation_video(self, outfile: Path, fps: int = 20) -> None:
         """Make a video for a simulated drink manipulation plan."""

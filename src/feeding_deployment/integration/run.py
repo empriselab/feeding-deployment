@@ -298,21 +298,15 @@ class _Runner:
             assert operator.preconditions.issubset(self.current_atoms)
 
             # Execute the high-level plan in simulation
-            ## Rajat Todo: execute_action returns None now, so need to rewrite saving trajectories
-            sim_traj = ground_hla.execute_action()
+            ground_hla.execute_action()
 
-            if sim_traj:
-                self.full_simulated_traj.extend(sim_traj)
+            sim_state = self.sim.get_current_state()
 
-            # Make sure the states are in sync.
-            if sim_traj:
-                self.sim.sync(sim_traj[-1])
             self.current_atoms -= operator.delete_effects
             self.current_atoms |= operator.add_effects
 
             # Save the latest state in case we want to resume execution
             # after a crash.
-            sim_state = self.full_simulated_traj[-1] if self.full_simulated_traj else None
             self._save_state(sim_state, self.current_atoms)
 
     def make_video(self, outfile: Path) -> None:
@@ -331,9 +325,10 @@ class _Runner:
         if sim_state is not None:
             assert isinstance(sim_state, FeedingDeploymentWorldState)
             self.sim.sync(sim_state)
-            self.rviz_interface.joint_state_update(sim_state.robot_joints)
-            if sim_state.held_object:
-                self.rviz_interface.tool_update(True, sim_state.held_object, Pose((0, 0, 0), (0, 0, 0, 1)))
+            if self.rviz_interface is not None:
+                self.rviz_interface.joint_state_update(sim_state.robot_joints)
+                if sim_state.held_object:
+                    self.rviz_interface.tool_update(True, sim_state.held_object, Pose((0, 0, 0), (0, 0, 0, 1)))
                 
         print(f"Loaded system state from {self._saved_state_infile}")
 
