@@ -13,10 +13,11 @@ except ModuleNotFoundError:
     ROSPY_IMPORTED = False
 
 import numpy as np
+from pathlib import Path
 from feeding_deployment.simulation.simulator import (
     FeedingDeploymentPyBulletSimulator,
 )
-from feeding_deployment.simulation.scene_description import SceneDescription
+from feeding_deployment.simulation.scene_description import SceneDescription, create_scene_description_from_config
 from pybullet_helpers.inverse_kinematics import add_fingers_to_joint_positions, check_collisions_with_held_object
 from pybullet_helpers.joint import JointPositions
 
@@ -24,7 +25,7 @@ from pybullet_helpers.joint import JointPositions
 class CollisionMonitor:
     """See docstring above."""
 
-    def __init__(self, use_ros: bool = True):
+    def __init__(self, scene_config: str, use_ros: bool = True):
         if use_ros:
             assert ROSPY_IMPORTED, "rospy was not imported"
             self._collision_pub = rospy.Publisher("/collision_free", Bool, queue_size=1)
@@ -33,7 +34,9 @@ class CollisionMonitor:
                 "/robot_joint_states", JointState, self._joint_state_callback
             )
         self._use_ros = use_ros
-        self._scene_description = SceneDescription()
+
+        scene_config_path = Path(__file__).parent.parent / "simulation" / "configs" / f"{scene_config}.yaml"
+        self._scene_description = create_scene_description_from_config(scene_config_path)
         self._sim = FeedingDeploymentPyBulletSimulator(self._scene_description, use_gui=False, ignore_user=True)
 
         self._print_once = True
@@ -83,17 +86,18 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("--scene_config", type=str, default="wheelchair")
     parser.add_argument("--dry", action="store_true")
     args = parser.parse_args()
 
     if args.dry:
-        monitor = CollisionMonitor(use_ros=False)
+        monitor = CollisionMonitor(scene_config=args.scene_config, use_ros=False)
         # A few tests.
         assert not monitor.check_collisions([2.8884768101246143, -0.7913320348241513, -1.7742571378056136, -2.078073911389284, 2.2868481461996795, -0.8264030187967055, -0.11233229012519357, 0.44, 0.44, 0.44, 0.44, -0.44, -0.44])
         assert monitor.check_collisions([2.0, -0.7913320348241513, -1.7742571378056136, -2.078073911389284, 2.2868481461996795, -0.8264030187967055, -0.11233229012519357, 0.44, 0.44, 0.44, 0.44, -0.44, -0.44])
     else:
         rospy.init_node("collision_free_monitor")
-        monitor = CollisionMonitor()
+        monitor = CollisionMonitor(scene_config=args.scene_config)
         rospy.spin()
     
     

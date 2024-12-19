@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 import pickle
 import queue
+import numpy as np
 
 try:
     import rospy
@@ -86,7 +87,7 @@ assert os.environ.get("PYTHONHASHSEED") == "0", \
 class _Runner:
     """A class for running the integrated system."""
 
-    def __init__(self, run_on_robot: bool, simulate_head_perception: bool, max_motion_planning_time: float,
+    def __init__(self, scene_config: str, run_on_robot: bool, simulate_head_perception: bool, max_motion_planning_time: float,
                  resume_from_state: str = "", no_waits: bool = False) -> None:
         self.run_on_robot = run_on_robot
         self.simulate_head_perception = simulate_head_perception
@@ -122,14 +123,15 @@ class _Runner:
             flair = None
 
         # Initialize the simulator.
-        kwargs: dict[str, Any] = {}
+        scene_config_path = Path(__file__).parent.parent / "simulation" / "configs" / f"{scene_config}.yaml"
+        self.scene_description = create_scene_description_from_config(str(scene_config_path))
+
         if run_on_robot:
-            kwargs["initial_joints"] = self.perception_interface.get_robot_joints()
-            print(f"Initial joint state: {kwargs['initial_joints']}")
+            print("Initial Robot Joints:", self.perception_interface.get_robot_joints())
+            assert np.allclose(self.scene_description.initial_joints, self.perception_interface.get_robot_joints(), atol=0.1), \
+                "Initial joint state in scene description does not match the actual robot joint state." 
         else:
             print("Running in simulation mode.")
-
-        self.scene_description = SceneDescription(**kwargs)
 
         self.rviz_interface = RVizInterface(self.scene_description)
 
@@ -332,6 +334,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("--scene_config", type=str, default="wheelchair")
     parser.add_argument("--run_on_robot", action="store_true")
     parser.add_argument("--simulate_head_perception", action="store_true")
     parser.add_argument("--make_videos", action="store_true")
@@ -345,7 +348,8 @@ if __name__ == "__main__":
     else:
         assert not args.run_on_robot, "Need ROS to run on robot"
 
-    runner = _Runner(args.run_on_robot, 
+    runner = _Runner(args.scene_config,
+                     args.run_on_robot, 
                      args.simulate_head_perception,
                      args.max_motion_planning_time,
                      args.resume_from_state,
