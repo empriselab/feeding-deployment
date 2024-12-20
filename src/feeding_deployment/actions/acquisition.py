@@ -167,14 +167,21 @@ class LookAtPlateHLA(HighLevelAction):
                         print("FINISHED GETTING PREFERENCES")
                         print("User Preference:", self.web_interface.user_preference)
                         self.flair.set_preference(self.web_interface.user_preference)
+                    else:
+                        # Use command line input for preference setting.
+                        print("Some example bite ordering preferences:")
+                        for ordering_option in ordering_options:
+                            print(" - ", ordering_option)
+                        preference = input("Enter preference: ")
+                        self.flair.set_preference(preference)
                 # else:
                 #     self.web_interface.send_web_interface_image(items_detection['plate_image'])
                 #     time.sleep(1.0)  # simulate delay, also needed for web interface
 
                 # Prepare for bite acquisition.
-                print("Doing Bite Acquisition")
-                self.wrist_interface.set_velocity_mode()
-                self.wrist_interface.reset()
+                if self.wrist_interface is not None:
+                    self.wrist_interface.set_velocity_mode()
+                    self.wrist_interface.reset()
 
                 next_action_prediction = self.flair.predict_next_action(camera_color_data, items_detection=None, log_path=None)
 
@@ -250,10 +257,28 @@ class AcquireBiteHLA(HighLevelAction):
 
             if self.flair is not None:
 
-                print("Doing Bite Acquisition")
-                camera_color_data, camera_info_data, camera_depth_data, _ = (
-                    self.perception_interface.get_camera_data()
-                )
+                if self.robot_interface is not None:
+                    camera_color_data, camera_info_data, camera_depth_data, _ = (
+                        self.perception_interface.get_camera_data()
+                    )
+                else:
+                    with open(self.log_path / "food_detection_data.pkl", "rb") as f:
+                            food_detection_data = pickle.load(f)
+
+                    camera_color_data = food_detection_data["camera_color_data"]
+                    camera_info_data = food_detection_data["camera_info_data"]
+                    camera_depth_data = food_detection_data["camera_depth_data"]
+
+                if self.web_interface is None:
+                    # params must be set manually to the autonomously selected values
+                    next_action_prediction = self.flair.get_next_action()
+                    next_food_item = next_action_prediction['labels_list'][next_action_prediction['food_id']]
+                    bite_mask_idx = next_action_prediction['bite_mask_idx']
+
+                    params = {
+                        "status": "aquire_food",
+                        "data": [next_food_item, bite_mask_idx],
+                    }
 
                 if params["status"] == 0:
 

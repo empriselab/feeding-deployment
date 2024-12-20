@@ -268,3 +268,6 @@ class FLAIR:
         
         self.next_action_prediction = next_action_prediction
         return next_action_prediction
+    
+    def get_next_action(self):
+        return self.next_action_prediction
