@@ -2,6 +2,8 @@
 
 from pathlib import Path
 from typing import Any
+import numpy as np
+from scipy.spatial.transform import Rotation
 
 try:
     import rospy
@@ -9,22 +11,6 @@ try:
     ROSPY_IMPORTED = True
 except ModuleNotFoundError:
     ROSPY_IMPORTED = False
-
-# Rajat ToDo: Remove this hacky addition
-FLAIR_PATH = "/home/isacc/deployment_ws/src/FLAIR/bite_acquisition/scripts"
-import sys
-
-sys.path.append(FLAIR_PATH)
-try:
-    # raise ModuleNotFoundError  # Just to skip this block
-    from wrist_controller import WristController
-    from flair import FLAIR
-
-    FLAIR_IMPORTED = True
-    print("FLAIR imported successfully")
-except ModuleNotFoundError:
-    FLAIR_IMPORTED = False
-    pass
 
 from relational_structs import (
     GroundAtom,
@@ -39,14 +25,13 @@ from tomsutils.pddl_planning import run_pyperplan_planning
 from pybullet_helpers.geometry import Pose
 from pybullet_helpers.link import get_link_pose, get_relative_link_pose
 
-from feeding_deployment.actions.high_level_actions import (
-    TransferToolHLA,
-    tool_type,
-)
+from feeding_deployment.actions.base import tool_type
+from feeding_deployment.actions.transfer_tool import TransferToolHLA
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
 from feeding_deployment.interfaces.web_interface import WebInterface
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
+from feeding_deployment.wrist_controller.wrist_controller import WristInterface
 from feeding_deployment.simulation.scene_description import (
     SceneDescription,
     create_scene_description_from_config,
@@ -55,13 +40,10 @@ from feeding_deployment.simulation.simulator import (
     FeedingDeploymentPyBulletSimulator,
     FeedingDeploymentWorldState,
 )
-from feeding_deployment.simulation.video import make_simulation_video
-
-import numpy as np
-from scipy.spatial.transform import Rotation
+from feeding_deployment.actions.flair.flair import FLAIR
 
 def _main(
-    tool: str, test: bool, record_rom: bool, max_motion_planning_time: float = 10
+    scene_config: str, transfer_type: str, tool: str, test: bool, record_rom: bool, max_motion_planning_time: float = 10
 ) -> None:
     """Testing components of the system."""
 
@@ -72,18 +54,13 @@ def _main(
 
     # Initialize the interface to the robot.
     robot_interface = ArmInterfaceClient()  # type: ignore  # pylint: disable=no-member
-
-    if ROSPY_IMPORTED:
-        web_interface = WebInterface()
-    else:
-        web_interface = None
+    web_interface = WebInterface()
 
     # Initialize the perceiver (e.g., get joint states or human head poses).
     if record_rom:
         test = True
 
     perception_interface = PerceptionInterface(robot_interface = robot_interface, record_goal_pose = not test)
-
 
     if not test: # calibrate utensil tip
         # set tool transform - only required once globally
@@ -99,19 +76,17 @@ def _main(
     else: # actually do the transfer
         run_on_robot = True
 
-        # Initialize the simulator.
-        kwargs: dict[str, Any] = {}
-        kwargs["initial_joints"] = perception_interface.get_robot_joints()
-        scene_description = SceneDescription(**kwargs)
+        scene_config_path = Path(__file__).parent.parent / "simulation" / "configs" / f"{scene_config}.yaml"
+        scene_description = create_scene_description_from_config(str(scene_config_path), transfer_type)
         sim = FeedingDeploymentPyBulletSimulator(scene_description, use_gui=False)
 
         rviz_interface = RVizInterface(scene_description)
-        wrist_controller = WristController()
+        wrist_controller = WristInterface()
 
         # Create skills for high-level planning.
         hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
 
-        high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_controller, None)
+        high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_controller, flair=None, no_waits=False, log_path=None)
 
         if tool == "fork":
             object = Object("utensil", tool_type)
@@ -139,12 +114,14 @@ def _main(
         rviz_interface.tool_update(True, sim.held_object_name, Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the tool in rviz
 
         perception_interface._head_perception.set_tool(args.tool)
-        sim_traj = high_level_action.execute_action(objects=[object], params={})
+        high_level_action.execute_action(objects=[object], params={})
 
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("--scene_config", type=str, default="vention")
+    parser.add_argument("--transfer_type", type=str, default="inside")
     parser.add_argument("--tool", type=str, default="fork")
     parser.add_argument("--test", action="store_true")
     parser.add_argument("--record_rom", action="store_true")
@@ -154,4 +131,4 @@ if __name__ == "__main__":
     if args.tool not in ["fork", "drink", "wipe"]:
         raise ValueError(f"Invalid tool: {args.tool}, must be one of fork, drink, wipe")
 
-    _main(args.tool, args.test, args.record_rom, args.max_motion_planning_time)
+    _main(args.scene_config, args.transfer_type, args.tool, args.test, args.record_rom, args.max_motion_planning_time)

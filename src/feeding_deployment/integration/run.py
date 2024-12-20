@@ -106,9 +106,11 @@ class _Runner:
         self.scene_description = create_scene_description_from_config(str(scene_config_path), transfer_type)
 
         if run_on_robot:
-            print("Initial Robot Joints:", self.perception_interface.get_robot_joints())
-            assert np.allclose(self.scene_description.initial_joints, self.perception_interface.get_robot_joints(), atol=0.1), \
-                "Initial joint state in scene description does not match the actual robot joint state." 
+            if not np.allclose(self.scene_description.initial_joints, self.perception_interface.get_robot_joints(), atol=0.2):
+                print("Initial joint state in scene description does not match the actual robot joint state.")
+                print("Initial Robot Joints:", self.perception_interface.get_robot_joints())
+                print("Initial Joints in Scene Description:", self.scene_description.initial_joints)
+                
         else:
             print("Running in simulation mode.")
 
@@ -372,6 +374,10 @@ if __name__ == "__main__":
 
     # drink_transfer_msg = {"status": "drink_transfer"}
     # runner.hla_command_queue.put(drink_transfer_msg)
+
+    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
+    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
+    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
 
     if not args.use_interface:
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))

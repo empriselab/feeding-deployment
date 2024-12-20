@@ -264,6 +264,7 @@ class KinovaArm:
         if tool == "fork":
             # Pinocchio setup (only used in low-level servoing mode)
             self.file_path = os.path.dirname(os.path.realpath(__file__))
+            self.file_path = os.path.join(self.file_path, "urdfs")
 
             if self.fix_joint_hack:
                 self.model = pin.buildModelFromUrdf(
@@ -282,6 +283,7 @@ class KinovaArm:
         elif tool == "wipe":
             # Pinocchio setup (only used in low-level servoing mode)
             self.file_path = os.path.dirname(os.path.realpath(__file__))
+            self.file_path = os.path.join(self.file_path, "urdfs")
 
             if self.fix_joint_hack:
                 self.model = pin.buildModelFromUrdf(
@@ -312,6 +314,7 @@ class KinovaArm:
 
             # Pinocchio setup (only used in low-level servoing mode)
             self.file_path = os.path.dirname(os.path.realpath(__file__))
+            self.file_path = os.path.join(self.file_path, "urdfs")
 
             if self.fix_joint_hack:
                 self.model = pin.buildModelFromUrdf(

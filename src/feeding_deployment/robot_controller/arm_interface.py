@@ -24,6 +24,7 @@ class ArmInterface:
         self.command_queue = queue.Queue(1)
         self.gravity_compensation_external_event = threading.Event()
         self.gravity_compensation_internal_event = threading.Event()
+        self.print_debug_once = True
         self.in_compliant_mode = False
 
         self.emergency_stop_active = False
@@ -46,7 +47,9 @@ class ArmInterface:
 
         # also check if gravity compensation has been set by the controller
         if self.gravity_compensation_internal_event.is_set():
-            print("Emergency stop (gravity compensation) activated by controller, will not take any more commands")
+            if self.print_debug_once:
+                print("Emergency stop (gravity compensation) activated by controller, will not take any more commands")
+                self.print_debug_once = False
             self.emergency_stop_active = True
             if self.in_compliant_mode:
                 self.in_compliant_mode = False

@@ -138,6 +138,10 @@ class TransferToolHLA(HighLevelAction):
         if tool.name == "utensil":
             assert self.sim.held_object_name == "utensil"
 
+            if self.wrist_interface is not None:
+                # start the horizontal spoon thread if it is not already running
+                self.wrist_interface.start_horizontal_spoon_thread()
+
             self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
             if self.wrist_interface is not None:

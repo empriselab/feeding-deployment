@@ -97,15 +97,20 @@ class HighLevelAction(abc.ABC):
         """Execute the action on the robot and return simulated trajectory."""
 
     def move_to_joint_positions(self, joint_positions: list[float]) -> None:
-        plan = self.sim.plan_to_joint_positions(joint_positions)
-        print("Plan has length", len(plan))
+        
+        plan = None 
+        if not self.no_waits:
+            plan = self.sim.plan_to_joint_positions(joint_positions)
         if self.robot_interface is None:
             self.sim.visualize_plan(plan)
         else:
             self.execute_robot_command(JointCommand(pos=joint_positions), plan)
             
     def move_to_ee_pose(self, pose: Pose) -> None:
-        plan = self.sim.plan_to_ee_pose(pose)
+
+        plan = None
+        if not self.no_waits:
+            plan = self.sim.plan_to_ee_pose(pose)
         if self.robot_interface is None:
             self.sim.visualize_plan(plan)
         else:
@@ -136,7 +141,8 @@ class HighLevelAction(abc.ABC):
     def execute_robot_command(self, robot_command: KinovaCommand, plan_viz: list[FeedingDeploymentWorldState] = None, tool_update: str = None) -> None:
         """Execute the given commands on the robot."""
         if self.robot_interface is None:
-            return
+            raise ValueError("Robot interface is not available to execute commands.")
+        
         if not self.no_waits:
             if tool_update is not None:
                 self.rviz_interface.tool_update(True, tool_update, Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the drink

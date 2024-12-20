@@ -88,9 +88,8 @@ class PickToolHLA(HighLevelAction):
             if self.sim.scene_description.scene_label == "vention":
                 self.move_to_ee_pose(self.sim.scene_description.utensil_outside_above_mount)
             self.move_to_joint_positions(self.sim.scene_description.retract_pos)
-            if self.sim.scene_description.scene_label == "wheelchair":
-                # Pre-emptively move to the before_transfer_pos because moving to above_plate_pos from retract_pos is unsafe.
-                self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
+            # Pre-emptively move to the before_transfer_pos because moving to above_plate_pos from retract_pos is unsafe.
+            self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
             
         if tool.name == "wipe":
 
@@ -112,9 +111,7 @@ class PickToolHLA(HighLevelAction):
             elif self.sim.scene_description.scene_label == "vention":
                 self.move_to_joint_positions(self.sim.scene_description.wipe_neutral_pos)
             self.move_to_joint_positions(self.sim.scene_description.retract_pos)
-
-            if self.sim.scene_description.scene_label == "wheelchair":
-                self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
+            self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
             # Send message to web interface.
             if self.web_interface is not None:

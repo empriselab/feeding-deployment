@@ -293,7 +293,7 @@ class PerceptionInterface:
             tool_tip_target_pose = self.tool_tip_target_pose
 
         # save them in a pickle file
-        if self.robot_interface is not None:
+        if self.robot_interface is not None and self.log_dir is not None:
             if self.tool == "fork":
                 with open(self.log_dir / 'head_perception_pose_fork.pkl', 'wb') as f:
                     pickle.dump(tool_tip_target_pose, f)
@@ -324,14 +324,14 @@ class PerceptionInterface:
 
         # Rajat ToDo: Fix these hardcoded values
         if self.tool == "fork":
-            tool_tip_staging_pose[:3, 3] = [0.091, 0.292, 0.402]
-            tool_tip_staging_pose[:3, :3] = R.from_quat([0.478, -0.505, -0.515, 0.502]).as_matrix()
+            tool_tip_staging_pose[:3, 3] = [0.250, 0.272, 0.518]
+            tool_tip_staging_pose[:3, :3] = R.from_quat([0.523, -0.503, -0.469, 0.503]).as_matrix()
         elif self.tool == "drink":
-            tool_tip_staging_pose[:3, 3] = [0.140, 0.331, 0.468]
-            tool_tip_staging_pose[:3, :3] = R.from_quat([0.478, -0.505, -0.515, 0.502]).as_matrix()
+            tool_tip_staging_pose[:3, 3] = [0.282, 0.314, 0.546]
+            tool_tip_staging_pose[:3, :3] = R.from_quat([0.523, -0.503, -0.469, 0.503]).as_matrix()
         elif self.tool == "wipe":
-            tool_tip_staging_pose[:3, 3] = [0.256, 0.284, 0.380]
-            tool_tip_staging_pose[:3, :3] = R.from_quat([0.478, -0.505, -0.515, 0.502]).as_matrix()
+            tool_tip_staging_pose[:3, 3] = [0.417, 0.280, 0.509]
+            tool_tip_staging_pose[:3, :3] = R.from_quat([0.523, -0.503, -0.469, 0.503]).as_matrix()
 
         return tool_tip_staging_pose
 
