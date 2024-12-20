@@ -91,19 +91,16 @@ class InsideMouthTransfer(Transfer):
         
         # Pause so that new head pose can be re-perceived
         time.sleep(0.2)
-        closed_loop = True
 
         while True:
             time.sleep(self.control_time)
 
-            if closed_loop:
-                forque_target_base = self.perception_interface.get_head_perception_tool_tip_target_pose()
+            forque_target_base = self.perception_interface.get_head_perception_tool_tip_target_pose()
 
             forque_source = self.perception_interface.get_tool_tip_pose()
             distance = np.linalg.norm(forque_source[:3,3] - forque_target_base[:3,3])
 
-            if distance < OPEN_LOOP_RADIUS and closed_loop:
-                closed_loop = False
+            if distance < OPEN_LOOP_RADIUS:
                 break
 
             intermediate_forque_target = np.eye(4)

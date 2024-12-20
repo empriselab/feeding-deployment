@@ -7,7 +7,7 @@ Panels:
         - /TF1
         - /TF1/Frames1
       Splitter Ratio: 0.6767485737800598
-    Tree Height: 551
+    Tree Height: 433
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -412,7 +412,7 @@ Visualization Manager:
       Marker Topic: /visualization_marker
       Name: Marker
       Namespaces:
-        {}
+        cube: true
       Queue Size: 100
       Value: true
     - Alpha: 1
@@ -449,6 +449,8 @@ Visualization Manager:
       Filter (whitelist): ""
       Frame Timeout: 15
       Frames:
+        AR_tag:
+          Value: true
         All Enabled: false
         base_link:
           Value: false
@@ -474,11 +476,17 @@ Visualization Manager:
           Value: false
         feeding_tool_tip:
           Value: false
+        final_target:
+          Value: true
         finger_tip:
+          Value: true
+        food_frame:
           Value: true
         forearm_link:
           Value: false
         fork_tip:
+          Value: true
+        fork_tip_target:
           Value: true
         forkbase:
           Value: false
@@ -490,8 +498,12 @@ Visualization Manager:
           Value: false
         half_arm_2_link:
           Value: false
+        head_pose:
+          Value: true
         inertia_link:
           Value: false
+        intermediate_target:
+          Value: true
         left_inner_finger:
           Value: false
         left_inner_finger_pad:
@@ -504,6 +516,10 @@ Visualization Manager:
           Value: false
         map:
           Value: false
+        next_target:
+          Value: true
+        reference_head_pose:
+          Value: true
         right_inner_finger:
           Value: false
         right_inner_finger_pad:
@@ -590,6 +606,10 @@ Visualization Manager:
           Value: false
         tool_frame:
           Value: false
+        tool_frame_target:
+          Value: true
+        tool_tip_target:
+          Value: true
         wipe_tip:
           Value: true
         wipebase:
@@ -606,6 +626,9 @@ Visualization Manager:
         map:
           sim/world:
             sim/base_link:
+              sim/drinkbase:
+                sim/drink_tip:
+                  {}
               sim/shoulder_link:
                 sim/half_arm_1_link:
                   sim/half_arm_2_link:
@@ -615,7 +638,12 @@ Visualization Manager:
                           sim/bracelet_link:
                             sim/end_effector_link:
                               sim/finger_tip:
-                                {}
+                                sim/forkbase:
+                                  sim/forkpitch:
+                                    sim/forkroll:
+                                      sim/feeding_tool_tip:
+                                        sim/fork_tip:
+                                          {}
                               sim/inertia_link:
                                 {}
                               sim/robotiq_arg2f_base_link:
@@ -635,8 +663,27 @@ Visualization Manager:
                                         {}
                               sim/tool_frame:
                                 {}
+              sim/wipebase:
+                sim/wipe_tip:
+                  {}
           world:
             base_link:
+              AR_tag:
+                {}
+              final_target:
+                {}
+              food_frame:
+                {}
+              fork_tip_target:
+                {}
+              head_pose:
+                {}
+              intermediate_target:
+                {}
+              next_target:
+                {}
+              reference_head_pose:
+                {}
               shoulder_link:
                 half_arm_1_link:
                   half_arm_2_link:
@@ -686,18 +733,10 @@ Visualization Manager:
                                         {}
                               tool_frame:
                                 {}
-        sim/drinkbase:
-          sim/drink_tip:
-            {}
-        sim/forkbase:
-          sim/forkpitch:
-            sim/forkroll:
-              sim/feeding_tool_tip:
-                sim/fork_tip:
-                  {}
-        sim/wipebase:
-          sim/wipe_tip:
-            {}
+              tool_frame_target:
+                {}
+              tool_tip_target:
+                {}
       Update Interval: 0
       Value: true
     - Class: rviz/MarkerArray
@@ -705,7 +744,7 @@ Visualization Manager:
       Marker Topic: /head_perception/voxels/marker_array
       Name: MarkerArray
       Namespaces:
-        {}
+        visualize_voxels: true
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -713,7 +752,7 @@ Visualization Manager:
       Marker Topic: /head_perception/tool/marker_array
       Name: MarkerArray
       Namespaces:
-        {}
+        tool_marker: true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -744,7 +783,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.5158221125602722
+      Distance: 2.250786304473877
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -760,19 +799,19 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.3697969317436218
+      Pitch: 0.4047969579696655
       Target Frame: <Fixed Frame>
-      Yaw: 1.5285611152648926
+      Yaw: 1.3385614156723022
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1556
+  Height: 1333
   Hide Left Dock: false
   Hide Right Dock: true
   Image:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000002130000050efc0200000009fb0000001200530065006c0065006300740069006f006e00000001e10000009b000000b000fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000b0fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000006e000002950000018200fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d006100670065010000030f0000026d0000002600ffffff000000010000015f00000367fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000006e000003670000013200fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000a510000005efc0100000002fb0000000800540069006d0065010000000000000a51000006dc00fffffffb0000000800540069006d00650100000000000004500000000000000000000008320000050e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000002130000042ffc0200000009fb0000001200530065006c0065006300740069006f006e00000001e10000009b000000b000fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000b0fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000006e0000021f0000018200fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d0061006700650100000299000002040000002600ffffff000000010000015f00000367fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000006e000003670000013200fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000006dc0000005efc0100000002fb0000000800540069006d00650100000000000006dc000006dc00fffffffb0000000800540069006d00650100000000000004500000000000000000000004bd0000042f00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -781,6 +820,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: true
-  Width: 2641
-  X: 96
-  Y: 54
+  Width: 1756
+  X: 1606
+  Y: 666
