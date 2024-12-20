@@ -9,11 +9,11 @@ from feeding_deployment.robot_controller.command_interface import (
     KinovaCommand,
     OpenGripperCommand,
 )
-from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
+from feeding_deployment.simulation.state import FeedingDeploymentWorldState
 
 
 def simulated_trajectory_to_kinova_commands(
-    traj: list[FeedingDeploymentSimulatorState],
+    traj: list[FeedingDeploymentWorldState],
 ) -> list[KinovaCommand]:
     """The Kinova controller expects arm joints and gripper values."""
     cmds: list[KinovaCommand] = []

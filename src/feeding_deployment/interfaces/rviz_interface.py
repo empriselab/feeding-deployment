@@ -8,18 +8,18 @@ from pybullet_helpers.geometry import Pose
 from pybullet_helpers.joint import JointPositions
 from scipy.spatial.transform import Rotation as R
 
-
 try:
     import rospy
     from sensor_msgs.msg import JointState
     from std_msgs.msg import String
     from visualization_msgs.msg import MarkerArray, Marker
     import tf2_ros
-    from geometry_msgs.msg import TransformStamped
-
+    from geometry_msgs.msg import TransformStamped, Pose as PoseMsg
     from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
-except ModuleNotFoundError:
-    pass
+    ROSPY_IMPORTED = True
+except ModuleNotFoundError as e:
+    # print(f"ROS not imported: {e}")
+    ROSPY_IMPORTED = False
 
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 from feeding_deployment.simulation.scene_description import SceneDescription
@@ -29,11 +29,15 @@ class RVizInterface:
 
     def __init__(self, scene_description: SceneDescription) -> None:
 
+        assert ROSPY_IMPORTED, "ROS is required to run RVizInterface"
+
         self._scene_description = scene_description
 
         # Create publishers for rviz simulation.
         self.sim_joint_publishers = rospy.Publisher("/sim/robot_joint_states", JointState, queue_size=10)
         self.marker_pub = rospy.Publisher("/visualization_marker", Marker, queue_size=10)
+        self.utensil_visualization_pub = rospy.Publisher('utensil_visualization_marker_array', MarkerArray, queue_size=10)
+        self.food_visualization_pub = rospy.Publisher('food_visualization_marker_array', MarkerArray, queue_size=10)
         
         # Create a static transform broadcaster for rviz simulation.
         self.static_transform_broadcaster = tf2_ros.StaticTransformBroadcaster()
@@ -170,5 +174,80 @@ class RVizInterface:
     def visualizeTransform(self, source_frame, target_frame, transform):
 
         self.publishTransformationToTF(source_frame, target_frame, transform)
+
+    def visualize_plan(self, plan):
+        for sim_state in plan:
+            self.joint_state_update(sim_state.robot_joints)
+            time.sleep(0.1)
+
+    def get_pose_msg_from_transform(self, transform):
+
+        pose = PoseMsg()
+        pose.position.x = transform[0,3]
+        pose.position.y = transform[1,3]
+        pose.position.z = transform[2,3]
+
+        quat = R.from_matrix(transform[:3,:3]).as_quat()
+        pose.orientation.x = quat[0]
+        pose.orientation.y = quat[1]
+        pose.orientation.z = quat[2]
+        pose.orientation.w = quat[3]
+
+        return pose
+
+    def visualize_fork(self, transform):
+        print("Visualizing fork")
+        # visualize fork mesh in rviz
+        marker_array = MarkerArray()
+        marker = Marker()
+        marker.id = 0
+        marker.header.stamp = rospy.Time.now()
+        marker.header.frame_id = "base_link"
+        marker.type = marker.MESH_RESOURCE
+        marker.action = marker.ADD
+        marker.scale.x = 0.001
+        marker.scale.y = 0.001
+        marker.scale.z = 0.001
+        marker.color.a = 1.0
+        
+        # marker color is grey
+        marker.color.r = 0.5
+        marker.color.g = 0.5
+        marker.color.b = 0.5
+        
+        pose = self.get_pose_msg_from_transform(transform)
+        marker.pose = pose
+
+        marker.mesh_resource = "package://kortex_description/tools/feeding_utensil/fork_tip.stl"
+        marker_array.markers.append(marker)
+
+        self.utensil_visualization_pub.publish(marker_array)
+
+    def visualize_food(self, transform, id = 0):
+
+        # publish a cube marker
+        marker_array = MarkerArray()
+        marker = Marker()
+        marker.id = id
+        marker.header.stamp = rospy.Time.now()
+        marker.header.frame_id = "base_link"
+        marker.type = marker.CUBE
+        marker.action = marker.ADD
+        marker.scale.x = 0.01
+        marker.scale.y = 0.01
+        marker.scale.z = 0.01
+        marker.color.a = 1.0
+
+        # marker color is red
+        marker.color.r = 1.0
+        marker.color.g = 0.0
+        marker.color.b = 0.0
+
+        pose = self.get_pose_msg_from_transform(transform)
+        marker.pose = pose
+
+        marker_array.markers.append(marker)
+
+        self.food_visualization_pub.publish(marker_array)
 
     

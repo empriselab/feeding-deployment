@@ -15,12 +15,12 @@
         <color rgba="0.75294 1 0.75294 1"/>
       </material>
     </visual>
-    <collision>
+    <!-- <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <mesh filename="utensil_base.stl"/>
       </geometry>
-    </collision>
+    </collision> -->
   </link>
 </robot>
 

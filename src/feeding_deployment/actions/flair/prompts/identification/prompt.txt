@@ -1,0 +1,9 @@
+Objective: To determine the food items on the plate.
+Available items: ['shrimp', 'chicken', 'noodles', 'chicken', 'broccoli', 'fettucine', 'meatball', 'spaghetti', 'brownie', 'chocolate sauce', 'strawberry', 'celery', 'watermelon', 'ranch dressing', 'mashed potatoes', 'sausage']
+
+The first 3 images are in-context examples with the ground truth food items.
+Example Image 1: ['shrimp', 'chicken', 'noodles']
+Example Image 2: ['chicken', 'broccoli', 'fettucine']
+Example Image 3: ['meatball', 'spaghetti']
+
+The 4th image is the test image. From the available items, what food items are present, as a comma-separated list? Format your answer in one-line as follows: ['first_item', 'second_item', ..., 'last_item']

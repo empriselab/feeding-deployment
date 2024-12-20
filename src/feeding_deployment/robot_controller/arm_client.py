@@ -8,11 +8,16 @@ import threading
 import time
 import numpy as np
 
-import rospy
-from sensor_msgs.msg import JointState
-from std_msgs.msg import Bool
-from geometry_msgs.msg import Pose
-# from netft_rdt_driver.srv import String_cmd
+try:
+    import rospy
+    from sensor_msgs.msg import JointState
+    from std_msgs.msg import Bool
+    from geometry_msgs.msg import Pose
+    # from netft_rdt_driver.srv import String_cmd
+    ROSPY_IMPORTED = True
+except ModuleNotFoundError as e:
+    # print(f"ROS not imported: {e}")
+    ROSPY_IMPORTED = False
 
 from feeding_deployment.robot_controller.arm_interface import ArmInterface, ArmManager, NUC_HOSTNAME, ARM_RPC_PORT, RPC_AUTHKEY
 from feeding_deployment.robot_controller.command_interface import KinovaCommand, JointTrajectoryCommand, JointCommand, CartesianCommand, OpenGripperCommand, CloseGripperCommand
@@ -20,6 +25,8 @@ from feeding_deployment.robot_controller.command_interface import KinovaCommand,
 
 class ArmInterfaceClient:
     def __init__(self):
+
+        assert ROSPY_IMPORTED, "ROS is required to run on the real robot"
 
         # make sure watchdog is running
         print("Waiting for Watchdog status...")

@@ -12,41 +12,37 @@ import pickle
 
 try:
     import rospy
-    from sensor_msgs.msg import JointState, CompressedImage
+    from sensor_msgs.msg import JointState
     from std_msgs.msg import String, Bool
-    from visualization_msgs.msg import MarkerArray
     import tf2_ros
-    from geometry_msgs.msg import TransformStamped
-    from cv_bridge import CvBridge
-    from geometry_msgs.msg import Pose as PoseMsg
+    from geometry_msgs.msg import WrenchStamped, Point, Pose as PoseMsg
+    from netft_rdt_driver.srv import String_cmd
 
     from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
     from feeding_deployment.aruco_perception.aruco_perception import ArUcoPerception
 except ModuleNotFoundError:
-    pass
+    ROSPY_IMPORTED = False
 
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
 
 class PerceptionInterface:
     """An interface for perception (robot joints, human head poses, etc.)."""
 
-    def __init__(self, robot_interface: ArmInterfaceClient | None, record_goal_pose: bool = False, simulate_head_perception: bool = False) -> None:
-        self._robot_interface = robot_interface
+    def __init__(self, robot_interface: ArmInterfaceClient | None, record_goal_pose: bool = False, simulate_head_perception: bool = False, log_dir: str | None = None) -> None:
+        self.robot_interface = robot_interface
         self._simulate_head_perception = simulate_head_perception
-
-        self.tfBuffer = tf2_ros.Buffer()
-        self.listener = tf2_ros.TransformListener(self.tfBuffer)
-
-        self.tool_tip_target_lock = threading.Lock()
-        # this term is updated in the run_head_perception method and read in the get_tool_tip_pose method
-        self.tool_tip_target_pose = None
+        self.log_dir = log_dir
 
         # run head perception
-        if robot_interface is None:
+        if self.robot_interface is None:
+            self.simulation = True
             self._head_perception = None
             self._aruco_perception = None
         else:
-            # self._head_perception = None
+            self.simulation = False
+            self.tfBuffer = tf2_ros.Buffer()
+            self.listener = tf2_ros.TransformListener(self.tfBuffer)
+
             self._head_perception = HeadPerceptionROSWrapper(record_goal_pose)
             
             # warm start head perception only if we're not recording the goal pose
@@ -58,10 +54,155 @@ class PerceptionInterface:
             # Rajat ToDo: pass perception queues to all perception classes instead of having them use ros subscribers which spawn threads
             self._aruco_perception = ArUcoPerception()
 
+            self.speak_pub = rospy.Publisher('/speak', String, queue_size=1)
+
+            self.set_filter_noisy_readings_pub = rospy.Publisher('/head_perception/set_filter_noisy_readings', Bool, queue_size=1)
+
+            self.transfer_button = False
+            self.transfer_button_sub = rospy.Subscriber('/transfer_button', Bool, self.transfer_button_callback)
+
+            self.mouth_open = False
+            self.mouth_state_sub = rospy.Subscriber('/head_perception/mouth_state', Bool, self.mouth_state_callback)
+            
+            self.ft_threshold_exceeded = False
+            self.ft_sensor_sub = rospy.Subscriber('/forque/forqueSensor', WrenchStamped, self.ft_callback)
+
+            self.head_shake_detected = False
+            self.head_still_detected = False
+            self.neck_rotation_sub = rospy.Subscriber('/head_perception/neck_rotation', Point, self.neck_rotation_callback)
+
+        self.tool_tip_target_lock = threading.Lock()
+        # this term is updated in the run_head_perception method and read in the get_tool_tip_pose method
+        self.tool_tip_target_pose = None
+
         # Head perception thread setup
         self.head_perception_thread = None
         self.kill_the_thread = False
         self.head_perception_running = False
+
+    def zero_ft_sensor(self):
+        print("Zeroing FT sensor")
+        if self.simulation:
+            return
+        bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
+        bias('bias')
+        
+    def speak(self, text):
+        print("Speaking: ", text)
+        if self.simulation:
+            return
+        self.speak_pub.publish(String(data=text))
+
+    def neck_rotation_callback(self, msg):
+
+        neck_rotation = np.array([msg.x, msg.y, msg.z])
+        if neck_rotation[1] > 5: # in degrees
+            self.head_shake_detected = True
+        if np.abs(neck_rotation[0]) < 5 and np.abs(neck_rotation[1]) < 5 and np.abs(neck_rotation[2]) < 5:
+            self.head_still_detected = True
+        else:
+            self.head_still_detected = False
+
+    def detect_mouth_open(self):
+        print("Waiting for mouth open")
+        if self.simulation:
+            return True
+        
+        self.mouth_open = False
+        # wait for mouth to open
+        while not rospy.is_shutdown() and not self.mouth_open:
+            time.sleep(0.05)
+        self.mouth_open = False
+        return True
+
+    def detect_button_press(self):
+        print("Waiting for button press")
+        if self.simulation:
+            return True
+        
+        self.transfer_button = False
+        # wait for button press
+        while not rospy.is_shutdown() and not self.transfer_button:
+            time.sleep(0.05)
+        self.transfer_button = False
+        return True
+    
+    def detect_force_trigger(self):
+        print("Waiting for force torque threshold to be exceeded")
+        if self.simulation:
+            return True
+        
+        self.ft_threshold_exceeded = False
+        # wait for force torque threshold to be exceeded
+        while not rospy.is_shutdown() and not self.ft_threshold_exceeded:
+            time.sleep(0.05)
+        self.ft_threshold_exceeded = False
+        return True
+    
+    def detect_head_shake(self):
+        print("Waiting for head shake")
+        if self.simulation:
+            return True
+        
+        self.set_filter_noisy_readings_pub.publish(Bool(data=False))
+        self.head_shake_detected = False
+        # wait for head shake
+        while not rospy.is_shutdown() and not self.head_shake_detected:
+            time.sleep(0.05)
+        self.set_filter_noisy_readings_pub.publish(Bool(data=True))
+        self.head_shake_detected = False
+        return True
+    
+    def detect_head_still(self):
+        print("Waiting for head still to be detected for 4 seconds")
+        if self.simulation:
+            return True
+        self.head_shake_detected = True
+        self.set_filter_noisy_readings_pub.publish(Bool(data=False))
+        while not rospy.is_shutdown():
+            head_still_start_time = time.time()
+            while not rospy.is_shutdown():
+                print("Head still detected: ",self.head_still_detected)
+                if not self.head_still_detected or time.time() - head_still_start_time > 4.0:
+                    break
+                if time.time() - head_still_start_time > 3.0:
+                    print("Waiting for head still to be detected for 1 more second")
+                elif time.time() - head_still_start_time > 2.0:
+                    print("Waiting for head still to be detected for 2 more seconds")
+                elif time.time() - head_still_start_time > 1.0:
+                    print("Waiting for head still to be detected for 3 more seconds")
+                time.sleep(0.05)
+            if time.time() - head_still_start_time > 4.0:
+                break
+        self.set_filter_noisy_readings_pub.publish(Bool(data=True))
+        self.head_still_detected = True
+        return True
+    
+    def auto_timeout(self, timeout=5.0):
+        print("Waiting for auto timeout")
+        if self.simulation:
+            return True
+        time.sleep(timeout)
+        return True
+
+    def ft_callback(self, msg):
+
+        ft_reading = np.array([msg.wrench.force.x, msg.wrench.force.y, msg.wrench.force.z, msg.wrench.torque.x, msg.wrench.torque.y, msg.wrench.torque.z])
+
+        down_torque = ft_reading[3]
+        if np.abs(down_torque) > 0.1:
+            self.ft_threshold_exceeded = True
+
+    def mouth_state_callback(self, msg):
+        self.mouth_open = msg.data
+
+    def transfer_button_callback(self, msg):
+        print("Transfer button pressed")
+        self.transfer_button = True
+
+    def head_shake_callback(self, msg):
+        with self.head_shake_lock:
+            self.head_shake_detected = msg.data
         
     def get_robot_joints(self) -> "JointState":
         """Get the current robot joint state."""
@@ -84,6 +225,7 @@ class PerceptionInterface:
     
     def set_head_perception_tool(self, tool: str) -> None:
         """Set the tool for head perception."""
+        self.tool = tool
         if self._head_perception is not None:
             self._head_perception.set_tool(tool)
 
@@ -109,12 +251,24 @@ class PerceptionInterface:
             t_now = time.time()
             step_time = t_now - t_init
             if step_time >= 0.02:  # 50 Hz
-                if not self._simulate_head_perception:
+                if self._head_perception is not None and not self._simulate_head_perception:
                     tool_tip_target_pose = self._head_perception.run_head_perception()
                 else:
-                    tool_tip_target_pose = np.eye(4)
-                    tool_tip_target_pose[:3, 3] = [-0.282, 0.540, 0.619]
-                    tool_tip_target_pose[:3, :3] = R.from_quat([-0.490, 0.510, 0.511, -0.489]).as_matrix()
+                    try:
+                        # read from logged data
+                        if self.tool == "fork":
+                            with open(self.log_dir / 'head_perception_pose_fork.pkl', 'rb') as f:
+                                tool_tip_target_pose = pickle.load(f)
+                        elif self.tool == "drink":
+                            with open(self.log_dir / 'head_perception_pose_drink.pkl', 'rb') as f:
+                                tool_tip_target_pose = pickle.load(f)
+                        elif self.tool == "wipe":
+                            with open(self.log_dir / 'head_perception_pose_wipe.pkl', 'rb') as f:
+                                tool_tip_target_pose = pickle.load(f)
+                        else:
+                            raise ValueError("Invalid tool")
+                    except FileNotFoundError:
+                        raise FileNotFoundError("No transfer logged data found for tool: ", self.tool)
                 with self.tool_tip_target_lock:
                     self.tool_tip_target_pose = tool_tip_target_pose
         self.head_perception_running = False
@@ -130,12 +284,29 @@ class PerceptionInterface:
     # Rajat ToDo: Change return type to Pose
     def get_head_perception_tool_tip_target_pose(self) -> np.ndarray:
         """Get a target of the forque from head perception."""
+
         with self.tool_tip_target_lock:
-            return self.tool_tip_target_pose
+            tool_tip_target_pose = self.tool_tip_target_pose
+
+        # save them in a pickle file
+        if self.robot_interface is not None:
+            if self.tool == "fork":
+                with open(self.log_dir / 'head_perception_pose_fork.pkl', 'wb') as f:
+                    pickle.dump(tool_tip_target_pose, f)
+            elif self.tool == "drink":
+                with open(self.log_dir / 'head_perception_pose_drink.pkl', 'wb') as f:
+                    pickle.dump(tool_tip_target_pose, f)
+            elif self.tool == "wipe":
+                with open(self.log_dir / 'head_perception_pose_wipe.pkl', 'wb') as f:
+                    pickle.dump(tool_tip_target_pose, f)
+            else:
+                raise ValueError("Invalid tool")
+            
+        return tool_tip_target_pose
         
     def get_tool_tip_pose(self) -> np.ndarray:
 
-        arm_pos, ee_pose, gripper_pos = self._robot_interface.get_state()
+        arm_pos, ee_pose, gripper_pos = self.robot_interface.get_state()
 
         tool_tip_pose = np.eye(4)
         tool_tip_pose[:3, 3] = ee_pose[:3]
@@ -147,13 +318,14 @@ class PerceptionInterface:
 
         tool_tip_staging_pose = np.eye(4)
 
-        if self._head_perception.head_perception.tool == "fork":
+        # Rajat ToDo: Fix these hardcoded values
+        if self.tool == "fork":
             tool_tip_staging_pose[:3, 3] = [0.091, 0.292, 0.402]
             tool_tip_staging_pose[:3, :3] = R.from_quat([0.478, -0.505, -0.515, 0.502]).as_matrix()
-        elif self._head_perception.head_perception.tool == "drink":
+        elif self.tool == "drink":
             tool_tip_staging_pose[:3, 3] = [0.140, 0.331, 0.468]
             tool_tip_staging_pose[:3, :3] = R.from_quat([0.478, -0.505, -0.515, 0.502]).as_matrix()
-        elif self._head_perception.head_perception.tool == "wipe":
+        elif self.tool == "wipe":
             tool_tip_staging_pose[:3, 3] = [0.256, 0.284, 0.380]
             tool_tip_staging_pose[:3, :3] = R.from_quat([0.478, -0.505, -0.515, 0.502]).as_matrix()
 
@@ -179,13 +351,16 @@ class PerceptionInterface:
 
     def perceive_drink_pickup_poses(self):
         
-        # Rajat Hack: Wait one second for the aruco mean to be correct, does this actually help though?
-        time.sleep(1)
+        if self.simulation:
+            self.aruco_pose = (np.array([0.5, 0.4, 0.25]), np.array([0.0, 0.0, 0.0, 1.0]))
+        else:
+            # Rajat Hack: Wait one second for the aruco mean to be correct, does this actually help though?
+            time.sleep(1)
 
-        aruco_pose_msg = rospy.wait_for_message("/aruco_pose", PoseMsg)
-        position = (aruco_pose_msg.position.x, aruco_pose_msg.position.y, aruco_pose_msg.position.z)
-        orientation = (aruco_pose_msg.orientation.x, aruco_pose_msg.orientation.y, aruco_pose_msg.orientation.z, aruco_pose_msg.orientation.w)
-        self.aruco_pose = (position, orientation)
+            aruco_pose_msg = rospy.wait_for_message("/aruco_pose", PoseMsg)
+            position = (aruco_pose_msg.position.x, aruco_pose_msg.position.y, aruco_pose_msg.position.z)
+            orientation = (aruco_pose_msg.orientation.x, aruco_pose_msg.orientation.y, aruco_pose_msg.orientation.z, aruco_pose_msg.orientation.w)
+            self.aruco_pose = (position, orientation)
 
         drink_poses  = {}
 
@@ -200,8 +375,11 @@ class PerceptionInterface:
 
         return drink_poses
     
-    def record_drink_pickup_joint_pos(self):
-        self.drink_pickup_joint_pos = self.get_robot_joints()[:7]
+    def record_drink_pickup_joint_pos(self, sim_joint_pos=None):
+        if self.simulation:
+            self.drink_pickup_joint_pos = sim_joint_pos
+        else:
+            self.drink_pickup_joint_pos = self.get_robot_joints()[:7]
         # save them in a pickle file
         drink_pickup_pos = {
             "last_drink_poses": self.last_drink_poses,

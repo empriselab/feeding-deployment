@@ -34,7 +34,6 @@ class CollisionMonitor:
                 "/robot_joint_states", JointState, self._joint_state_callback
             )
         self._use_ros = use_ros
-
         scene_config_path = Path(__file__).parent.parent / "simulation" / "configs" / f"{scene_config}.yaml"
         self._scene_description = create_scene_description_from_config(scene_config_path)
         self._sim = FeedingDeploymentPyBulletSimulator(self._scene_description, use_gui=False, ignore_user=True)
@@ -57,7 +56,7 @@ class CollisionMonitor:
         joint_lst = list(joint_state_msg.position)
         assert len(joint_lst) == 8
         arm_joint_state, finger_state = joint_lst[:7], joint_lst[7]
-        combined_joint_state = add_fingers_to_joint_positions(self._sim.robot,
+        combined_joint_state = add_fingers_to_joint_positions(self.sim.robot,
                                                             arm_joint_state,
                                                             finger_state)
         # Run collision checking.
@@ -70,12 +69,12 @@ class CollisionMonitor:
 
     def check_collisions(self, joint_positions: JointPositions) -> bool:
         """Check collisions, but only with objects that can't be held."""
-        collision_ids = self._sim.get_collision_ids()
-        collision_ids -= {self._sim.drink_id, self._sim.utensil_id, self._sim.wipe_id}
+        collision_ids = self.sim.get_collision_ids()
+        collision_ids -= {self.sim.drink_id, self.sim.utensil_id, self.sim.wipe_id}
         return check_collisions_with_held_object(
-            self._sim.robot,
+            self.sim.robot,
             collision_ids,
-            self._sim.physics_client_id,
+            self.sim.physics_client_id,
             held_object=None,
             base_link_to_held_obj=None,
             joint_state=joint_positions,
