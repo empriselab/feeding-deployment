@@ -1,0 +1,95 @@
+# Config file when robot is mounted on wheelchair
+
+# Robot constants
+retract_pos: 
+  description: ""
+  type: "joint_positions"
+  values: [0.0, -0.34903602299465675, -3.141591055693139, -2.5482592711638783, 0.0, -0.872688061814757, 1.57075917569769]
+initial_joints: 
+  description: ""
+  type: "joint_positions"
+  values: [0.0, -0.34903602299465675, -3.141591055693139, -2.5482592711638783, 0.0, -0.872688061814757, 1.57075917569769, 0.8, 0.8, 0.8, 0.8, -0.8, -0.8]
+
+# Feeding task constants
+above_plate_pos: 
+  description: ""
+  type: "joint_positions"
+  values: [-2.24219867867983, -1.117632303074795, -1.822950011441888, -2.108239012687754, -0.6023660258951367, -0.27174949026390305, -1.4889110474937937]
+before_transfer_pos: 
+  description: ""
+  type: "joint_positions"
+  values: [-2.291869562487007, -1.3006196994707935, -1.720891553199544, -2.208449769765801, -0.477821699620927, -0.1613864967943659, -2.9981518678009262]
+before_transfer_pose:
+  description: ""
+  type: "ee_pose"
+  values: [0.346, 0.300, 0.392, 0.0, 0.707, 0.707, 0]
+
+# Utensil mount constants
+utensil_inside_mount: 
+  description: ""
+  type: "ee_pose"
+  values: [-0.286, -0.133, 0.065, 0.7071068, -0.7071068, 0, 0]
+utensil_inside_mount_pos: 
+  description: ""
+  type: "joint_positions"
+  values: [2.2467215251591117, 0.5836147086598885, -2.535738152982762, -2.2963045246503158, -0.7542663428866403, -0.4699185027700077, 1.9096838418235886]
+utensil_outside_mount: 
+  description: ""
+  type: "ee_pose"
+  values: [-0.286, -0.263, 0.065, 0.7071068, -0.7071068, 0, 0]
+utensil_outside_mount_pos: 
+  description: ""
+  type: "joint_positions"
+  values: [1.9202113176126718, 0.6917033625584985, -2.4682459277929927, -2.063521874824234, -0.7181986196114787, -0.6391235078926281, 1.523472620014461]
+utensil_above_mount: 
+  description: ""
+  type: "ee_pose"
+  values: [-0.286, -0.133, 0.165, 0.7071068, -0.7071068, 0, 0]
+utensil_above_mount_pos: 
+  description: ""
+  type: "joint_positions"
+  values: [1.9755942824839052, 0.3527602540420511, -2.2270956258218817, -2.1930039680755593, -0.39397207269978196, -0.7730064748453094, 1.5904074455880766]
+
+# Drink placement constants
+drink_gaze_pos: 
+  description: ""
+  type: "joint_positions"
+  values: [0.0, -0.34903602299465675, -3.141591055693139, -2.5482592711638783, 0.0, -0.872688061814757, 1.57075917569769]
+drink_staging_pos: 
+  description: ""
+  type: "joint_positions"
+  values: [-2.5860902733967808, -1.105096803823792, -1.0315333702969696, -1.3979449215077393, -0.7852325147776451, -0.8370922506847585, -2.7182634909296315]
+
+# Wipe mount constants
+wipe_inside_mount: 
+  description: ""
+  type: "ee_pose"
+  values: [-0.444, -0.139, 0.065, 0.7071068, -0.7071068, 0, 0]
+wipe_inside_mount_pos: 
+  description: ""
+  type: "joint_positions"
+  values: [2.4024543972753483, 0.7942983146024386, -2.472859055433228, -1.8032721804634013, -0.6638818512826585, -0.7855201361753741, 1.851469670397492]
+wipe_outside_mount: 
+  description: ""
+  type: "ee_pose"
+  values: [-0.444, -0.269, 0.065, 0.7071068, -0.7071068, 0, 0]
+wipe_outside_mount_pos: 
+  description: ""
+  type: "joint_positions"
+  values: [2.188196829149912, 0.882908608288209, -2.4520760126023586, -1.6022200297611775, -0.6621619818506854, -0.905755467805835, 1.5558217714595446]
+wipe_above_mount: 
+  description: ""
+  type: "ee_pose"
+  values: [-0.444, -0.139, 0.165, 0.7071068, -0.7071068, 0, 0]
+wipe_above_mount_pos: 
+  description: ""
+  type: "joint_positions"
+  values: [2.323328152863568, 0.6356845013979816, -2.3499581658677062, -1.7172542077827142, -0.5122867325520781, -1.011576173720134, 1.7346615607738536]
+wipe_outside_above_mount: 
+  description: ""
+  type: "ee_pose"
+  values: [-0.444, -0.269, 0.165, 0.7071068, -0.7071068, 0, 0]
+wipe_outside_above_mount_pos: 
+  description: ""
+  type: "joint_positions"
+  values: [2.141991250553146, 0.7403159727275052, -2.361341048998923, -1.5166649144779463, -0.546357617641898, -1.1156594333392649, 1.4704801085376829]

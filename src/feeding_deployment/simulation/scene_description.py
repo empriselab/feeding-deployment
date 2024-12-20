@@ -18,45 +18,84 @@ from pybullet_helpers.joint import (
 from pybullet_helpers.math_utils import rotate_about_point
 from scipy.spatial.transform import Rotation
 
+import yaml
 
 def create_scene_description_from_config(config_file_path: str) -> SceneDescription:
-    # Read the config file
+    """Create a SceneDescription instance from a YAML configuration file."""
+    # Load the YAML file
     with open(config_file_path, "r") as file:
-        config = json.load(file)
+        config = yaml.safe_load(file)
 
-    # convert lists containting 6 elements to Pose objects
-    for key in config:
-        if isinstance(config[key], list):
-            config[key] = Pose(config[key][:3], config[key][3:])
+    # Process the configuration dictionary
+    processed_config = {}
+    for key, value in config.items():
+        if isinstance(value, dict):
+            value_type = value.get("type")
+            values = value.get("values")
 
-    # Create an instance of SceneDescription using the config
-    return SceneDescription(**config)
+            if not value_type or values is None:
+                raise ValueError(f"Key '{key}' is missing 'type' or 'values': {value}")
+
+            if value_type == "joint_positions":
+                # Handle joint positions
+                processed_config[key] = values
+            elif value_type == "ee_pose":
+                # Handle end-effector poses
+                if len(values) != 7:
+                    raise ValueError(f"Pose for key '{key}' must have 7 values (3 position, 4 quaternion), got {len(values)}")
+                position = tuple(values[:3])
+                orientation = tuple(values[3:])
+                processed_config[key] = Pose(position, orientation)
+            else:
+                raise ValueError(f"Unknown type '{value_type}' for key '{key}'")
+        else:
+            raise ValueError(f"Unexpected value type for key '{key}': {type(value)}")
+    
+    processed_config["scene_label"] = Path(config_file_path).stem
+
+    # Create an instance of SceneDescription using the processed config
+    return SceneDescription(**processed_config)
 
 
 @dataclass(frozen=True)
 class SceneDescription:
     """Scene description."""
 
+    scene_label: str
+
+    # Robot constants
+    initial_joints: JointPositions
+    retract_pos: JointPositions
+
+    # Feeding task constants
+    above_plate_pos: JointPositions
+    before_transfer_pos: JointPositions
+    before_transfer_pose: Pose
+
+    # Utensil mount constants
+    utensil_inside_mount: Pose
+    utensil_inside_mount_pos: JointPositions
+    utensil_outside_mount: Pose
+    utensil_outside_mount_pos: JointPositions
+    utensil_above_mount: Pose
+    utensil_above_mount_pos: JointPositions
+
+    # Drink placement constants
+    drink_gaze_pos: JointPositions
+    drink_staging_pos: JointPositions
+
+    # Wipe mount constants
+    wipe_inside_mount: Pose
+    wipe_inside_mount_pos: JointPositions
+    wipe_outside_mount: Pose
+    wipe_outside_mount_pos: JointPositions
+    wipe_above_mount: Pose
+    wipe_above_mount_pos: JointPositions
+    wipe_outside_above_mount: Pose
+    wipe_outside_above_mount_pos: JointPositions
+
     # Robot.
     robot_name: str = "kinova-gen3"
-    initial_joints: JointPositions = field(
-        default_factory=lambda: [
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0
-
-        ]
-    )
     robot_base_pose: Pose = Pose(
         (0.0, 0.0, 0.0),
         (0.0, 0.0, 0.0, 1.0),
@@ -105,77 +144,11 @@ class SceneDescription:
     table_rgba: tuple[float, float, float, float] = (0.5, 0.5, 0.5, 1.0)
     table_half_extents: tuple[float, float, float] = (0.25, 0.4, 0.345)
 
-    # # Constants across all tools
-    # above_plate_pos: JointPositions = field(
-    #     default_factory=lambda: [
-    #         -2.86495014,
-    #         -1.61460533,
-    #         -2.6115943,
-    #         -1.37673391,
-    #         1.11842806,
-    #         -1.17904586,
-    #         -2.6957422,
-    #     ]
-    # )
-
-    above_plate_pos: JointPositions = field(
-        default_factory=lambda: [
-            -2.24219867867983, 
-            -1.117632303074795, 
-            -1.822950011441888, 
-            -2.108239012687754, 
-            -0.6023660258951367, 
-            -0.27174949026390305, 
-            -1.4889110474937937
-        ]
-    )
-
-    # before_transfer_pos: JointPositions = field(
-    #     default_factory=lambda: [
-    #         -2.86554642,
-    #         -1.61951779,
-    #         -2.60986085,
-    #         -1.37302839,
-    #         1.11779249,
-    #         -1.18028264,
-    #         2.05515862,
-    #     ]
-    # )
-
-    before_transfer_pos: JointPositions = field(
-        default_factory=lambda: [
-            -2.291869562487007, 
-            -1.3006196994707935, 
-            -1.720891553199544, 
-            -2.208449769765801, 
-            -0.477821699620927, 
-            -0.1613864967943659, 
-            -2.9981518678009262
-        ]
-    )
-
-    before_transfer_pose: Pose = Pose(
-        (0.346, 0.300, 0.392), 
-        (0.0, 0.707, 0.707, 0),
-    )
-
-    retract_pos: JointPositions = field(
-        default_factory=lambda: [
-            0.0,
-            -0.34903602299465675,
-            -3.141591055693139,
-            -2.5482592711638783,
-            0.0,
-            -0.872688061814757,
-            1.57075917569769,
-        ]
-    )
-
     tool_grasp_fingers_value: float = 0.44
 
-    ######### Utensil #########
+    ######### Simulator Poses for Tools #########
 
-    # Used by simulator to spawn the utensil
+    # Utensil
     utensil_pose: Pose = Pose(
         (0.35, -0.15, -0.05), p.getQuaternionFromEuler((0.0, np.pi, np.pi))
     )
@@ -191,57 +164,7 @@ class SceneDescription:
         (0.000, 0.707, 0.000, 0.707),
     )
 
-    # Constants for utensil pick and place
-    utensil_inside_mount: Pose = Pose(
-        (-0.286, -0.133, 0.065),
-        (0.7071068, -0.7071068, 0, 0),
-    )
-    utensil_inside_mount_pos: JointPositions = field(
-        default_factory=lambda: [
-            2.2467215251591117, 
-            0.5836147086598885, 
-            -2.535738152982762, 
-            -2.2963045246503158, 
-            -0.7542663428866403, 
-            -0.4699185027700077, 
-            1.9096838418235886
-        ]
-    )
-
-    utensil_outside_mount: Pose = Pose(
-        (-0.286, -0.263, 0.065),
-        (0.7071068, -0.7071068, 0, 0),
-    )
-    utensil_outside_mount_pos: JointPositions = field(
-        default_factory=lambda: [
-            1.9202113176126718, 
-            0.6917033625584985, 
-            -2.4682459277929927, 
-            -2.063521874824234, 
-            -0.7181986196114787, 
-            -0.6391235078926281, 
-            1.523472620014461
-        ]
-    )
-
-    utensil_above_mount: Pose = Pose(
-        (-0.286, -0.133, 0.165),
-        (0.7071068, -0.7071068, 0, 0),
-    )
-    utensil_above_mount_pos: JointPositions = field(
-        default_factory=lambda: [
-            1.9755942824839052, 
-            0.3527602540420511, 
-            -2.2270956258218817, 
-            -2.1930039680755593, 
-            -0.39397207269978196, 
-            -0.7730064748453094, 
-            1.5904074455880766
-        ]
-    )
-
-    ######### drink #########
-
+    # Drink
     drink_pose: Pose = Pose(
         (0.545, 0.65, 0.270), 
         (-0.2126311, -0.6743797, -0.6743797, 0.2126311)
@@ -258,47 +181,7 @@ class SceneDescription:
         (0.000, 0.707, 0.000, 0.707),
     )
 
-    # # Constants for drink pick and place
-    # drink_gaze_pos: JointPositions = field(
-    #     default_factory=lambda: [
-    #         -0.004187021865822871, 0.6034579885210962, -3.1259047705564633, -2.3538005746884725, 0.01149092320739253, 1.3411586039000891, 1.6825233913747728
-    #     ]
-    # )
-
-    drink_gaze_pos: JointPositions = field(
-        default_factory=lambda: [
-            0.0,
-            -0.34903602299465675,
-            -3.141591055693139,
-            -2.5482592711638783,
-            0.0,
-            -0.872688061814757,
-            1.57075917569769,
-        ]
-    )
-
-    drink_staging_pos: JointPositions = field(
-        default_factory=lambda: [
-            # -2.66714970644385, -1.1667276777704059, -0.9741023013894106, -1.4808070482966826, -0.9401592480319145, -0.8664637217150242, -2.4832424542073377
-            # -0.017759556045302105, 0.694072510664233, 3.122327878896378, -2.0030297685597382, 1.3270309337913822, 1.3287449442689572, 1.1063354400467882
-            -2.5860902733967808, -1.105096803823792, -1.0315333702969696, -1.3979449215077393, -0.7852325147776451, -0.8370922506847585, -2.7182634909296315,
-        ]
-    )
-
-    # drink_pre_staging_pos: JointPositions = field(
-    #     default_factory=lambda: [
-    #         -2.4297866858589403, -1.1346866540634446, -0.9258335718961606, -1.5283066568671186, -0.8368781325331156, -1.0769876711502242, -2.506139514311512
-    #     ]
-    # )
-
-    # drink_staging_pos: JointPositions = field(
-    #     default_factory=lambda: [
-    #        -2.7565158052469845, -1.184186829244747, -1.0646716163730439, -1.6191545385007728, -1.093139210529337, -0.6452967152994313, -2.309888776738592
-    #     ]
-    # )
-
-    ######### Wiping Utensil #########
-
+    # Wipe
     wipe_pose: Pose = Pose(
         (0.35, 0.15, -0.05), p.getQuaternionFromEuler((0.0, np.pi, np.pi))
     )
@@ -312,72 +195,6 @@ class SceneDescription:
     tool_frame_to_wipe_tip: Pose = Pose(
         (0.089, -0.015, -0.018),
         (0.000, 0.707, 0.000, 0.707),
-    )
-
-    # Constants for wiping utensil pick and place
-    wipe_inside_mount: Pose = Pose(
-        (-0.444, -0.139, 0.065),
-        (0.7071068, -0.7071068, 0, 0),
-    )
-    wipe_inside_mount_pos: JointPositions = field(
-        default_factory=lambda: [
-            2.4024543972753483, 
-            0.7942983146024386, 
-            -2.472859055433228, 
-            -1.8032721804634013, 
-            -0.6638818512826585, 
-            -0.7855201361753741, 
-            1.851469670397492
-        ]
-    )
-
-    wipe_outside_mount: Pose = Pose(
-        (-0.444, -0.269, 0.065),
-        (0.7071068, -0.7071068, 0, 0),
-    )
-    wipe_outside_mount_pos: JointPositions = field(
-        default_factory=lambda: [
-            2.188196829149912, 
-            0.882908608288209, 
-            -2.4520760126023586, 
-            -1.6022200297611775, 
-            -0.6621619818506854, 
-            -0.905755467805835, 
-            1.5558217714595446
-        ]
-    )
-
-    wipe_above_mount: Pose = Pose(
-        (-0.444, -0.139, 0.165),
-        (0.7071068, -0.7071068, 0, 0),
-    )
-    wipe_above_mount_pos: JointPositions = field(
-        default_factory=lambda: [
-            2.323328152863568, 
-            0.6356845013979816, 
-            -2.3499581658677062, 
-            -1.7172542077827142, 
-            -0.5122867325520781, 
-            -1.011576173720134, 
-            1.7346615607738536
-        ]
-    )
-
-    wipe_outside_above_mount: Pose = Pose(
-        (-0.444, -0.269, 0.165),
-        (0.7071068, -0.7071068, 0, 0),
-    )
-
-    wipe_outside_above_mount_pos: JointPositions = field(
-        default_factory=lambda: [
-            2.141991250553146, 
-            0.7403159727275052, 
-            -2.361341048998923, 
-            -1.5166649144779463, 
-            -0.546357617641898, 
-            -1.1156594333392649, 
-            1.4704801085376829
-        ]
     )
 
     @property
@@ -444,33 +261,3 @@ class SceneDescription:
         # TODO need to refactor to avoid calling a function that no longer
         # exists (create_pybullet_scene_from_description).
         return False
-
-        # physics_client_id = p.connect(p.DIRECT)
-        # scene = create_pybullet_scene_from_description(physics_client_id, self)
-        # robot = scene.robot
-        # joint_infos = get_joint_infos(
-        #     robot.robot_id, robot.arm_joints, robot.physics_client_id
-        # )
-        # diff = get_jointwise_difference(
-        #     joint_infos, self.initial_joints, other.initial_joints
-        # )
-        # close = np.allclose(diff, 0, atol=atol)
-        # p.disconnect(physics_client_id)
-        # if not close:
-        #     return False
-
-        # for fld in fields(self):
-        #     if fld.name == "initial_joints":
-        #         continue  # handled above
-        #     mine, theirs = getattr(self, fld.name), getattr(other, fld.name)
-        #     if hasattr(mine, "allclose"):
-        #         field_close = mine.allclose(theirs, atol=atol)
-        #     elif isinstance(mine, (tuple, list)):
-        #         field_close = np.allclose(mine, theirs, atol=atol)
-        #     elif isinstance(mine, (float, int)):
-        #         field_close = np.isclose(mine, theirs, atol=atol)
-        #     else:
-        #         field_close = mine == theirs
-        #     if not field_close:
-        #         return False
-        # return True
