@@ -67,7 +67,7 @@ class FoodManipulationSkillLibrary:
 
     def move_to_ee_pose(self, pose, plan_override=False):
 
-        if not plan_override:
+        if not plan_override and not self.no_waits:
             plan = self.sim.plan_to_ee_pose(pose)
         if self.robot_interface is None:
             self.sim.visualize_plan(plan)

@@ -90,7 +90,8 @@ class InsideMouthTransfer(Transfer):
             self.rviz_interface.visualizeTransform("base_link", "final_target", servo_point_base)
         
         # Pause so that new head pose can be re-perceived
-        time.sleep(0.5)
+        time.sleep(0.2)
+        closed_loop = True
 
         while True:
             time.sleep(self.control_time)
