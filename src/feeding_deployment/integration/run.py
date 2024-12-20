@@ -6,6 +6,9 @@ from pathlib import Path
 from typing import Any
 import pickle
 import queue
+import os
+import sys
+import signal
 import numpy as np
 
 try:
@@ -15,24 +18,6 @@ try:
     ROSPY_IMPORTED = True
 except ModuleNotFoundError:
     ROSPY_IMPORTED = False
-
-# Rajat ToDo: Remove this hacky addition
-FLAIR_PATH = "/home/isacc/deployment_ws/src/FLAIR/bite_acquisition/scripts"
-import sys
-
-sys.path.append(FLAIR_PATH)
-
-import os
-try:
-    # raise ModuleNotFoundError  # Just to skip this block
-    from wrist_controller import WristController
-    from flair import FLAIR
-
-    FLAIR_IMPORTED = True
-    print("FLAIR imported successfully")
-except ModuleNotFoundError:
-    FLAIR_IMPORTED = False
-    pass
 
 from relational_structs import (
     GroundAtom,
@@ -44,39 +29,40 @@ from relational_structs import (
 )
 from relational_structs.utils import parse_pddl_plan
 from tomsutils.pddl_planning import run_pyperplan_planning
+from pybullet_helpers.geometry import Pose
 
-from feeding_deployment.actions.high_level_actions import (
+from feeding_deployment.actions.base import (
     GripperFree,
-    GroundHighLevelAction,
     Holding,
     IsUtensil,
     PlateInView,
-    PickToolHLA,
-    LookAtPlateHLA,
-    AcquireBiteHLA,
-    StowToolHLA,
     ToolPrepared,
     ToolTransferDone,
-    TransferToolHLA,
     ResetPos,
+    tool_type,
+    GroundHighLevelAction,
     ResetHLA,
     pddl_plan_to_hla_plan,
-    tool_type,
 )
+from feeding_deployment.actions.pick_tool import PickToolHLA
+from feeding_deployment.actions.stow_tool import StowToolHLA
+from feeding_deployment.actions.transfer_tool import TransferToolHLA
+from feeding_deployment.actions.acquisition import LookAtPlateHLA, AcquireBiteHLA
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
 from feeding_deployment.interfaces.web_interface import WebInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
 from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
+from feeding_deployment.wrist_controller.wrist_controller import WristInterface
 from feeding_deployment.simulation.scene_description import (
     SceneDescription,
     create_scene_description_from_config,
 )
 from feeding_deployment.simulation.simulator import (
     FeedingDeploymentPyBulletSimulator,
-    FeedingDeploymentSimulatorState,
+    FeedingDeploymentWorldState,
 )
-from feeding_deployment.simulation.video import make_simulation_video
-from pybullet_helpers.geometry import Pose
+from feeding_deployment.actions.flair.flair import FLAIR
+
 
 # All the high level actions we want to consider.
 HLAS = {PickToolHLA, StowToolHLA, LookAtPlateHLA, AcquireBiteHLA, TransferToolHLA, ResetHLA}
@@ -87,9 +73,10 @@ assert os.environ.get("PYTHONHASHSEED") == "0", \
 class _Runner:
     """A class for running the integrated system."""
 
-    def __init__(self, scene_config: str, run_on_robot: bool, simulate_head_perception: bool, max_motion_planning_time: float,
+    def __init__(self, scene_config: str, run_on_robot: bool, use_interface: bool, use_gui: bool, simulate_head_perception: bool, max_motion_planning_time: float,
                  resume_from_state: str = "", no_waits: bool = False) -> None:
         self.run_on_robot = run_on_robot
+        self.use_interface = use_interface  
         self.simulate_head_perception = simulate_head_perception
         self.max_motion_planning_time = max_motion_planning_time
         self.no_waits = no_waits
@@ -103,24 +90,16 @@ class _Runner:
         # Initialize the interface to the robot.
         if run_on_robot:
             self.robot_interface = ArmInterfaceClient()  # type: ignore  # pylint: disable=no-member
+            self.wrist_interface = WristInterface()
         else:
             self.robot_interface = None
+            self.wrist_interface = None
+
+        self.log_dir = Path(__file__).parent / "sensor_log"
+        self.log_dir.mkdir(exist_ok=True)
 
         # Initialize the perceiver (e.g., get joint states or human head poses).
-        self.perception_interface = PerceptionInterface(robot_interface=self.robot_interface, simulate_head_perception=self.simulate_head_perception)
-
-        if ROSPY_IMPORTED:
-            # Initialize the web interface.
-            self.hla_command_queue = queue.Queue()
-            self.web_interface = WebInterface(self.hla_command_queue)
-
-        # Initialize the FLAIR interface.
-        if FLAIR_IMPORTED:
-            wrist_controller = WristController()
-            flair = FLAIR(self.robot_interface, wrist_controller, self.no_waits)
-        else:
-            wrist_controller = None
-            flair = None
+        self.perception_interface = PerceptionInterface(robot_interface=self.robot_interface, simulate_head_perception=self.simulate_head_perception, log_dir=self.log_dir)
 
         # Initialize the simulator.
         scene_config_path = Path(__file__).parent.parent / "simulation" / "configs" / f"{scene_config}.yaml"
@@ -133,17 +112,29 @@ class _Runner:
         else:
             print("Running in simulation mode.")
 
-        self.rviz_interface = RVizInterface(self.scene_description)
+        if self.use_interface:
+            # Initialize the web interface.
+            self.hla_command_queue = queue.Queue()
+            self.web_interface = WebInterface(self.hla_command_queue)
+        else:
+            self.web_interface = None
+
+        if self.run_on_robot:
+            self.rviz_interface = RVizInterface(self.scene_description)
+            self.flair = FLAIR()
+        else:
+            self.rviz_interface = None
+            self.flair = None
 
         # self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description)
-        self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description, use_gui=False)
+        self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description, use_gui=use_gui, ignore_user=True)
 
         # Create skills for high-level planning.
         hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
         print("Creating HLAs...")
         self.hlas = {
-            cls(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.web_interface, hla_hyperparams, run_on_robot,
-                wrist_controller, flair, self.no_waits) for cls in HLAS  # type: ignore
+            cls(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.web_interface, hla_hyperparams,
+                self.wrist_interface, self.flair, self.no_waits, self.log_dir) for cls in HLAS  # type: ignore
         }
         print("HLAs created.")
         self.hla_name_to_hla = {hla.get_name(): hla for hla in self.hlas}
@@ -175,7 +166,7 @@ class _Runner:
         }
 
         # Record the full simulated trajectory for viz and debug.
-        self.full_simulated_traj: list[FeedingDeploymentSimulatorState] = []
+        self.full_simulated_traj: list[FeedingDeploymentWorldState] = []
 
         if self._saved_state_infile:
             self._load_from_state()
@@ -188,6 +179,9 @@ class _Runner:
                     sys.exit(0)
 
         print("Runner is ready.")
+        self.active = True
+
+    def run(self) -> None:
 
         # for i in range(2):
         #     # # Uncomment to test commands.
@@ -195,18 +189,26 @@ class _Runner:
         #     self.hla_command_queue.put(drink_pickup_msg)
 
         # wipe_transfer_msg = {"status": "move_to_wiping_position", "state": "prepared_mouth_wiping"}
-        # self.hla_command_queue.put(wipe_transfer_msg)
+        # self.parse_interface_msg(wipe_transfer_msg)
 
         # drink_pickup_msg = {"status": "drink_pickup", "state": "pre_bite_pickup"}
-        # self.hla_command_queue.put(drink_pickup_msg)
+        # self.parse_interface_msg(drink_pickup_msg)
 
-        while not rospy.is_shutdown():
-            try:
-                hla_interface_msg = self.hla_command_queue.get(timeout=1)
-                self.parse_interface_msg(hla_interface_msg)
-                print("Ready for next user command.")
-            except queue.Empty:
-                continue
+        if self.use_interface:
+            while self.active:
+                try:
+                    hla_interface_msg = self.hla_command_queue.get(timeout=1)
+                    self.parse_interface_msg(hla_interface_msg)
+                    print("Ready for next user command.")
+                except queue.Empty:
+                    continue
+        else:
+            print("No commands can be processed without the web interface.")
+
+    def signal_handler(self, signal, frame):
+        self.active = False
+        print("\nprogram exiting gracefully")
+        sys.exit(0)
 
     def parse_interface_msg(self, msg_dict: dict[str, Any]) -> None:
         """Pass high level action message from the web interface."""
@@ -291,28 +293,23 @@ class _Runner:
             assert operator.preconditions.issubset(self.current_atoms)
 
             # Execute the high-level plan in simulation
-            sim_traj = ground_hla.execute_action()
+            ground_hla.execute_action()
 
-            if sim_traj:
-                self.full_simulated_traj.extend(sim_traj)
+            sim_state = self.sim.get_current_state()
 
-            # Make sure the states are in sync.
-            if sim_traj:
-                self.sim.sync(sim_traj[-1])
             self.current_atoms -= operator.delete_effects
             self.current_atoms |= operator.add_effects
 
             # Save the latest state in case we want to resume execution
             # after a crash.
-            sim_state = self.full_simulated_traj[-1] if self.full_simulated_traj else None
             self._save_state(sim_state, self.current_atoms)
 
     def make_video(self, outfile: Path) -> None:
         """Create a video of the simulated trajectory."""
-        make_simulation_video(self.sim, self.full_simulated_traj, outfile)
+        self.sim.make_simulation_video(outfile)
         print(f"Saved video to {outfile}")
 
-    def _save_state(self, sim_state: FeedingDeploymentSimulatorState, atoms: set[GroundAtom]) -> None:
+    def _save_state(self, sim_state: FeedingDeploymentWorldState, atoms: set[GroundAtom]) -> None:
         with open(self._saved_state_outfile, "wb") as f:
             pickle.dump((sim_state, atoms), f)
         print(f"Saved system state to {self._saved_state_outfile}")
@@ -321,11 +318,12 @@ class _Runner:
         with open(self._saved_state_infile, "rb") as f:
             sim_state, self.current_atoms = pickle.load(f)
         if sim_state is not None:
-            assert isinstance(sim_state, FeedingDeploymentSimulatorState)
+            assert isinstance(sim_state, FeedingDeploymentWorldState)
             self.sim.sync(sim_state)
-            self.rviz_interface.joint_state_update(sim_state.robot_joints)
-            if sim_state.held_object:
-                self.rviz_interface.tool_update(True, sim_state.held_object, Pose((0, 0, 0), (0, 0, 0, 1)))
+            if self.rviz_interface is not None:
+                self.rviz_interface.joint_state_update(sim_state.robot_joints)
+                if sim_state.held_object:
+                    self.rviz_interface.tool_update(True, sim_state.held_object, Pose((0, 0, 0), (0, 0, 0, 1)))
                 
         print(f"Loaded system state from {self._saved_state_infile}")
 
@@ -336,6 +334,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--scene_config", type=str, default="wheelchair")
     parser.add_argument("--run_on_robot", action="store_true")
+    parser.add_argument("--use_interface", action="store_true")
+    parser.add_argument("--use_gui", action="store_true")
     parser.add_argument("--simulate_head_perception", action="store_true")
     parser.add_argument("--make_videos", action="store_true")
     parser.add_argument("--max_motion_planning_time", type=float, default=10.0)
@@ -343,17 +343,27 @@ if __name__ == "__main__":
     parser.add_argument("--no_waits", action="store_true")
     args = parser.parse_args()
 
-    if ROSPY_IMPORTED:
-        rospy.init_node("feeding_deployment_integration")
-    else:
-        assert not args.run_on_robot, "Need ROS to run on robot"
+    if args.run_on_robot or args.use_interface:
+        if not ROSPY_IMPORTED:
+            raise ModuleNotFoundError("Need ROS to run on robot or use interface")
+        else:
+            rospy.init_node("feeding_deployment", anonymous=True)
+        
+    # Rajat ToDo: have run on robot without interface functionality
+    if args.run_on_robot:
+        args.use_interface = True
 
     runner = _Runner(args.scene_config,
                      args.run_on_robot, 
+                     args.use_interface,
+                     args.use_gui,
                      args.simulate_head_perception,
                      args.max_motion_planning_time,
                      args.resume_from_state,
                      args.no_waits)
+    
+    # Handle Ctrl+C gracefully
+    signal.signal(signal.SIGINT, runner.signal_handler)
 
     # Uncomment to test commands.
     # drink_pickup_msg = {"status": "drink_pickup"}
@@ -362,16 +372,25 @@ if __name__ == "__main__":
     # drink_transfer_msg = {"status": "drink_transfer"}
     # runner.hla_command_queue.put(drink_transfer_msg)
 
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.utensil,)))
-    # for _ in range(10):
+    if not args.use_interface:
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.utensil,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
+        # for _ in range(10):
+            # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
+            # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
+
+    runner.run()
 
     if args.make_videos:
         runner.make_video(Path("full.mp4"))
 
-    if ROSPY_IMPORTED:
+    if args.run_on_robot:
         rospy.spin()

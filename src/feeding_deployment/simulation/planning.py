@@ -25,111 +25,12 @@ from pybullet_helpers.trajectory import (
     iter_traj_with_max_distance,
 )
 
-from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
-from feeding_deployment.simulation.state import FeedingDeploymentSimulatorState
-
-
-def _get_interpolated_plan_for_robot_finger_tip(
-    target_pose: Pose,
-    sim: FeedingDeploymentPyBulletSimulator,
-    num_interp_waypoints: int,
-    max_motion_plan_time: float,
-    exclude_collision_ids: set[int] | None = None,
-) -> list[FeedingDeploymentSimulatorState]:
-
-    # Commands will be in end effector space, but grasp planning will be in
-    # finger frame space.
-    robot = sim.robot
-    physics_client_id = sim.physics_client_id
-    finger_frame_id = robot.link_from_name("finger_tip")
-    end_effector_link_id = robot.link_from_name(robot.tool_link_name)
-    finger_from_end_effector = get_relative_link_pose(
-        robot.robot_id, end_effector_link_id, finger_frame_id, physics_client_id
-    )
-
-    target_end_effector_pose = multiply_poses(target_pose, finger_from_end_effector)
-    current_end_effector_pose = robot.get_end_effector_pose()
-
-    interpolated_poses = list(
-        interpolate_poses(
-            current_end_effector_pose,
-            target_end_effector_pose,
-            num_interp=num_interp_waypoints,
-        )
-    )
-
-    _joint_distance_fn = _create_joint_distance_fn(robot)
-
-    collision_ids = sim.get_collision_ids()
-    if exclude_collision_ids is not None:
-        collision_ids -= exclude_collision_ids
-
-    plan = smoothly_follow_end_effector_path(
-        robot,
-        interpolated_poses,
-        robot.get_joint_positions(),
-        collision_ids,
-        _joint_distance_fn,
-        max_time=max_motion_plan_time,
-        held_object=sim.held_object_id,
-        base_link_to_held_obj=sim.held_object_tf,
-    )
-    return _plan_to_sim_state_trajectory(plan, sim)
-
-
-def run_smooth_ee_interpolated_planning_to_pose(
-    target_pose: Pose,
-    end_effector_from_tip: Pose,
-    sim: FeedingDeploymentPyBulletSimulator,
-    num_interp_waypoints: int,
-    max_motion_plan_time: float,
-    exclude_collision_ids: set[int] | None = None,
-    check_held_object_collisions: bool = True,
-) -> list[FeedingDeploymentSimulatorState]:
-
-    # Commands will be in end effector space, but grasp planning will be in
-    # finger frame space.
-    robot = sim.robot
-
-    target_end_effector_pose = multiply_poses(target_pose, end_effector_from_tip)
-    current_end_effector_pose = robot.get_end_effector_pose()
-
-    interpolated_poses = list(
-        interpolate_poses(
-            current_end_effector_pose,
-            target_end_effector_pose,
-            num_interp=num_interp_waypoints,
-        )
-    )
-
-    _joint_distance_fn = _create_joint_distance_fn(robot)
-
-    collision_ids = sim.get_collision_ids()
-    if exclude_collision_ids is not None:
-        collision_ids -= exclude_collision_ids
-
-    if check_held_object_collisions:
-        held_object = sim.held_object_id
-        base_link_to_held_obj = sim.held_object_tf
-    else:
-        held_object = None
-        base_link_to_held_obj = None
-
-    plan = smoothly_follow_end_effector_path(
-        robot,
-        interpolated_poses,
-        robot.get_joint_positions(),
-        collision_ids,
-        _joint_distance_fn,
-        max_time=max_motion_plan_time,
-        held_object=held_object,
-        base_link_to_held_obj=base_link_to_held_obj,
-    )
-    return _plan_to_sim_state_trajectory(plan, sim)
+from feeding_deployment.simulation.world import FeedingDeploymentPyBulletWorld
+from feeding_deployment.simulation.state import FeedingDeploymentWorldState
 
 def _plan_to_sim_state_trajectory(
-    plan: list[JointPositions], sim: FeedingDeploymentPyBulletSimulator
-) -> list[FeedingDeploymentSimulatorState]:
+    plan: list[JointPositions], sim: FeedingDeploymentPyBulletWorld
+) -> list[FeedingDeploymentWorldState]:
     # Read out the simulator states from the plan.
     drink_pose: Pose | None = None
     if sim.held_object_name != "drink":
@@ -141,9 +42,9 @@ def _plan_to_sim_state_trajectory(
     if sim.held_object_name != "utensil":
         utensil_pose = get_pose(sim.utensil_id, sim.physics_client_id)
 
-    sim_states: list[FeedingDeploymentSimulatorState] = []
+    sim_states: list[FeedingDeploymentWorldState] = []
     for joints in plan:
-        sim_state = FeedingDeploymentSimulatorState(
+        sim_state = FeedingDeploymentWorldState(
             joints,
             drink_pose=drink_pose,
             wipe_pose=wipe_pose,
@@ -153,13 +54,14 @@ def _plan_to_sim_state_trajectory(
         )
         sim_states.append(sim_state)
     # Sync simulator to end of plan.
-    sim.sync(sim_states[-1])
+    if len(sim_states) > 0:
+        sim.sync(sim_states[-1])
     return sim_states
 
 
 def _get_plan_to_execute_grasp(
-    sim: FeedingDeploymentPyBulletSimulator, object_name: str
-) -> list[FeedingDeploymentSimulatorState]:
+    sim: FeedingDeploymentPyBulletWorld, object_name: str
+) -> list[FeedingDeploymentWorldState]:
 
     # Simulate grasping by faking a constraint with the held object.
     robot = sim.robot
@@ -186,8 +88,8 @@ def _get_plan_to_execute_grasp(
 
 
 def _get_plan_to_execute_ungrasp(
-    sim: FeedingDeploymentPyBulletSimulator,
-) -> list[FeedingDeploymentSimulatorState]:
+    sim: FeedingDeploymentPyBulletWorld,
+) -> list[FeedingDeploymentWorldState]:
     robot = sim.robot
     robot.close_fingers()
     sim.held_object_name = None
@@ -219,10 +121,10 @@ def _create_joint_distance_fn(
 
 
 def remap_trajectory_to_constant_distance(
-    traj: list[FeedingDeploymentSimulatorState],
-    sim: FeedingDeploymentPyBulletSimulator,
+    traj: list[FeedingDeploymentWorldState],
+    sim: FeedingDeploymentPyBulletWorld,
     max_joint_space_distance: float = 0.1,
-) -> list[FeedingDeploymentSimulatorState]:
+) -> list[FeedingDeploymentWorldState]:
     """Remap a trajectory so that joint waypoints have constant distance."""
 
     robot = sim.robot
@@ -233,17 +135,17 @@ def remap_trajectory_to_constant_distance(
 
     # Create a continuous-time trajectory.
     def _interpolate_fn(
-        s0: FeedingDeploymentSimulatorState,
-        s1: FeedingDeploymentSimulatorState,
+        s0: FeedingDeploymentWorldState,
+        s1: FeedingDeploymentWorldState,
         t: float,
-    ) -> FeedingDeploymentSimulatorState:
+    ) -> FeedingDeploymentWorldState:
         # Interpolate the robot joints.
         robot_joints = interpolate_joints(
             joint_infos, s0.robot_joints, s1.robot_joints, t
         )
         # Interpolate the movable object poses.
         # TODO need to refactor interpolate_poses.
-        return FeedingDeploymentSimulatorState(
+        return FeedingDeploymentWorldState(
             robot_joints,
             drink_pose=s0.drink_pose,
             wipe_pose=s0.wipe_pose,
@@ -253,7 +155,7 @@ def remap_trajectory_to_constant_distance(
         )
 
     def _distance_fn(
-        s0: FeedingDeploymentSimulatorState, s1: FeedingDeploymentSimulatorState
+        s0: FeedingDeploymentWorldState, s1: FeedingDeploymentWorldState
     ) -> float:
         return _joint_distance_fn(s0.robot_joints, s1.robot_joints)
 

@@ -29,19 +29,29 @@ def create_scene_description_from_config(config_file_path: str) -> SceneDescript
     # Process the configuration dictionary
     processed_config = {}
     for key, value in config.items():
-        if isinstance(value, list):
-            if len(value) == 7 or len(value) == 13: # 13 is with gripper joints
-                # Handle 7-DoF joint poses
-                processed_config[key] = value
-            elif len(value) == 6:
-                # Handle Pose with 3D position and quaternion
-                position = tuple(value[:3])
-                orientation = tuple(value[3:])
+        if isinstance(value, dict):
+            value_type = value.get("type")
+            values = value.get("values")
+
+            if not value_type or values is None:
+                raise ValueError(f"Key '{key}' is missing 'type' or 'values': {value}")
+
+            if value_type == "joint_positions":
+                # Handle joint positions
+                processed_config[key] = values
+            elif value_type == "ee_pose":
+                # Handle end-effector poses
+                if len(values) != 7:
+                    raise ValueError(f"Pose for key '{key}' must have 7 values (3 position, 4 quaternion), got {len(values)}")
+                position = tuple(values[:3])
+                orientation = tuple(values[3:])
                 processed_config[key] = Pose(position, orientation)
             else:
-                raise ValueError(f"Unexpected list length for key '{key}': {len(value)}")
+                raise ValueError(f"Unknown type '{value_type}' for key '{key}'")
         else:
             raise ValueError(f"Unexpected value type for key '{key}': {type(value)}")
+    
+    processed_config["scene_label"] = Path(config_file_path).stem
 
     # Create an instance of SceneDescription using the processed config
     return SceneDescription(**processed_config)
@@ -51,6 +61,8 @@ def create_scene_description_from_config(config_file_path: str) -> SceneDescript
 class SceneDescription:
     """Scene description."""
 
+    scene_label: str
+
     # Robot constants
     initial_joints: JointPositions
     retract_pos: JointPositions
@@ -58,6 +70,7 @@ class SceneDescription:
     # Feeding task constants
     above_plate_pos: JointPositions
     before_transfer_pos: JointPositions
+    before_transfer_pose: Pose
 
     # Utensil mount constants
     utensil_inside_mount: Pose
@@ -108,6 +121,18 @@ class SceneDescription:
         / "wheelchair"
         / "wheelchair.urdf"
     )
+    
+    user_head_pose: Pose = Pose(
+        (-0.4, 0.5, 0.67), (0.5, 0.5, 0.5, 0.5)
+    )
+
+    user_head_urdf_path: Path = (
+        Path(__file__).parent.parent
+        / "assets"
+        / "urdf"
+        / "head_models"
+        / "mouth_open.urdf"
+    )
 
     # Conservative bounding box around the wheel chair.
     conservative_bb_pose: Pose = Pose((-0.4, 0.7, -0.25))
@@ -134,6 +159,10 @@ class SceneDescription:
         / "feeding_utensil"
         / "feeding_utensil.urdf"
     )
+    tool_frame_to_utensil_tip: Pose = Pose(
+        (0.255, 0.0, -0.018),
+        (0.000, 0.707, 0.000, 0.707),
+    )
 
     # Drink
     drink_pose: Pose = Pose(
@@ -147,6 +176,10 @@ class SceneDescription:
         / "drinking_utensil"
         / "drinking_utensil.urdf"
     )
+    tool_frame_to_drink_tip: Pose = Pose(
+        (0.210, 0.070, 0.023),
+        (0.000, 0.707, 0.000, 0.707),
+    )
 
     # Wipe
     wipe_pose: Pose = Pose(
@@ -158,6 +191,10 @@ class SceneDescription:
         / "urdf"
         / "wiping_utensil"
         / "wiping_utensil.urdf"
+    )
+    tool_frame_to_wipe_tip: Pose = Pose(
+        (0.089, -0.015, -0.018),
+        (0.000, 0.707, 0.000, 0.707),
     )
 
     @property
@@ -185,6 +222,8 @@ class SceneDescription:
             "outer_camera_yaw": 30,
             "outer_camera_distance": 2.5,
             "outer_camera_pitch": -30,
+            "outer_image_width": 2000,
+            "outer_image_height": 2000,
             "inner_camera_target": head_position,
             "inner_camera_yaw": 0,
             "inner_camera_distance": 1.0,

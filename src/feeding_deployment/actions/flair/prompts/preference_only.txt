@@ -1,0 +1,25 @@
+You are feeding me a plate of food.
+Items remaining: %s
+Portions remaining: %s 
+Preference: %s
+Dipping sauces remaining: %s
+---
+Given this information, you will decide what bite to feed me next. You may ONLY suggest a bite from the available 'Items remaining', optionally dipped in an item from 'Dipping sauces.'
+
+1) First, summarize your high-level strategy for feeding me. Describe the order of bites you would use to feed me the remaining items, and explain which Rules (1/2/3) you use to make your decision.
+   Decision Criteria:
+    - Prioritize my preference above all else. If I have a strong preference for a particular ordering of foods, you should obey that as best as possible. Respect user preferences for not dipping certain food items in certain sauces. If the preference specifies 'Feed me X and then Y', perceive it as me asking you to feed all of X before you feed any of Y.
+    - So far, I have eaten the following bites: %s. Use this to inform what you feed me next.
+    - In your answer, state the portions of each item remaining. If I do not have a strong preference, use commonsense. For dishes like noodles with vegetables and meat, or porridge with different toppings, prioritize feeding me a MIX of different items. The exception to this rule is if there is a lot more of one item than another. In that case, you should prioritize feeding me the higher quantity item until the portions are more evenly distributed, even if I have eaten it consecutively, and eat the last bite of a particular item later. Lastly, use your best judgment to figure out what ordering makes sense. For instance, looking at a plate of carrots, ranch, apples, and caramel, you should be able to tell that apples go with the caramel, and carrots go with the ranch, and that apple should not be dipped in ranch because that is not typical. Avoid feeding savory foods with sweet sauces, and vice versa (i.e. chicken nugget and chocolate sauce is NOT a good suggestion, apple should not be dipped in ketchup; canteloupe, honeydew, and melons are usually eaten plain without sauce). A good rule of thumb is to prioritize: common pairings (i.e. sweet savory), portion sizes, and bite variability (in that order).
+
+2) Next, choose an item from 'Items available' to feed next, based on your answer to 1). Examples: "Feed shrimp", "Feed apple dipped in caramel", "Do not feed a bite". You can either feed a single food item which appears in 'Items remaining' ("Feed shrimp"), a single food item dipped in something ("Feed apple dipped in caramel"), or opt to not feed an item ("Do not feed a bite"); only do this if I strongly dislike the remaining bites, or I only requested a 2 bites of 'tiramisu,' for example, at the end of a meal, and you already fed me both (as mentioned in 'The bites I have taken so far'). You CANNOT feed a dip (i.e. ranch, mustard, whipped cream, bbq sauce, chocolate sauce, etc.) by itself. You can ONLY feed an item if it is present in 'Items remaining.' For example, given 'Items remaining: ["broccoli", "asparagus"]', you cannot suggest "Feed pasta", even if I have taken a bite of 'pasta' in the past.
+
+3) Now, summarize your planned bite from 2) in a list format. You can either output a single item in a list ['item'], where 'item' is chosen from 'Items remaining', if you would like to feed this item by itself. Or, you can output two items in a list ['item1', 'item2'], if you would like to dip 'item1' (from 'Items remaining') in 'item2' (from 'Dipping sauces remaining') i.e. ['banana', 'nutella']. However, you cannot suggest to feed 2 items if one of them is not a dip (i.e. ['ramen', 'beef'] or ['rice', 'chicken'] or ['linguini', 'mushroom'] are NOT allowed, you must feed ['ramen'] or ['beef'] by itself). Lastly, you can output an empty list [] if there is absolutely no bite that makes sense.
+---
+Format your response as follows:
+Strategy: <Sentence describing your high-level strategy>
+Next bite: <Phrase describing the next bite you plan to feed>
+Next bite as list: ['item1'] # Or ['item1', 'item2'] or []
+
+---
+Output your response here. Ensure that the last line begins with 'Next bite as list:
