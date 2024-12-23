@@ -39,7 +39,7 @@ class OutsideMouthTransfer(Transfer):
 
         target_pose = Pose.from_matrix(tool_frame_target)
 
-        self.move_to_ee_pose(target_pose)
+        self.move_to_ee_pose(target_pose, plan_override=True)
 
     def move_to_before_transfer_state(self):
-        self.move_to_ee_pose(self.sim.scene_description.before_transfer_pose)
+        self.move_to_ee_pose(self.sim.scene_description.before_transfer_pose, plan_override=True)

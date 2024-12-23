@@ -37,7 +37,7 @@
 
     <!-- FT sensor -->
     <include file="$(find netft_rdt_driver)/launch/ft_sensor.launch">
-        <arg name="ip_address" value="192.168.1.23"/>
+        <arg name="ip_address" value="192.168.1.4"/>
         <arg name="rate" value="1000"/>
     </include>
 

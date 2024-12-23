@@ -77,7 +77,7 @@ class LookAtPlateHLA(HighLevelAction):
                     # log the data
                     if self.log_path is not None:
 
-                        items = self.flair.identify_plate(camera_color_data)
+                        # items = self.flair.identify_plate(camera_color_data)
                         # items = ['cantaloupe', 'banana']
                         items = ['banana']
                         self.flair.set_food_items(items)
