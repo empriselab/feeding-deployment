@@ -42,6 +42,7 @@ class FeedingDeploymentPyBulletWorld:
             base_pose=scene_description.robot_base_pose,
             control_mode="reset",
             home_joint_positions=scene_description.initial_joints,
+            custom_urdf_path=Path(__file__).parent.parent / scene_description.robot_urdf_path,
         )
         assert isinstance(robot, FingeredSingleArmPyBulletRobot)
         robot.close_fingers()
