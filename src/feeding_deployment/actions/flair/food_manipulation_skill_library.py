@@ -110,7 +110,8 @@ class FoodManipulationSkillLibrary:
         if self.robot_interface is not None:
             return self.tf_utils.getTransformationFromTF(from_frame, to_frame)
         else:
-            raise NotImplementedError("Get transform not implemented for simulation")
+            pose_transform = self.sim.get_transform(from_frame, to_frame)
+            return pose_transform.to_matrix()
 
     def skewering_skill(self, color_image, depth_image, camera_info, keypoint=None, major_axis=None, action_index=0):
         if keypoint is not None:
