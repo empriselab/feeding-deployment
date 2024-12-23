@@ -106,10 +106,22 @@ class SceneDescription:
 
     # Robot.
     robot_name: str = "kinova-gen3"
+    robot_urdf_path: Path = "assets/urdf/robot/robot.urdf"
     robot_base_pose: Pose = Pose(
         (0.0, 0.0, 0.0),
         (0.0, 0.0, 0.0, 1.0),
     )
+    # end_effector_link to camera_color_optical_frame
+    camera_pose: Pose = Pose(
+        (-0.046, 0.084, 0.125),
+        (0.0, 0.707, 0.0, 0.707),
+    )
+    
+    # - Translation: [-0.046, 0.084, 0.125]
+    # - Rotation: in Quaternion [0.001, 0.707, -0.002, 0.707]
+    #             in RPY (radian) [-0.749, 1.569, -0.753]
+    #             in RPY (degree) [-42.905, 89.924, -43.172]
+
 
     # Robot holder (vention stand).
     # robot_holder_pose: Pose = Pose((0.0, 0.0, -0.261))

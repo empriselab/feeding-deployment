@@ -114,6 +114,8 @@ class _Runner:
         else:
             print("Running in simulation mode.")
 
+        self.flair = FLAIR()
+
         if self.use_interface:
             # Initialize the web interface.
             self.hla_command_queue = queue.Queue()
@@ -123,10 +125,8 @@ class _Runner:
 
         if self.run_on_robot:
             self.rviz_interface = RVizInterface(self.scene_description)
-            self.flair = FLAIR()
         else:
             self.rviz_interface = None
-            self.flair = None
 
         self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description, use_gui=use_gui, ignore_user=True)
 
@@ -376,8 +376,8 @@ if __name__ == "__main__":
     # runner.hla_command_queue.put(drink_transfer_msg)
 
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
-    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
-    runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
+    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
+    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
 
     if not args.use_interface:
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))

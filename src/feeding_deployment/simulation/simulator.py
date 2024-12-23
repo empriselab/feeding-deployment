@@ -19,6 +19,7 @@ from pybullet_helpers.gui import visualize_pose
 from pybullet_helpers.camera import capture_superimposed_image
 from pybullet_helpers.inverse_kinematics import add_fingers_to_joint_positions
 from pybullet_helpers.motion_planning import run_motion_planning
+from pybullet_helpers.link import get_relative_link_pose
 
 from feeding_deployment.simulation.scene_description import SceneDescription
 from feeding_deployment.simulation.state import FeedingDeploymentWorldState
@@ -179,3 +180,16 @@ class FeedingDeploymentPyBulletSimulator(FeedingDeploymentPyBulletWorld):
             imgs.append(img)
         iio.mimsave(outfile, imgs, fps=fps)  # type: ignore
         print(f"Wrote out to {outfile}")
+
+    def get_transform(self, source_frame, target_frame):
+
+        try:
+            if target_frame == "camera_color_optical_frame":
+                source_to_ee_frame = get_relative_link_pose(self.robot.robot_id, self.robot.link_from_name(source_frame), self.robot.link_from_name("end_effector_link"), self.physics_client_id)
+                ee_frame_to_camera_frame = self.scene_description.camera_pose
+                return source_to_ee_frame.multiply(ee_frame_to_camera_frame)
+            else:
+                source_to_target_frame = get_relative_link_pose(self.robot.robot_id, self.robot.link_from_name(source_frame), self.robot.link_from_name(target_frame), self.physics_client_id)
+                return source_to_target_frame
+        except:
+            raise NotImplementedError(f"{source_frame} to {target_frame} transform not implemented for simulation")
