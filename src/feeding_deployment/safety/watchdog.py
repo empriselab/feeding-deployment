@@ -29,7 +29,7 @@ import rospy
 from std_msgs.msg import Bool
 from netft_rdt_driver.srv import String_cmd
 
-from feeding_deployment.robot_controller.arm_interface import ArmInterface, ArmManager, NUC_HOSTNAME, ARM_RPC_PORT, RPC_AUTHKEY
+from feeding_deployment.control.robot_controller.arm_interface import ArmInterface, ArmManager, NUC_HOSTNAME, ARM_RPC_PORT, RPC_AUTHKEY
 
 
 CAMERA_FREQUENCY_THRESHOLD = 10 # expected is 30 Hz

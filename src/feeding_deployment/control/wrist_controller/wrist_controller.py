@@ -14,7 +14,7 @@ except ModuleNotFoundError as e:
     # print(f"ROS not imported: {e}")
     ROSPY_IMPORTED = False
 
-from feeding_deployment.wrist_controller.horizontal_spoon import HorizontalSpoon
+from feeding_deployment.control.wrist_controller.horizontal_spoon import HorizontalSpoon
 
 class HorizontalSpoonThread(threading.Thread):
     def __init__(self):

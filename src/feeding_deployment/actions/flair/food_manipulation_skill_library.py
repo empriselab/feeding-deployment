@@ -21,9 +21,9 @@ from feeding_deployment.simulation.state import FeedingDeploymentWorldState
 
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
-from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
-from feeding_deployment.wrist_controller.wrist_controller import WristInterface
-from feeding_deployment.robot_controller.command_interface import (
+from feeding_deployment.control.robot_controller.arm_client import ArmInterfaceClient
+from feeding_deployment.control.wrist_controller.wrist_controller import WristInterface
+from feeding_deployment.control.robot_controller.command_interface import (
     CartesianCommand,
     CloseGripperCommand,
     JointCommand,

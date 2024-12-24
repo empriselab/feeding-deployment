@@ -10,7 +10,7 @@ import rospy
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Pose
 
-from feeding_deployment.robot_controller.arm_interface import ArmInterface, ArmManager, NUC_HOSTNAME, ARM_RPC_PORT, RPC_AUTHKEY
+from feeding_deployment.control.robot_controller.arm_interface import ArmInterface, ArmManager, NUC_HOSTNAME, ARM_RPC_PORT, RPC_AUTHKEY
 
 class JointStatesPublisher:
     def __init__(self):

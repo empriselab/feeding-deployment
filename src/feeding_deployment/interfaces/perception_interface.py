@@ -18,12 +18,12 @@ try:
     from geometry_msgs.msg import WrenchStamped, Point, Pose as PoseMsg
     from netft_rdt_driver.srv import String_cmd
 
-    from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
-    from feeding_deployment.aruco_perception.aruco_perception import ArUcoPerception
+    from feeding_deployment.perception.head_perception.ros_wrapper import HeadPerceptionROSWrapper
+    from feeding_deployment.perception.aruco_perception.aruco_perception import ArUcoPerception
 except ModuleNotFoundError:
     ROSPY_IMPORTED = False
 
-from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
+from feeding_deployment.control.robot_controller.arm_client import ArmInterfaceClient
 
 class PerceptionInterface:
     """An interface for perception (robot joints, human head poses, etc.)."""

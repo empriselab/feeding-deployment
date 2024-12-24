@@ -15,13 +15,13 @@ try:
     from visualization_msgs.msg import MarkerArray, Marker
     import tf2_ros
     from geometry_msgs.msg import TransformStamped, Pose as PoseMsg
-    from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
+    from feeding_deployment.perception.head_perception.ros_wrapper import HeadPerceptionROSWrapper
     ROSPY_IMPORTED = True
 except ModuleNotFoundError as e:
     # print(f"ROS not imported: {e}")
     ROSPY_IMPORTED = False
 
-from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
+from feeding_deployment.control.robot_controller.arm_client import ArmInterfaceClient
 from feeding_deployment.simulation.scene_description import SceneDescription
 
 class RVizInterface:

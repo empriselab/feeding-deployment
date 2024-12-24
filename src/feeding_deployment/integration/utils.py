@@ -3,7 +3,7 @@
 import numpy as np
 from numpy.typing import NDArray
 
-from feeding_deployment.robot_controller.command_interface import (
+from feeding_deployment.control.robot_controller.command_interface import (
     CloseGripperCommand,
     JointTrajectoryCommand,
     KinovaCommand,
