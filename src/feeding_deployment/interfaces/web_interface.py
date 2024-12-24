@@ -25,7 +25,7 @@ try:
     from cv_bridge import CvBridge
 
 
-    from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
+    from feeding_deployment.perception.head_perception.ros_wrapper import HeadPerceptionROSWrapper
 except ModuleNotFoundError:
     pass
 

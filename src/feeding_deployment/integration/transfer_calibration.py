@@ -30,8 +30,8 @@ from feeding_deployment.actions.transfer_tool import TransferToolHLA
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
 from feeding_deployment.interfaces.web_interface import WebInterface
-from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
-from feeding_deployment.wrist_controller.wrist_controller import WristInterface
+from feeding_deployment.control.robot_controller.arm_client import ArmInterfaceClient
+from feeding_deployment.control.wrist_controller.wrist_controller import WristInterface
 from feeding_deployment.simulation.scene_description import (
     SceneDescription,
     create_scene_description_from_config,

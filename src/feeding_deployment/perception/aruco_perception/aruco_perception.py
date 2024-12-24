@@ -17,8 +17,8 @@ import tf2_ros
 from geometry_msgs.msg import Point, Pose
 from visualization_msgs.msg import MarkerArray, Marker
 
-from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
-from feeding_deployment.robot_controller.command_interface import CartesianCommand, JointCommand, CloseGripperCommand, OpenGripperCommand
+from feeding_deployment.control.robot_controller.arm_client import ArmInterfaceClient
+from feeding_deployment.control.robot_controller.command_interface import CartesianCommand, JointCommand, CloseGripperCommand, OpenGripperCommand
 from geometry_msgs.msg import TransformStamped
 from collections import deque
 

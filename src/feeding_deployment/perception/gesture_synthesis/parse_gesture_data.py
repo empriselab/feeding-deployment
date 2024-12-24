@@ -6,7 +6,7 @@ import os
 import pickle
 from scipy.spatial.transform import Rotation as R
 
-from feeding_deployment.head_perception.deca_perception import (
+from feeding_deployment.perception.head_perception.deca_perception import (
     HeadPerception,
 )
 

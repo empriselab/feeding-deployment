@@ -45,7 +45,7 @@ except ModuleNotFoundError:
 from scipy.spatial.transform import Rotation as R
 
 # for joint space compliant control
-from feeding_deployment.robot_controller.compliant_controller import CompliantController
+from feeding_deployment.control.robot_controller.compliant_controller import CompliantController
 
 # from std_msgs.msg import Bool
 

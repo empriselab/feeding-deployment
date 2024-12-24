@@ -3,10 +3,10 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
-from feeding_deployment.robot_controller.arm_client import ArmInterfaceClient
+from feeding_deployment.control.robot_controller.arm_client import ArmInterfaceClient
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
-from feeding_deployment.robot_controller.command_interface import CartesianCommand
+from feeding_deployment.control.robot_controller.command_interface import CartesianCommand
 from feeding_deployment.actions.feel_the_bite.base import Transfer
 
 from pybullet_helpers.geometry import Pose
