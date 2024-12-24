@@ -356,7 +356,9 @@ class PerceptionInterface:
     def perceive_drink_pickup_poses(self):
         
         if self.simulation:
-            self.aruco_pose = (np.array([0.5, 0.4, 0.25]), np.array([0.0, 0.0, 0.0, 1.0]))
+            # load them from a pickle file
+            with open(self.log_dir / 'aruco_pose.pkl', 'rb') as f:
+                self.aruco_pose = pickle.load(f)
         else:
             # Rajat Hack: Wait one second for the aruco mean to be correct, does this actually help though?
             time.sleep(1)
@@ -365,6 +367,10 @@ class PerceptionInterface:
             position = (aruco_pose_msg.position.x, aruco_pose_msg.position.y, aruco_pose_msg.position.z)
             orientation = (aruco_pose_msg.orientation.x, aruco_pose_msg.orientation.y, aruco_pose_msg.orientation.z, aruco_pose_msg.orientation.w)
             self.aruco_pose = (position, orientation)
+
+            # save them in a pickle file
+            with open(self.log_dir / 'aruco_pose.pkl', 'wb') as f:
+                pickle.dump(self.aruco_pose, f)
 
         drink_poses  = {}
 

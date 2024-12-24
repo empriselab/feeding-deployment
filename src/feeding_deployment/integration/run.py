@@ -350,10 +350,6 @@ if __name__ == "__main__":
             raise ModuleNotFoundError("Need ROS to run on robot or use interface")
         else:
             rospy.init_node("feeding_deployment", anonymous=True)
-        
-    # Rajat ToDo: have run on robot without interface functionality
-    if args.run_on_robot:
-        args.use_interface = True
 
     runner = _Runner(args.scene_config,
                      args.transfer_type,
@@ -380,8 +376,8 @@ if __name__ == "__main__":
     # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
 
     if not args.use_interface:
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.utensil,)))
