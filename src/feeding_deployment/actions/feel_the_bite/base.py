@@ -21,11 +21,10 @@ class Transfer(abc.ABC):
     def set_tool(self, tool):
         self.tool = tool
 
-    def move_to_ee_pose(self, pose, plan_override=False):
+    def move_to_ee_pose(self, pose):
 
-        if not plan_override:
-            plan = self.sim.plan_to_ee_pose(pose)
         if self.robot_interface is None:
+            plan = self.sim.plan_to_ee_pose(pose)
             self.sim.visualize_plan(plan)
         else:
             self.robot_interface.execute_command(CartesianCommand(pos=pose.position, quat=pose.orientation))

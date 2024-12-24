@@ -85,7 +85,7 @@ class InsideMouthTransfer(Transfer):
 
             target = self.getNextWaypoint(forque_base, servo_point_base, distance_lookahead=INFRONT_DISTANCE_LOOKAHEAD)
 
-            self.move_to_ee_pose(Pose.from_matrix(target), plan_override=True)
+            self.move_to_ee_pose(Pose.from_matrix(target))
             self.rviz_interface.visualizeTransform("base_link", "next_target", target)
             self.rviz_interface.visualizeTransform("base_link", "final_target", servo_point_base)
         
@@ -119,7 +119,7 @@ class InsideMouthTransfer(Transfer):
                 orientation_lookahead_update = ANGULAR_LOOKAHEAD - intermediate_angular_error
                 target = self.getNextWaypoint(intermediate_forque_target, forque_target_base, distance_lookahead = distance_lookahead_update)
             
-            self.move_to_ee_pose(Pose.from_matrix(target), plan_override=True)
+            self.move_to_ee_pose(Pose.from_matrix(target))
             self.rviz_interface.visualizeTransform("base_link", "next_target", target)
             self.rviz_interface.visualizeTransform("base_link", "final_target", forque_target_base)
             self.rviz_interface.visualizeTransform("base_link", "intermediate_target", intermediate_forque_target)
@@ -141,7 +141,7 @@ class InsideMouthTransfer(Transfer):
 
             target = self.getNextWaypoint(forque_base, forque_target_base, distance_lookahead = INSIDE_DISTANCE_LOOKAHEAD_Z)
             
-            self.move_to_ee_pose(Pose.from_matrix(target), plan_override=True)
+            self.move_to_ee_pose(Pose.from_matrix(target))
             self.rviz_interface.visualizeTransform("base_link", "next_target", target)
             self.rviz_interface.visualizeTransform("base_link", "final_target", forque_target_base)
 
@@ -157,6 +157,6 @@ class InsideMouthTransfer(Transfer):
             
             target = self.getNextWaypoint(forque_base, final_target, distance_lookahead=INFRONT_DISTANCE_LOOKAHEAD)
 
-            self.move_to_ee_pose(Pose.from_matrix(target), plan_override=True)
+            self.move_to_ee_pose(Pose.from_matrix(target))
             self.rviz_interface.visualizeTransform("base_link", "next_target", target)
             self.rviz_interface.visualizeTransform("base_link", "final_target", final_target)

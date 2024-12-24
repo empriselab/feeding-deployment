@@ -113,9 +113,10 @@ class SceneDescription:
     )
     # end_effector_link to camera_color_optical_frame
     camera_pose: Pose = Pose(
-        (-0.046, 0.084, 0.125),
-        (0.0, 0.707, 0.0, 0.707),
+        (-0.046, 0.083, 0.125),
+        (0.006, 0.708, 0.005, 0.706),
     )
+
     
     # - Translation: [-0.046, 0.084, 0.125]
     # - Rotation: in Quaternion [0.001, 0.707, -0.002, 0.707]

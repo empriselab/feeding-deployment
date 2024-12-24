@@ -61,6 +61,9 @@ class FeedingDeploymentPyBulletSimulator(FeedingDeploymentPyBulletWorld):
         for _ in range(100):
             p.stepSimulation(physicsClientId=self.physics_client_id)
 
+    def set_wrist_state(self, pitch_angle, roll_angle):
+        self.set_utensil_motors([pitch_angle, roll_angle])
+
     def plan_to_ee_pose(self, pose: Pose, max_control_time: float = 30.0) -> list[FeedingDeploymentWorldState]:
         """Move the robot to the specified end effector pose using cartesian control."""
 

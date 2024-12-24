@@ -76,7 +76,7 @@ class FoodManipulationSkillLibrary:
 
     def set_wrist_state(self, pitch_angle, roll_angle):
         if self.robot_interface is None:
-            raise NotImplementedError("Wrist state setting not implemented for simulation")
+            self.sim.set_wrist_state(pitch_angle, roll_angle)
         else:
             self.wrist_interface.set_wrist_state(pitch_angle, roll_angle)
 
@@ -104,12 +104,24 @@ class FoodManipulationSkillLibrary:
             pose = Pose.from_matrix(tool_frame_target)
             self.move_to_ee_pose(pose)
         else:
-            raise NotImplementedError("Move utensil to pose not implemented for simulation")
+            if tip_to_wrist is None:
+                raise ValueError("tip_to_wrist must be provided in simulation")
+            
+            tool_frame_target = tip_pose @ tip_to_wrist
+            plan = self.sim.plan_to_ee_pose(Pose.from_matrix(tool_frame_target))
+            self.sim.visualize_plan(plan)
     
     def get_transform(self, from_frame, to_frame):
         if self.robot_interface is not None:
             return self.tf_utils.getTransformationFromTF(from_frame, to_frame)
         else:
+            if from_frame == "fork_tip" and to_frame == "tool_frame":
+                tip_to_wrist = np.array([[0, 0, -1, -1.79500833e-02],
+                                        [0, 1, 0, -2.66243553e-03],
+                                        [1, 0, 0, -2.55099477e-01],
+                                        [0, 0, 0, 1]])
+                return tip_to_wrist
+
             pose_transform = self.sim.get_transform(from_frame, to_frame)
             return pose_transform.to_matrix()
 
@@ -131,35 +143,28 @@ class FoodManipulationSkillLibrary:
             return
 
         print("Getting transformation from base_link to camera_color_optical_frame")
-        food_transform = np.eye(4)
-        food_transform[:3,3] = point.reshape(1,3)
+        base_to_camera_transform = self.get_transform('base_link', 'camera_color_optical_frame')
+        print("Base to camera transform: ", base_to_camera_transform)
 
-        food_base = self.get_transform("base_link", "camera_color_optical_frame") @ food_transform
-        print("---- Height of skewer point: ", food_base[2,3])
-
-        print("Food detection height: ", food_base[2,3])
-        if not self.no_waits:
-            input("Press enter to continue")
+        food_base = np.eye(4)
+        food_base[:3,3] = point.reshape(1,3)
+        food_base = base_to_camera_transform @ food_base
         food_base[2,3] = max(food_base[2,3] - 0.01, self.plate_height) 
-        print("---- Height of skewer point (after max): ", food_base[2,3]) 
-
-        food_base[:3,:3] = Rotation.from_euler('xyz', [0,0,0], degrees=True).as_matrix()
-
         # magic number for skewering offset
         food_base[0,3] += 0.012
+        # keep the orientation of the food base fixed
+        food_base[:3,:3] = Rotation.from_quat([-0.7071068, 0.7071068, 0, 0]).as_matrix()
 
         if self.robot_interface is not None:
             self.tf_utils.publishTransformationToTF('base_link', 'food_frame', food_base)
             self.rviz_interface.visualize_food(food_base)
-
-        base_to_tip = self.get_transform('base_link', 'fork_tip')
-        food_base[:3,:3] = food_base[:3,:3] @ base_to_tip[:3,:3]
 
         if major_axis < np.pi/2:
             major_axis = major_axis + np.pi/2
 
         # caching this so that the robot doesn't rotate the wrist again
         tip_to_wrist = self.get_transform('fork_tip', 'tool_frame')
+        print("Tip to wrist: ", tip_to_wrist)
         
         # Action 0: Rotate twirl DoF to skewer angle
         self.set_wrist_state(0, -major_axis)
@@ -174,8 +179,11 @@ class FoodManipulationSkillLibrary:
         self.move_utensil_to_pose(waypoint_2_tip, tip_to_wrist)
 
         # Rajat ToDo: Switch to scooping pick up
-        self.scooping_pickup()
-        # self.move_utensil_to_pose(waypoint_1_tip)
+        if self.robot_interface is not None:
+            self.scooping_pickup()
+        else:
+            # Rajat ToDo: Implement scooping pick up for simulation
+            self.move_utensil_to_pose(waypoint_1_tip, tip_to_wrist)
 
     def scooping_pickup(self, hack = True):
 
