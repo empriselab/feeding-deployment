@@ -21,7 +21,7 @@ cleanup() {
 trap cleanup SIGINT
 
 # Start joint states publisher
-cd /home/isacc/deployment_ws/src/feeding-deployment/src/feeding_deployment/robot_controller
+cd /home/isacc/deployment_ws/src/feeding-deployment/src/feeding_deployment/control/robot_controller
 python joint_states_publisher.py &
 joint_states_publisher_pid=$!  # Store the PID of joint_states_publisher
 

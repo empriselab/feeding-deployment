@@ -95,7 +95,7 @@ class _Runner:
             self.robot_interface = None
             self.wrist_interface = None
 
-        self.log_dir = Path(__file__).parent / "sensor_log"
+        self.log_dir = Path(__file__).parent / "log"
         self.log_dir.mkdir(exist_ok=True)
 
         # Initialize the perceiver (e.g., get joint states or human head poses).
@@ -183,28 +183,14 @@ class _Runner:
         self.active = True
 
     def run(self) -> None:
-
-        # for i in range(2):
-        #     # # Uncomment to test commands.
-        #     drink_pickup_msg = {"status": "drink_pickup"}
-        #     self.hla_command_queue.put(drink_pickup_msg)
-
-        # wipe_transfer_msg = {"status": "move_to_wiping_position", "state": "prepared_mouth_wiping"}
-        # self.parse_interface_msg(wipe_transfer_msg)
-
-        # drink_pickup_msg = {"status": "drink_pickup", "state": "pre_bite_pickup"}
-        # self.parse_interface_msg(drink_pickup_msg)
-
-        if self.use_interface:
-            while self.active:
-                try:
-                    hla_interface_msg = self.hla_command_queue.get(timeout=1)
-                    self.parse_interface_msg(hla_interface_msg)
-                    print("Ready for next user command.")
-                except queue.Empty:
-                    continue
-        else:
-            print("No commands can be processed without the web interface.")
+        
+        while self.active:
+            try:
+                hla_interface_msg = self.hla_command_queue.get(timeout=1)
+                self.parse_interface_msg(hla_interface_msg)
+                print("Ready for next user command.")
+            except queue.Empty:
+                continue
 
     def signal_handler(self, signal, frame):
         self.active = False
@@ -371,32 +357,17 @@ if __name__ == "__main__":
     # drink_transfer_msg = {"status": "drink_transfer"}
     # runner.hla_command_queue.put(drink_transfer_msg)
 
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
-    # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
-
     if not args.use_interface:
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.utensil,)))
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
-        # for _ in range(10):
-            # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
-            # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
-
-    runner.run()
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
+    else:
+        runner.run()
 
     if args.make_videos:
-        runner.make_video(Path("full.mp4"))
+        output_path = Path(__file__).parent / "videos" / "full.mp4"
+        runner.make_video(output_path)
 
     if args.run_on_robot:
         rospy.spin()

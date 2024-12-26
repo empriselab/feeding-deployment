@@ -18,7 +18,9 @@ class OutsideMouthTransfer(Transfer):
     def move_to_transfer_state(self, maintain_position_at_goal = False):
 
         # move to infront of mouth
-        forque_target_base = self.perception_interface.get_head_perception_tool_tip_target_pose()
+        forque_target_base, neck_frame = self.perception_interface.get_head_perception_tool_tip_target_pose()
+        self.sim.set_head_pose(Pose.from_matrix(neck_frame))
+
         servo_point_forque_target = np.identity(4)
         servo_point_forque_target[:3,3] = np.array([0, 0, -DISTANCE_INFRONT_MOUTH]).reshape(1,3)
         infront_mouth_target = forque_target_base @ servo_point_forque_target

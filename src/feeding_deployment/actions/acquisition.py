@@ -71,7 +71,7 @@ class LookAtPlateHLA(HighLevelAction):
 
                 if self.robot_interface is not None:
                     # Run FLAIR perception.
-                    camera_color_data, camera_info_data, camera_depth_data, _ = (
+                    camera_color_data, camera_info_data, camera_depth_data = (
                         self.perception_interface.get_camera_data()
                     )
                     # log the data
@@ -259,7 +259,7 @@ class AcquireBiteHLA(HighLevelAction):
             if self.flair is not None:
 
                 if self.robot_interface is not None:
-                    camera_color_data, camera_info_data, camera_depth_data, _ = (
+                    camera_color_data, camera_info_data, camera_depth_data = (
                         self.perception_interface.get_camera_data()
                     )
                 else:

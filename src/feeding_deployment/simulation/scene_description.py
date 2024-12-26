@@ -148,6 +148,12 @@ class SceneDescription:
         / "wheelchair"
         / "wheelchair.urdf"
     )
+    wheelchair_mesh_path: Path = (
+        Path(__file__).parent.parent
+        / "assets"
+        / "wheelchair"
+        / "wheelchair.obj"
+    )
     
     user_head_pose: Pose = Pose(
         (-0.4, 0.5, 0.67), (0.5, 0.5, 0.5, 0.5)
@@ -168,14 +174,17 @@ class SceneDescription:
     # Table.
     table_pose: Pose = Pose((0.35, 0.45, 0.15))
     table_urdf_path: Path = Path(__file__).parent.parent / "assets" / "table" / "table.urdf"
+    table_mesh_path: Path = Path(__file__).parent.parent / "assets" / "table" / "table.obj"
 
     # Plate
-    plate_pose: Pose = Pose((0.25, 0.25, 0.16))
+    plate_pose: Pose = Pose((0.3, 0.25, 0.16))
     plate_urdf_path: Path = Path(__file__).parent.parent / "assets" / "plate" / "plate.urdf"
+    plate_mesh_path: Path = Path(__file__).parent.parent / "assets" / "plate" / "plate.obj"
 
     # Floor
     floor_position: tuple[float, float, float] = (0, 0, -0.66)
     floor_urdf: Path = Path(__file__).parent.parent / "assets" / "floor" / "floor.urdf"
+    floor_mesh_path: Path = Path(__file__).parent.parent / "assets" / "floor" / "floor.obj"
 
     wall_poses: list[Pose] = field(
         default_factory=lambda: [
@@ -234,7 +243,7 @@ class SceneDescription:
     
     @property
     def drink_pose(self):
-        with open('study_drink_pickup_pos.pkl', 'rb') as f:
+        with open(Path(__file__).parent.parent / 'integration' / 'log' / 'drink_pickup_pos.pkl', 'rb') as f:
             drink_poses = pickle.load(f)
         inside_drink_pose = drink_poses["last_drink_poses"]["inside_top_pose"]
         return inside_drink_pose.multiply(self.tool_frame_to_finger_tip)

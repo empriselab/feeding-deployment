@@ -64,11 +64,19 @@ class FeedingDeploymentPyBulletSimulator(FeedingDeploymentPyBulletWorld):
     def set_wrist_state(self, pitch_angle, roll_angle):
         self.set_utensil_motors([pitch_angle, roll_angle])
 
+    def set_head_pose(self, pose: Pose) -> None:
+        p.resetBasePositionAndOrientation(
+            self._user_head,
+            pose.position,
+            pose.orientation,
+            physicsClientId=self.physics_client_id,
+        )
+
     def plan_to_ee_pose(self, pose: Pose, max_control_time: float = 30.0) -> list[FeedingDeploymentWorldState]:
         """Move the robot to the specified end effector pose using cartesian control."""
 
-        visualize_pose(pose, self.physics_client_id)
-        visualize_pose(self.robot.get_end_effector_pose(), self.physics_client_id)
+        # visualize_pose(pose, self.physics_client_id)
+        # visualize_pose(self.robot.get_end_effector_pose(), self.physics_client_id)
         initial_fingers_positions = self.robot.get_joint_positions()[7:]
     
         joint_trajectory: list[JointPositions] = []

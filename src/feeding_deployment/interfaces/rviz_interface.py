@@ -49,16 +49,18 @@ class RVizInterface:
         rospy.sleep(1)
 
         # Visualize the table.     
-        self._add_cube(self._scene_description.table_pose,
-                self._scene_description.table_half_extents,
-                self._scene_description.table_rgba,
-                marker_id=0)
+        # Rajat ToDo: Resolve the path error
+        # self._add_mesh(self._scene_description.table_pose, str(self._scene_description.table_mesh_path), marker_id=0)
 
         # Visualize the vention stand.
         self._add_cube(self._scene_description.robot_holder_pose,
                 self._scene_description.robot_holder_half_extents,
                 self._scene_description.robot_holder_rgba,
                 marker_id=1)
+        
+        # Visualize the wheelchair.
+        # Rajat ToDo: Resolve the path error
+        # self._add_mesh(self._scene_description.wheelchair_pose, str(self._scene_description.wheelchair_mesh_path), marker_id=3)
 
         # Visualize the conservative bounding box.
         self._add_cube(self._scene_description.conservative_bb_pose,
@@ -148,6 +150,36 @@ class RVizInterface:
         marker.color.g = rgba[1]
         marker.color.b = rgba[2]
         marker.color.a = rgba[3]
+
+        self.marker_pub.publish(marker)
+
+    def _add_mesh(self, 
+            pose: Pose, 
+            mesh_path: str, 
+            marker_id: int) -> None:
+        
+        marker = Marker()
+
+        marker.ns = "mesh"
+        marker.id = marker_id
+        marker.type = Marker.MESH_RESOURCE
+        marker.mesh_resource = mesh_path
+        marker.mesh_use_embedded_materials = True
+        marker.header.stamp = rospy.Time.now()
+        marker.header.frame_id = "sim/base_link"
+        marker.action = marker.ADD
+
+        marker.pose.position.x = pose.position[0]
+        marker.pose.position.y = pose.position[1]
+        marker.pose.position.z = pose.position[2]
+        marker.pose.orientation.x = pose.orientation[0]
+        marker.pose.orientation.y = pose.orientation[1]
+        marker.pose.orientation.z = pose.orientation[2]
+        marker.pose.orientation.w = pose.orientation[3]
+        
+        marker.scale.x = 1
+        marker.scale.y = 1
+        marker.scale.z = 1
 
         self.marker_pub.publish(marker)
 

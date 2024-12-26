@@ -59,7 +59,7 @@ class StowToolHLA(HighLevelAction):
             self.move_to_joint_positions(self.sim.scene_description.drink_staging_pos)
             self.move_to_joint_positions(self.sim.scene_description.retract_pos)
 
-        if tool.name == "utensil":
+        elif tool.name == "utensil":
 
             assert self.sim.held_object_name == "utensil"
             
@@ -76,7 +76,7 @@ class StowToolHLA(HighLevelAction):
             self.move_to_ee_pose(self.sim.scene_description.utensil_above_mount)
             self.move_to_joint_positions(self.sim.scene_description.retract_pos)
         
-        if tool.name == "wipe":
+        elif tool.name == "wipe":
 
             assert self.sim.held_object_name == "wipe"
             

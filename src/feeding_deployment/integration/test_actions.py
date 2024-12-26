@@ -148,7 +148,7 @@ def _main(
         wrist_interface = None
         flair = None
 
-    log_dir = Path(__file__).parent / "sensor_log"
+    log_dir = Path(__file__).parent / "log"
     log_dir.mkdir(exist_ok=True)
 
     if use_interface:

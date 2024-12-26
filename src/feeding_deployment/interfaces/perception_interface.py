@@ -2,7 +2,7 @@
 
 import threading
 import time
-
+from pathlib import Path
 import numpy as np
 from pybullet_helpers.geometry import Pose
 from pybullet_helpers.joint import JointPositions
@@ -24,6 +24,7 @@ except ModuleNotFoundError:
     ROSPY_IMPORTED = False
 
 from feeding_deployment.control.robot_controller.arm_client import ArmInterfaceClient
+from feeding_deployment.utils.camera_utils import CustomCameraInfo
 
 class PerceptionInterface:
     """An interface for perception (robot joints, human head poses, etc.)."""
@@ -74,6 +75,7 @@ class PerceptionInterface:
         self.tool_tip_target_lock = threading.Lock()
         # this term is updated in the run_head_perception method and read in the get_tool_tip_pose method
         self.tool_tip_target_pose = None
+        self.neck_frame = None
 
         # Head perception thread setup
         self.head_perception_thread = None
@@ -221,7 +223,9 @@ class PerceptionInterface:
         return joint_state
 
     def get_camera_data(self):  # Rajat ToDo: Add return type
-        return self._head_perception.get_camera_data()
+        camera_color_data, camera_info_data, camera_depth_data, _ = self._head_perception.get_camera_data()
+        camera_info = CustomCameraInfo(fx=camera_info_data.K[0], fy=camera_info_data.K[4], cx=camera_info_data.K[2], cy=camera_info_data.K[5])
+        return camera_color_data, camera_info, camera_depth_data
     
     def set_head_perception_tool(self, tool: str) -> None:
         """Set the tool for head perception."""
@@ -256,25 +260,19 @@ class PerceptionInterface:
             step_time = t_now - t_init
             if step_time >= 0.02:  # 50 Hz
                 if self._head_perception is not None and not self._simulate_head_perception:
-                    tool_tip_target_pose = self._head_perception.run_head_perception()
+                    tool_tip_target_pose, neck_frame = self._head_perception.run_head_perception()
                 else:
                     try:
                         # read from logged data
-                        if self.tool == "fork":
-                            with open(self.log_dir / 'head_perception_pose_fork.pkl', 'rb') as f:
-                                tool_tip_target_pose = pickle.load(f)
-                        elif self.tool == "drink":
-                            with open(self.log_dir / 'head_perception_pose_drink.pkl', 'rb') as f:
-                                tool_tip_target_pose = pickle.load(f)
-                        elif self.tool == "wipe":
-                            with open(self.log_dir / 'head_perception_pose_wipe.pkl', 'rb') as f:
-                                tool_tip_target_pose = pickle.load(f)
-                        else:
-                            raise ValueError("Invalid tool")
+                        with open(self.log_dir / f'head_perception_pose_{self.tool}.pkl', 'rb') as f:
+                            pose_data = pickle.load(f)
+                        tool_tip_target_pose = pose_data["tool_tip_target_pose"]
+                        neck_frame = pose_data["neck_frame"]
                     except FileNotFoundError:
                         raise FileNotFoundError("No transfer logged data found for tool: ", self.tool)
                 with self.tool_tip_target_lock:
                     self.tool_tip_target_pose = tool_tip_target_pose
+                    self.neck_frame = neck_frame
         self.head_perception_running = False
 
     def stop_head_perception_thread(self):
@@ -291,22 +289,18 @@ class PerceptionInterface:
 
         with self.tool_tip_target_lock:
             tool_tip_target_pose = self.tool_tip_target_pose
+            neck_frame = self.neck_frame
 
         # save them in a pickle file
         if self.robot_interface is not None and self.log_dir is not None:
-            if self.tool == "fork":
-                with open(self.log_dir / 'head_perception_pose_fork.pkl', 'wb') as f:
-                    pickle.dump(tool_tip_target_pose, f)
-            elif self.tool == "drink":
-                with open(self.log_dir / 'head_perception_pose_drink.pkl', 'wb') as f:
-                    pickle.dump(tool_tip_target_pose, f)
-            elif self.tool == "wipe":
-                with open(self.log_dir / 'head_perception_pose_wipe.pkl', 'wb') as f:
-                    pickle.dump(tool_tip_target_pose, f)
-            else:
-                raise ValueError("Invalid tool")
+            pose_data = {
+                "tool_tip_target_pose": tool_tip_target_pose,
+                "neck_frame": neck_frame
+            }
+            with open(self.log_dir / f'head_perception_pose_{self.tool}.pkl', 'wb') as f:
+                pickle.dump(pose_data, f)
             
-        return tool_tip_target_pose
+        return tool_tip_target_pose, neck_frame
         
     def get_tool_tip_pose(self) -> np.ndarray:
 
@@ -357,8 +351,10 @@ class PerceptionInterface:
         
         if self.simulation:
             # load them from a pickle file
-            with open(self.log_dir / 'aruco_pose.pkl', 'rb') as f:
-                self.aruco_pose = pickle.load(f)
+            with open(Path(__file__).parent.parent / 'integration' / 'log' / 'drink_pickup_pos.pkl', 'rb') as f:
+                drink_pickup_pos = pickle.load(f)
+            drink_poses = drink_pickup_pos["last_drink_poses"]
+
         else:
             # Rajat Hack: Wait one second for the aruco mean to be correct, does this actually help though?
             time.sleep(1)
@@ -368,40 +364,35 @@ class PerceptionInterface:
             orientation = (aruco_pose_msg.orientation.x, aruco_pose_msg.orientation.y, aruco_pose_msg.orientation.z, aruco_pose_msg.orientation.w)
             self.aruco_pose = (position, orientation)
 
-            # save them in a pickle file
-            with open(self.log_dir / 'aruco_pose.pkl', 'wb') as f:
-                pickle.dump(self.aruco_pose, f)
-
-        drink_poses  = {}
-
-        drink_poses['pre_grasp_pose'] = self.get_aruco_relative_pose(self.get_pre_grasp_transform())
-        drink_poses['inside_bottom_pose'] = self.get_aruco_relative_pose(self.get_inside_bottom_transform())
-        drink_poses['inside_top_pose'] = self.get_aruco_relative_pose(self.get_inside_top_transform())
-        drink_poses['post_grasp_pose'] = self.get_aruco_relative_pose(self.get_post_grasp_pose())
-        drink_poses['place_inside_bottom_pose'] = self.get_aruco_relative_pose(self.get_place_inside_bottom_transform())
-        drink_poses['place_pre_grasp_pose'] = self.get_aruco_relative_pose(self.get_place_pre_grasp_transform())
+            drink_poses  = {}
+            drink_poses['pre_grasp_pose'] = self.get_aruco_relative_pose(self.get_pre_grasp_transform())
+            drink_poses['inside_bottom_pose'] = self.get_aruco_relative_pose(self.get_inside_bottom_transform())
+            drink_poses['inside_top_pose'] = self.get_aruco_relative_pose(self.get_inside_top_transform())
+            drink_poses['post_grasp_pose'] = self.get_aruco_relative_pose(self.get_post_grasp_pose())
+            drink_poses['place_inside_bottom_pose'] = self.get_aruco_relative_pose(self.get_place_inside_bottom_transform())
+            drink_poses['place_pre_grasp_pose'] = self.get_aruco_relative_pose(self.get_place_pre_grasp_transform())
 
         self.last_drink_poses = drink_poses
 
         return drink_poses
     
-    def record_drink_pickup_joint_pos(self, sim_joint_pos=None):
+    def record_drink_pickup_joint_pos(self):
         if self.simulation:
-            self.drink_pickup_joint_pos = sim_joint_pos
-        else:
-            self.drink_pickup_joint_pos = self.get_robot_joints()[:7]
+            return
+        
+        self.drink_pickup_joint_pos = self.get_robot_joints()[:7]
         # save them in a pickle file
         drink_pickup_pos = {
             "last_drink_poses": self.last_drink_poses,
             "drink_pickup_joint_pos": self.drink_pickup_joint_pos
         }
-        with open('drink_pickup_pos.pkl', 'wb') as f:
+        with open(Path(__file__).parent.parent / 'integration' / 'log' / 'drink_pickup_pos.pkl', 'wb') as f:
             pickle.dump(drink_pickup_pos, f)
         print("Drink pickup poses recorded")
 
     def get_last_drink_pickup_configs(self, study_poses = False):
         if study_poses:
-            with open('study_drink_pickup_pos.pkl', 'rb') as f:
+            with open(Path(__file__).parent.parent / 'integration' / 'log' / 'study_drink_pickup_pos.pkl', 'rb') as f:
                 drink_pickup_pos = pickle.load(f)
             last_drink_poses = drink_pickup_pos["last_drink_poses"]
             drink_pickup_joint_pos = drink_pickup_pos["drink_pickup_joint_pos"]
@@ -411,7 +402,7 @@ class PerceptionInterface:
                 drink_pickup_joint_pos = self.drink_pickup_joint_pos
             except Exception as e:
                 print("Error loading drink pickup poses from script, using values from file instead")
-                with open('drink_pickup_pos.pkl', 'rb') as f:
+                with open(Path(__file__).parent.parent / 'integration' / 'log' / 'drink_pickup_pos.pkl', 'rb') as f:
                     drink_pickup_pos = pickle.load(f)
                 last_drink_poses = drink_pickup_pos["last_drink_poses"]
                 drink_pickup_joint_pos = drink_pickup_pos["drink_pickup_joint_pos"]

@@ -68,7 +68,7 @@ class PickToolHLA(HighLevelAction):
             if self.web_interface is not None:
                 self.web_interface.send_web_interface_message({"state": "drink_pickup", "status": "completed"})
 
-        if tool.name == "utensil":
+        elif tool.name == "utensil":
 
             assert self.sim.held_object_name is None
             
@@ -91,7 +91,7 @@ class PickToolHLA(HighLevelAction):
             # Pre-emptively move to the before_transfer_pos because moving to above_plate_pos from retract_pos is unsafe.
             self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
             
-        if tool.name == "wipe":
+        elif tool.name == "wipe":
 
             assert self.sim.held_object_name is None
             

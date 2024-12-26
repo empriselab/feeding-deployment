@@ -26,6 +26,13 @@ class CollisionMonitor:
     """See docstring above."""
 
     def __init__(self, scene_config: str, transfer_type: str, use_ros: bool = True):
+        self._use_ros = use_ros
+        scene_config_path = Path(__file__).parent.parent / "simulation" / "configs" / f"{scene_config}.yaml"
+        self._scene_description = create_scene_description_from_config(scene_config_path, transfer_type)
+        self._sim = FeedingDeploymentPyBulletSimulator(self._scene_description, use_gui=False, ignore_user=True)
+
+        self._print_once = True
+
         if use_ros:
             assert ROSPY_IMPORTED, "rospy was not imported"
             self._collision_pub = rospy.Publisher("/collision_free", Bool, queue_size=1)
@@ -33,12 +40,6 @@ class CollisionMonitor:
             self._joint_state_sub = rospy.Subscriber(
                 "/robot_joint_states", JointState, self._joint_state_callback
             )
-        self._use_ros = use_ros
-        scene_config_path = Path(__file__).parent.parent / "simulation" / "configs" / f"{scene_config}.yaml"
-        self._scene_description = create_scene_description_from_config(scene_config_path, transfer_type)
-        self._sim = FeedingDeploymentPyBulletSimulator(self._scene_description, use_gui=False, ignore_user=True)
-
-        self._print_once = True
 
     def _joint_state_callback(self, joint_state_msg: "JointState") -> None:
         # Convert joint state message into JointPositions.

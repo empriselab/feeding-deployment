@@ -9,7 +9,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="mouth_open.obj"/>
+        <mesh filename="mouth_open_neck_origin.obj"/>
       </geometry>
       <material name="">
         <color rgba="0.9 0.76 0.6 1"/>

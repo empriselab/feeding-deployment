@@ -1,5 +1,13 @@
 import numpy as np
 import math
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class CustomCameraInfo:
+    fx: float
+    fy: float
+    cx: float
+    cy: float
 
 def angle_between_pixels(source_px, target_px, image_width, image_height, orientation_symmetry = True):
     def angle_between(p1, p2):
@@ -43,10 +51,10 @@ def pixel2World(camera_info, image_x, image_y, depth_image, box_width = 2):
 
     depth = depth/1000.0 # Convert from mm to m
 
-    fx = camera_info.K[0]
-    fy = camera_info.K[4]
-    cx = camera_info.K[2]
-    cy = camera_info.K[5]  
+    fx = camera_info.fx
+    fy = camera_info.fy
+    cx = camera_info.cx
+    cy = camera_info.cy 
 
     # Convert to world space
     world_x = (depth / fx) * (image_x - cx)
@@ -57,10 +65,10 @@ def pixel2World(camera_info, image_x, image_y, depth_image, box_width = 2):
 
 def world2Pixel(camera_info, world_x, world_y, world_z):
 
-    fx = camera_info.K[0]
-    fy = camera_info.K[4]
-    cx = camera_info.K[2]
-    cy = camera_info.K[5]  
+    fx = camera_info.fx
+    fy = camera_info.fy
+    cx = camera_info.cx
+    cy = camera_info.cy  
 
     image_x = world_x * (fx / world_z) + cx
     image_y = world_y * (fy / world_z) + cy

@@ -247,7 +247,7 @@ class HeadPerceptionROSWrapper:
             if self.filter_noisy_readings:
                 self.noisy_reading_publisher.publish(Bool(data=True))
 
-        return tool_tip_target_pose
+        return tool_tip_target_pose, neck_frame
 
     def updateTF(self, source_frame, target_frame, pose):
 

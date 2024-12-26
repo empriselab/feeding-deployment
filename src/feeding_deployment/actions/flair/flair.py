@@ -4,6 +4,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 import math
 import os
+from pathlib import Path
 
 from feeding_deployment.actions.flair.inference_class import BiteAcquisitionInference
 
@@ -16,25 +17,14 @@ class FLAIR:
         self.inference_server = BiteAcquisitionInference(mode='ours')
         print("inf server init")
 
-        if not os.path.exists("log"):
-            os.mkdir("log")
-        self.log_file = "log/"
-        files = os.listdir(self.log_file)
-
-        if not os.path.exists('history.txt'):
-            self.log_count = 1
+        history_path = Path(__file__).parent.parent / "integration" / "log" / "history.txt"
+        if not os.path.exists(history_path):
             self.bite_history = []
         else:
             with open('history.txt', 'r') as f:
                 self.bite_history = ast.literal_eval(f.read().strip())
-                self.log_count = len(self.bite_history)+1
 
-        print("Log count", self.log_count)
         print("History", self.bite_history)
-                
-        # self.log_count should be the maximum numbered file in the log folder + 1
-        self.log_count = max([int(x.split('_')[0]) for x in files]) + 1 if len(files) > 0 else 1
-        #self.log_count = len(os.listdir('log')) + 1
 
         # User preference
         self.user_preference = None
@@ -76,11 +66,6 @@ class FLAIR:
         return self.user_preference is not None
 
     def detect_items(self, camera_color_data, camera_depth_data, camera_info_data, log_path):
-
-        vis = camera_color_data.copy()
-
-        log_path = self.log_file + str(self.log_count)
-        self.log_count += 1
 
         annotated_image, detections, item_masks, item_portions, item_labels, plate_bounds = self.inference_server.detect_items(camera_color_data, log_path)
 
