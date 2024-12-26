@@ -73,7 +73,7 @@ class FeedingDeploymentPyBulletWorld:
             base_pose=scene_description.robot_base_pose,
             control_mode="reset",
             home_joint_positions=scene_description.initial_joints,
-            custom_urdf_path=Path(__file__).parent.parent / scene_description.robot_urdf_path,
+            custom_urdf_path=scene_description.robot_urdf_path,
         )
         assert isinstance(robot, FingeredSingleArmPyBulletRobot)
         robot.close_fingers()
@@ -92,20 +92,20 @@ class FeedingDeploymentPyBulletWorld:
             physicsClientId=self.physics_client_id,
         )
 
-        if not ignore_user:
-            # Create wheelchair.
-            self._wheelchair_id = p.loadURDF(
-                str(scene_description.wheelchair_urdf_path),
-                useFixedBase=True,
-                physicsClientId=self.physics_client_id,
-            )
-            p.resetBasePositionAndOrientation(
-                self._wheelchair_id,
-                scene_description.wheelchair_pose.position,
-                scene_description.wheelchair_pose.orientation,
-                physicsClientId=self.physics_client_id,
-            )
+        # Create wheelchair.
+        self._wheelchair_id = p.loadURDF(
+            str(scene_description.wheelchair_urdf_path),
+            useFixedBase=True,
+            physicsClientId=self.physics_client_id,
+        )
+        p.resetBasePositionAndOrientation(
+            self._wheelchair_id,
+            scene_description.wheelchair_pose.position,
+            scene_description.wheelchair_pose.orientation,
+            physicsClientId=self.physics_client_id,
+        )
 
+        if not ignore_user:
             # Create a conservative collision boundary around the wheelchair.
             self.conservative_bb_id = create_pybullet_block(
                 scene_description.conservative_bb_rgba,
@@ -119,7 +119,6 @@ class FeedingDeploymentPyBulletWorld:
                 physicsClientId=self.physics_client_id,
             )
         else:
-            self._wheelchair_id = None
             self.conservative_bb_id = None
 
         self._user_head = p.loadURDF(

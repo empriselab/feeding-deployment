@@ -1,10 +1,10 @@
-import rospy
 import numpy as np
 import math
 import threading
 import time
 
 try:
+    import rospy
     from sensor_msgs.msg import JointState
 
     from wrist_driver_interfaces.msg import SimpleJointAngleCommand

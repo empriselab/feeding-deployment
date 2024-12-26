@@ -106,9 +106,13 @@ class SceneDescription:
 
     # Robot.
     robot_name: str = "kinova-gen3"
-    robot_urdf_path: Path = "assets/urdf/robot/robot.urdf"
+    robot_urdf_path: Path = (Path(__file__).parent.parent / "assets" / "robot" / "robot.urdf")
     robot_base_pose: Pose = Pose(
         (0.0, 0.0, 0.0),
+        (0.0, 0.0, 0.0, 1.0),
+    )
+    tool_frame_to_finger_tip: Pose = Pose(
+        (0.0, 0.0, 0.05955),
         (0.0, 0.0, 0.0, 1.0),
     )
     # end_effector_link to camera_color_optical_frame
@@ -132,7 +136,7 @@ class SceneDescription:
 
     # Wheelchair.
     wheelchair_pose: Pose = Pose(
-        (0.2, 0.5, -0.25), tuple(p.getQuaternionFromEuler((0.0, 0.0, np.pi / 2)))
+        (-0.3, 0.45, -0.06), (0.0, 0.0, 0.0, 1.0)
     )
     wheelchair_relative_head_pose: Pose = Pose(
         (0.0, -0.25, 0.75), (0.0, 0.0, 0.0, 1.0)
@@ -140,7 +144,6 @@ class SceneDescription:
     wheelchair_urdf_path: Path = (
         Path(__file__).parent.parent
         / "assets"
-        / "urdf"
         / "wheelchair"
         / "wheelchair.urdf"
     )
@@ -152,7 +155,6 @@ class SceneDescription:
     user_head_urdf_path: Path = (
         Path(__file__).parent.parent
         / "assets"
-        / "urdf"
         / "head_models"
         / "mouth_open.urdf"
     )
@@ -164,15 +166,15 @@ class SceneDescription:
 
     # Table.
     table_pose: Pose = Pose((0.25, 0.45, 0.15))
-    table_urdf_path: Path = Path(__file__).parent.parent / "assets" / "urdf" / "table" / "table.urdf"
+    table_urdf_path: Path = Path(__file__).parent.parent / "assets" / "table" / "table.urdf"
 
     # Plate
     plate_pose: Pose = Pose((0.25, 0.25, 0.16))
-    plate_urdf_path: Path = Path(__file__).parent.parent / "assets" / "urdf" / "plate" / "plate.urdf"
+    plate_urdf_path: Path = Path(__file__).parent.parent / "assets" / "plate" / "plate.urdf"
 
     # Floor
     floor_position: tuple[float, float, float] = (0, 0, -0.66)
-    floor_urdf: Path = Path(__file__).parent.parent / "assets" / "urdf" / "floor" / "floor.urdf"
+    floor_urdf: Path = Path(__file__).parent.parent / "assets" / "floor" / "floor.urdf"
 
     wall_poses: list[Pose] = field(
         default_factory=lambda: [
@@ -190,13 +192,9 @@ class SceneDescription:
     ######### Simulator Poses for Tools #########
 
     # Utensil
-    utensil_pose: Pose = Pose(
-        (0.35, -0.15, -0.05), p.getQuaternionFromEuler((0.0, np.pi, np.pi))
-    )
     utensil_urdf_path: Path = (
         Path(__file__).parent.parent
         / "assets"
-        / "urdf"
         / "feeding_utensil"
         / "feeding_utensil.urdf"
     )
@@ -204,7 +202,7 @@ class SceneDescription:
         (0.255, 0.0, -0.018),
         (0.000, 0.707, 0.000, 0.707),
     )
-
+    
     # Drink
     drink_pose: Pose = Pose(
         (0.545, 0.65, 0.270), 
@@ -213,7 +211,6 @@ class SceneDescription:
     drink_urdf_path: Path = (
         Path(__file__).parent.parent
         / "assets"
-        / "urdf"
         / "drinking_utensil"
         / "drinking_utensil.urdf"
     )
@@ -223,13 +220,9 @@ class SceneDescription:
     )
 
     # Wipe
-    wipe_pose: Pose = Pose(
-        (0.35, 0.15, -0.05), p.getQuaternionFromEuler((0.0, np.pi, np.pi))
-    )
     wipe_urdf_path: Path = (
         Path(__file__).parent.parent
         / "assets"
-        / "urdf"
         / "wiping_utensil"
         / "wiping_utensil.urdf"
     )
@@ -237,6 +230,16 @@ class SceneDescription:
         (0.089, -0.015, -0.018),
         (0.000, 0.707, 0.000, 0.707),
     )
+
+    @property
+    def utensil_pose(self):
+        # Perform the computation dynamically when accessed
+        return self.utensil_inside_mount.multiply(self.tool_frame_to_finger_tip)
+
+    @property
+    def wipe_pose(self):
+        # Perform the computation dynamically when accessed
+        return self.wipe_inside_mount.multiply(self.tool_frame_to_finger_tip)
 
     @property
     def wheelchair_head_pose(self) -> Pose:
@@ -270,35 +273,3 @@ class SceneDescription:
             "inner_camera_distance": 1.0,
             "inner_camera_pitch": -20,
         }
-
-    def rotate_about_point(
-        self, point: Pose3D, rotation: Quaternion
-    ) -> SceneDescription:
-        """Create a rotated scene (useful for testing.)"""
-        pose_fields = {
-            "robot_base_pose",
-            "robot_holder_pose",
-            "wheelchair_pose",
-            "table_pose",
-            "conservative_bb_pose",
-            "drink_pose",
-            "wipe_pose",
-            "utensil_pose",
-        }
-        pose_dict: dict[str, Any] = {
-            k: rotate_about_point(point, rotation, getattr(self, k))
-            for k in pose_fields
-        }
-        return replace(
-            self,
-            **pose_dict,
-        )
-
-    def allclose(self, other: Any, atol=1e-4) -> bool:
-        """Compare this scene description to another, e.g., for caching."""
-        if not isinstance(other, SceneDescription):
-            return False
-
-        # TODO need to refactor to avoid calling a function that no longer
-        # exists (create_pybullet_scene_from_description).
-        return False
