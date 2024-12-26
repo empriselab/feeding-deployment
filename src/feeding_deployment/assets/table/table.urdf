@@ -9,7 +9,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="table_new.obj"/>
+        <mesh filename="table.obj"/>
       </geometry>
     </visual>
     <collision>
