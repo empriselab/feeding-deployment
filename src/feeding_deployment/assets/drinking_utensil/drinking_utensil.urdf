@@ -9,7 +9,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="utensil_base.stl"/>
+        <mesh filename="mug_with_holder.obj"/>
       </geometry>
       <material name="bluish">
         <color rgba="0.75294 1 0.75294 1"/>
@@ -18,7 +18,7 @@
     <!-- <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="utensil_base.stl"/>
+        <mesh filename="mug_with_holder.obj"/>
       </geometry>
     </collision> -->
   </link>

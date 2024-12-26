@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import pickle
 from dataclasses import dataclass, field, fields, replace
 from pathlib import Path
 from typing import Any
@@ -165,7 +166,7 @@ class SceneDescription:
     conservative_bb_half_extents: tuple[float, float, float] = (0.4, 0.4, 1.0)
 
     # Table.
-    table_pose: Pose = Pose((0.25, 0.45, 0.15))
+    table_pose: Pose = Pose((0.35, 0.45, 0.15))
     table_urdf_path: Path = Path(__file__).parent.parent / "assets" / "table" / "table.urdf"
 
     # Plate
@@ -204,10 +205,6 @@ class SceneDescription:
     )
     
     # Drink
-    drink_pose: Pose = Pose(
-        (0.545, 0.65, 0.270), 
-        (-0.2126311, -0.6743797, -0.6743797, 0.2126311)
-    )
     drink_urdf_path: Path = (
         Path(__file__).parent.parent
         / "assets"
@@ -233,12 +230,17 @@ class SceneDescription:
 
     @property
     def utensil_pose(self):
-        # Perform the computation dynamically when accessed
         return self.utensil_inside_mount.multiply(self.tool_frame_to_finger_tip)
+    
+    @property
+    def drink_pose(self):
+        with open('study_drink_pickup_pos.pkl', 'rb') as f:
+            drink_poses = pickle.load(f)
+        inside_drink_pose = drink_poses["last_drink_poses"]["inside_top_pose"]
+        return inside_drink_pose.multiply(self.tool_frame_to_finger_tip)
 
     @property
     def wipe_pose(self):
-        # Perform the computation dynamically when accessed
         return self.wipe_inside_mount.multiply(self.tool_frame_to_finger_tip)
 
     @property
