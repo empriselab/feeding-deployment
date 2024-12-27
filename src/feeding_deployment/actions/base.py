@@ -3,10 +3,11 @@
 import abc
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 import time
+import py_trees
 
 from pybullet_helpers.geometry import Pose, multiply_poses
 from pybullet_helpers.joint import JointPositions
@@ -221,3 +222,19 @@ def pddl_plan_to_hla_plan(
         ground_hla = GroundHighLevelAction(hla, objects)
         hla_plan.append(ground_hla)
     return hla_plan
+
+
+class FunctionalSingletonBTBehaviour(py_trees.behaviour.Behaviour):
+    """A behaviour tree behaviour that invokes one function once.
+    
+    The behaviour is assumed to complete successfully. If custom checks are
+    required then just implement a custom subclass of Behaviour.
+    """
+
+    def __init__(self, name: str, behavior_fn: Callable[[], None]) -> None:
+        super().__init__(name=name)
+        self._behavior_fn = behavior_fn
+
+    def update(self):
+        self._behavior_fn()
+        return py_trees.common.Status.SUCCESS
