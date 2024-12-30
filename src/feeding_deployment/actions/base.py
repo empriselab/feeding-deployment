@@ -73,6 +73,7 @@ class HighLevelAction(abc.ABC):
         hla_hyperparams: dict[str, Any],
         wrist_interface: WristInterface,
         flair,
+        behavior_tree_dir: Path,
         no_waits=False,
         log_path=None
     ) -> None:
@@ -84,6 +85,7 @@ class HighLevelAction(abc.ABC):
         self.hla_hyperparams = hla_hyperparams
         self.wrist_interface = wrist_interface
         self.flair = flair
+        self.behavior_tree_dir = behavior_tree_dir
         self.no_waits = no_waits
         self.log_path = log_path
         # NOTE: assuming 7-dof and that first 7 entries are arm joints (not gripper).
@@ -113,7 +115,9 @@ class HighLevelAction(abc.ABC):
     ) -> None:
         """Execute the action on the robot."""
         bt_filename = self.get_behavior_tree_filename(objects, params)
-        bt = load_behavior_tree(bt_filename, self)
+        bt_filepath = self.behavior_tree_dir / bt_filename
+        assert bt_filepath.exists()
+        bt = load_behavior_tree(bt_filepath, self)
         bt.tick()
 
     def move_to_joint_positions(self, joint_positions: list[float]) -> None:
@@ -380,10 +384,8 @@ def _eval_expression(obj, loader, node):
         raise ValueError(f"Error evaluating expression '{value}': {e}")
 
 
-def load_behavior_tree(filename: str, hla: HighLevelAction) -> BehaviorTreeNode:
+def load_behavior_tree(filepath: Path, hla: HighLevelAction) -> BehaviorTreeNode:
 
-    filepath = Path(__file__).parent / "behavior_trees" / filename
-    assert filepath.exists()
     with open(filepath, "r", encoding="utf-8") as f:
         yaml_text = f.read()
 
