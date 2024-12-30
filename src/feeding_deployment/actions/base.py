@@ -492,9 +492,6 @@ class SequenceBehaviorTreeNode(BehaviorTreeNode):
 
 def _eval_expression(obj, loader, node):
     value = loader.construct_scalar(node)
-    if value.endswith("'"):
-        import ipdb; ipdb.set_trace()
-        value = value[:-1]
     try:
         # Need to use attrgetter instead of getattr for nested attributes.
         return attrgetter(value)(obj)
