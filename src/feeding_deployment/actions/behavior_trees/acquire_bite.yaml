@@ -1,5 +1,12 @@
 # Acquire a bite while holding utensil and looking at plate.
 name: "AcquireBite"
 type: "Behavior"
-parameters: []
+parameters:
+  - name: "Speed"
+    space:
+      type: "Box"
+      lower: 0.5
+      upper: 1.5
+    is_user_editable: True
+    value: 1.0
 fn: !hla acquire_bite

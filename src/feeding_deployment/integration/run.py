@@ -9,6 +9,7 @@ import queue
 import os
 import sys
 import signal
+import shutil
 import numpy as np
 
 try:
@@ -130,12 +131,21 @@ class _Runner:
 
         self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description, use_gui=use_gui, ignore_user=True)
 
+        # Copy the initial behavior trees into a directory for this run, where
+        # they will be modified based on user feedback.
+        self.run_behavior_tree_dir = self.log_dir / "behavior_trees"
+        self.run_behavior_tree_dir.mkdir(exist_ok=True)
+        original_behavior_tree_dir = Path(__file__).parents[1] / "actions" / "behavior_trees"
+        assert original_behavior_tree_dir.exists()
+        for original_bt_filename in original_behavior_tree_dir.glob("*.yaml"):
+            shutil.copy(original_bt_filename, self.run_behavior_tree_dir)
+
         # Create skills for high-level planning.
         hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
         print("Creating HLAs...")
         self.hlas = {
             cls(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.web_interface, hla_hyperparams,
-                self.wrist_interface, self.flair, self.no_waits, self.log_dir) for cls in HLAS  # type: ignore
+                self.wrist_interface, self.flair, self.run_behavior_tree_dir, self.no_waits, self.log_dir) for cls in HLAS  # type: ignore
         }
         print("HLAs created.")
         self.hla_name_to_hla = {hla.get_name(): hla for hla in self.hlas}
@@ -355,7 +365,11 @@ if __name__ == "__main__":
     # runner.hla_command_queue.put(drink_transfer_msg)
 
     if not args.use_interface:
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.utensil,)))
+        # Example of updating a behavior tree parameer.
+        bite_acquisition = GroundHighLevelAction(runner.hla_name_to_hla["AcquireBite"], (runner.utensil,))
+        bite_acquisition.process_behavior_tree_update("AcquireBite", "Speed", 1.25)
+
+        # Run some commands.
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))

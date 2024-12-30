@@ -1,5 +1,7 @@
 """High-level actions that we can simulate and execute."""
 
+from __future__ import annotations
+
 import abc
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -73,6 +75,7 @@ class HighLevelAction(abc.ABC):
         hla_hyperparams: dict[str, Any],
         wrist_interface: WristInterface,
         flair,
+        behavior_tree_dir: Path,
         no_waits=False,
         log_path=None
     ) -> None:
@@ -84,6 +87,7 @@ class HighLevelAction(abc.ABC):
         self.hla_hyperparams = hla_hyperparams
         self.wrist_interface = wrist_interface
         self.flair = flair
+        self.behavior_tree_dir = behavior_tree_dir
         self.no_waits = no_waits
         self.log_path = log_path
         # NOTE: assuming 7-dof and that first 7 entries are arm joints (not gripper).
@@ -113,8 +117,48 @@ class HighLevelAction(abc.ABC):
     ) -> None:
         """Execute the action on the robot."""
         bt_filename = self.get_behavior_tree_filename(objects, params)
-        bt = load_behavior_tree(bt_filename, self)
+        bt_filepath = self.behavior_tree_dir / bt_filename
+        assert bt_filepath.exists()
+        bt = load_behavior_tree(bt_filepath, self)
         bt.tick()
+
+    def process_behavior_tree_update(
+        self,
+        objects: tuple[Object, ...],
+        params: dict[str, Any],
+        node_name: str,
+        parameter_name: str,
+        new_parameter_value: Any
+    ) -> None:
+        """Validate and update the behavior tree for this HLA."""
+        # Load the current behavior tree.
+        bt_filename = self.get_behavior_tree_filename(objects, params)
+        bt_filepath = self.behavior_tree_dir / bt_filename
+        assert bt_filepath.exists()
+        bt = load_behavior_tree(bt_filepath, self)
+        # Get the node.
+        node = bt.get_node(node_name)
+        if node is None or not isinstance(node, ParameterizedActionBehaviorTreeNode):
+            print(f"BT UPDATE FAILED. Invalid node name: {node_name}")
+            return
+        # Get the parameter.
+        parameter = node.get_parameter(parameter_name)
+        if parameter is None:
+            print(f"BT UPDATE FAILED. Invalid parameter name: {parameter_name}")
+            return
+        # Ensure the parameter is allowed to be edited.
+        if not parameter.is_user_editable:
+            print(f"BT UPDATE FAILED. Parameter not user editable: {parameter_name}")
+            return
+        # Ensure the new value is in bounds.
+        if not parameter.space.contains(new_parameter_value):
+            print(f"BT UPDATE FAILED. Parameter value is out of bounds: {new_parameter_value} for {parameter_name}")
+            return
+        # Update is valid! So update the tree.
+        print(f"BT UPDATE SUCCEEDED! New: {new_parameter_value} for {parameter_name}")
+        node.set_parameter(parameter, new_parameter_value)
+        # Write the change to disk.
+        save_behavior_tree(bt, bt_filepath, self)
 
     def move_to_joint_positions(self, joint_positions: list[float]) -> None:
         
@@ -208,6 +252,10 @@ class GroundHighLevelAction:
         """Execute the command."""
         self.hla.execute_action(self.objects, self.params)
 
+    def process_behavior_tree_update(self, node_name: str, parameter_name: str, new_parameter_value: Any) -> None:
+        """Validate and update the behavior tree for this ground HLA."""
+        self.hla.process_behavior_tree_update(self.objects, self.params, node_name, parameter_name, new_parameter_value)
+
 
 class ResetHLA(HighLevelAction):
     """Move the robot to retract position without any tool."""
@@ -277,6 +325,15 @@ class BehaviorTreeParameter:
     
     def __eq__(self, other: Any):
         return isinstance(other, BehaviorTreeParameter) and other.name == self.name
+    
+    def get_yaml_dict(self) -> dict[str, Any]:
+        """Get a YAML dict for this parameter."""
+        space_dict = get_space_yaml_dict(self.space)
+        return {
+            "name": self.name,
+            "is_user_editable": self.is_user_editable,
+            "space": space_dict
+        }
 
 
 class BehaviorTreeParameterizedPolicy(abc.ABC):
@@ -288,6 +345,10 @@ class BehaviorTreeParameterizedPolicy(abc.ABC):
     @abc.abstractmethod
     def get_parameters(self) -> list[BehaviorTreeParameter]:
         """Expose ordered parameters for this policy."""
+
+    @abc.abstractmethod
+    def get_function_name(self) -> str:
+        """Get the name of the function for dumping to YAML."""
 
     def run(self, bindings: dict[BehaviorTreeParameter, Any]) -> None:
         """Run the policy given values for the parameters."""
@@ -322,7 +383,10 @@ class FunctionalBehaviorTreeParameterizedPolicy(BehaviorTreeParameterizedPolicy)
 
     def get_parameters(self) -> list[BehaviorTreeParameter]:
         return list(self._parameters)
-    
+
+    def get_function_name(self) -> str:
+        return self._fn.__name__
+        
     def _execute(self, *args: Any) -> None:
         return self._fn(*args)
     
@@ -336,6 +400,14 @@ class BehaviorTreeNode(abc.ABC):
     @abc.abstractmethod
     def tick(self) -> bool:
         """Execute the node for one step and return a status."""
+
+    @abc.abstractmethod
+    def get_node(self, name: str) -> BehaviorTreeNode | None:
+        """Get a node in this subtree with the given name."""
+
+    @abc.abstractmethod
+    def get_yaml_dict(self, hla: HighLevelAction) -> dict[str, Any]:
+        """Get a dictionary to pass to yaml.dump()."""
 
 
 class ParameterizedActionBehaviorTreeNode(BehaviorTreeNode):
@@ -355,6 +427,39 @@ class ParameterizedActionBehaviorTreeNode(BehaviorTreeNode):
         self._policy.run(self._bindings)
         return True  # assume this worked
 
+    def get_node(self, name: str) -> BehaviorTreeNode | None:
+        if name == self._name:
+            return self
+        return None
+    
+    def get_yaml_dict(self, hla: HighLevelAction) -> dict[str, Any]:
+        fn_name = self._policy.get_function_name()
+        assert hasattr(hla, fn_name)
+        fn_str = f"!hla {fn_name}"
+        parameter_dicts = []
+        for parameter in self._policy.get_parameters():
+            parameter_dict = parameter.get_yaml_dict().copy()
+            parameter_dict["value"] = self._bindings[parameter]
+            parameter_dicts.append(parameter_dict)
+        return {
+            "name": self._name,
+            "type": "Behavior",
+            "parameters": parameter_dicts,
+            "fn": fn_str,
+        }
+
+    def get_parameter(self, name: str) -> BehaviorTreeParameter | None:
+        """Access a policy parameter by name."""
+        for parameter in self._policy.get_parameters():
+            if parameter.name == name:
+                return parameter
+        return None
+    
+    def set_parameter(self, parameter: BehaviorTreeParameter, value: Any) -> None:
+        """Update the parameter binding."""
+        assert parameter.space.contains(value)
+        self._bindings[parameter] = value
+
 
 class SequenceBehaviorTreeNode(BehaviorTreeNode):
     """A sequence node in a behavior tree.
@@ -370,6 +475,20 @@ class SequenceBehaviorTreeNode(BehaviorTreeNode):
             child.tick()
         return True  # assume everything worked
 
+    def get_node(self, name: str) -> BehaviorTreeNode | None:
+        for child in self._children:
+            if child.get_node(name) is not None:
+                return child
+        return None
+
+    def get_yaml_dict(self, hla: HighLevelAction) -> dict[str, Any]:
+        child_dicts = [child.get_yaml_dict(hla) for child in self._children]
+        return {
+            "name": self._name,
+            "type": "Sequence",
+            "children": child_dicts,
+        }
+
 
 def _eval_expression(obj, loader, node):
     value = loader.construct_scalar(node)
@@ -380,10 +499,8 @@ def _eval_expression(obj, loader, node):
         raise ValueError(f"Error evaluating expression '{value}': {e}")
 
 
-def load_behavior_tree(filename: str, hla: HighLevelAction) -> BehaviorTreeNode:
+def load_behavior_tree(filepath: Path, hla: HighLevelAction) -> BehaviorTreeNode:
 
-    filepath = Path(__file__).parent / "behavior_trees" / filename
-    assert filepath.exists()
     with open(filepath, "r", encoding="utf-8") as f:
         yaml_text = f.read()
 
@@ -395,6 +512,27 @@ def load_behavior_tree(filename: str, hla: HighLevelAction) -> BehaviorTreeNode:
                                                                          hla.sim.scene_description))
     root_dict = yaml.load(yaml_text, Loader=CustomLoader)
     return _parse_node(root_dict)
+
+
+def save_behavior_tree(behavior_tree: BehaviorTreeNode, filepath: Path, hla: HighLevelAction) -> None:
+
+    yaml_dict = behavior_tree.get_yaml_dict(hla)
+    yaml_str = yaml.dump(yaml_dict, sort_keys=False)
+
+    # Cannot find any better way to do this... the issue is that the YAML dumper
+    # puts single quotes around the !hla expression, but then loading doesn't
+    # work. I tried many things on both loading and dumping and then gave up.
+    lines = []
+    for line in yaml_str.splitlines():
+        if "'!hla" in line:
+            assert line.endswith("'")
+            line = line[:-1]
+            line = line.replace("'!hla", "!hla")
+        lines.append(line)
+    yaml_str = "\n".join(lines)
+
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write(yaml_str)
 
 
 def _parse_node(node_dict: dict) -> BehaviorTreeNode:
@@ -444,3 +582,26 @@ def _parse_node(node_dict: dict) -> BehaviorTreeNode:
 
     else:
         raise ValueError(f"Unknown node type: {node_type}")
+
+
+def get_space_yaml_dict(space: Space) -> dict[str, Any]:
+    """Get a YAML dict for a space."""
+    if isinstance(space, Box):
+        return {
+            "type": "Box",
+            "lower": space.low.tolist(),
+            "upper": space.high.tolist(),
+        }
+            
+    if isinstance(space, EnumSpace):
+        return {
+            "type": "Enum",
+            "elements": space.elements,
+        }
+    
+    if isinstance(space, PoseSpace):
+        return {
+            "type": "PoseSpace",
+        }
+
+    raise ValueError(f"Unrecognized space type: {space}")
