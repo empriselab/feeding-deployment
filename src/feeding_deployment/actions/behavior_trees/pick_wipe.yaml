@@ -1,0 +1,5 @@
+# Pick wipe.
+name: "PickWipe"
+type: "Behavior"
+parameters: []
+fn: !hla pick_wipe
