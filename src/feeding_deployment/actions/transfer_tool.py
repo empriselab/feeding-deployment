@@ -141,6 +141,8 @@ class TransferToolHLA(HighLevelAction):
 
         if tool.name == "utensil":
             yaml_filename = "transfer_utensil.yaml"
+        elif tool.name == "drink":
+            yaml_filename = "transfer_drink.yaml"
         else:
             raise NotImplementedError
 
@@ -154,23 +156,10 @@ class TransferToolHLA(HighLevelAction):
         assert len(objects) == 1
         tool = objects[0]
 
-        if tool.name == "utensil":
+        if tool.name in ["utensil", "drink"]:
             # Get and execute the behavior tree.
             behavior_tree = self.get_behavior_tree(objects, params)
             behavior_tree.tick()
-        
-        elif tool.name == "drink":
-
-            assert self.sim.held_object_name == "drink"
-            
-            self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
-
-            self.set_tool("drink")    
-            self.execute_transfer(maintain_position_at_goal=True)
-
-            # Send message to web interface indicating transfer is done.
-            if self.web_interface is not None:
-                self.web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})
         
         elif tool.name == "wipe":
 
@@ -208,3 +197,15 @@ class TransferToolHLA(HighLevelAction):
         # Send message to web interface indicating transfer is done.
         if self.web_interface is not None:
             self.web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
+
+    def transfer_drink(self) -> None:
+        assert self.sim.held_object_name == "drink"
+        
+        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
+
+        self.set_tool("drink")    
+        self.execute_transfer(maintain_position_at_goal=True)
+
+        # Send message to web interface indicating transfer is done.
+        if self.web_interface is not None:
+            self.web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})        
