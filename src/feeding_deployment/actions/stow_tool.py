@@ -49,6 +49,8 @@ class StowToolHLA(HighLevelAction):
 
         if tool.name == "utensil":
             yaml_filename = "stow_utensil.yaml"
+        elif tool.name == "drink":
+            yaml_filename = "stow_drink.yaml"
         else:
             raise NotImplementedError
 
@@ -62,23 +64,7 @@ class StowToolHLA(HighLevelAction):
         assert len(objects) == 1
         tool = objects[0]
 
-        if tool.name == "drink":
-
-            assert self.sim.held_object_name == "drink"
-            
-            self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
-
-            last_drink_poses, last_drink_pickup_joint_pos = self.perception_interface.get_last_drink_pickup_configs(study_poses=True)
-
-            self.move_to_joint_positions(last_drink_pickup_joint_pos)
-            self.move_to_ee_pose(last_drink_poses['inside_top_pose'])
-            self.ungrasp_tool("drink")
-            self.move_to_ee_pose(last_drink_poses['place_inside_bottom_pose'])
-            self.move_to_ee_pose(last_drink_poses['place_pre_grasp_pose'])
-            self.move_to_joint_positions(self.sim.scene_description.drink_staging_pos)
-            self.move_to_joint_positions(self.sim.scene_description.retract_pos)
-
-        elif tool.name == "utensil":
+        if tool.name in ["drink", "utensil"]:
 
             # Get and execute the behavior tree.
             behavior_tree = self.get_behavior_tree(objects, params)
@@ -123,4 +109,19 @@ class StowToolHLA(HighLevelAction):
         self.move_to_ee_pose(self.sim.scene_description.utensil_inside_mount)
         self.ungrasp_tool("utensil")
         self.move_to_ee_pose(self.sim.scene_description.utensil_above_mount)
+        self.move_to_joint_positions(self.sim.scene_description.retract_pos)
+
+    def stow_drink(self) -> None:
+        assert self.sim.held_object_name == "drink"
+        
+        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
+
+        last_drink_poses, last_drink_pickup_joint_pos = self.perception_interface.get_last_drink_pickup_configs(study_poses=True)
+
+        self.move_to_joint_positions(last_drink_pickup_joint_pos)
+        self.move_to_ee_pose(last_drink_poses['inside_top_pose'])
+        self.ungrasp_tool("drink")
+        self.move_to_ee_pose(last_drink_poses['place_inside_bottom_pose'])
+        self.move_to_ee_pose(last_drink_poses['place_pre_grasp_pose'])
+        self.move_to_joint_positions(self.sim.scene_description.drink_staging_pos)
         self.move_to_joint_positions(self.sim.scene_description.retract_pos)
