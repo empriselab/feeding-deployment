@@ -143,6 +143,8 @@ class TransferToolHLA(HighLevelAction):
             yaml_filename = "transfer_utensil.yaml"
         elif tool.name == "drink":
             yaml_filename = "transfer_drink.yaml"
+        elif tool.name == "wipe":
+            yaml_filename = "transfer_wipe.yaml"
         else:
             raise NotImplementedError
 
@@ -156,24 +158,11 @@ class TransferToolHLA(HighLevelAction):
         assert len(objects) == 1
         tool = objects[0]
 
-        if tool.name in ["utensil", "drink"]:
+        if tool.name in ["utensil", "drink", "wipe"]:
             # Get and execute the behavior tree.
             behavior_tree = self.get_behavior_tree(objects, params)
             behavior_tree.tick()
         
-        elif tool.name == "wipe":
-
-            assert self.sim.held_object_name == "wipe"
-            
-            self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
-
-            self.set_tool("wipe")
-            self.execute_transfer(maintain_position_at_goal=True)
-
-            # Send message to web interface indicating transfer is done.
-            if self.web_interface is not None:
-                self.web_interface.send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})
-
         else:
             print(f"TransferTool not yet implemented for {tool}")
             return []
@@ -209,3 +198,15 @@ class TransferToolHLA(HighLevelAction):
         # Send message to web interface indicating transfer is done.
         if self.web_interface is not None:
             self.web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})        
+
+    def transfer_wipe(self) -> None:
+        assert self.sim.held_object_name == "wipe"
+        
+        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
+
+        self.set_tool("wipe")
+        self.execute_transfer(maintain_position_at_goal=True)
+
+        # Send message to web interface indicating transfer is done.
+        if self.web_interface is not None:
+            self.web_interface.send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})

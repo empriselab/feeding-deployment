@@ -1,0 +1,5 @@
+# Transfer wipe.
+name: "TransferWipe"
+type: "Behavior"
+parameters: []
+fn: !hla transfer_wipe
