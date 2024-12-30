@@ -3,12 +3,19 @@
 import abc
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
+from gymnasium.spaces import Space, Box
+from tomsutils.spaces import EnumSpace
+import functools
+from operator import attrgetter
+
+import yaml
 
 import numpy as np
 import time
 
 from pybullet_helpers.geometry import Pose, multiply_poses
+from pybullet_helpers.spaces import PoseSpace
 from pybullet_helpers.joint import JointPositions
 from relational_structs import (
     GroundAtom,
@@ -79,6 +86,9 @@ class HighLevelAction(abc.ABC):
         self.flair = flair
         self.no_waits = no_waits
         self.log_path = log_path
+        # NOTE: assuming 7-dof and that first 7 entries are arm joints (not gripper).
+        self.arm_joint_lower_limits = self.sim.robot.joint_lower_limits[:7]
+        self.arm_joint_upper_limits = self.sim.robot.joint_upper_limits[:7]
 
     @abc.abstractmethod
     def get_name(self) -> str:
@@ -137,6 +147,13 @@ class HighLevelAction(abc.ABC):
             self.sim.robot.close_fingers()
         else:
             self.execute_robot_command(CloseGripperCommand())
+
+    def reset_wrist(self) -> None:
+        if self.wrist_interface is not None:
+            time.sleep(1.0) # wait for the utensil to be connected
+            print("Resetting wrist controller ...")
+            self.wrist_interface.set_velocity_mode()
+            self.wrist_interface.reset()
 
     def execute_robot_command(self, robot_command: KinovaCommand, plan_viz: list[FeedingDeploymentWorldState] = None, tool_update: str = None) -> None:
         """Execute the given commands on the robot."""
@@ -221,3 +238,197 @@ def pddl_plan_to_hla_plan(
         ground_hla = GroundHighLevelAction(hla, objects)
         hla_plan.append(ground_hla)
     return hla_plan
+
+
+@dataclass(frozen=True)
+class BehaviorTreeParameter:
+    """A single parameter for a policy in a behavior tree.
+    
+    One policy may have multiple parameters.
+    """
+    
+    name: str
+    space: Space
+    is_user_editable: bool
+
+    def __hash__(self):
+        return hash(self.name)  # assume unique names
+    
+    def __eq__(self, other: Any):
+        return isinstance(other, BehaviorTreeParameter) and other.name == self.name
+
+
+class BehaviorTreeParameterizedPolicy(abc.ABC):
+    """A parameterized policy for an action node in a behavior tree."""
+
+    def __init__(self, name: str) -> None:
+        self._name = name
+
+    @abc.abstractmethod
+    def get_parameters(self) -> list[BehaviorTreeParameter]:
+        """Expose ordered parameters for this policy."""
+
+    def run(self, bindings: dict[BehaviorTreeParameter, Any]) -> None:
+        """Run the policy given values for the parameters."""
+        parameters = self.get_parameters()
+        assert set(bindings) == set(parameters)
+        ordered_parameter_values = []
+        for parameter in parameters:
+            value = bindings[parameter]
+            assert parameter.space.contains(value), (
+                f"Value {value} invalid for parameter {parameter}")
+            ordered_parameter_values.append(value)
+        
+        print(f"Executing parameterized policy {self._name} with bindings:")
+        for parameter, value in zip(parameters, ordered_parameter_values, strict=True):
+            print(f"  {parameter.name} = {value}")
+
+        self._execute(*ordered_parameter_values)
+
+    @abc.abstractmethod
+    def _execute(self, *args: Any) -> None:
+        """Execute the policy given ordered values for the parameters."""
+
+
+class FunctionalBehaviorTreeParameterizedPolicy(BehaviorTreeParameterizedPolicy):
+    """A parameterized policy defined by a given function."""
+
+    def __init__(self, name: str, parameters: list[BehaviorTreeParameter],
+                 fn: Callable[[Any], None]) -> None:
+        super().__init__(name)
+        self._parameters = parameters
+        self._fn = fn
+
+    def get_parameters(self) -> list[BehaviorTreeParameter]:
+        return list(self._parameters)
+    
+    def _execute(self, *args: Any) -> None:
+        return self._fn(*args)
+    
+
+class BehaviorTreeNode(abc.ABC):
+    """A node in a behavior tree."""
+
+    def __init__(self, name: str) -> None:
+        self._name = name
+
+    @abc.abstractmethod
+    def tick(self) -> bool:
+        """Execute the node for one step and return a status."""
+
+
+class ParameterizedActionBehaviorTreeNode(BehaviorTreeNode):
+    """A node in a behavior tree that executes a parameterized action open-loop.
+    
+    For now, the status after execution is not checked.
+
+    Parameters may or may not be user-editable.
+    """
+    def __init__(self, name: str, policy: BehaviorTreeParameterizedPolicy,
+                 bindings: dict[BehaviorTreeParameter, Any]) -> None:
+        super().__init__(name)
+        self._policy = policy
+        self._bindings = bindings
+
+    def tick(self) -> bool:
+        self._policy.run(self._bindings)
+        return True  # assume this worked
+
+
+class SequenceBehaviorTreeNode(BehaviorTreeNode):
+    """A sequence node in a behavior tree.
+    
+    For now, the status after execution is not checked.
+    """
+    def __init__(self, name: str, children: list[BehaviorTreeNode]) -> None:
+        super().__init__(name)
+        self._children = children
+
+    def tick(self) -> bool:
+        for child in self._children:
+            child.tick()
+        return True  # assume everything worked
+
+
+def _eval_expression(obj, loader, node):
+    value = loader.construct_scalar(node)
+    try:
+        # Need to use attrgetter instead of getattr for nested attributes.
+        return attrgetter(value)(obj)
+    except Exception as e:
+        raise ValueError(f"Error evaluating expression '{value}': {e}")
+
+
+def parse_behavior_tree(yaml_text: str, hla: HighLevelAction) -> BehaviorTreeNode:
+
+    class CustomLoader(yaml.SafeLoader):
+        pass
+
+    CustomLoader.add_constructor('!hla', functools.partial(_eval_expression, hla))
+    CustomLoader.add_constructor('!scene_description', functools.partial(_eval_expression,
+                                                                         hla.sim.scene_description))
+
+    # Parse top-level data
+    root_dict = yaml.load(yaml_text, Loader=CustomLoader)
+    return _parse_node(root_dict)
+
+
+def _parse_node(node_dict: dict) -> BehaviorTreeNode:
+    """Recursively parse a node from the loaded YAML structure."""
+    node_name = node_dict["name"]
+    node_type = node_dict["type"]
+
+    if node_type == "Sequence":
+        # Recursively parse children
+        children_dicts = node_dict.get("children", [])
+        children_nodes = [_parse_node(child) for child in children_dicts]
+        return SequenceBehaviorTreeNode(node_name, children_nodes)
+
+    elif node_type == "Behavior":
+        # Parse parameters array
+        params_list = node_dict.get("parameters", [])
+        parameters = []
+        bindings = {}
+        for p in params_list:
+            p_name = p["name"]
+            p_is_user_editable = p["is_user_editable"]
+            space_spec = p["space"]
+            space_type = space_spec["type"]
+            if space_type == "Box":
+                space = Box(np.array(space_spec["lower"]),
+                            np.array(space_spec["upper"]),
+                            dtype=np.float64)
+            elif space_type == "Enum":
+                space = EnumSpace(space_spec["elements"])
+            elif space_type == "PoseSpace":
+                space = PoseSpace()
+            else:
+                raise ValueError(f"Unrecognized space type: {space_type}")
+
+            param_obj = BehaviorTreeParameter(
+                name=p_name,
+                space=space,
+                is_user_editable=p_is_user_editable
+            )
+            parameters.append(param_obj)
+
+            # The parameter's value is in p["value"]
+            param_value = p["value"]
+            # Build the param -> value binding
+            bindings[param_obj] = param_value
+
+        # Parse the function reference
+        fn = node_dict["fn"]  
+
+        # Construct the policy
+        policy = FunctionalBehaviorTreeParameterizedPolicy(
+            name=node_name,
+            parameters=parameters,
+            fn=fn
+        )
+
+        # Return a ParameterizedActionBehaviorTreeNode
+        return ParameterizedActionBehaviorTreeNode(node_name, policy, bindings)
+
+    else:
+        raise ValueError(f"Unknown node type: {node_type}")
