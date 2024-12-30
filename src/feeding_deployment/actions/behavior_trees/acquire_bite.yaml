@@ -1,0 +1,5 @@
+# Acquire a bite while holding utensil and looking at plate.
+name: "AcquireBite"
+type: "Behavior"
+parameters: []
+fn: !hla acquire_bite

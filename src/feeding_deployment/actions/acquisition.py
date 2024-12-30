@@ -81,7 +81,7 @@ class LookAtPlateHLA(HighLevelAction):
             pass
         return []
     
-    def look_at_plate(self):
+    def look_at_plate(self) -> None:
         
         print("In LookAtPlateHLA")
         assert self.sim.held_object_name == "utensil"
@@ -270,6 +270,23 @@ class AcquireBiteHLA(HighLevelAction):
             add_effects={ToolPrepared([tool])},
             delete_effects={LiftedAtom(PlateInView, [])},
         )
+    
+    def get_behavior_tree(
+        self,
+        objects: tuple[Object, ...],
+        params: dict[str, Any],
+    ) -> BehaviorTreeNode:
+        del params  # not used right now
+        
+        assert len(objects) == 1
+        tool = objects[0]
+
+        if tool.name == "utensil":
+            yaml_filename = "acquire_bite.yaml"
+        else:
+            raise NotImplementedError
+
+        return load_behavior_tree(yaml_filename, self)
 
     def execute_action(
         self,
@@ -281,91 +298,96 @@ class AcquireBiteHLA(HighLevelAction):
 
         if tool.name == "utensil":
 
-            if self.flair is not None:
-
-                if self.robot_interface is not None:
-                    camera_color_data, camera_info_data, camera_depth_data = (
-                        self.perception_interface.get_camera_data()
-                    )
-                else:
-                    with open(self.log_path / "food_detection_data.pkl", "rb") as f:
-                            food_detection_data = pickle.load(f)
-
-                    camera_color_data = food_detection_data["camera_color_data"]
-                    camera_info_data = food_detection_data["camera_info_data"]
-                    camera_depth_data = food_detection_data["camera_depth_data"]
-
-                if self.web_interface is None:
-                    # params must be set manually to the autonomously selected values
-                    next_action_prediction = self.flair.get_next_action()
-                    next_food_item = next_action_prediction['labels_list'][next_action_prediction['food_id']]
-                    bite_mask_idx = next_action_prediction['bite_mask_idx']
-
-                    params = {
-                        "status": "aquire_food",
-                        "data": [next_food_item, bite_mask_idx],
-                    }
-
-                if params["status"] == 0:
-
-                    detections = self.flair.get_items_detection()
-                    plate_bounds = detections["plate_bounds"]
-                    pos = params["positions"][0]
-
-                    point_x = int(pos["x"]*plate_bounds[2]) + plate_bounds[0]
-                    point_y = int(pos["y"]*plate_bounds[3]) + plate_bounds[1]
-
-                    print("Plate Bounds:", plate_bounds)
-                    print("Positions:", params["positions"])
-                    print("Point:", point_x, point_y)
-
-                    if not self.no_waits:
-                        # visualize point on camera color image
-                        viz = camera_color_data.copy()
-                        for pos in params["positions"]:
-                            cv2.circle(viz, (point_x, point_y), 5, (0, 255, 0), -1)
-                        cv2.imshow("viz", viz)
-                        cv2.waitKey(0)
-                        cv2.destroyAllWindows()
-
-                    skewer_center = (point_x, point_y)
-                    skewer_angle = -np.pi/2
-
-                    self.food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_center, major_axis = skewer_angle)
-
-                elif params["status"] == "aquire_food":
-                    detections = self.flair.get_items_detection()
-                    food_type_to_masks = detections["food_type_to_masks"]
-                    food_type_to_skill = detections["food_type_to_skill"]
-                    
-                    food_type = params["data"][0]
-                    item_id = params["data"][1] - 1
-
-                    mask = food_type_to_masks[food_type][item_id]
-                    skill = food_type_to_skill[food_type]
-
-                    if skill == "Skewer":
-                        skewer_point, skewer_angle = self.flair.inference_server.get_skewer_action(mask)
-                        self.food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_point, major_axis = skewer_angle)
-                    elif skill == "Scoop":
-                        raise NotImplementedError("Scoop skill not yet implemented")
-
-                self.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
-
-                # set the wrist controller to always keep utensil horizontal
-                if self.wrist_interface is not None:
-                    self.wrist_interface.start_horizontal_spoon_thread()
-    
-            else:
-                time.sleep(2.0)  # simulate delay, also needed for web interface
-
-            # Send message to web interface indicating that robot is done with acquisition.
-            if self.web_interface is not None:
-                self.web_interface.send_web_interface_message({"state": "bite_pickup", "status": "completed"})
-
-            return []
+            # Get and execute the behavior tree.
+            behavior_tree = self.get_behavior_tree(objects, params)
+            behavior_tree.tick()            
 
         else:
             # Other tools are always prepared
             pass
+        return []
+    
+    def acquire_bite(self) -> None:
+        if self.flair is not None:
+
+            if self.robot_interface is not None:
+                camera_color_data, camera_info_data, camera_depth_data = (
+                    self.perception_interface.get_camera_data()
+                )
+            else:
+                with open(self.log_path / "food_detection_data.pkl", "rb") as f:
+                        food_detection_data = pickle.load(f)
+
+                camera_color_data = food_detection_data["camera_color_data"]
+                camera_info_data = food_detection_data["camera_info_data"]
+                camera_depth_data = food_detection_data["camera_depth_data"]
+
+            if self.web_interface is None:
+                # params must be set manually to the autonomously selected values
+                next_action_prediction = self.flair.get_next_action()
+                next_food_item = next_action_prediction['labels_list'][next_action_prediction['food_id']]
+                bite_mask_idx = next_action_prediction['bite_mask_idx']
+
+                params = {
+                    "status": "aquire_food",
+                    "data": [next_food_item, bite_mask_idx],
+                }
+
+            if params["status"] == 0:
+
+                detections = self.flair.get_items_detection()
+                plate_bounds = detections["plate_bounds"]
+                pos = params["positions"][0]
+
+                point_x = int(pos["x"]*plate_bounds[2]) + plate_bounds[0]
+                point_y = int(pos["y"]*plate_bounds[3]) + plate_bounds[1]
+
+                print("Plate Bounds:", plate_bounds)
+                print("Positions:", params["positions"])
+                print("Point:", point_x, point_y)
+
+                if not self.no_waits:
+                    # visualize point on camera color image
+                    viz = camera_color_data.copy()
+                    for pos in params["positions"]:
+                        cv2.circle(viz, (point_x, point_y), 5, (0, 255, 0), -1)
+                    cv2.imshow("viz", viz)
+                    cv2.waitKey(0)
+                    cv2.destroyAllWindows()
+
+                skewer_center = (point_x, point_y)
+                skewer_angle = -np.pi/2
+
+                self.food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_center, major_axis = skewer_angle)
+
+            elif params["status"] == "aquire_food":
+                detections = self.flair.get_items_detection()
+                food_type_to_masks = detections["food_type_to_masks"]
+                food_type_to_skill = detections["food_type_to_skill"]
+                
+                food_type = params["data"][0]
+                item_id = params["data"][1] - 1
+
+                mask = food_type_to_masks[food_type][item_id]
+                skill = food_type_to_skill[food_type]
+
+                if skill == "Skewer":
+                    skewer_point, skewer_angle = self.flair.inference_server.get_skewer_action(mask)
+                    self.food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_point, major_axis = skewer_angle)
+                elif skill == "Scoop":
+                    raise NotImplementedError("Scoop skill not yet implemented")
+
+            self.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
+
+            # set the wrist controller to always keep utensil horizontal
+            if self.wrist_interface is not None:
+                self.wrist_interface.start_horizontal_spoon_thread()
+
+        else:
+            time.sleep(2.0)  # simulate delay, also needed for web interface
+
+        # Send message to web interface indicating that robot is done with acquisition.
+        if self.web_interface is not None:
+            self.web_interface.send_web_interface_message({"state": "bite_pickup", "status": "completed"})
+
         return []
