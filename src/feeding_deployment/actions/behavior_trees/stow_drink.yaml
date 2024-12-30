@@ -1,0 +1,5 @@
+# Stow drink.
+name: "StowDrink"
+type: "Behavior"
+parameters: []
+fn: !hla stow_drink
