@@ -14,8 +14,6 @@ from relational_structs import (
 )
 from feeding_deployment.actions.base import (
     HighLevelAction,
-    BehaviorTreeNode,
-    load_behavior_tree,
     tool_type,
     GripperFree,
     Holding,
@@ -37,45 +35,17 @@ class PickToolHLA(HighLevelAction):
             delete_effects={LiftedAtom(GripperFree, [])},
         )
     
-    def get_behavior_tree(
+    def get_behavior_tree_filename(
         self,
         objects: tuple[Object, ...],
         params: dict[str, Any],
-    ) -> BehaviorTreeNode:
+    ) -> str:
         del params  # not used right now
-        
         assert len(objects) == 1
         tool = objects[0]
-        assert self.sim.held_object_name is None
-
-        if tool.name == "utensil" and self.sim.scene_description.scene_label == "vention":
-            yaml_filename = "pick_utensil.yaml"
-        elif tool.name == "drink":
-            yaml_filename = "pick_drink.yaml"
-        elif tool.name == "wipe":
-            yaml_filename = "pick_wipe.yaml"
-        else:
-            raise NotImplementedError
-
-        return load_behavior_tree(yaml_filename, self)
-
-    def execute_action(
-        self,
-        objects: tuple[Object, ...],
-        params: dict[str, Any],
-    ) -> None:
-        assert len(objects) == 1
-        tool = objects[0]
-
-        if tool.name in ["drink", "utensil", "wipe"]:
-
-            # Get and execute the behavior tree.
-            behavior_tree = self.get_behavior_tree(objects, params)
-            behavior_tree.tick()
-
-        else:
-            print(f"PickTool not yet implemented for {tool}")
-            return []
+        assert self.sim.scene_description.scene_label == "vention"
+        assert tool.name in ["utensil", "drink", "wipe"]
+        return f"pick_{tool.name}.yaml"
         
     def pick_drink(self) -> None:
         assert self.sim.held_object_name is None

@@ -17,8 +17,6 @@ from relational_structs import (
 )
 from feeding_deployment.actions.base import (
     HighLevelAction,
-    BehaviorTreeNode,
-    load_behavior_tree,
     tool_type,
     GripperFree,
     Holding,
@@ -29,6 +27,7 @@ from feeding_deployment.actions.base import (
 
 from feeding_deployment.actions.flair.flair import FLAIR
 from feeding_deployment.actions.flair.food_manipulation_skill_library import FoodManipulationSkillLibrary
+
 
 class LookAtPlateHLA(HighLevelAction):
     """Look at plate in preparation of bite acquisition."""
@@ -46,40 +45,16 @@ class LookAtPlateHLA(HighLevelAction):
             delete_effects=set(),
         )
     
-    def get_behavior_tree(
+    def get_behavior_tree_filename(
         self,
         objects: tuple[Object, ...],
         params: dict[str, Any],
-    ) -> BehaviorTreeNode:
+    ) -> str:
         del params  # not used right now
-        
         assert len(objects) == 1
         tool = objects[0]
-
-        if tool.name == "utensil":
-            yaml_filename = "look_at_plate.yaml"
-        else:
-            raise NotImplementedError
-
-        return load_behavior_tree(yaml_filename, self)
-
-    def execute_action(
-        self,
-        objects: tuple[Object, ...],
-        params: dict[str, Any],
-    ) -> None:
-        assert len(objects) == 1
-        tool = objects[0]
-
-        if tool.name == "utensil":
-            # Get and execute the behavior tree.
-            behavior_tree = self.get_behavior_tree(objects, params)
-            behavior_tree.tick()
-
-        else:
-            # Other tools are always prepared
-            pass
-        return []
+        assert tool.name == "utensil"
+        return "look_at_plate.yaml"
     
     def look_at_plate(self) -> None:
         
@@ -271,41 +246,16 @@ class AcquireBiteHLA(HighLevelAction):
             delete_effects={LiftedAtom(PlateInView, [])},
         )
     
-    def get_behavior_tree(
+    def get_behavior_tree_filename(
         self,
         objects: tuple[Object, ...],
         params: dict[str, Any],
-    ) -> BehaviorTreeNode:
+    ) -> str:
         del params  # not used right now
-        
         assert len(objects) == 1
         tool = objects[0]
-
-        if tool.name == "utensil":
-            yaml_filename = "acquire_bite.yaml"
-        else:
-            raise NotImplementedError
-
-        return load_behavior_tree(yaml_filename, self)
-
-    def execute_action(
-        self,
-        objects: tuple[Object, ...],
-        params: dict[str, Any],
-    ) -> None:
-        assert len(objects) == 1
-        tool = objects[0]
-
-        if tool.name == "utensil":
-
-            # Get and execute the behavior tree.
-            behavior_tree = self.get_behavior_tree(objects, params)
-            behavior_tree.tick()            
-
-        else:
-            # Other tools are always prepared
-            pass
-        return []
+        assert tool.name == "utensil"
+        return "acquire_bite.yaml"
     
     def acquire_bite(self) -> None:
         if self.flair is not None:

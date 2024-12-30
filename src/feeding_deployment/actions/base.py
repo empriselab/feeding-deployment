@@ -99,12 +99,22 @@ class HighLevelAction(abc.ABC):
         """Create a planning operator for this HLA."""
 
     @abc.abstractmethod
+    def get_behavior_tree_filename(
+        self,
+        objects: tuple[Object, ...],
+        params: dict[str, Any],
+    ) -> str:
+        """Get the YAML filename (not path, just name) for the behavior tree."""
+
     def execute_action(
         self,
         objects: tuple[Object, ...],
         params: dict[str, Any],
     ) -> None:
-        """Execute the action on the robot and return simulated trajectory."""
+        """Execute the action on the robot."""
+        bt_filename = self.get_behavior_tree_filename(objects, params)
+        bt = load_behavior_tree(bt_filename, self)
+        bt.tick()
 
     def move_to_joint_positions(self, joint_positions: list[float]) -> None:
         
@@ -168,6 +178,7 @@ class HighLevelAction(abc.ABC):
             input("Execute next command?")
         self.robot_interface.execute_command(robot_command)
 
+
 @dataclass(frozen=True)
 class GroundHighLevelAction:
     """A high-level action with objects and parameters specified.
@@ -197,6 +208,7 @@ class GroundHighLevelAction:
         """Execute the command."""
         self.hla.execute_action(self.objects, self.params)
 
+
 class ResetHLA(HighLevelAction):
     """Move the robot to retract position without any tool."""
 
@@ -211,6 +223,14 @@ class ResetHLA(HighLevelAction):
             add_effects={LiftedAtom(ResetPos, [])},
             delete_effects=set(),
         )
+    
+    def get_behavior_tree_filename(
+        self,
+        objects: tuple[Object, ...],
+        params: dict[str, Any],
+    ) -> str:
+        # Behavior trees not used for this HLA
+        raise NotImplementedError
 
     def execute_action(
         self,
@@ -225,6 +245,7 @@ class ResetHLA(HighLevelAction):
         # set FLAIR preferences to None
         if self.flair is not None:
             self.flair.clear_preference()
+
 
 def pddl_plan_to_hla_plan(
     pddl_plan: list[GroundOperator], hlas: set[HighLevelAction]
