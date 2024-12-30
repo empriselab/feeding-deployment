@@ -158,7 +158,7 @@ class HighLevelAction(abc.ABC):
         print(f"BT UPDATE SUCCEEDED! New: {new_parameter_value} for {parameter_name}")
         node.set_parameter(parameter, new_parameter_value)
         # Write the change to disk.
-        save_behavior_tree(bt, bt_filepath)
+        save_behavior_tree(bt, bt_filepath, self)
 
     def move_to_joint_positions(self, joint_positions: list[float]) -> None:
         
@@ -325,6 +325,15 @@ class BehaviorTreeParameter:
     
     def __eq__(self, other: Any):
         return isinstance(other, BehaviorTreeParameter) and other.name == self.name
+    
+    def get_yaml_dict(self) -> dict[str, Any]:
+        """Get a YAML dict for this parameter."""
+        space_dict = get_space_yaml_dict(self.space)
+        return {
+            "name": self.name,
+            "is_user_editable": self.is_user_editable,
+            "space": space_dict
+        }
 
 
 class BehaviorTreeParameterizedPolicy(abc.ABC):
@@ -336,6 +345,10 @@ class BehaviorTreeParameterizedPolicy(abc.ABC):
     @abc.abstractmethod
     def get_parameters(self) -> list[BehaviorTreeParameter]:
         """Expose ordered parameters for this policy."""
+
+    @abc.abstractmethod
+    def get_function_name(self) -> str:
+        """Get the name of the function for dumping to YAML."""
 
     def run(self, bindings: dict[BehaviorTreeParameter, Any]) -> None:
         """Run the policy given values for the parameters."""
@@ -370,7 +383,10 @@ class FunctionalBehaviorTreeParameterizedPolicy(BehaviorTreeParameterizedPolicy)
 
     def get_parameters(self) -> list[BehaviorTreeParameter]:
         return list(self._parameters)
-    
+
+    def get_function_name(self) -> str:
+        return self._fn.__name__
+        
     def _execute(self, *args: Any) -> None:
         return self._fn(*args)
     
@@ -388,6 +404,15 @@ class BehaviorTreeNode(abc.ABC):
     @abc.abstractmethod
     def get_node(self, name: str) -> BehaviorTreeNode | None:
         """Get a node in this subtree with the given name."""
+
+    def to_yaml(self, hla: HighLevelAction) -> str:
+        """Get a YAML representation of the behavior tree."""
+        yaml_dict = self.get_yaml_dict(hla)
+        return yaml.dump(yaml_dict, sort_keys=False)
+    
+    @abc.abstractmethod
+    def get_yaml_dict(self, hla: HighLevelAction) -> dict[str, Any]:
+        """Get a dictionary to pass to yaml.dump()."""
 
 
 class ParameterizedActionBehaviorTreeNode(BehaviorTreeNode):
@@ -412,6 +437,22 @@ class ParameterizedActionBehaviorTreeNode(BehaviorTreeNode):
             return self
         return None
     
+    def get_yaml_dict(self, hla: HighLevelAction) -> dict[str, Any]:
+        fn_name = self._policy.get_function_name()
+        assert hasattr(hla, fn_name)
+        fn_str = f"!hla {fn_name}"
+        parameter_dicts = []
+        for parameter in self._policy.get_parameters():
+            parameter_dict = parameter.get_yaml_dict().copy()
+            parameter_dict["value"] = self._bindings[parameter]
+            parameter_dicts.append(parameter_dict)
+        return {
+            "name": self._name,
+            "type": "Behavior",
+            "parameters": parameter_dicts,
+            "fn": fn_str,
+        }
+
     def get_parameter(self, name: str) -> BehaviorTreeParameter | None:
         """Access a policy parameter by name."""
         for parameter in self._policy.get_parameters():
@@ -445,6 +486,14 @@ class SequenceBehaviorTreeNode(BehaviorTreeNode):
                 return child
         return None
 
+    def get_yaml_dict(self, hla: HighLevelAction) -> dict[str, Any]:
+        child_dicts = [child.get_yaml_dict(hla) for child in self._children]
+        return {
+            "name": self._name,
+            "type": "Sequence",
+            "children": child_dicts,
+        }
+
 
 def _eval_expression(obj, loader, node):
     value = loader.construct_scalar(node)
@@ -470,8 +519,10 @@ def load_behavior_tree(filepath: Path, hla: HighLevelAction) -> BehaviorTreeNode
     return _parse_node(root_dict)
 
 
-def save_behavior_tree(behavior_tree: BehaviorTreeNode, filepath: Path):
-    import ipdb; ipdb.set_trace()
+def save_behavior_tree(behavior_tree: BehaviorTreeNode, filepath: Path, hla: HighLevelAction) -> None:
+    yaml_str = behavior_tree.to_yaml(hla)
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write(yaml_str)
 
 
 def _parse_node(node_dict: dict) -> BehaviorTreeNode:
@@ -521,3 +572,26 @@ def _parse_node(node_dict: dict) -> BehaviorTreeNode:
 
     else:
         raise ValueError(f"Unknown node type: {node_type}")
+
+
+def get_space_yaml_dict(space: Space) -> dict[str, Any]:
+    """Get a YAML dict for a space."""
+    if isinstance(space, Box):
+        return {
+            "type": "Box",
+            "lower": space.low.tolist(),
+            "upper": space.high.tolist(),
+        }
+            
+    if isinstance(space, EnumSpace):
+        return {
+            "type": "Enum",
+            "elements": space.elements,
+        }
+    
+    if isinstance(space, PoseSpace):
+        return {
+            "type": "PoseSpace",
+        }
+
+    raise ValueError(f"Unrecognized space type: {space}")
