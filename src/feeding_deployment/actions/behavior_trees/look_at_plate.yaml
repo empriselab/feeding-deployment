@@ -1,0 +1,5 @@
+# Look at plate while holding utensil.
+name: "LookAtPlate"
+type: "Behavior"
+parameters: []
+fn: !hla look_at_plate
