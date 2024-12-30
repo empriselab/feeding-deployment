@@ -1,0 +1,92 @@
+# Pick utensil.
+name: "Root"
+type: "Sequence"
+children:
+  - name: "MoveToRetractPos"
+    type: "Behavior"
+    parameters:
+      - name: "RetractPosition"
+        space:
+          type: "Box"
+          lower: !hla arm_joint_lower_limits
+          upper: !hla arm_joint_upper_limits
+        is_user_editable: False
+        value: !scene_description retract_pos
+    fn: !hla move_to_joint_positions
+  - name: "CloseGripper"
+    type: "Behavior"
+    parameters: []
+    fn: !hla close_gripper
+  - name: "MoveToUtensilAboveMountPos"
+    type: "Behavior"
+    parameters:
+      - name: "UtensilAboveMountPos"
+        space:
+          type: "Box"
+          lower: !hla arm_joint_lower_limits
+          upper: !hla arm_joint_upper_limits
+        is_user_editable: False
+        value: !scene_description utensil_above_mount_pos
+    fn: !hla move_to_joint_positions
+  - name: "MoveUtensilInsideMount"
+    type: "Behavior"
+    parameters:
+      - name: "UtensilInsideMountEE"
+        space:
+          type: "PoseSpace"
+        is_user_editable: False
+        value: !scene_description utensil_inside_mount
+    fn: !hla move_to_ee_pose
+  - name: "GraspUtensil"
+    type: "Behavior"
+    parameters:
+      - name: "Tool"
+        space:
+          type: "Enum"
+          elements: ["utensil", "drink", "wipe"]
+        is_user_editable: False
+        value: "utensil"
+    fn: !hla grasp_tool
+  - name: "MoveUtensilOutsideMount"
+    type: "Behavior"
+    parameters:
+      - name: "MoveUtensilOutsideMountEE"
+        space:
+          type: "PoseSpace"
+        is_user_editable: False
+        value: !scene_description utensil_outside_mount
+    fn: !hla move_to_ee_pose
+  # Assuming here self.sim.scene_description.scene_label == "vention"
+  - name: "MoveUtensilOutsideAboveMount"
+    type: "Behavior"
+    parameters:
+      - name: "MoveUtensilOutsideAboveMountEE"
+        space:
+          type: "PoseSpace"
+        is_user_editable: False
+        value: !scene_description utensil_outside_above_mount
+    fn: !hla move_to_ee_pose
+  - name: "MoveToRetractPos"
+    type: "Behavior"
+    parameters:
+      - name: "RetractPosition"
+        space:
+          type: "Box"
+          lower: !hla arm_joint_lower_limits
+          upper: !hla arm_joint_upper_limits
+        is_user_editable: False
+        value: !scene_description retract_pos
+    fn: !hla move_to_joint_positions
+  # Pre-emptively move to the before_transfer_pos because moving to above_plate_pos
+  # from retract_pos is unsafe.
+  - name: "MoveToBeforeTransferPos"
+    type: "Behavior"
+    parameters:
+      - name: "BeforeTransferPos"
+        space:
+          type: "Box"
+          lower: !hla arm_joint_lower_limits
+          upper: !hla arm_joint_upper_limits
+        is_user_editable: False
+        value: !scene_description before_transfer_pos
+    fn: !hla move_to_joint_positions

@@ -126,61 +126,58 @@ class TransferToolHLA(HighLevelAction):
             add_effects={LiftedAtom(ToolTransferDone, [tool])},
             delete_effects=set(),
         )
-
-    def execute_action(
+    
+    def get_behavior_tree_filename(
         self,
         objects: tuple[Object, ...],
         params: dict[str, Any],
-    ) -> None:
+    ) -> str:
+        del params  # not used right now
         assert len(objects) == 1
         tool = objects[0]
+        assert tool.name in ["utensil", "drink", "wipe"]
+        return f"transfer_{tool.name}.yaml"    
+    
+    def transfer_utensil(self) -> None:
+        assert self.sim.held_object_name == "utensil"
 
-        if tool.name == "utensil":
-            assert self.sim.held_object_name == "utensil"
+        if self.wrist_interface is not None:
+            # start the horizontal spoon thread if it is not already running
+            self.wrist_interface.start_horizontal_spoon_thread()
 
-            if self.wrist_interface is not None:
-                # start the horizontal spoon thread if it is not already running
-                self.wrist_interface.start_horizontal_spoon_thread()
+        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
-            self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
+        if self.wrist_interface is not None:
+            # stop the keep horizontal thread
+            self.wrist_interface.stop_horizontal_spoon_thread()
 
-            if self.wrist_interface is not None:
-                # stop the keep horizontal thread
-                self.wrist_interface.stop_horizontal_spoon_thread()
+        self.set_tool("fork")
+        self.execute_transfer()
 
-            self.set_tool("fork")
-            self.execute_transfer()
+        # Send message to web interface indicating transfer is done.
+        if self.web_interface is not None:
+            self.web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
 
-            # Send message to web interface indicating transfer is done.
-            if self.web_interface is not None:
-                self.web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
+    def transfer_drink(self) -> None:
+        assert self.sim.held_object_name == "drink"
         
-        elif tool.name == "drink":
+        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
-            assert self.sim.held_object_name == "drink"
-            
-            self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
+        self.set_tool("drink")    
+        self.execute_transfer(maintain_position_at_goal=True)
 
-            self.set_tool("drink")    
-            self.execute_transfer(maintain_position_at_goal=True)
+        # Send message to web interface indicating transfer is done.
+        if self.web_interface is not None:
+            self.web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})        
 
-            # Send message to web interface indicating transfer is done.
-            if self.web_interface is not None:
-                self.web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})
+    def transfer_wipe(self) -> None:
+        assert self.sim.held_object_name == "wipe"
         
-        elif tool.name == "wipe":
+        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
-            assert self.sim.held_object_name == "wipe"
-            
-            self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
+        self.set_tool("wipe")
+        self.execute_transfer(maintain_position_at_goal=True)
 
-            self.set_tool("wipe")
-            self.execute_transfer(maintain_position_at_goal=True)
-
-            # Send message to web interface indicating transfer is done.
-            if self.web_interface is not None:
-                self.web_interface.send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})
-
-        else:
-            print(f"TransferTool not yet implemented for {tool}")
-            return []
+        # Send message to web interface indicating transfer is done.
+        if self.web_interface is not None:
+            self.web_interface.send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})

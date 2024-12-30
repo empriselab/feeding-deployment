@@ -99,12 +99,22 @@ class HighLevelAction(abc.ABC):
         """Create a planning operator for this HLA."""
 
     @abc.abstractmethod
+    def get_behavior_tree_filename(
+        self,
+        objects: tuple[Object, ...],
+        params: dict[str, Any],
+    ) -> str:
+        """Get the YAML filename (not path, just name) for the behavior tree."""
+
     def execute_action(
         self,
         objects: tuple[Object, ...],
         params: dict[str, Any],
     ) -> None:
-        """Execute the action on the robot and return simulated trajectory."""
+        """Execute the action on the robot."""
+        bt_filename = self.get_behavior_tree_filename(objects, params)
+        bt = load_behavior_tree(bt_filename, self)
+        bt.tick()
 
     def move_to_joint_positions(self, joint_positions: list[float]) -> None:
         
@@ -168,6 +178,7 @@ class HighLevelAction(abc.ABC):
             input("Execute next command?")
         self.robot_interface.execute_command(robot_command)
 
+
 @dataclass(frozen=True)
 class GroundHighLevelAction:
     """A high-level action with objects and parameters specified.
@@ -197,6 +208,7 @@ class GroundHighLevelAction:
         """Execute the command."""
         self.hla.execute_action(self.objects, self.params)
 
+
 class ResetHLA(HighLevelAction):
     """Move the robot to retract position without any tool."""
 
@@ -211,6 +223,14 @@ class ResetHLA(HighLevelAction):
             add_effects={LiftedAtom(ResetPos, [])},
             delete_effects=set(),
         )
+    
+    def get_behavior_tree_filename(
+        self,
+        objects: tuple[Object, ...],
+        params: dict[str, Any],
+    ) -> str:
+        # Behavior trees not used for this HLA
+        raise NotImplementedError
 
     def execute_action(
         self,
@@ -225,6 +245,7 @@ class ResetHLA(HighLevelAction):
         # set FLAIR preferences to None
         if self.flair is not None:
             self.flair.clear_preference()
+
 
 def pddl_plan_to_hla_plan(
     pddl_plan: list[GroundOperator], hlas: set[HighLevelAction]
@@ -359,7 +380,12 @@ def _eval_expression(obj, loader, node):
         raise ValueError(f"Error evaluating expression '{value}': {e}")
 
 
-def parse_behavior_tree(yaml_text: str, hla: HighLevelAction) -> BehaviorTreeNode:
+def load_behavior_tree(filename: str, hla: HighLevelAction) -> BehaviorTreeNode:
+
+    filepath = Path(__file__).parent / "behavior_trees" / filename
+    assert filepath.exists()
+    with open(filepath, "r", encoding="utf-8") as f:
+        yaml_text = f.read()
 
     class CustomLoader(yaml.SafeLoader):
         pass
@@ -367,8 +393,6 @@ def parse_behavior_tree(yaml_text: str, hla: HighLevelAction) -> BehaviorTreeNod
     CustomLoader.add_constructor('!hla', functools.partial(_eval_expression, hla))
     CustomLoader.add_constructor('!scene_description', functools.partial(_eval_expression,
                                                                          hla.sim.scene_description))
-
-    # Parse top-level data
     root_dict = yaml.load(yaml_text, Loader=CustomLoader)
     return _parse_node(root_dict)
 
@@ -379,13 +403,11 @@ def _parse_node(node_dict: dict) -> BehaviorTreeNode:
     node_type = node_dict["type"]
 
     if node_type == "Sequence":
-        # Recursively parse children
         children_dicts = node_dict.get("children", [])
         children_nodes = [_parse_node(child) for child in children_dicts]
         return SequenceBehaviorTreeNode(node_name, children_nodes)
 
     elif node_type == "Behavior":
-        # Parse parameters array
         params_list = node_dict.get("parameters", [])
         parameters = []
         bindings = {}
@@ -404,30 +426,20 @@ def _parse_node(node_dict: dict) -> BehaviorTreeNode:
                 space = PoseSpace()
             else:
                 raise ValueError(f"Unrecognized space type: {space_type}")
-
             param_obj = BehaviorTreeParameter(
                 name=p_name,
                 space=space,
                 is_user_editable=p_is_user_editable
             )
             parameters.append(param_obj)
-
-            # The parameter's value is in p["value"]
             param_value = p["value"]
-            # Build the param -> value binding
             bindings[param_obj] = param_value
-
-        # Parse the function reference
         fn = node_dict["fn"]  
-
-        # Construct the policy
         policy = FunctionalBehaviorTreeParameterizedPolicy(
             name=node_name,
             parameters=parameters,
             fn=fn
         )
-
-        # Return a ParameterizedActionBehaviorTreeNode
         return ParameterizedActionBehaviorTreeNode(node_name, policy, bindings)
 
     else:

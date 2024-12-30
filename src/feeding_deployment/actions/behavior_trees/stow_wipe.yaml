@@ -1,0 +1,5 @@
+# Stow wipe.
+name: "StowWipe"
+type: "Behavior"
+parameters: []
+fn: !hla stow_wipe
