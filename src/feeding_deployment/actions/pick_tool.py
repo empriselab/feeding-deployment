@@ -50,6 +50,8 @@ class PickToolHLA(HighLevelAction):
 
         if tool.name == "utensil" and self.sim.scene_description.scene_label == "vention":
             yaml_filename = "pick_utensil.yaml"
+        elif tool.name == "drink":
+            yaml_filename = "pick_drink.yaml"
         else:
             raise NotImplementedError
 
@@ -63,32 +65,7 @@ class PickToolHLA(HighLevelAction):
         assert len(objects) == 1
         tool = objects[0]
 
-        if tool.name == "drink":
-
-            assert self.sim.held_object_name is None
-
-            self.move_to_joint_positions(self.sim.scene_description.retract_pos)
-            self.close_gripper()
-            self.move_to_joint_positions(self.sim.scene_description.drink_gaze_pos)
-
-            drink_poses = self.perception_interface.perceive_drink_pickup_poses()
-
-            self.move_to_joint_positions(self.sim.scene_description.drink_staging_pos)
-            self.move_to_ee_pose(drink_poses['pre_grasp_pose'])
-            self.move_to_ee_pose(drink_poses['inside_bottom_pose'])
-            self.move_to_ee_pose(drink_poses['inside_top_pose'])
-            self.grasp_tool("drink")
-            self.move_to_ee_pose(drink_poses['post_grasp_pose'])
-
-            self.perception_interface.record_drink_pickup_joint_pos()
-
-            self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
-
-            # Send message to web interface.
-            if self.web_interface is not None:
-                self.web_interface.send_web_interface_message({"state": "drink_pickup", "status": "completed"})
-
-        elif tool.name == "utensil":
+        if tool.name in ["drink", "utensil"]:
 
             # Get and execute the behavior tree.
             behavior_tree = self.get_behavior_tree(objects, params)
@@ -123,3 +100,27 @@ class PickToolHLA(HighLevelAction):
         else:
             print(f"PickTool not yet implemented for {tool}")
             return []
+        
+    def pick_drink(self) -> None:
+        assert self.sim.held_object_name is None
+
+        self.move_to_joint_positions(self.sim.scene_description.retract_pos)
+        self.close_gripper()
+        self.move_to_joint_positions(self.sim.scene_description.drink_gaze_pos)
+
+        drink_poses = self.perception_interface.perceive_drink_pickup_poses()
+
+        self.move_to_joint_positions(self.sim.scene_description.drink_staging_pos)
+        self.move_to_ee_pose(drink_poses['pre_grasp_pose'])
+        self.move_to_ee_pose(drink_poses['inside_bottom_pose'])
+        self.move_to_ee_pose(drink_poses['inside_top_pose'])
+        self.grasp_tool("drink")
+        self.move_to_ee_pose(drink_poses['post_grasp_pose'])
+
+        self.perception_interface.record_drink_pickup_joint_pos()
+
+        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
+
+        # Send message to web interface.
+        if self.web_interface is not None:
+            self.web_interface.send_web_interface_message({"state": "drink_pickup", "status": "completed"})

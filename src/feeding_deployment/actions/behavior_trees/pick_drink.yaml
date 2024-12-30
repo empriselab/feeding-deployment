@@ -1,0 +1,5 @@
+# Pick drink.
+name: "PickDrink"
+type: "Behavior"
+parameters: []
+fn: !hla pick_drink
