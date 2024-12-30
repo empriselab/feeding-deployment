@@ -1,0 +1,5 @@
+# Transfer drink.
+name: "TransferDrink"
+type: "Behavior"
+parameters: []
+fn: !hla transfer_drink
