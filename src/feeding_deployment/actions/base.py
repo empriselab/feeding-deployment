@@ -405,11 +405,6 @@ class BehaviorTreeNode(abc.ABC):
     def get_node(self, name: str) -> BehaviorTreeNode | None:
         """Get a node in this subtree with the given name."""
 
-    def to_yaml(self, hla: HighLevelAction) -> str:
-        """Get a YAML representation of the behavior tree."""
-        yaml_dict = self.get_yaml_dict(hla)
-        return yaml.dump(yaml_dict, sort_keys=False)
-    
     @abc.abstractmethod
     def get_yaml_dict(self, hla: HighLevelAction) -> dict[str, Any]:
         """Get a dictionary to pass to yaml.dump()."""
@@ -497,6 +492,9 @@ class SequenceBehaviorTreeNode(BehaviorTreeNode):
 
 def _eval_expression(obj, loader, node):
     value = loader.construct_scalar(node)
+    if value.endswith("'"):
+        import ipdb; ipdb.set_trace()
+        value = value[:-1]
     try:
         # Need to use attrgetter instead of getattr for nested attributes.
         return attrgetter(value)(obj)
@@ -520,7 +518,22 @@ def load_behavior_tree(filepath: Path, hla: HighLevelAction) -> BehaviorTreeNode
 
 
 def save_behavior_tree(behavior_tree: BehaviorTreeNode, filepath: Path, hla: HighLevelAction) -> None:
-    yaml_str = behavior_tree.to_yaml(hla)
+
+    yaml_dict = behavior_tree.get_yaml_dict(hla)
+    yaml_str = yaml.dump(yaml_dict, sort_keys=False)
+
+    # Cannot find any better way to do this... the issue is that the YAML dumper
+    # puts single quotes around the !hla expression, but then loading doesn't
+    # work. I tried many things on both loading and dumping and then gave up.
+    lines = []
+    for line in yaml_str.splitlines():
+        if "'!hla" in line:
+            assert line.endswith("'")
+            line = line[:-1]
+            line = line.replace("'!hla", "!hla")
+        lines.append(line)
+    yaml_str = "\n".join(lines)
+
     with open(filepath, "w", encoding="utf-8") as f:
         f.write(yaml_str)
 
