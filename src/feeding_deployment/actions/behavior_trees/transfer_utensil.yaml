@@ -1,0 +1,5 @@
+# Bite transfer.
+name: "TransferUtensil"
+type: "Behavior"
+parameters: []
+fn: !hla transfer_utensil

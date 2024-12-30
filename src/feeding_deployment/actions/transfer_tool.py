@@ -19,6 +19,8 @@ from relational_structs import (
 )
 from feeding_deployment.actions.base import (
     HighLevelAction,
+    BehaviorTreeNode,
+    load_behavior_tree,
     tool_type,
     GripperFree,
     Holding,
@@ -126,6 +128,23 @@ class TransferToolHLA(HighLevelAction):
             add_effects={LiftedAtom(ToolTransferDone, [tool])},
             delete_effects=set(),
         )
+    
+    def get_behavior_tree(
+        self,
+        objects: tuple[Object, ...],
+        params: dict[str, Any],
+    ) -> BehaviorTreeNode:
+        del params  # not used right now
+        
+        assert len(objects) == 1
+        tool = objects[0]
+
+        if tool.name == "utensil":
+            yaml_filename = "transfer_utensil.yaml"
+        else:
+            raise NotImplementedError
+
+        return load_behavior_tree(yaml_filename, self)    
 
     def execute_action(
         self,
@@ -136,24 +155,9 @@ class TransferToolHLA(HighLevelAction):
         tool = objects[0]
 
         if tool.name == "utensil":
-            assert self.sim.held_object_name == "utensil"
-
-            if self.wrist_interface is not None:
-                # start the horizontal spoon thread if it is not already running
-                self.wrist_interface.start_horizontal_spoon_thread()
-
-            self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
-
-            if self.wrist_interface is not None:
-                # stop the keep horizontal thread
-                self.wrist_interface.stop_horizontal_spoon_thread()
-
-            self.set_tool("fork")
-            self.execute_transfer()
-
-            # Send message to web interface indicating transfer is done.
-            if self.web_interface is not None:
-                self.web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
+            # Get and execute the behavior tree.
+            behavior_tree = self.get_behavior_tree(objects, params)
+            behavior_tree.tick()
         
         elif tool.name == "drink":
 
@@ -184,3 +188,23 @@ class TransferToolHLA(HighLevelAction):
         else:
             print(f"TransferTool not yet implemented for {tool}")
             return []
+
+    def transfer_utensil(self) -> None:
+        assert self.sim.held_object_name == "utensil"
+
+        if self.wrist_interface is not None:
+            # start the horizontal spoon thread if it is not already running
+            self.wrist_interface.start_horizontal_spoon_thread()
+
+        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
+
+        if self.wrist_interface is not None:
+            # stop the keep horizontal thread
+            self.wrist_interface.stop_horizontal_spoon_thread()
+
+        self.set_tool("fork")
+        self.execute_transfer()
+
+        # Send message to web interface indicating transfer is done.
+        if self.web_interface is not None:
+            self.web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
