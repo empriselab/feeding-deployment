@@ -257,7 +257,11 @@ class AcquireBiteHLA(HighLevelAction):
         assert tool.name == "utensil"
         return "acquire_bite.yaml"
     
-    def acquire_bite(self) -> None:
+    def acquire_bite(self, speed: float) -> None:
+
+        # TODO actually use speed
+        print("ACQUIRE BITE CALLED WITH SPEED: ", speed)
+
         if self.flair is not None:
 
             if self.robot_interface is not None:
