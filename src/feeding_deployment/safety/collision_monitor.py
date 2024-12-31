@@ -19,7 +19,7 @@ from feeding_deployment.simulation.simulator import (
 )
 from feeding_deployment.simulation.scene_description import SceneDescription, create_scene_description_from_config
 from pybullet_helpers.inverse_kinematics import add_fingers_to_joint_positions, check_collisions_with_held_object
-from pybullet_helpers.joint import JointPositions
+from pybullet_helpers.joint import JointPositions, JointVelocities
 
 
 class CollisionMonitor:
@@ -62,7 +62,7 @@ class CollisionMonitor:
                                                             finger_state)
         # Run collision checking.
         # has_collision = self.check_collisions(combined_joint_state)
-        has_collision = False
+        has_collision = self.sense_collisions(combined_joint_state)
         self._collision_pub.publish(Bool(data=not has_collision))
         if has_collision and self._print_once:
             print("Collision detected by CollisionMonitor")
@@ -81,6 +81,16 @@ class CollisionMonitor:
             joint_state=joint_positions,
             distance_threshold=0.005, # 5mm
         )
+
+
+    # Todo: Add JointTorques to pybullet_helpers.joint 
+    def sense_collisions(self, joint_positions: JointPositions, joint_velocities: JointVelocities, torque_readings: JointPositions) -> bool:
+        """Check collisions with all objects."""
+        print("joint_positions: ", joint_positions)
+        print("joint_velocities: ", joint_velocities)
+        print("torque_readings: ", torque_readings)
+        return False
+        # return self._sim.check_collisions(joint_positions)
     
 if __name__ == "__main__":
     import argparse
