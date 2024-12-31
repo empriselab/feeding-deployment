@@ -23,8 +23,11 @@ from feeding_deployment.simulation.simulator import (
 from feeding_deployment.simulation.scene_description import SceneDescription, create_scene_description_from_config
 from pybullet_helpers.inverse_kinematics import add_fingers_to_joint_positions, check_collisions_with_held_object
 from pybullet_helpers.joint import JointPositions, JointVelocities
+<<<<<<< HEAD
 
 MAX_ERROR = 0.0
+=======
+>>>>>>> 63607bdf3486a1b59936f8d821e2100d3d7c4823
 
 
 class CollisionMonitor:

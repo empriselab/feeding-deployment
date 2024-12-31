@@ -102,7 +102,7 @@ class KinovaArm:
     def __init__(self):
 
         # Using Hack: fix joint 6
-        self.fix_joint_hack = True
+        self.fix_joint_hack = False
 
         # rospy.init_node("kinova_controller", anonymous=True)
 
@@ -258,7 +258,7 @@ class KinovaArm:
         )
 
     def set_tool(self, tool):
-        assert not self.cyclic_running, "Arm must be in high-level servoing mode to set tool"
+        # assert not self.cyclic_running, "Arm must be in high-level servoing mode to set tool"
         
         # updates the urdf being used by pinocchio to include tool mass
         if tool == "fork":
@@ -271,7 +271,6 @@ class KinovaArm:
                     os.path.join(self.file_path, "hack_gen3_robotiq_2f_85_fork.urdf")
                 )
             else:
-                raise ValueError("URDF not available for fork tool without joint hack")
                 self.model = pin.buildModelFromUrdf(
                     os.path.join(self.file_path, "gen3_robotiq_2f_85_fork.urdf")
                 )
@@ -290,7 +289,6 @@ class KinovaArm:
                     os.path.join(self.file_path, "hack_gen3_robotiq_2f_85_wipe.urdf")
                 )
             else:
-                raise ValueError("URDF not available for wipe tool without joint hack")
                 self.model = pin.buildModelFromUrdf(
                     os.path.join(self.file_path, "gen3_robotiq_2f_85_wipe.urdf")
                 )
@@ -321,9 +319,8 @@ class KinovaArm:
                     os.path.join(self.file_path, current_drink_urdf)
                 )
             else:
-                raise ValueError("URDF not available for drink tool without joint hack")
                 self.model = pin.buildModelFromUrdf(
-                    os.path.join(self.file_path, "gen3_robotiq_2f_85.urdf")
+                    os.path.join(self.file_path, "gen3_robotiq_2f_85_drink.urdf")
                 )
             self.data = self.model.createData()
             self.q_pin = np.zeros(self.model.nq)
@@ -470,7 +467,7 @@ class KinovaArm:
         )
 
         # return q, dq, tau, ee_pos, ee_vel, ee_force, gripper_pos
-        return q, ee_pos, gripper_pos
+        return q, dq, tau
 
     def move_angular_trajectory(self, trajectory_joint_angles, blocking=True):
 
@@ -946,7 +943,6 @@ class KinovaArm:
         print("Arm is back in high-level servoing mode")
 
     def update_state(self):
-        assert self.cyclic_running, "Arm must be in low-level servoing mode"
 
         # Robot state
         for i in range(self.n_compliant_dofs):
@@ -1141,118 +1137,46 @@ class KinovaArm:
 def main():
     arm = KinovaArm()
     try:
-        # input("Press Enter to move to home pos")
-        # arm.home()
+        # input("Press Enter to zero torque offsets")
+        # arm.zero_torque_offsets()
 
-        input("Press Enter to zero torque offsets")
-        arm.zero_torque_offsets()
-
-        # np.set_printoptions(precision=4, suppress=True)
-
-        # for i in range(10):
-        #     input("Press Enter to read current state")
-        #     ee_force = arm.get_ee_force()
-        #     print(f"End Effector Force: {ee_force}")
-
-        # input("Press Enter to move to home pos")
-        # arm.home()
-
-        # before_transfer_pos = [
-        #     -2.8655331,  
-        #     -1.61973777, 
-        #     -2.6097253, 
-        #     -1.37301134, 
-        #     1.11781087,
-        #     -1.18039928,
-        #     2.05515662
-        # ]
-
-        # before_transfer_tool_transform = np.zeros(7)
-        # before_transfer_tool_transform[:3] = [0.250, 0.271, 0.529]
-        # before_transfer_tool_transform[3:] = [0.539, -0.445, -0.526, 0.483]
+        arm.set_tool("drink")
         
-        # input("Press Enter to move to before transfer pos")
-        # arm.move_angular(before_transfer_pos)
+        max_until_now = 0
+        while True:
 
-        # input('Press Enter to switch to gravity compensation mode')
-        # arm.switch_to_gravity_compensation_mode()
+            # read current state
+            q, dq, torque_reading = arm.get_state()
 
-        # input('Press Enter to switch to joint compliant mode')
-        # command_queue = queue.Queue(1)
-        # arm.switch_to_joint_compliant_mode(command_queue)  
+            # Pinocchio joint configuration
+            arm.q_pin = np.array(
+                [
+                    math.cos(q[0]),
+                    math.sin(q[0]),
+                    q[1],
+                    math.cos(q[2]),
+                    math.sin(q[2]),
+                    q[3],
+                    math.cos(q[4]),
+                    math.sin(q[4]),
+                    q[5],
+                    math.cos(q[6]),
+                    math.sin(q[6]),
+                ]
+            )
 
-        # input('Press Enter to switch to task compliant mode')
-        # command_queue = queue.Queue(1)
-        # arm.switch_to_task_compliant_mode(command_queue)
+            gravity = pin.computeGeneralizedGravity(arm.model, arm.data, arm.q_pin)
+            torque_model = pin.rnea(arm.model, arm.data, arm.q_pin, dq, np.zeros(7))
 
-        # for i in range(5):
-        #     input("Press Enter to read current state")
-        #     q, _, _, current_x, _ = arm.get_update_state()
-        #     print(f"Current q: {q}")
-        #     print(f"Goal q: {before_transfer_pos}")
-        #     print(f"Current x: {current_x[:3]}")
-        #     print(f"Goal x: {before_transfer_tool_transform[:3]}")
+            error = np.abs(torque_reading - torque_model)
 
-        # input('Press Enter to switch to task compliant mode')
-        # command_queue = queue.Queue(1)
-        # arm.switch_to_task_compliant_mode(command_queue)
+            max_this_time = np.max(error)
 
-        # _, _, _, initial_x, gripper_pos = arm.get_update_state()
-        # # send 5 commands to the robot
-        # for i in range(5):
-        #     _, _, _, current_x, _ = arm.get_update_state()
-        #     print(f"Current x: {current_x}")
-        #     # enter desired x
-        #     desired_x_x = float(input("Enter desired x x: "))
-        #     desired_x_y = float(input("Enter desired x y: "))
-        #     desired_x_z = float(input("Enter desired x z: "))
-        #     desired_x = np.array([desired_x_x, desired_x_y, desired_x_z, initial_x[3], initial_x[4], initial_x[5], initial_x[6]])
-        #     print(f"Desired x: {desired_x}")
-        #     command_queue.put((desired_x, gripper_pos))
-        #     time.sleep(1)
+            if max_this_time > max_until_now:
+                max_until_now = max_this_time
 
-        # input('Press Enter to switch out of joint compliant mode')
-        # arm.switch_out_of_compliant_mode()
-
-        # arm.home()
-
-        # home_pos = [
-        #     2.2912759438800285,
-        #     0.7308686750765581,
-        #     2.082994642398784,
-        #     4.109475142253324,
-        #     0.2853091081120964,
-        #     5.818345985240578,
-        #     5.988186420599291,
-        # ]
-        # home_pos = [math.degrees(angle) for angle in home_pos]
-
-        # infront_mount_position = [0.0, -0.17, 0.15]
-        # infront_mount_orientation = R.from_quat([0.7071068, -0.7071068, 0, 0]).as_euler('xyz', degrees=True)
-
-        # input("Press Enter to move to home pos")
-        # arm.move_angular(home_pos)
-
-        # input("Press Enter to move to infront mount pose")
-        # arm.move_cartesian(infront_mount_position, infront_mount_orientation)
-
-        # input("Press Enter to move to home config")
-        # arm.home()
-
-        # input("Press Enter to start gravity compensation")
-        # arm.switch_to_gravity_compensation_mode()
-
-        # input("Press Enter to move to home config")
-        # arm.home()
-
-        # input("Press Enter to start joint compliant mode")
-        # command_queue = queue.Queue(1)
-        # arm.switch_to_joint_compliant_mode(command_queue)
-
-        # input("Press Enter to move to retract config")
-        # arm.retract()
-
-        # arm.move_angular_trajectory([])
+            np.set_printoptions(precision=2, suppress=True)
+            print("max error: ", max_this_time, " max until now: ", max_until_now)
 
     finally:
         arm.disconnect()
