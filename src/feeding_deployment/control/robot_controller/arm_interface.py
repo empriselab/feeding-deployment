@@ -39,7 +39,7 @@ class ArmInterface:
 
     def get_state(self):
         try:
-            arm_pos, ee_pose, gripper_pos = self.arm.get_state()
+            current_state = self.arm.get_state()
         except Exception as e:
             print(f"Error in get_state: {e}")
             # Re-raise a simplified exception to avoid pickling issues
@@ -54,7 +54,7 @@ class ArmInterface:
             if self.in_compliant_mode:
                 self.in_compliant_mode = False
 
-        return arm_pos, ee_pose, gripper_pos
+        return current_state
 
     def reset(self):
         # Go to home position

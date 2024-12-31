@@ -32,7 +32,7 @@ class JointStatesPublisher:
     def publish_joint_states(self):
 
         try:
-            arm_pos, ee_pose, gripper_pos = self._arm_interface.get_state()
+            current_state = self._arm_interface.get_state()
         except Exception as e:
             raise Exception(f"Error getting state: {e}")
         
@@ -49,14 +49,16 @@ class JointStatesPublisher:
             "finger_joint",
         ]
 
+        gripper_pos = current_state["gripper_pos"]
         if gripper_pos < 0.0:
             gripper_pos = 0.0 # sometimes the gripper position is slightly negative
 
-        joint_state_msg.position = arm_pos.tolist() + [gripper_pos*0.8] # sim/rviz gripper is 0.8x real gripper
-        joint_state_msg.velocity = [0.0] * 8
-        joint_state_msg.effort = [0.0] * 8
+        joint_state_msg.position = current_state["position"].tolist() + [gripper_pos*0.8] # sim/rviz gripper is 0.8x real gripper
+        joint_state_msg.velocity = current_state["velocity"].tolist() + [0.0]
+        joint_state_msg.effort = current_state["effort"].tolist() + [0.0]
         self.joint_states_pub.publish(joint_state_msg)
 
+        ee_pose = current_state["ee_pos"]
         cartesian_state_msg = Pose()
         cartesian_state_msg.position.x = ee_pose[0]
         cartesian_state_msg.position.y = ee_pose[1]
