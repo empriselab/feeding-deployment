@@ -1,6 +1,6 @@
 import os
 from openai import OpenAI
-
+import pickle
 import numpy as np
 import math
 import time
@@ -37,6 +37,25 @@ class Transparency:
         """
         Loads the current execution log from the log directory.
         """
+
+        # For now I am just using food detection data, but I need to identify all the data that needs to be logged / used for transparency.
+        self.execution_log_path = Path(__file__).parent.parent / "integration" / "log"
+
+        # read from "food_detection_data.pkl"
+        with open(self.execution_log_path / "food_detection_data.pkl", 'rb') as f:
+            food_detection_data = pickle.load(f)
+
+        useful_info = {
+            "labels_list": food_detection_data["items_detection"]["labels_list"],
+            "per_food_portions": food_detection_data["items_detection"]["per_food_portions"],
+            "food_type_to_skill": food_detection_data["items_detection"]["food_type_to_skill"]
+        }
+
+        execution_description = "Food detection data:\n"
+        for key, value in useful_info.items():
+            execution_description += f"{key}: {value}\n"
+
+        return execution_description
 
     def load_behavior(self):
         """
