@@ -1,5 +1,5 @@
 name: "AcquireBite"
-description: "Pickup the appropriate food item from the plate."
+description: "Pick up the appropriate food item from the plate."
 type: "Behavior"
 parameters:
   - name: "Speed"

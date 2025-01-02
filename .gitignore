@@ -6,6 +6,8 @@
 *.zip
 
 src/feeding_deployment/integration/log/behavior_trees
+src/feeding_deployment/integration/log/execution_log.txt
+src/feeding_deployment/integration/log/nuc_execution_log.txt
 src/feeding_deployment/gesture_synthesis/gesture_data/*
 src/feeding_deployment/perception/head_perception/DECA/*
 

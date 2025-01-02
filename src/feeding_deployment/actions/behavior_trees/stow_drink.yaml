@@ -1,5 +1,5 @@
 name: "StowDrink"
-description: "Place the drink on the table."
+description: "Place the mug on the table."
 type: "Behavior"
 parameters: []
 fn: !hla stow_drink

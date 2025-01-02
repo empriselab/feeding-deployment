@@ -1,5 +1,5 @@
 name: "PickWipe"
-description: "Pickup the wipe from the tool mount."
+description: "Pick up the wipe from the tool mount."
 type: "Behavior"
 parameters: []
 fn: !hla pick_wipe
