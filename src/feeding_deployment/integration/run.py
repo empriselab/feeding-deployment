@@ -11,6 +11,7 @@ import sys
 import signal
 import shutil
 import numpy as np
+from tomsutils.llm import OpenAILLM
 
 try:
     import rospy
@@ -28,7 +29,7 @@ from relational_structs import (
     PDDLProblem,
     Predicate,
 )
-from relational_structs.utils import parse_pddl_plan
+from relational_structs.utils import parse_pddl_plan, get_object_combinations
 from tomsutils.pddl_planning import run_pyperplan_planning
 from pybullet_helpers.geometry import Pose
 
@@ -44,6 +45,8 @@ from feeding_deployment.actions.base import (
     GroundHighLevelAction,
     ResetHLA,
     pddl_plan_to_hla_plan,
+    interpret_user_update_request,
+    NodeModificationUserUpdateRequest,
 )
 from feeding_deployment.actions.pick_tool import PickToolHLA
 from feeding_deployment.actions.stow_tool import StowToolHLA
@@ -98,6 +101,11 @@ class _Runner:
 
         self.log_dir = Path(__file__).parent / "log"
         self.log_dir.mkdir(exist_ok=True)
+
+        self.llm = OpenAILLM(
+            model_name="gpt-4o",
+            cache_dir=self.log_dir / "llm_cache",
+        )
 
         # Initialize the perceiver (e.g., get joint states or human head poses).
         self.perception_interface = PerceptionInterface(robot_interface=self.robot_interface, simulate_head_perception=self.simulate_head_perception, log_dir=self.log_dir)
@@ -167,6 +175,11 @@ class _Runner:
         self.wipe = Object("wipe", tool_type)
         self.utensil = Object("utensil", tool_type)
         self.all_objects = {self.drink, self.wipe, self.utensil}
+        self.object_name_to_object = {
+            "drink": self.drink,
+            "wipe": self.wipe,
+            "utensil": self.utensil,
+        }
 
         # Track the current high-level state.
         self.current_atoms = {
@@ -321,6 +334,41 @@ class _Runner:
                 
         print(f"Loaded system state from {self._saved_state_infile}")
 
+    def process_user_update_request(self, request_text: str) -> None:
+        """Validate and update behavior trees."""
+        available_hla_object_names = []
+        for hla_name, hla in sorted(self.hla_name_to_hla.items()):
+            types = [p.type for p in hla.get_operator().parameters]
+            for obj_combo in get_object_combinations(sorted(self.all_objects), types):
+                object_strs = [obj.name for obj in obj_combo]
+                objects_str = ", ".join(object_strs)
+                available_hla_object_name = f"hla_name={hla_name}, hla_object_names=({objects_str},)"
+                available_hla_object_names.append(available_hla_object_name)
+        requested_updates = interpret_user_update_request(request_text, self.llm, available_hla_object_names, self.run_behavior_tree_dir)
+        for update in requested_updates:
+            if isinstance(update, NodeModificationUserUpdateRequest):
+                if update.hla_name not in self.hla_name_to_hla:
+                    print(f"BT UPDATE FAILED: Unknown HLA name {update.hla_name}")
+                    continue
+                hla = self.hla_name_to_hla[update.hla_name]
+                hla_object_list = []
+                failed_object_name = None
+                for obj_name in update.hla_object_names:
+                    if obj_name not in self.object_name_to_object:
+                        failed_object_name = obj_name
+                        break
+                    hla_object_list.append(self.object_name_to_object[obj_name])
+                if failed_object_name is not None:
+                    print(f"BT UPDATE FAILED: Unknown object name {failed_object_name}")
+                    continue
+                assert update.hla_parameters is None
+                ground_hla = GroundHighLevelAction(hla, tuple(hla_object_list))
+                ground_hla.process_behavior_tree_parameter_update(update.node_name, update.parameter_name, update.new_value)
+            else:
+                # TODO: handle node additions
+                raise NotImplementedError
+
+
 
 if __name__ == "__main__":
     import argparse
@@ -365,14 +413,13 @@ if __name__ == "__main__":
     # runner.hla_command_queue.put(drink_transfer_msg)
 
     if not args.use_interface:
-        bite_acquisition = GroundHighLevelAction(runner.hla_name_to_hla["AcquireBite"], (runner.utensil,))
+        # Example of using LLM to generate updates to behavior trees.
+        runner.process_user_update_request("Move a little bit faster while picking up the food")
 
-        # Examples of adding a (safe) node to a behavior tree.
+        # Example of directly updating the behavior trees.
+        bite_acquisition = GroundHighLevelAction(runner.hla_name_to_hla["AcquireBiteWithTool"], (runner.utensil,))
         bite_acquisition.process_behavior_tree_node_addition("Pause", {"duration": 1.0}, "AcquireBite", "before")
         bite_acquisition.process_behavior_tree_node_addition("Pause", {"duration": 0.5}, "AcquireBite", "after")
-
-        # Example of updating a behavior tree parameter.
-        bite_acquisition.process_behavior_tree_parameter_update("AcquireBite", "Speed", 1.25)
 
         # Run some commands.
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))

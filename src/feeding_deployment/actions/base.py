@@ -32,6 +32,8 @@ from relational_structs import (
 )
 from pybullet_helpers.gui import visualize_pose
 
+from tomsutils.llm import LargeLanguageModel
+
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
 from feeding_deployment.interfaces.web_interface import WebInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
@@ -745,3 +747,105 @@ def get_space_yaml_dict(space: Space) -> dict[str, Any]:
         }
 
     raise ValueError(f"Unrecognized space type: {space}")
+
+
+@dataclass(frozen=True)
+class UserUpdateRequest:
+    """A structured request for updating a behavior tree."""
+
+    hla_name: str
+    hla_object_names: tuple[str, ...]
+    hla_parameters: None   # not currently used
+
+
+@dataclass(frozen=True)
+class NodeModificationUserUpdateRequest(UserUpdateRequest):
+    """A request to change the parameters of an existing node."""
+
+    node_name: str
+    parameter_name: str
+    new_value: Any
+
+
+def interpret_user_update_request(
+    request_txt: str,
+    llm: LargeLanguageModel,
+    available_hla_object_names: list[str],
+    behavior_log_path,
+) -> list[UserUpdateRequest]:
+    """Use an LLM to convert natural language into a user update request."""
+
+    # TODO refactor to avoid this copied code from query_llm.py. I'm not yet
+    # sure where this code should live.
+    bite = ["pick_utensil", "look_at_plate", "acquire_bite", "transfer_utensil", "stow_utensil"]
+    drink = ["pick_drink", "transfer_drink", "stow_drink"]
+    wipe = ["pick_wipe", "transfer_wipe", "stow_wipe"]
+
+    all_nodes_description = ""
+    
+    # Load the behavior trees.
+    all_nodes_description += "Bite:\n"
+    for bite_node in bite:
+        with open(behavior_log_path / f"{bite_node}.yaml", 'r') as f:
+            node_description = f.read()
+        all_nodes_description += node_description + "\n---\n"
+
+    all_nodes_description += "Drink:\n"
+    for drink_node in drink:
+        with open(behavior_log_path / f"{drink_node}.yaml", 'r') as f:
+            node_description = f.read()
+        all_nodes_description += node_description + "\n---\n"
+
+    all_nodes_description += "Wipe:\n"
+    for wipe_node in wipe:
+        with open(behavior_log_path / f"{wipe_node}.yaml", 'r') as f:
+            node_description = f.read()
+        all_nodes_description += node_description + "\n---\n"
+
+    hla_object_name_str = ", ".join(available_hla_object_names)
+
+    prompt = """Your job is to convert the following command into one or more structured outputs in a format that I will describe next.
+
+The command is: %s
+
+The available structured output types are:
+
+@dataclass(frozen=True)
+class UserUpdateRequest:
+    hla_name: str
+    hla_object_names: tuple[str, ...]
+    hla_parameters: None   # not currently used
+
+@dataclass(frozen=True)
+class NodeModificationUserUpdateRequest(UserUpdateRequest):
+    node_name: str
+    parameter_name: str
+    new_value: Any
+
+The "hla" stands for high-level action. Each hla can be grounded with zero or more object names. The possible hla and object combinations are:
+%s
+
+IMPORTANT: make sure your hla_object_names and hla_name appear together in the list above!
+
+The hla parameters can be ignored for now.
+
+A NodeModificationUserUpdateRequest a request to modify one parameter for one node in a behavior tree associated with an hla.
+
+Here are all behavior trees:
+%s
+
+Based on the information given, convert the original command into a list of one or more structured outputs.
+
+Return your answer in a format where calling eval() in python will directly produce a list of UserUpdateRequest instances.
+""" % (request_txt, hla_object_name_str, all_nodes_description)
+
+    response = llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
+    if response.startswith("```python"):
+        response = response[len("```python"):]
+    if response.endswith("```"):
+        response = response[:-len("```")]
+
+    # This is really not safe but I'm not actually worried.
+    pythonic_response = eval(response)
+
+    return pythonic_response
