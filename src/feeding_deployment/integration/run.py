@@ -342,7 +342,7 @@ class _Runner:
             for obj_combo in get_object_combinations(sorted(self.all_objects), types):
                 object_strs = [obj.name for obj in obj_combo]
                 objects_str = ", ".join(object_strs)
-                available_hla_object_name = f"{hla_name}({objects_str})"
+                available_hla_object_name = f"hla_name={hla_name}, hla_object_names=({objects_str},)"
                 available_hla_object_names.append(available_hla_object_name)
         requested_updates = interpret_user_update_request(request_text, self.llm, available_hla_object_names, self.run_behavior_tree_dir)
         for update in requested_updates:
@@ -357,6 +357,7 @@ class _Runner:
                     if obj_name not in self.object_name_to_object:
                         failed_object_name = obj_name
                         break
+                    hla_object_list.append(self.object_name_to_object[obj_name])
                 if failed_object_name is not None:
                     print(f"BT UPDATE FAILED: Unknown object name {failed_object_name}")
                     continue
@@ -416,7 +417,7 @@ if __name__ == "__main__":
         runner.process_user_update_request("Move a little bit faster while picking up the food")
 
         # Example of directly updating the behavior trees.
-        bite_acquisition = GroundHighLevelAction(runner.hla_name_to_hla["AcquireBite"], (runner.utensil,))
+        bite_acquisition = GroundHighLevelAction(runner.hla_name_to_hla["AcquireBiteWithTool"], (runner.utensil,))
         bite_acquisition.process_behavior_tree_node_addition("Pause", {"duration": 1.0}, "AcquireBite", "before")
         bite_acquisition.process_behavior_tree_node_addition("Pause", {"duration": 0.5}, "AcquireBite", "after")
 
