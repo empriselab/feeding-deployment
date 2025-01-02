@@ -5,6 +5,7 @@ import numpy as np
 import math
 import time
 from pathlib import Path
+from tomsutils.llm import OpenAILLM
 
 class GPTInterface:
     def __init__(self):
@@ -29,14 +30,21 @@ class GPTInterface:
 
 class Transparency:
     def __init__(self):
-        self.gpt = GPTInterface()
+
+        log_dir = Path(__file__).parent.parent / "integration" / "log"
+
+        self.llm = OpenAILLM(
+            model_name="gpt-4o",
+            cache_dir=log_dir / "llm_cache",
+        )
+
         with open('prompt.txt', 'r') as f:
             self.prompt_skeleton = f.read()
 
-        self.behavior_log_path = Path(__file__).parent.parent / "integration" / "log" / "behavior_trees"
-        self.execution_log_path = Path(__file__).parent.parent / "integration" / "log" / "execution_log.txt"
-        self.nuc_execution_log_path = Path(__file__).parent.parent / "integration" / "log" / "nuc_execution_log.txt"
-        self.sensor_log_path = Path(__file__).parent.parent / "integration" / "log"
+        self.behavior_log_path = log_dir / "behavior_trees"
+        self.execution_log_path = log_dir / "execution_log.txt"
+        self.nuc_execution_log_path = log_dir / "nuc_execution_log.txt"
+        self.sensor_log_path = log_dir
 
         self.query_history = ""
 
@@ -79,12 +87,13 @@ class Transparency:
         """
         
         execution_description = ""
-        with open(self.execution_log_path, 'r') as f:
-            execution_description = f.read()
+        if self.execution_log_path.exists():
+            with open(self.execution_log_path, 'r') as f:
+                execution_description = f.read()
 
-        with open(self.nuc_execution_log_path, 'r') as f:
-            nuc_execution_description = f.read()
-        execution_description += nuc_execution_description
+            with open(self.nuc_execution_log_path, 'r') as f:
+                nuc_execution_description = f.read()
+            execution_description += nuc_execution_description
 
         return execution_description
     
@@ -120,7 +129,7 @@ class Transparency:
         execution = self.load_execution()
         sensor = self.load_sensor()
         prompt = self.prompt_skeleton%(behavior, execution, sensor, self.query_history, query)
-        response = self.gpt.chat_with_openai(prompt)
+        response = self.llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
 
         self.query_history += f"Query: {query}\nResponse: {response}\n\n"
         return response
