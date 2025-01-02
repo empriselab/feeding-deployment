@@ -32,30 +32,10 @@ class Transparency:
         self.gpt = GPTInterface()
         with open('prompt.txt', 'r') as f:
             self.prompt_skeleton = f.read()
-    
-    def load_execution(self):
-        """
-        Loads the current execution log from the log directory.
-        """
 
-        # For now I am just using food detection data, but I need to identify all the data that needs to be logged / used for transparency.
-        self.execution_log_path = Path(__file__).parent.parent / "integration" / "log"
-
-        # read from "food_detection_data.pkl"
-        with open(self.execution_log_path / "food_detection_data.pkl", 'rb') as f:
-            food_detection_data = pickle.load(f)
-
-        useful_info = {
-            "labels_list": food_detection_data["items_detection"]["labels_list"],
-            "per_food_portions": food_detection_data["items_detection"]["per_food_portions"],
-            "food_type_to_skill": food_detection_data["items_detection"]["food_type_to_skill"]
-        }
-
-        execution_description = "Food detection data:\n"
-        for key, value in useful_info.items():
-            execution_description += f"{key}: {value}\n"
-
-        return execution_description
+        self.behavior_log_path = Path(__file__).parent.parent / "integration" / "log" / "behavior_trees"
+        self.execution_log_path = Path(__file__).parent.parent / "integration" / "log" / "execution_log.txt"
+        self.sensor_log_path = Path(__file__).parent.parent / "integration" / "log"
 
     def load_behavior(self):
         """
@@ -66,8 +46,6 @@ class Transparency:
         bite = ["pick_utensil", "look_at_plate", "acquire_bite", "transfer_utensil", "stow_utensil"]
         drink = ["pick_drink", "transfer_drink", "stow_drink"]
         wipe = ["pick_wipe", "transfer_wipe", "stow_wipe"]
-
-        self.behavior_log_path = Path(__file__).parent.parent / "integration" / "log" / "behavior_trees"
 
         all_nodes_description = ""
         
@@ -91,6 +69,40 @@ class Transparency:
             all_nodes_description += node_description + "\n---\n"
 
         return all_nodes_description
+    
+    def load_execution(self):
+        """
+        Loads the current execution log from the log directory.
+        """
+        
+        execution_description = ""
+        with open(self.execution_log_path, 'r') as f:
+            execution_description = f.read()
+
+        return execution_description
+    
+    def load_sensor(self):
+        """
+        Loads the current sensor log from the log directory.
+        """
+
+        # For now I am just using food detection data, but I need to identify all the data that needs to be logged / used for transparency.
+
+        # read from "food_detection_data.pkl"
+        with open(self.sensor_log_path / "food_detection_data.pkl", 'rb') as f:
+            food_detection_data = pickle.load(f)
+
+        useful_info = {
+            "labels_list": food_detection_data["items_detection"]["labels_list"],
+            "per_food_portions": food_detection_data["items_detection"]["per_food_portions"],
+            "food_type_to_skill": food_detection_data["items_detection"]["food_type_to_skill"]
+        }
+
+        sensor_data_description = "Food detection data:\n"
+        for key, value in useful_info.items():
+            sensor_data_description += f"{key}: {value}\n"
+
+        return sensor_data_description
 
     def answer_query(self, query):
         """
@@ -99,7 +111,8 @@ class Transparency:
 
         behavior = self.load_behavior()
         execution = self.load_execution()
-        prompt = self.prompt_skeleton%(behavior, execution, query)
+        sensor = self.load_sensor()
+        prompt = self.prompt_skeleton%(behavior, execution, sensor, query)
         response = self.gpt.chat_with_openai(prompt)
         return response
     

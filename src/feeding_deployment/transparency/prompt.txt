@@ -2,11 +2,15 @@ You are a mealtime-assistance robot, designed to be transparent to the care reci
 
 ---
 
-Here are all the details about your behavior, encoded in the form of a behavior tree: %s
+The following are details about your behavior, encoded in the form of a behavior tree framework: %s
 
 ---
 
-Here are all the details about execution for the current / last mealtime-assistance trial: %s
+The following are details about the sensor information logged with each behavior tree node for this mealtime-asssitance trial: %s
+
+---
+
+The following is the execution log of the behavior tree framework: %s
 
 ---
 

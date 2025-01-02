@@ -396,6 +396,9 @@ class FunctionalBehaviorTreeParameterizedPolicy(BehaviorTreeParameterizedPolicy)
 class BehaviorTreeNode(abc.ABC):
     """A node in a behavior tree."""
 
+    # using for creating an execution log of the behavior tree
+    _execution_log_path = Path(__file__).parent.parent / "integration" / "log" / "execution_log.txt"
+
     def __init__(self, name: str, description: str) -> None:
         self._name = name
         self._description = description
@@ -412,6 +415,16 @@ class BehaviorTreeNode(abc.ABC):
     def get_yaml_dict(self, hla: HighLevelAction) -> dict[str, Any]:
         """Get a dictionary to pass to yaml.dump()."""
 
+    def log_start(self) -> None:
+        """Log the start of execution."""
+        with open(self._execution_log_path, 'a') as f:
+            f.write(f"Starting node: {self._name}\n")
+
+    def log_end(self) -> None:
+        """Log the end of execution."""
+        with open(self._execution_log_path, 'a') as f:
+            f.write(f"Finished executing node: {self._name}\n")
+
 
 class ParameterizedActionBehaviorTreeNode(BehaviorTreeNode):
     """A node in a behavior tree that executes a parameterized action open-loop.
@@ -427,7 +440,9 @@ class ParameterizedActionBehaviorTreeNode(BehaviorTreeNode):
         self._bindings = bindings
 
     def tick(self) -> bool:
+        self.log_start()
         self._policy.run(self._bindings)
+        self.log_end()
         return True  # assume this worked
 
     def get_node(self, name: str) -> BehaviorTreeNode | None:
@@ -475,8 +490,10 @@ class SequenceBehaviorTreeNode(BehaviorTreeNode):
         self._children = children
 
     def tick(self) -> bool:
+        self.log_start()
         for child in self._children:
             child.tick()
+        self.log_end()
         return True  # assume everything worked
 
     def get_node(self, name: str) -> BehaviorTreeNode | None:
