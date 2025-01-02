@@ -367,8 +367,9 @@ if __name__ == "__main__":
     if not args.use_interface:
         bite_acquisition = GroundHighLevelAction(runner.hla_name_to_hla["AcquireBite"], (runner.utensil,))
 
-        # Example of adding a (safe) node to a behavior tree.
+        # Examples of adding a (safe) node to a behavior tree.
         bite_acquisition.process_behavior_tree_node_addition("Pause", {"duration": 1.0}, "AcquireBite", "before")
+        bite_acquisition.process_behavior_tree_node_addition("Pause", {"duration": 0.5}, "AcquireBite", "after")
 
         # Example of updating a behavior tree parameter.
         bite_acquisition.process_behavior_tree_parameter_update("AcquireBite", "Speed", 1.25)
