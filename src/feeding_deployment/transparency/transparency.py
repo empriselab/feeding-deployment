@@ -35,6 +35,7 @@ class Transparency:
 
         self.behavior_log_path = Path(__file__).parent.parent / "integration" / "log" / "behavior_trees"
         self.execution_log_path = Path(__file__).parent.parent / "integration" / "log" / "execution_log.txt"
+        self.nuc_execution_log_path = Path(__file__).parent.parent / "integration" / "log" / "nuc_execution_log.txt"
         self.sensor_log_path = Path(__file__).parent.parent / "integration" / "log"
 
         self.query_history = ""
@@ -80,6 +81,10 @@ class Transparency:
         execution_description = ""
         with open(self.execution_log_path, 'r') as f:
             execution_description = f.read()
+
+        with open(self.nuc_execution_log_path, 'r') as f:
+            nuc_execution_description = f.read()
+        execution_description += nuc_execution_description
 
         return execution_description
     
