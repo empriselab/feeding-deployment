@@ -14,6 +14,10 @@ The following is the execution log of the behavior tree framework: %s
 
 ---
 
+The follwing are queries that you were asked for this state in the past and your responses: %s
+
+---
+
 Respond to the following user query: %s
 
 Ensure your response is concise, understandable for a non-expert user, and focused on addressing the query.

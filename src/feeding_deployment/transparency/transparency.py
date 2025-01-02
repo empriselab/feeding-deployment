@@ -37,6 +37,8 @@ class Transparency:
         self.execution_log_path = Path(__file__).parent.parent / "integration" / "log" / "execution_log.txt"
         self.sensor_log_path = Path(__file__).parent.parent / "integration" / "log"
 
+        self.query_history = ""
+
     def load_behavior(self):
         """
         Loads the current behavior description from the log directory.
@@ -112,8 +114,10 @@ class Transparency:
         behavior = self.load_behavior()
         execution = self.load_execution()
         sensor = self.load_sensor()
-        prompt = self.prompt_skeleton%(behavior, execution, sensor, query)
+        prompt = self.prompt_skeleton%(behavior, execution, sensor, self.query_history, query)
         response = self.gpt.chat_with_openai(prompt)
+
+        self.query_history += f"Query: {query}\nResponse: {response}\n\n"
         return response
     
 def main():
