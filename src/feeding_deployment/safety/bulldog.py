@@ -53,7 +53,9 @@ class BullDog:
 
         self.bulldog_status_pub = rospy.Publisher('/bulldog_status', Bool, queue_size=1)
 
-        # For transmitting logs to isacc
+        # Path is hardcoded because emprise uses two machines, 
+        # isacc for compute and nuc for robot control, 
+        # and we need to transmit logs from nuc (where bulldog runs) to isacc
         self.remote_execution_log_path = "/home/isacc/deployment_ws/src/feeding-deployment/src/feeding_deployment/integration/log/nuc_execution_log.txt"
         hostname = "192.168.1.2"
         username = "isacc"

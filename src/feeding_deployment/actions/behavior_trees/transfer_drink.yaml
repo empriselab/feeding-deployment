@@ -1,5 +1,5 @@
 name: "TransferDrink"
-description: "Bring the drink to the users mouth for a sip."
+description: "Bring the mug to the user's mouth for a sip."
 type: "Behavior"
 parameters: []
 fn: !hla transfer_drink
