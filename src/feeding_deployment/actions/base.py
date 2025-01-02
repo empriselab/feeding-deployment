@@ -140,6 +140,9 @@ class HighLevelAction(abc.ABC):
         new_node_dict = self.create_user_addition_node_dict(new_node_name, new_node_type, new_node_parameters)
         if new_node_dict is None:  # node addition was misspecified / not safe
             return
+        if before_or_after not in ("before", "after"):
+            print(f"BT UPDATE FAILED. Invalid before or after: {before_or_after}")
+            return
         # Create the node itself.
         new_node = _parse_node(new_node_dict)
         # Load the current behavior tree.
