@@ -365,9 +365,14 @@ if __name__ == "__main__":
     # runner.hla_command_queue.put(drink_transfer_msg)
 
     if not args.use_interface:
-        # Example of updating a behavior tree parameer.
         bite_acquisition = GroundHighLevelAction(runner.hla_name_to_hla["AcquireBite"], (runner.utensil,))
-        bite_acquisition.process_behavior_tree_update("AcquireBite", "Speed", 1.25)
+
+        # Examples of adding a (safe) node to a behavior tree.
+        bite_acquisition.process_behavior_tree_node_addition("Pause", {"duration": 1.0}, "AcquireBite", "before")
+        bite_acquisition.process_behavior_tree_node_addition("Pause", {"duration": 0.5}, "AcquireBite", "after")
+
+        # Example of updating a behavior tree parameter.
+        bite_acquisition.process_behavior_tree_parameter_update("AcquireBite", "Speed", 1.25)
 
         # Run some commands.
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
