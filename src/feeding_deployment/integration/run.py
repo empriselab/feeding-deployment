@@ -321,6 +321,10 @@ class _Runner:
                 
         print(f"Loaded system state from {self._saved_state_infile}")
 
+    def process_user_update_request(self, request_text: str) -> None:
+        """Validate and update behavior trees."""
+        import ipdb; ipdb.set_trace()
+
 
 if __name__ == "__main__":
     import argparse
@@ -365,14 +369,15 @@ if __name__ == "__main__":
     # runner.hla_command_queue.put(drink_transfer_msg)
 
     if not args.use_interface:
-        bite_acquisition = GroundHighLevelAction(runner.hla_name_to_hla["AcquireBite"], (runner.utensil,))
+        # Example of using LLM to generate updates to behavior trees.
+        runner.process_user_update_request("Pause for 1 second before getting the food with the fork")
+        runner.process_user_update_request("Stop for half a second after picking up the food")
+        runner.process_user_update_request("Move a little bit faster while picking up the food")
 
-        # Examples of adding a (safe) node to a behavior tree.
-        bite_acquisition.process_behavior_tree_node_addition("Pause", {"duration": 1.0}, "AcquireBite", "before")
-        bite_acquisition.process_behavior_tree_node_addition("Pause", {"duration": 0.5}, "AcquireBite", "after")
-
-        # Example of updating a behavior tree parameter.
-        bite_acquisition.process_behavior_tree_parameter_update("AcquireBite", "Speed", 1.25)
+        # bite_acquisition = GroundHighLevelAction(runner.hla_name_to_hla["AcquireBite"], (runner.utensil,))
+        # bite_acquisition.process_behavior_tree_node_addition("Pause", {"duration": 1.0}, "AcquireBite", "before")
+        # bite_acquisition.process_behavior_tree_node_addition("Pause", {"duration": 0.5}, "AcquireBite", "after")
+        # bite_acquisition.process_behavior_tree_parameter_update("AcquireBite", "Speed", 1.25)
 
         # Run some commands.
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
