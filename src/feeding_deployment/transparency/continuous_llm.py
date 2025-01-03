@@ -33,9 +33,10 @@ class TransparencyContinuous(TransparencyBase):
                 prompt = self.prompt_skeleton%(old_behavior, behavior, old_execution, execution, old_sensor, sensor, self.explanation_history)
                 response = self.llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
                 print(response)
-                if response == "No updates":
-                    continue
                 self.explanation_history += response + "\n"
+                old_behavior, old_execution, old_sensor = behavior, execution, sensor
+            # else:
+                # print("No change in behavior, execution, or sensor.")
 
 def main():
     transparency_continuous = TransparencyContinuous()

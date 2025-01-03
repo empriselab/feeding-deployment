@@ -12,7 +12,7 @@ NEW BEHAVIOR TREE:
 
 ---
 
-The following are details about the sensor information logged with each behavior tree node for this mealtime-assitance trial: %s
+The following are details about the sensor information logged with each behavior tree node for this mealtime-assitance trial:
 
 OLD SENSOR LOG:
 %s
@@ -37,4 +37,4 @@ The following are the explanations that you have generated up until now:
 
 ---
 
-Based on any differences or updates in the behavior tree, sensor log, or execution log, generate a new explanation that is clear to a non-expert. Make sure your explanation naturally continues from the previous explanations. If there is abosolutely no updates, exactly output "No updates" as your explanation.
+Based on any differences in the behavior tree, sensor log, or execution log, generate a single-sentence explanation about the change that is clear to a non-expert. State only what has changed without naming any specific node or using internal encoding, and ensure the explanation naturally continues from the previous explanations.
