@@ -7,118 +7,15 @@ import time
 from pathlib import Path
 from tomsutils.llm import OpenAILLM
 
-class GPTInterface:
+from feeding_deployment.transparency.base import TransparencyBase
+
+class TransparencyQuery(TransparencyBase):
+
     def __init__(self):
-        self.api_key =  os.environ.get('OPENAI_API_KEY')
-        self.client = OpenAI(api_key=self.api_key)
-        
-    def chat_with_openai(self, prompt):
-        """
-        Sends the prompt to OpenAI API using the chat interface and gets the model's response.
-        """
-        message = {
-                    'role': 'user',
-                    'content': prompt
-                  }
-        response = self.client.chat.completions.create(
-                   model='gpt-4o',
-                   messages=[message]
-                  )
-        chatbot_response = response.choices[0].message.content
-        return chatbot_response.strip()
-    
-
-class Transparency:
-    def __init__(self):
-
-        log_dir = Path(__file__).parent.parent / "integration" / "log"
-
-        self.llm = OpenAILLM(
-            model_name="gpt-4o",
-            cache_dir=log_dir / "llm_cache",
-        )
-
-        with open('prompt.txt', 'r') as f:
+        super().__init__()
+        with open(Path(__file__).parent / "query_prompt.txt", 'r') as f:
             self.prompt_skeleton = f.read()
-
-        self.behavior_log_path = log_dir / "behavior_trees"
-        self.execution_log_path = log_dir / "execution_log.txt"
-        self.nuc_execution_log_path = log_dir / "nuc_execution_log.txt"
-        self.sensor_log_path = log_dir
-
         self.query_history = ""
-
-    def load_behavior(self):
-        """
-        Loads the current behavior description from the log directory.
-        """
-
-        # For now I am sequencing them in a fixed order, but ideally this should reflect integration with the web interface.
-        bite = ["pick_utensil", "look_at_plate", "acquire_bite", "transfer_utensil", "stow_utensil"]
-        drink = ["pick_drink", "transfer_drink", "stow_drink"]
-        wipe = ["pick_wipe", "transfer_wipe", "stow_wipe"]
-
-        all_nodes_description = ""
-        
-        # Load the behavior trees
-        all_nodes_description += "Bite:\n"
-        for bite_node in bite:
-            with open(self.behavior_log_path / f"{bite_node}.yaml", 'r') as f:
-                node_description = f.read()
-            all_nodes_description += node_description + "\n---\n"
-
-        all_nodes_description += "Drink:\n"
-        for drink_node in drink:
-            with open(self.behavior_log_path / f"{drink_node}.yaml", 'r') as f:
-                node_description = f.read()
-            all_nodes_description += node_description + "\n---\n"
-
-        all_nodes_description += "Wipe:\n"
-        for wipe_node in wipe:
-            with open(self.behavior_log_path / f"{wipe_node}.yaml", 'r') as f:
-                node_description = f.read()
-            all_nodes_description += node_description + "\n---\n"
-
-        return all_nodes_description
-    
-    def load_execution(self):
-        """
-        Loads the current execution log from the log directory.
-        """
-        
-        execution_description = ""
-        if self.execution_log_path.exists():
-            with open(self.execution_log_path, 'r') as f:
-                execution_description = f.read()
-
-            with open(self.nuc_execution_log_path, 'r') as f:
-                nuc_execution_description = f.read()
-            execution_description += nuc_execution_description
-
-        return execution_description
-    
-    def load_sensor(self):
-        """
-        Loads the current sensor log from the log directory.
-        """
-
-        # For now I am just using food detection data, but I need to identify all the data that needs to be logged / used for transparency.
-
-        # read from "food_detection_data.pkl"
-        with open(self.sensor_log_path / "food_detection_data.pkl", 'rb') as f:
-            food_detection_data = pickle.load(f)
-
-        useful_info = {
-            "labels_list": food_detection_data["items_detection"]["labels_list"],
-            "per_food_portions": food_detection_data["items_detection"]["per_food_portions"],
-            "food_type_to_skill": food_detection_data["items_detection"]["food_type_to_skill"]
-        }
-
-        sensor_data_description = "Food detection data:\n"
-        for key, value in useful_info.items():
-            sensor_data_description += f"{key}: {value}\n"
-
-        return sensor_data_description
 
     def answer_query(self, query):
         """
@@ -133,15 +30,15 @@ class Transparency:
 
         self.query_history += f"Query: {query}\nResponse: {response}\n\n"
         return response
-    
+
 def main():
-    transparency = Transparency()
+    transparency_query = TransparencyQuery()
     print("Ready to answer queries. Type 'exit' to quit.")
     while True:
         query = input("Enter a query: ")
         if query == 'exit':
             break
-        response = transparency.answer_query(query)
+        response = transparency_query.answer_query(query)
         print("Response: ", response)
 
 if __name__ == '__main__':
