@@ -33,7 +33,7 @@ class LookAtPlateHLA(HighLevelAction):
     """Look at plate in preparation of bite acquisition."""
 
     def get_name(self) -> str:
-        return "LookAtPlate"
+        return "LookAtPlateWhileHolding"
 
     def get_operator(self) -> LiftedOperator:
         tool = Variable("?tool", tool_type)
@@ -234,7 +234,7 @@ class AcquireBiteHLA(HighLevelAction):
         self.food_manipulation_skill_library = FoodManipulationSkillLibrary(self.sim, self.robot_interface, self.wrist_interface, self.perception_interface, self.rviz_interface, self.no_waits)
 
     def get_name(self) -> str:
-        return "AcquireBite"
+        return "AcquireBiteWithTool"
 
     def get_operator(self) -> LiftedOperator:
         tool = Variable("?tool", tool_type)

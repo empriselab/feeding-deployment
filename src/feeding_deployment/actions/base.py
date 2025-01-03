@@ -802,7 +802,7 @@ def interpret_user_update_request(
             node_description = f.read()
         all_nodes_description += node_description + "\n---\n"
 
-    hla_object_name_str = ", ".join(available_hla_object_names)
+    hla_object_name_str = "\n".join(available_hla_object_names)
 
     prompt = """Your job is to convert the following command into one or more structured outputs in a format that I will describe next.
 
