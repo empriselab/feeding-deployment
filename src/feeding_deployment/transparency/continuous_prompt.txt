@@ -37,4 +37,4 @@ The following are the explanations that you have generated up until now:
 
 ---
 
-Based on any differences in the behavior tree, sensor log, or execution log, generate a single-sentence explanation about the change that is clear to a non-expert. State only what has changed without naming any specific node or using internal encoding, and ensure the explanation naturally continues from the previous explanations.
+Based on any differences in the behavior tree, sensor log, or execution log, generate a single-sentence explanation about the change that is clear to a non-expert. State only what has changed without naming any specific node or using internal encoding or speculating about the effect of the change. Ensure the explanation naturally continues from the previous explanations.

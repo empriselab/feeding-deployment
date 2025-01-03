@@ -24,7 +24,7 @@ class TransparencyContinuous(TransparencyBase):
         old_sensor = self.load_sensor()
 
         while True:
-            time.sleep(1)
+            time.sleep(5)
             behavior = self.load_behavior()
             execution = self.load_execution()
             sensor = self.load_sensor()
