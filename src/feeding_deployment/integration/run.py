@@ -30,7 +30,7 @@ from relational_structs import (
     Predicate,
 )
 from relational_structs.utils import parse_pddl_plan, get_object_combinations
-from tomsutils.pddl_planning import run_pyperplan_planning
+from tomsutils.pddl_planning import run_pddl_planner
 from pybullet_helpers.geometry import Pose
 
 from feeding_deployment.actions.base import (
@@ -279,8 +279,8 @@ class _Runner:
             self.current_atoms,
             goal_atoms,
         )
-        plan_strs = run_pyperplan_planning(
-            str(self.domain), str(problem), heuristic="lmcut", search="astar"
+        plan_strs = run_pddl_planner(
+            str(self.domain), str(problem), planner="fd-opt",
         )
         assert plan_strs is not None
         plan_ops = parse_pddl_plan(plan_strs, self.domain, problem)
