@@ -44,7 +44,7 @@ class TransferToolHLA(HighLevelAction):
         else:
             raise ValueError("Bite transfer type not recognized")
 
-        self.ready_for_transfer_interaction = "silent" # "silent", "voice" or "led"
+        self.ready_for_transfer_interaction = "voice" # "silent", "voice" or "led"
         self.initiate_transfer_interaction = "open_mouth" # "button", "open_mouth" or "auto_timeout"
         self.transfer_complete_interaction = "sense" # "button", "sense" or "auto_timeout"
     
@@ -74,11 +74,17 @@ class TransferToolHLA(HighLevelAction):
             self.perception_interface.auto_timeout()
         print("Detected transfer completion")
 
+    def relay_ready_to_initiate_transfer(self):
+        if self.ready_for_transfer_interaction == "silent":
+            pass
+        elif self.ready_for_transfer_interaction == "voice":
+            self.perception_interface.speak("Please open your mouth when ready")
+
     def relay_ready_for_transfer(self):
         if self.ready_for_transfer_interaction == "silent":
             pass
         elif self.ready_for_transfer_interaction == "voice":
-            self.perception_interface.speak("Please ooopen your mouth when ready")
+            self.perception_interface.speak("Ready for transfer")
 
     def execute_transfer(self, maintain_position_at_goal = False):
 
@@ -96,12 +102,13 @@ class TransferToolHLA(HighLevelAction):
                 input("Press enter to switch to task compliant mode")
             self.robot_interface.switch_to_task_compliant_mode()
 
-        self.relay_ready_for_transfer()
+        self.relay_ready_to_initiate_transfer()
         self.detect_initiate_transfer()
 
         self.transfer.set_tool(self.tool)
         self.transfer.move_to_transfer_state(maintain_position_at_goal)
 
+        self.relay_ready_for_transfer()
         self.detect_transfer_complete()
 
         # shutdown the head perception thread

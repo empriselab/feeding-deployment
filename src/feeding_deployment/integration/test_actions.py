@@ -169,8 +169,8 @@ def _main(
     # Create skills for high-level planning.
     hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
 
-    test_LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, tool, no_waits)
-    test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, tool, no_waits)
+    # test_LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, tool, no_waits)
+    # test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, tool, no_waits)
     test_TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, tool, no_waits)
 
 if __name__ == "__main__":
