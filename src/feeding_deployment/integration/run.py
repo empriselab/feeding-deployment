@@ -435,7 +435,6 @@ if __name__ == "__main__":
         # Example of directly updating the behavior trees.
         bite_acquisition = GroundHighLevelAction(runner.hla_name_to_hla["AcquireBiteWithTool"], (runner.utensil,))
 
-        # We can later do this interpretation stuff inside the HLA or inside gesture detection.
         gesture_fn_text = """
 def my_custom_gesture_detector(robot, threshold, timeout):
     print("Detecting gesture...")
