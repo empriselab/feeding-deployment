@@ -148,6 +148,13 @@ class _Runner:
         for original_bt_filename in original_behavior_tree_dir.glob("*.yaml"):
             shutil.copy(original_bt_filename, self.run_behavior_tree_dir)
 
+        # Copy the initial gesture detction file into a directory for this run,
+        # where it will be updated from LLM-based few-shot learning.
+        original_gesture_detection_filepath = Path(__file__).parents[1] / "perception" / "gesture_synthesis" / "synthesized_gesture_detectors.py"
+        assert original_gesture_detection_filepath.exists()
+        shutil.copy(original_gesture_detection_filepath, self.run_behavior_tree_dir)
+        self._gesture_detection_filepath = self.run_behavior_tree_dir / original_gesture_detection_filepath.name
+
         # Create skills for high-level planning.
         hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
         print("Creating HLAs...")
@@ -367,7 +374,16 @@ class _Runner:
             else:
                 # TODO: handle node additions
                 raise NotImplementedError
-
+            
+    def register_gesture_detector(self, gesture_fn_name: str, gesture_fn_text: str) -> bool:
+        """Add the gesture function to this run's python file."""
+        with open(self._gesture_detection_filepath, "r", encoding="utf-8") as f:
+            gesture_file_text = f.read()
+        assert f"def {gesture_fn_name}(" not in gesture_file_text
+        gesture_file_text += "\n" + gesture_fn_text + "\n"
+        with open(self._gesture_detection_filepath, "w", encoding="utf-8") as f:
+            f.write(gesture_file_text)
+        print(f"Registered new gesture detection function: {gesture_fn_name}")
 
 
 if __name__ == "__main__":
@@ -418,7 +434,18 @@ if __name__ == "__main__":
 
         # Example of directly updating the behavior trees.
         bite_acquisition = GroundHighLevelAction(runner.hla_name_to_hla["AcquireBiteWithTool"], (runner.utensil,))
-        bite_acquisition.process_behavior_tree_node_addition("Pause", {"duration": 1.0}, "AcquireBite", "before")
+
+        # We can later do this interpretation stuff inside the HLA or inside gesture detection.
+        gesture_fn_text = """
+def my_custom_gesture_detector(robot, threshold, timeout):
+    print("Detecting gesture...")
+    time.sleep(timeout)
+    return True
+"""
+        gesture_fn_name = "my_custom_gesture_detector"
+        runner.register_gesture_detector(gesture_fn_name, gesture_fn_text)
+
+        bite_acquisition.process_behavior_tree_node_addition("WaitForGesture", {"gesture_fn_name": gesture_fn_name}, "AcquireBite", "before")
         bite_acquisition.process_behavior_tree_node_addition("Pause", {"duration": 0.5}, "AcquireBite", "after")
 
         # Run some commands.

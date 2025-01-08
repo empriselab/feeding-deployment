@@ -248,6 +248,30 @@ class HighLevelAction(abc.ABC):
                 ],
                 "fn": self.pause,
             }
+        
+        if new_node_type == "WaitForGesture":
+            if "gesture_fn_name" not in new_node_parameters:
+                print("BT UPDATE FAILED: missing parameter gesture_fn_name")
+                return
+            gesture_fn_name = new_node_parameters["gesture_fn_name"]
+            return {
+                "type": "Behavior",
+                "name": new_node_name,
+                "description": "User-added gesture detector.",
+                "parameters": [
+                {
+                    "name": "GestureDetector",
+                    "space": {
+                        "type": "Text",
+                    },
+                    "description": "Gesture detection function name.",
+                    "is_user_editable": True,
+                    "value": gesture_fn_name,
+                },
+                ],
+                "fn": self.wait_for_gesture,
+            }
+
 
         print(f"BT UPDATE FAILED: invalid new node type {new_node_type}")
         return None
@@ -303,6 +327,9 @@ class HighLevelAction(abc.ABC):
 
     def pause(self, duration: float) -> None:
         time.sleep(duration)
+
+    def wait_for_gesture(self, gesture_fn_name: str) -> None:
+        import ipdb; ipdb.set_trace()
 
     def execute_robot_command(self, robot_command: KinovaCommand, plan_viz: list[FeedingDeploymentWorldState] = None, tool_update: str = None) -> None:
         """Execute the given commands on the robot."""
