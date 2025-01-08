@@ -342,16 +342,11 @@ class HighLevelAction(abc.ABC):
         assert gesture_fn_name in local_namespace
 
         # Add constants that we will pass to the gesture detector.
-        local_namespace["ROBOT"] = self.robot_interface
+        local_namespace["PERCEPTION_INTERFACE"] = self.perception_interface
         local_namespace["TIMEOUT"] = 5.0
 
         # Create a snippet that will actually run gesture detection in a loop.
-        wait_for_gesture_code_text = f"""
-while True:  # maybe do max retries instead?
-    if {gesture_fn_name}(ROBOT, TIMEOUT):
-        break
-    time.sleep(1.0)  # or whatever
-"""
+        wait_for_gesture_code_text = f"""{gesture_fn_name}(PERCEPTION_INTERFACE, TIMEOUT):"""
         # Run the code.
         exec(wait_for_gesture_code_text, local_namespace)
 

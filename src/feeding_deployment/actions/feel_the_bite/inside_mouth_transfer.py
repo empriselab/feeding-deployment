@@ -4,6 +4,12 @@ import numpy as np
 from scipy.spatial.transform import Rotation, Slerp
 import time
 
+try:
+    import rospy
+    from std_msgs.msg import Bool
+except ModuleNotFoundError:
+    ROSPY_IMPORTED = False
+
 # Parameters
 OPEN_LOOP_RADIUS = 0.02
 # OPEN_LOOP_RADIUS = 0.0
@@ -66,6 +72,9 @@ class InsideMouthTransfer(Transfer):
 
     def move_to_transfer_state(self, maintain_position_at_goal = False):
 
+        if self.robot_interface is not None:
+            self.set_filter_noisy_readings_pub.publish(Bool(data=True))
+
         head_perception_data = self.perception_interface.get_head_perception_data()
         forque_target_base = head_perception_data["tool_tip_target_pose"]
 
@@ -125,6 +134,9 @@ class InsideMouthTransfer(Transfer):
             self.rviz_interface.visualizeTransform("base_link", "next_target", target)
             self.rviz_interface.visualizeTransform("base_link", "final_target", forque_target_base)
             self.rviz_interface.visualizeTransform("base_link", "intermediate_target", intermediate_forque_target)
+
+        if self.robot_interface is not None:
+            self.set_filter_noisy_readings_pub.publish(Bool(data=False))
 
     def move_to_before_transfer_state(self):
 

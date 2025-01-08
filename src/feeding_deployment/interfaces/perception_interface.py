@@ -57,8 +57,6 @@ class PerceptionInterface:
 
             self.speak_pub = rospy.Publisher('/speak', String, queue_size=1)
 
-            self.set_filter_noisy_readings_pub = rospy.Publisher('/head_perception/set_filter_noisy_readings', Bool, queue_size=1)
-
             self.transfer_button = False
             self.transfer_button_sub = rospy.Subscriber('/transfer_button', Bool, self.transfer_button_callback)
             
@@ -87,28 +85,6 @@ class PerceptionInterface:
             return
         self.speak_pub.publish(String(data=text))
 
-    def neck_rotation_callback(self, msg):
-
-        neck_rotation = np.array([msg.x, msg.y, msg.z])
-        if neck_rotation[1] > 5: # in degrees
-            self.head_shake_detected = True
-        if np.abs(neck_rotation[0]) < 5 and np.abs(neck_rotation[1]) < 5 and np.abs(neck_rotation[2]) < 5:
-            self.head_still_detected = True
-        else:
-            self.head_still_detected = False
-
-    def detect_mouth_open(self):
-        print("Waiting for mouth open")
-        if self.simulation:
-            return True
-        
-        self.mouth_open = False
-        # wait for mouth to open
-        while not rospy.is_shutdown() and not self.mouth_open:
-            time.sleep(0.05)
-        self.mouth_open = False
-        return True
-
     def detect_button_press(self):
         print("Waiting for button press")
         if self.simulation:
@@ -132,52 +108,6 @@ class PerceptionInterface:
             time.sleep(0.05)
         self.ft_threshold_exceeded = False
         return True
-    
-    def detect_head_shake(self):
-        print("Waiting for head shake")
-        if self.simulation:
-            return True
-        
-        self.set_filter_noisy_readings_pub.publish(Bool(data=False))
-        self.head_shake_detected = False
-        # wait for head shake
-        while not rospy.is_shutdown() and not self.head_shake_detected:
-            time.sleep(0.05)
-        self.set_filter_noisy_readings_pub.publish(Bool(data=True))
-        self.head_shake_detected = False
-        return True
-    
-    def detect_head_still(self):
-        print("Waiting for head still to be detected for 4 seconds")
-        if self.simulation:
-            return True
-        self.head_shake_detected = True
-        self.set_filter_noisy_readings_pub.publish(Bool(data=False))
-        while not rospy.is_shutdown():
-            head_still_start_time = time.time()
-            while not rospy.is_shutdown():
-                print("Head still detected: ",self.head_still_detected)
-                if not self.head_still_detected or time.time() - head_still_start_time > 4.0:
-                    break
-                if time.time() - head_still_start_time > 3.0:
-                    print("Waiting for head still to be detected for 1 more second")
-                elif time.time() - head_still_start_time > 2.0:
-                    print("Waiting for head still to be detected for 2 more seconds")
-                elif time.time() - head_still_start_time > 1.0:
-                    print("Waiting for head still to be detected for 3 more seconds")
-                time.sleep(0.05)
-            if time.time() - head_still_start_time > 4.0:
-                break
-        self.set_filter_noisy_readings_pub.publish(Bool(data=True))
-        self.head_still_detected = True
-        return True
-    
-    def auto_timeout(self, timeout=5.0):
-        print("Waiting for auto timeout")
-        if self.simulation:
-            return True
-        time.sleep(timeout)
-        return True
 
     def ft_callback(self, msg):
 
@@ -187,16 +117,9 @@ class PerceptionInterface:
         if np.abs(down_torque) > 0.1:
             self.ft_threshold_exceeded = True
 
-    def mouth_state_callback(self, msg):
-        self.mouth_open = msg.data
-
     def transfer_button_callback(self, msg):
         print("Transfer button pressed")
         self.transfer_button = True
-
-    def head_shake_callback(self, msg):
-        with self.head_shake_lock:
-            self.head_shake_detected = msg.data
         
     def get_robot_joints(self) -> "JointState":
         """Get the current robot joint state."""
@@ -229,11 +152,7 @@ class PerceptionInterface:
         return self.head_perception_running
 
     def start_head_perception_thread(self):
-        assert not self.head_perception_running, "Head perception thread is already running"
-
-        if self.robot_interface is not None:
-            # Filter noisy readings
-            self.set_filter_noisy_readings_pub.publish(Bool(data=True))
+        assert not self.head_perception_running, "Head perception thread is already running" 
 
         # Start head perception thread
         self.kill_the_thread = False

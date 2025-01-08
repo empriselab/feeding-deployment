@@ -7,6 +7,12 @@ from feeding_deployment.interfaces.perception_interface import PerceptionInterfa
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
 from feeding_deployment.control.robot_controller.command_interface import CartesianCommand
 
+try:
+    import rospy
+    from std_msgs.msg import Bool
+except ModuleNotFoundError:
+    ROSPY_IMPORTED = False
+
 class Transfer(abc.ABC):
     """ Base class for transfer actions. """
 
@@ -17,6 +23,9 @@ class Transfer(abc.ABC):
         self.perception_interface = perception_interface
         self.rviz_interface = rviz_interface
         self.no_waits = no_waits
+
+        if self.robot_interface is not None:
+            self.set_filter_noisy_readings_pub = rospy.Publisher('/head_perception/set_filter_noisy_readings', Bool, queue_size=1)
 
     def set_tool(self, tool):
         self.tool = tool

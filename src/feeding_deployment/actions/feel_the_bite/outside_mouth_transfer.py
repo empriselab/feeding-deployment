@@ -2,6 +2,12 @@
 import numpy as np
 from scipy.spatial.transform import Rotation
 
+try:
+    import rospy
+    from std_msgs.msg import Bool
+except ModuleNotFoundError:
+    ROSPY_IMPORTED = False
+
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.control.robot_controller.arm_client import ArmInterfaceClient
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
@@ -17,11 +23,17 @@ class OutsideMouthTransfer(Transfer):
 
     def move_to_transfer_state(self, maintain_position_at_goal = False):
 
+        if self.robot_interface is not None:
+            self.set_filter_noisy_readings_pub.publish(Bool(data=True))
+
         # move to infront of mouth
         head_perception_data = self.perception_interface.get_head_perception_data()
         forque_target_base = head_perception_data["tool_tip_target_pose"]
         head_pose = head_perception_data["head_pose"]
         self.sim.set_head_pose(Pose(position=head_pose[:3], orientation=Rotation.from_matrix(head_pose[3:]).as_quat()))
+
+        if self.robot_interface is not None:
+            self.set_filter_noisy_readings_pub.publish(Bool(data=False))
 
         servo_point_forque_target = np.identity(4)
         servo_point_forque_target[:3,3] = np.array([0, 0, -DISTANCE_INFRONT_MOUTH]).reshape(1,3)
