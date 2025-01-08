@@ -66,7 +66,8 @@ class InsideMouthTransfer(Transfer):
 
     def move_to_transfer_state(self, maintain_position_at_goal = False):
 
-        forque_target_base, _ = self.perception_interface.get_head_perception_tool_tip_target_pose()
+        head_perception_data = self.perception_interface.get_head_perception_data()
+        forque_target_base = head_perception_data["tool_tip_target_pose"]
 
         servo_point_forque_target = np.identity(4)
         servo_point_forque_target[:3,3] = np.array([0, 0, -DISTANCE_INFRONT_MOUTH]).reshape(1,3)
@@ -95,7 +96,8 @@ class InsideMouthTransfer(Transfer):
         while True:
             time.sleep(self.control_time)
 
-            forque_target_base, _ = self.perception_interface.get_head_perception_tool_tip_target_pose()
+            head_perception_data = self.perception_interface.get_head_perception_data()
+            forque_target_base = head_perception_data["tool_tip_target_pose"]
 
             forque_source = self.perception_interface.get_tool_tip_pose()
             distance = np.linalg.norm(forque_source[:3,3] - forque_target_base[:3,3])
