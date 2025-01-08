@@ -83,6 +83,13 @@ class EmulateTransferHLA(HighLevelAction):
         self.transfer.set_tool("fork")
         self.transfer.move_to_transfer_state()
 
+        if self.test_mode:
+            # Test new gestures at this state using the web application
+            pass
+        else:
+            # Record new gestures at this state using the web application
+            pass
+
         self.detect_transfer_complete()
 
         # shutdown the head perception thread
@@ -107,5 +114,6 @@ class EmulateTransferHLA(HighLevelAction):
         objects: tuple[Object, ...],
         params: dict[str, Any],
     ) -> str:
-        del params  # not used right now
+        if params["test_mode"]:
+            self.test_mode = True
         return f"emulate_transfer.yaml"
