@@ -61,21 +61,13 @@ class PerceptionInterface:
 
             self.transfer_button = False
             self.transfer_button_sub = rospy.Subscriber('/transfer_button', Bool, self.transfer_button_callback)
-
-            self.mouth_open = False
-            self.mouth_state_sub = rospy.Subscriber('/head_perception/mouth_state', Bool, self.mouth_state_callback)
             
             self.ft_threshold_exceeded = False
             self.ft_sensor_sub = rospy.Subscriber('/forque/forqueSensor', WrenchStamped, self.ft_callback)
 
-            self.head_shake_detected = False
-            self.head_still_detected = False
-            self.neck_rotation_sub = rospy.Subscriber('/head_perception/neck_rotation', Point, self.neck_rotation_callback)
-
-        self.tool_tip_target_lock = threading.Lock()
+        self.head_perception_data_lock = threading.Lock()
         # this term is updated in the run_head_perception method and read in the get_tool_tip_pose method
-        self.tool_tip_target_pose = None
-        self.neck_frame = None
+        self.head_perception_data = None
 
         # Head perception thread setup
         self.head_perception_thread = None
@@ -260,19 +252,16 @@ class PerceptionInterface:
             step_time = t_now - t_init
             if step_time >= 0.02:  # 50 Hz
                 if self._head_perception is not None and not self._simulate_head_perception:
-                    tool_tip_target_pose, neck_frame = self._head_perception.run_head_perception()
+                    head_perception_data = self._head_perception.run_head_perception()
                 else:
                     try:
                         # read from logged data
-                        with open(self.log_dir / f'head_perception_pose_{self.tool}.pkl', 'rb') as f:
-                            pose_data = pickle.load(f)
-                        tool_tip_target_pose = pose_data["tool_tip_target_pose"]
-                        neck_frame = pose_data["neck_frame"]
+                        with open(self.log_dir / f'head_perception_data_{self.tool}.pkl', 'rb') as f:
+                            head_perception_data = pickle.load(f)
                     except FileNotFoundError:
                         raise FileNotFoundError("No transfer logged data found for tool: ", self.tool)
-                with self.tool_tip_target_lock:
-                    self.tool_tip_target_pose = tool_tip_target_pose
-                    self.neck_frame = neck_frame
+                with self.head_perception_data_lock:
+                    self.head_perception_data = head_perception_data
         self.head_perception_running = False
 
     def stop_head_perception_thread(self):
@@ -283,24 +272,18 @@ class PerceptionInterface:
         else:
             print("Head perception thread is not running")
 
-    # Rajat ToDo: Change return type to Pose
-    def get_head_perception_tool_tip_target_pose(self) -> np.ndarray:
-        """Get a target of the forque from head perception."""
+    def get_head_perception_data(self) -> dict:
+        """Get head perception data (head pose, face keypoints, tool tip target pose)."""
 
-        with self.tool_tip_target_lock:
-            tool_tip_target_pose = self.tool_tip_target_pose
-            neck_frame = self.neck_frame
+        with self.head_perception_data_lock:
+            head_perception_data = self.head_perception_data
 
         # save them in a pickle file
         if self.robot_interface is not None and self.log_dir is not None:
-            pose_data = {
-                "tool_tip_target_pose": tool_tip_target_pose,
-                "neck_frame": neck_frame
-            }
-            with open(self.log_dir / f'head_perception_pose_{self.tool}.pkl', 'wb') as f:
-                pickle.dump(pose_data, f)
+            with open(self.log_dir / f'head_perception_data_{self.tool}.pkl', 'wb') as f:
+                pickle.dump(head_perception_data, f)
             
-        return tool_tip_target_pose, neck_frame
+        return head_perception_data
         
     def get_tool_tip_pose(self) -> np.ndarray:
 
