@@ -436,7 +436,7 @@ if __name__ == "__main__":
         bite_acquisition = GroundHighLevelAction(runner.hla_name_to_hla["AcquireBiteWithTool"], (runner.utensil,))
 
         gesture_fn_text = """
-def my_custom_gesture_detector(robot, threshold, timeout):
+def my_custom_gesture_detector(robot, timeout):
     print("Detecting gesture...")
     time.sleep(timeout)
     return True

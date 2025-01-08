@@ -342,13 +342,12 @@ class HighLevelAction(abc.ABC):
 
         # Add constants that we will pass to the gesture detector.
         local_namespace["ROBOT"] = self.robot_interface
-        local_namespace["THRESHOLD"] = 1e-3
         local_namespace["TIMEOUT"] = 5.0
 
         # Create a snippet that will actually run gesture detection in a loop.
         wait_for_gesture_code_text = f"""
 while True:  # maybe do max retries instead?
-    if {gesture_fn_name}(ROBOT, THRESHOLD, TIMEOUT):
+    if {gesture_fn_name}(ROBOT, TIMEOUT):
         break
     time.sleep(1.0)  # or whatever
 """
