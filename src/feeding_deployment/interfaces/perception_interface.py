@@ -198,7 +198,7 @@ class PerceptionInterface:
             head_perception_data = self.head_perception_data
 
         # save them in a pickle file
-        if self.robot_interface is not None and self.log_dir is not None:
+        if self.robot_interface is not None and self.log_dir is not None and self._simulate_head_perception == False:
             with open(self.log_dir / f'head_perception_data_{self.tool}.pkl', 'wb') as f:
                 pickle.dump(head_perception_data, f)
             
