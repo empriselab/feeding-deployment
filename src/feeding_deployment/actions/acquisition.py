@@ -252,12 +252,18 @@ class AcquireBiteHLA(HighLevelAction):
         objects: tuple[Object, ...],
         params: dict[str, Any],
     ) -> str:
-        # del params  # not used right now
-        self.params = params
         assert len(objects) == 1
         tool = objects[0]
         assert tool.name == "utensil"
         return "acquire_bite.yaml"
+    
+    def execute_action(
+        self,
+        objects: tuple[Object, ...],
+        params: dict[str, Any],
+    ) -> None:
+        self.params = params
+        return super().execute_action(objects, params)
     
     def acquire_bite(self, speed: float) -> None:
 

@@ -111,9 +111,7 @@ class TransferToolHLA(HighLevelAction):
         self.transfer.move_to_transfer_state(maintain_position_at_goal)
 
         self.relay_ready_for_transfer()
-
-        input("Press enter to complete transfer")
-        # self.detect_transfer_complete()
+        self.detect_transfer_complete()
 
         # shutdown the head perception thread
         self.perception_interface.stop_head_perception_thread()
