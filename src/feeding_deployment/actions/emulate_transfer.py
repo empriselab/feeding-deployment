@@ -25,7 +25,7 @@ from feeding_deployment.actions.base import (
     ToolPrepared,
     EmulateTransferDone,
 )
-from feeding_deployment.perception.gesture_synthesis.static_gesture_detectors import mouth_open_detector
+from feeding_deployment.perception.gestures_perception.static_gesture_detectors import mouth_open_detector
 from feeding_deployment.actions.feel_the_bite.outside_mouth_transfer import OutsideMouthTransfer
 
 class EmulateTransferHLA(HighLevelAction):
