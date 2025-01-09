@@ -5,7 +5,7 @@ from scipy.spatial.transform import Rotation, Slerp
 import time
 
 # Parameters
-OPEN_LOOP_RADIUS = 0.02
+OPEN_LOOP_RADIUS = 0.03
 # OPEN_LOOP_RADIUS = 0.0
 INTERMEDIATE_THRESHOLD_RELAXED = 0.03
 INTERMEDIATE_ANGULAR_THRESHOLD_RELAXED = 7*np.pi/180

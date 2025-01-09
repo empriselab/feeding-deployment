@@ -292,7 +292,7 @@ class PerceptionInterface:
             neck_frame = self.neck_frame
 
         # save them in a pickle file
-        if self.robot_interface is not None and self.log_dir is not None:
+        if self.robot_interface is not None and self.log_dir is not None and self._simulate_head_perception == False:
             pose_data = {
                 "tool_tip_target_pose": tool_tip_target_pose,
                 "neck_frame": neck_frame

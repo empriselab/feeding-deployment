@@ -247,11 +247,11 @@ class _Runner:
             or (msg_dict["status"] == "return_to_main" and msg_dict["state"] == "post_drink_transfer") \
             or (msg_dict["status"] == "back" and msg_dict["state"] == "bite_selection"): 
             user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["LookAtPlate"], (self.utensil,)
+                self.hla_name_to_hla["LookAtPlateWhileHolding"], (self.utensil,)
             )
         elif msg_dict["status"] == "aquire_food" or msg_dict["status"] == 0: # manual acquire food
             user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["AcquireBite"], (self.utensil,), params=msg_dict
+                self.hla_name_to_hla["AcquireBiteWithTool"], (self.utensil,), params=msg_dict
             )
         elif msg_dict["status"] == "bite_transfer":
             user_cmd = GroundHighLevelAction(
