@@ -346,7 +346,7 @@ class HighLevelAction(abc.ABC):
         local_namespace["TIMEOUT"] = 5.0
 
         # Create a snippet that will actually run gesture detection in a loop.
-        wait_for_gesture_code_text = f"""{gesture_fn_name}(PERCEPTION_INTERFACE, TIMEOUT):"""
+        wait_for_gesture_code_text = f"""{gesture_fn_name}(PERCEPTION_INTERFACE, TIMEOUT)"""
         # Run the code.
         exec(wait_for_gesture_code_text, local_namespace)
 
