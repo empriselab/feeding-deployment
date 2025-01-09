@@ -25,7 +25,7 @@ from feeding_deployment.actions.base import (
     ToolPrepared,
     EmulateTransferDone,
 )
-
+from feeding_deployment.perception.gesture_synthesis.static_gesture_detectors import mouth_open_detector
 from feeding_deployment.actions.feel_the_bite.outside_mouth_transfer import OutsideMouthTransfer
 
 class EmulateTransferHLA(HighLevelAction):
@@ -44,23 +44,29 @@ class EmulateTransferHLA(HighLevelAction):
         if self.initiate_transfer_interaction == "button":
             self.perception_interface.detect_button_press()
         elif self.initiate_transfer_interaction == "open_mouth":
-            self.perception_interface.detect_mouth_open()
+            mouth_open_detector(self.perception_interface, timeout=600) # 10 minutes
         elif self.initiate_transfer_interaction == "auto_timeout":
-            self.perception_interface.auto_timeout()
+            time.sleep(5.0)
         print("Initiating transfer")
 
     def detect_transfer_complete(self):
         if self.transfer_complete_interaction == "button":
             self.perception_interface.detect_button_press()
         elif self.transfer_complete_interaction == "auto_timeout":
-            self.perception_interface.auto_timeout()
+            time.sleep(5.0)
         print("Detected transfer completion")
 
-    def relay_ready_for_transfer(self):
+    def relay_ready_to_initiate_transfer(self):
         if self.ready_for_transfer_interaction == "silent":
             pass
         elif self.ready_for_transfer_interaction == "voice":
             self.perception_interface.speak("Please open your mouth when ready")
+
+    def relay_ready_for_gestures(self):
+        if self.ready_for_transfer_interaction == "silent":
+            pass
+        elif self.ready_for_transfer_interaction == "voice":
+            self.perception_interface.speak("Ready for gestures")
 
     def emulate_transfer(self):
 
@@ -75,11 +81,15 @@ class EmulateTransferHLA(HighLevelAction):
         else:
             time.sleep(1.0) # let sim head perception thread warmstart
 
-        self.relay_ready_for_transfer()
-        self.detect_initiate_transfer()
+        if self.robot_interface is not None:
+            self.relay_ready_to_initiate_transfer()
+            self.detect_initiate_transfer()
 
         self.transfer.set_tool("fork")
         self.transfer.move_to_transfer_state()
+
+        if self.robot_interface is not None:
+            self.relay_ready_for_gestures()
 
         if self.test_mode:
             # Test new gestures at this state using the web application
@@ -87,8 +97,9 @@ class EmulateTransferHLA(HighLevelAction):
         else:
             # Record new gestures at this state using the web application
             pass
-
-        self.detect_transfer_complete()
+        
+        if self.robot_interface is not None:
+            self.detect_transfer_complete()
 
         # shutdown the head perception thread
         self.perception_interface.stop_head_perception_thread()
