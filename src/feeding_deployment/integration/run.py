@@ -152,7 +152,7 @@ class _Runner:
 
         # Copy the initial gesture detction file into a directory for this run,
         # where it will be updated from LLM-based few-shot learning.
-        original_gesture_detection_filepath = Path(__file__).parents[1] / "perception" / "gesture_synthesis" / "synthesized_gesture_detectors.py"
+        original_gesture_detection_filepath = Path(__file__).parents[1] / "perception" / "gestures_perception" / "synthesized_gesture_detectors.py"
         assert original_gesture_detection_filepath.exists()
         shutil.copy(original_gesture_detection_filepath, self.run_behavior_tree_dir)
         self._gesture_detection_filepath = self.run_behavior_tree_dir / original_gesture_detection_filepath.name

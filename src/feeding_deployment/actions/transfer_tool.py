@@ -26,7 +26,7 @@ from feeding_deployment.actions.base import (
     ToolTransferDone,
 )
 
-from feeding_deployment.perception.gesture_synthesis.static_gesture_detectors import mouth_open_detector, head_shake_detector, head_still_detector
+from feeding_deployment.perception.gestures_perception.static_gesture_detectors import mouth_open_detector, head_shake_detector, head_still_detector
 
 from feeding_deployment.actions.feel_the_bite.inside_mouth_transfer import InsideMouthTransfer
 from feeding_deployment.actions.feel_the_bite.outside_mouth_transfer import OutsideMouthTransfer

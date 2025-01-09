@@ -8,7 +8,7 @@
 src/feeding_deployment/integration/log/behavior_trees
 src/feeding_deployment/integration/log/execution_log.txt
 src/feeding_deployment/integration/log/nuc_execution_log.txt
-src/feeding_deployment/perception/gesture_synthesis/gesture_data/*
+src/feeding_deployment/perception/gestures_perception/gesture_data/*
 src/feeding_deployment/perception/head_perception/DECA/*
 
 # Byte-compiled / optimized / DLL files

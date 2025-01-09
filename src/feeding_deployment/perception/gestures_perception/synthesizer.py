@@ -8,7 +8,7 @@ import textwrap
 import pickle
 from tomsutils.llm import OpenAILLM
 
-from feeding_deployment.perception.gesture_synthesis.in_context_examples import in_context_example1, in_context_example2
+from feeding_deployment.perception.gestures_perception.in_context_examples import in_context_example1, in_context_example2
 
 class MockPerceptionInterface:
     """
