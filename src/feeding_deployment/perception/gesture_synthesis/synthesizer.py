@@ -65,12 +65,30 @@ class PersonalizedGestureDetectorSynthesizer:
             print("Best Accuracy: ", accuracy)
             with open(f"gesture_data/{label}/results/response.txt", "a") as f:
                 f.write(f"\nBest Threshold: {threshold}\nBest Accuracy: {accuracy}")
+            
+            # Code snippet to replace
+            old_snippet = """
+        head_perception_data = perception_interface.get_head_perception_data()
+        if head_perception_data is None:
+            break
+"""
+            assert old_snippet.strip() in function_code, "head perception snippet not found in the generated function code"
+            # Replacement snippet
+            new_snippet = """
+        head_perception_data = perception_interface.get_head_perception_data()
+        if head_perception_data is None:
+            continue
+        else:
+            time.sleep(0.1) # Maintain 10 Hz rate
+"""
+            updated_function_code = function_code.replace(old_snippet.strip(), new_snippet.strip())  
             function_code_with_threshold = f"""
 def {label}(perception_interface, timeout):
+    \"\"\"{language_description}\"\"\"
     threshold = {threshold}
-{textwrap.indent(function_code, "    ")}
+{textwrap.indent(updated_function_code, "    ")}
     return gesture_detector(perception_interface, timeout, threshold)
-"""
+"""   
             return function_code_with_threshold
         except Exception as e:
             print("Error: ", e)
@@ -148,7 +166,7 @@ def main():
         
         generated_function = synthesizer.generate_function(gesture, language_description)
         if generated_function is not None:
-            with open(f"gesture_data/{gesture}/gesture_detector.py", "w") as f:
+            with open("synthesized_gesture_detectors.py", "a") as f:
                 f.write(generated_function)
 
 if __name__ == '__main__':
