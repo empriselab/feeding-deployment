@@ -103,13 +103,17 @@ class TransferToolHLA(HighLevelAction):
             self.robot_interface.switch_to_task_compliant_mode()
 
         self.relay_ready_to_initiate_transfer()
+
+        # input("Press enter to initiate transfer")
         self.detect_initiate_transfer()
 
         self.transfer.set_tool(self.tool)
         self.transfer.move_to_transfer_state(maintain_position_at_goal)
 
         self.relay_ready_for_transfer()
-        self.detect_transfer_complete()
+
+        input("Press enter to complete transfer")
+        # self.detect_transfer_complete()
 
         # shutdown the head perception thread
         self.perception_interface.stop_head_perception_thread()

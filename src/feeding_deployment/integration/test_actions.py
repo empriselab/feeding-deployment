@@ -2,7 +2,7 @@
 
 from pathlib import Path
 from typing import Any
-
+import shutil
 import json
 import sys
 
@@ -42,9 +42,9 @@ from feeding_deployment.simulation.scene_description import (
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.actions.flair.flair import FLAIR
 
-def test_TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, tool, no_waits):
+def test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, run_behavior_tree_dir, no_waits, log_path=None):
 
-    high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, no_waits, log_path=None)
+    high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair=None, behavior_tree_dir=run_behavior_tree_dir , no_waits=False, log_path=None)    
 
     if tool == "fork":
         utensil = Object("utensil", tool_type)
@@ -158,7 +158,7 @@ def _main(
 
     scene_config_path = Path(__file__).parent.parent / "simulation" / "configs" / f"{scene_config}.yaml"
     scene_description = create_scene_description_from_config(str(scene_config_path), transfer_type)
-    sim = FeedingDeploymentPyBulletSimulator(scene_description, use_gui=False)
+    sim = FeedingDeploymentPyBulletSimulator(scene_description, use_gui=use_gui)
 
     if robot_interface is not None:
         # Initialize the interface to RViz.
@@ -169,9 +169,18 @@ def _main(
     # Create skills for high-level planning.
     hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
 
+    # Copy the initial behavior trees into a directory for this run, where
+    # they will be modified based on user feedback.
+    run_behavior_tree_dir = Path(__file__).parent / "log" / "behavior_trees"
+    run_behavior_tree_dir.mkdir(exist_ok=True)
+    original_behavior_tree_dir = Path(__file__).parents[1] / "actions" / "behavior_trees"
+    assert original_behavior_tree_dir.exists()
+    for original_bt_filename in original_behavior_tree_dir.glob("*.yaml"):
+        shutil.copy(original_bt_filename, run_behavior_tree_dir)
+
     # test_LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, tool, no_waits)
     # test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, tool, no_waits)
-    test_TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, tool, no_waits)
+    test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, run_behavior_tree_dir, no_waits, log_path=None)
 
 if __name__ == "__main__":
     import argparse

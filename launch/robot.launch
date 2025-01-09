@@ -29,10 +29,7 @@
     <include file="$(find realsense2_camera)/launch/rs_camera.launch">
         <arg name="align_depth" value="true"/>
         <arg name="enable_sync" value="true"/>
-        <arg name="filters" value="pointcloud"/>
-
-        <!-- Set camera parameters -->
-        <param name="rs435/color/exposure" value="170"/> <!-- Replace '100' with your desired value -->
+        <!-- <arg name="filters" value="pointcloud"/> -->
     </include>
 
     <!-- FT sensor -->
