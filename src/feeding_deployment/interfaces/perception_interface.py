@@ -9,6 +9,10 @@ from pybullet_helpers.joint import JointPositions
 from scipy.spatial.transform import Rotation as R
 import json
 import pickle
+import serial
+
+LED_SERIAL_PORT = '/dev/ttyACM0'
+LED_BAUD_RATE = 115200
 
 try:
     import rospy
@@ -84,6 +88,18 @@ class PerceptionInterface:
         if self.simulation:
             return
         self.speak_pub.publish(String(data=text))
+
+    def turn_on_led(self):
+        with serial.Serial(LED_SERIAL_PORT, LED_BAUD_RATE, timeout=1) as ser:
+            ser.reset_input_buffer()  # Clear input buffer
+            ser.reset_output_buffer()  # Clear output buffer
+            ser.write(b"on\r\n")  # Send the command
+    
+    def turn_off_led(self):
+        with serial.Serial(LED_SERIAL_PORT, LED_BAUD_RATE, timeout=1) as ser:
+            ser.reset_input_buffer()
+            ser.reset_output_buffer()
+            ser.write(b"off\r\n")
 
     def detect_button_press(self):
         print("Waiting for button press")

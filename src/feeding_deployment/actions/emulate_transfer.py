@@ -36,6 +36,7 @@ class EmulateTransferHLA(HighLevelAction):
 
         self.transfer = OutsideMouthTransfer(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.no_waits)
 
+        self.ready_to_initiate_transfer_interaction = "voice" # "silent", "voice" or "led"
         self.ready_for_transfer_interaction = "voice" # "silent", "voice" or "led"
         self.initiate_transfer_interaction = "open_mouth" # "button", "open_mouth" or "auto_timeout"
         self.transfer_complete_interaction = "button" # "button", "sense" or "auto_timeout"
@@ -49,6 +50,9 @@ class EmulateTransferHLA(HighLevelAction):
             time.sleep(5.0)
         print("Initiating transfer")
 
+        if self.ready_to_initiate_transfer_interaction == "led":
+            self.perception_interface.turn_off_led()
+
     def detect_transfer_complete(self):
         if self.transfer_complete_interaction == "button":
             self.perception_interface.detect_button_press()
@@ -56,17 +60,24 @@ class EmulateTransferHLA(HighLevelAction):
             time.sleep(5.0)
         print("Detected transfer completion")
 
+        if self.ready_for_transfer_interaction == "led":
+            self.perception_interface.turn_off_led()
+
     def relay_ready_to_initiate_transfer(self):
-        if self.ready_for_transfer_interaction == "silent":
+        if self.ready_to_initiate_transfer_interaction == "silent":
             pass
-        elif self.ready_for_transfer_interaction == "voice":
+        elif self.ready_to_initiate_transfer_interaction == "voice":
             self.perception_interface.speak("Please open your mouth when ready")
+        elif self.ready_to_initiate_transfer_interaction == "led":
+            self.perception_interface.turn_on_led()
 
     def relay_ready_for_gestures(self):
         if self.ready_for_transfer_interaction == "silent":
             pass
         elif self.ready_for_transfer_interaction == "voice":
             self.perception_interface.speak("Ready for gestures")
+        elif self.ready_for_transfer_interaction == "led":
+            self.perception_interface.turn_on_led()
 
     def emulate_transfer(self):
 
