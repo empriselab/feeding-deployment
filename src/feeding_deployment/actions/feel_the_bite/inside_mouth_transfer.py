@@ -4,8 +4,14 @@ import numpy as np
 from scipy.spatial.transform import Rotation, Slerp
 import time
 
+try:
+    import rospy
+    from std_msgs.msg import Bool
+except ModuleNotFoundError:
+    ROSPY_IMPORTED = False
+
 # Parameters
-OPEN_LOOP_RADIUS = 0.02
+OPEN_LOOP_RADIUS = 0.03
 # OPEN_LOOP_RADIUS = 0.0
 INTERMEDIATE_THRESHOLD_RELAXED = 0.03
 INTERMEDIATE_ANGULAR_THRESHOLD_RELAXED = 7*np.pi/180
@@ -66,7 +72,11 @@ class InsideMouthTransfer(Transfer):
 
     def move_to_transfer_state(self, maintain_position_at_goal = False):
 
-        forque_target_base, _ = self.perception_interface.get_head_perception_tool_tip_target_pose()
+        if self.robot_interface is not None:
+            self.set_filter_noisy_readings_pub.publish(Bool(data=True))
+
+        head_perception_data = self.perception_interface.get_head_perception_data()
+        forque_target_base = head_perception_data["tool_tip_target_pose"]
 
         servo_point_forque_target = np.identity(4)
         servo_point_forque_target[:3,3] = np.array([0, 0, -DISTANCE_INFRONT_MOUTH]).reshape(1,3)
@@ -95,7 +105,8 @@ class InsideMouthTransfer(Transfer):
         while True:
             time.sleep(self.control_time)
 
-            forque_target_base, _ = self.perception_interface.get_head_perception_tool_tip_target_pose()
+            head_perception_data = self.perception_interface.get_head_perception_data()
+            forque_target_base = head_perception_data["tool_tip_target_pose"]
 
             forque_source = self.perception_interface.get_tool_tip_pose()
             distance = np.linalg.norm(forque_source[:3,3] - forque_target_base[:3,3])
@@ -123,6 +134,9 @@ class InsideMouthTransfer(Transfer):
             self.rviz_interface.visualizeTransform("base_link", "next_target", target)
             self.rviz_interface.visualizeTransform("base_link", "final_target", forque_target_base)
             self.rviz_interface.visualizeTransform("base_link", "intermediate_target", intermediate_forque_target)
+
+        if self.robot_interface is not None:
+            self.set_filter_noisy_readings_pub.publish(Bool(data=False))
 
     def move_to_before_transfer_state(self):
 

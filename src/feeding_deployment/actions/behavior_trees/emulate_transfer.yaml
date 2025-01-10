@@ -1,0 +1,5 @@
+name: "EmulateTransfer"
+description: "Bring the empty gripper in front of the user's mouth to facilitate recording or testing gestures."
+type: "Behavior"
+parameters: []
+fn: !hla emulate_transfer
