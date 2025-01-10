@@ -6,8 +6,8 @@ cleanup() {
     if kill -0 $joint_states_publisher_pid 2>/dev/null; then
         kill $joint_states_publisher_pid
     fi
-    if kill -0 $collision_monitor_pid 2>/dev/null; then
-        kill $collision_monitor_pid
+    if kill -0 $collision_sensor_pid 2>/dev/null; then
+        kill $collision_sensor_pid
     fi
     # if kill -0 $transfer_button_pid 2>/dev/null; then
     #     kill $transfer_button_pid
@@ -32,11 +32,11 @@ cd /home/isacc/deployment_ws/src/feeding-deployment/src/feeding_deployment/safet
 # python transfer_button_listener.py --button_id -1 &
 # transfer_button_pid=$!  # Store the PID of transfer_button_listener
 
-# Start collision monitor
-python collision_monitor.py &
-collision_monitor_pid=$!  # Store the PID of collision_monitor
+# Start collision sensor
+python collision_sensor.py &
+collision_sensor_pid=$!  # Store the PID of collision_sensor
 
-# Wait for 2 second to make sure collision monitor is running
+# Wait for 2 second to make sure collision sensor is running
 sleep 2
 
 # Run watchdog
@@ -44,5 +44,5 @@ python watchdog.py
 
 cleanup  # Ensure cleanup is called when bulldog finishes
 wait $joint_states_publisher_pid
-wait $collision_monitor_pid
+wait $collision_sensor_pid
 # wait $transfer_button_pid
