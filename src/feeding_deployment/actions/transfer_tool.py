@@ -46,60 +46,65 @@ class TransferToolHLA(HighLevelAction):
         else:
             raise ValueError("Bite transfer type not recognized")
 
-        self.ready_to_initiate_transfer_interaction = "led" # "silent", "voice" or "led"
-        self.ready_for_transfer_interaction = "led" # "silent", "voice" or "led"
-        self.initiate_transfer_interaction = "open_mouth" # "button", "open_mouth" or "auto_timeout"
-        self.transfer_complete_interaction = "sense" # "button", "sense" or "auto_timeout"
-    
     def set_tool(self, tool):
         self.tool = tool
 
-    def detect_initiate_transfer(self):
-        if self.initiate_transfer_interaction == "button":
+    def detect_initiate_transfer(self, initiate_transfer_interaction: str, ready_to_initiate_mode: str):
+        if initiate_transfer_interaction == "button":
             self.perception_interface.detect_button_press()
-        elif self.initiate_transfer_interaction == "open_mouth":
+        elif initiate_transfer_interaction == "open_mouth":
             mouth_open_detector(self.perception_interface, timeout=600) # 10 minutes
-        elif self.initiate_transfer_interaction == "auto_timeout":
+        elif initiate_transfer_interaction == "auto_timeout":
             time.sleep(5.0)
+        else:
+            raise NotImplementedError
         print("Initiating transfer")
 
-        if self.ready_to_initiate_transfer_interaction == "led":
+        if ready_to_initiate_mode == "led":
             self.perception_interface.turn_off_led()
 
-    def detect_transfer_complete(self):
-        if self.transfer_complete_interaction == "button":
+    def detect_transfer_complete(self, transfer_complete_interaction: str, ready_for_transfer_interaction: str):
+        if transfer_complete_interaction == "button":
             self.perception_interface.detect_button_press()
-        elif self.transfer_complete_interaction == "sense":
+        elif transfer_complete_interaction == "sense":
             if self.tool == "fork":
                 self.perception_interface.detect_force_trigger()
             elif self.tool == "drink":
                 head_shake_detector(self.perception_interface, timeout=600) # 10 minutes
             elif self.tool == "wipe":
                 head_still_detector(self.perception_interface, timeout=600) # 10 minutes
-        elif self.transfer_complete_interaction == "auto_timeout":
+        elif transfer_complete_interaction == "auto_timeout":
             time.sleep(5.0)
+        else:
+            raise NotImplementedError
         print("Detected transfer completion")
 
-        if self.ready_for_transfer_interaction == "led":
+        if ready_for_transfer_interaction == "led":
             self.perception_interface.turn_off_led()
 
-    def relay_ready_to_initiate_transfer(self):
-        if self.ready_to_initiate_transfer_interaction == "silent":
+    def relay_ready_to_initiate_transfer(self, ready_to_initiate_transfer_interaction: str):
+        if ready_to_initiate_transfer_interaction == "silent":
             pass
-        elif self.ready_to_initiate_transfer_interaction == "voice":
+        elif ready_to_initiate_transfer_interaction == "voice":
             self.perception_interface.speak("Please open your mouth when ready")
-        elif self.ready_to_initiate_transfer_interaction == "led":
+        elif ready_to_initiate_transfer_interaction == "led":
             self.perception_interface.turn_on_led()
+        else:
+            raise NotImplementedError
 
-    def relay_ready_for_transfer(self):
-        if self.ready_for_transfer_interaction == "silent":
+    def relay_ready_for_transfer(self, ready_for_transfer_interaction: str):
+        if ready_for_transfer_interaction == "silent":
             pass
-        elif self.ready_for_transfer_interaction == "voice":
+        elif ready_for_transfer_interaction == "voice":
             self.perception_interface.speak("Ready for transfer")
-        elif self.ready_for_transfer_interaction == "led":
+        elif ready_for_transfer_interaction == "led":
             self.perception_interface.turn_on_led()
+        else:
+            raise NotImplementedError
 
-    def execute_transfer(self, maintain_position_at_goal = False):
+    def execute_transfer(self, ready_to_initiate_mode: str, ready_to_transfer_mode: str,
+                         initiate_transfer_mode: str, transfer_complete_mode: str,
+                         maintain_position_at_goal = False):
 
         self.perception_interface.set_head_perception_tool(self.tool)
         self.perception_interface.start_head_perception_thread()
@@ -116,15 +121,15 @@ class TransferToolHLA(HighLevelAction):
             self.robot_interface.switch_to_task_compliant_mode()
 
         if self.robot_interface is not None:
-            self.relay_ready_to_initiate_transfer()
-            self.detect_initiate_transfer()
+            self.relay_ready_to_initiate_transfer(ready_to_initiate_mode)
+            self.detect_initiate_transfer(initiate_transfer_mode, ready_to_initiate_mode)
 
         self.transfer.set_tool(self.tool)
         self.transfer.move_to_transfer_state(maintain_position_at_goal)
 
         if self.robot_interface is not None:
-            self.relay_ready_for_transfer()
-            self.detect_transfer_complete()
+            self.relay_ready_for_transfer(ready_to_transfer_mode)
+            self.detect_transfer_complete(transfer_complete_mode, ready_to_transfer_mode)
 
         # shutdown the head perception thread
         self.perception_interface.stop_head_perception_thread()
@@ -146,7 +151,7 @@ class TransferToolHLA(HighLevelAction):
             parameters=[tool],
             preconditions={Holding([tool]), ToolPrepared([tool])},
             add_effects={LiftedAtom(ToolTransferDone, [tool])},
-            delete_effects=set(),
+            delete_effects={ToolPrepared([tool])},
         )
     
     def get_behavior_tree_filename(
@@ -160,7 +165,7 @@ class TransferToolHLA(HighLevelAction):
         assert tool.name in ["utensil", "drink", "wipe"]
         return f"transfer_{tool.name}.yaml"    
     
-    def transfer_utensil(self) -> None:
+    def transfer_utensil(self, *args, **kwargs) -> None:
         assert self.sim.held_object_name == "utensil"
 
         if self.wrist_interface is not None:
@@ -174,31 +179,31 @@ class TransferToolHLA(HighLevelAction):
             self.wrist_interface.stop_horizontal_spoon_thread()
 
         self.set_tool("fork")
-        self.execute_transfer()
+        self.execute_transfer(*args, **kwargs)
 
         # Send message to web interface indicating transfer is done.
         if self.web_interface is not None:
             self.web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
 
-    def transfer_drink(self) -> None:
+    def transfer_drink(self, *args, **kwargs) -> None:
         assert self.sim.held_object_name == "drink"
-        
+
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
         self.set_tool("drink")    
-        self.execute_transfer(maintain_position_at_goal=True)
+        self.execute_transfer(*args, maintain_position_at_goal=True, **kwargs)
 
         # Send message to web interface indicating transfer is done.
         if self.web_interface is not None:
             self.web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})        
 
-    def transfer_wipe(self) -> None:
+    def transfer_wipe(self, *args, **kwargs) -> None:
         assert self.sim.held_object_name == "wipe"
         
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
         self.set_tool("wipe")
-        self.execute_transfer(maintain_position_at_goal=True)
+        self.execute_transfer(*args, maintain_position_at_goal=True, **kwargs)
 
         # Send message to web interface indicating transfer is done.
         if self.web_interface is not None:
