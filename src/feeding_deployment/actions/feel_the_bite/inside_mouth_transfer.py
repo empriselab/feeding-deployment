@@ -75,6 +75,8 @@ class InsideMouthTransfer(Transfer):
 
         head_perception_data = self.perception_interface.get_head_perception_data()
         forque_target_base = head_perception_data["tool_tip_target_pose"]
+        head_pose = head_perception_data["head_pose"]
+        self.sim.set_head_pose(Pose(position=head_pose[:3], orientation=Rotation.from_euler('yxz', head_pose[3:], degrees=True).as_quat()))
 
         servo_point_forque_target = np.identity(4)
         servo_point_forque_target[:3,3] = np.array([0, 0, -DISTANCE_INFRONT_MOUTH]).reshape(1,3)
@@ -110,7 +112,7 @@ class InsideMouthTransfer(Transfer):
         if self.robot_interface is None:
             head_perception_data = self.perception_interface.get_head_perception_data()
             forque_target_base = head_perception_data["tool_tip_target_pose"]
-            tool_frame_target = servo_point_base @ self.get_tip_wrist_transform()
+            tool_frame_target = forque_target_base @ self.get_tip_wrist_transform()
             target_pose = Pose.from_matrix(tool_frame_target)
             self.move_to_ee_pose(target_pose)
         else:
@@ -152,18 +154,23 @@ class InsideMouthTransfer(Transfer):
 
     def move_to_before_transfer_state(self):
 
-        source_base = self.perception_interface.get_tool_tip_pose()
-        forque_target_source = np.identity(4)
-        forque_target_source[:3,3] = np.array([0, 0, -MOVE_OUTSIDE_DISTANCE]).reshape(1,3)
-        forque_target_base = source_base @ forque_target_source
-
         if self.robot_interface is None:
             # In simulation, directly move to outside the mouth
+            head_perception_data = self.perception_interface.get_head_perception_data()
+            source_base = head_perception_data["tool_tip_target_pose"]
+            forque_target_source = np.identity(4)
+            forque_target_source[:3,3] = np.array([0, 0, -MOVE_OUTSIDE_DISTANCE]).reshape(1,3)
+            forque_target_base = source_base @ forque_target_source
             tool_frame_target = forque_target_base @ self.get_tip_wrist_transform()
             target_pose = Pose.from_matrix(tool_frame_target)
             self.move_to_ee_pose(target_pose)
         else:
             # For real robot, move outside the mouth by setting intermediate waypoints for compliant controller
+            source_base = self.perception_interface.get_tool_tip_pose()
+            forque_target_source = np.identity(4)
+            forque_target_source[:3,3] = np.array([0, 0, -MOVE_OUTSIDE_DISTANCE]).reshape(1,3)
+            forque_target_base = source_base @ forque_target_source
+            
             while True:
                 time.sleep(self.control_time)
                 forque_base = self.perception_interface.get_tool_tip_pose()
@@ -180,7 +187,7 @@ class InsideMouthTransfer(Transfer):
 
         final_target = self.perception_interface.get_tool_tip_pose_at_staging()
 
-        if self.robot_interface is not None:
+        if self.robot_interface is None:
             # In simulation, directly move to staging configuration
             tool_frame_target = final_target @ self.get_tip_wrist_transform()
             target_pose = Pose.from_matrix(tool_frame_target)

@@ -30,7 +30,6 @@ class OutsideMouthTransfer(Transfer):
         head_perception_data = self.perception_interface.get_head_perception_data()
         forque_target_base = head_perception_data["tool_tip_target_pose"]
         head_pose = head_perception_data["head_pose"]
-        print("Head pose: ", head_pose)
         self.sim.set_head_pose(Pose(position=head_pose[:3], orientation=Rotation.from_euler('yxz', head_pose[3:], degrees=True).as_quat()))
 
         if self.robot_interface is not None:
