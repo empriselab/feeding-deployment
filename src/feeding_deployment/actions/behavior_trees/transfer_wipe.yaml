@@ -1,5 +1,33 @@
 name: "TransferWipe"
 description: "Bring the wipe to the user's mouth for a cleaning."
 type: "Behavior"
-parameters: []
+parameters:
+  - name: "ReadyToInitiateTransferInteraction"
+    description: "Interaction mode for ready to initiate transfer."
+    space:
+      type: "Enum"
+      elements: ["silent", "voice", "led"]
+    is_user_editable: True
+    value: "led"
+  - name: "ReadyForTransferInteraction"
+    description: "Interaction mode for ready to transfer."
+    space:
+      type: "Enum"
+      elements: ["silent", "voice", "led"]
+    is_user_editable: True
+    value: "led"
+  - name: "InitiateTransferInteraction"
+    description: "Interaction mode for transfer."
+    space:
+      type: "Enum"
+      elements: ["button", "open_mouth", "auto_timeout"]
+    is_user_editable: True
+    value: "open_mouth"
+  - name: "TransferCompleteInteraction"
+    description: "Interaction mode for transfer completion."
+    space:
+      type: "Enum"
+      elements: ["button", "sense", "auto_timeout"]
+    is_user_editable: True
+    value: "sense"
 fn: !hla transfer_wipe
