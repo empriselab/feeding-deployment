@@ -418,10 +418,18 @@ class KinovaArm:
             q, dq, tau, x, gripper_pos = self.get_update_state()
             if self.fix_joint_hack:
                 q = np.insert(q, 5, -1.18039928)
-                dq = np.insert(dq, 5, 0)
-                tau = np.insert(tau, 5, 0)
 
-            return q, x, gripper_pos
+                # Not returning below values as they are not correct
+                # dq = np.insert(dq, 5, 0)
+                # tau = np.insert(tau, 5, 0)
+
+            return {
+                "position": q,
+                "velocity": np.zeros(self.actuator_count),
+                "effort": np.zeros(self.actuator_count),
+                "ee_pos": x,
+                "gripper_pos": gripper_pos,
+            }
             
         assert (
             not self.cyclic_running
@@ -466,8 +474,13 @@ class KinovaArm:
             base_feedback.interconnect.gripper_feedback.motor[0].position / 100.0
         )
 
-        # return q, dq, tau, ee_pos, ee_vel, ee_force, gripper_pos
-        return q, dq, tau
+        return {
+            "position": q,
+            "velocity": dq,
+            "effort": tau,
+            "ee_pos": ee_pos,
+            "gripper_pos": gripper_pos,
+        }
 
     def move_angular_trajectory(self, trajectory_joint_angles, blocking=True):
 
@@ -533,7 +546,8 @@ class KinovaArm:
             print("Waiting for angular movement to finish ...")
             self.end_or_abort_event.wait(KinovaArm.ACTION_TIMEOUT_DURATION)
             # read states and check if the arm actually reached the desired position
-            q, _, _ = self.get_state()
+            current_state = self.get_state()
+            q = current_state["position"]
             # find error while wrapping angles
             error = np.degrees(q - joint_angles)
             while np.any(error > 180) or np.any(error < -180):
@@ -571,7 +585,8 @@ class KinovaArm:
             print("Waiting for cartesian movement to finish ...")
             self.end_or_abort_event.wait(KinovaArm.ACTION_TIMEOUT_DURATION)
             # read states and check if the arm actually reached the desired position
-            _, x, _ = self.get_state()
+            current_state = self.get_state()
+            x = current_state["ee_pos"]
             if not np.allclose(x[:3], xyz, atol=0.01): # 1 cm
                 print("Arm did not reach desired position")
                 self.stop()
@@ -1096,8 +1111,8 @@ class KinovaArm:
             gripper_command = arm.gripper_pos
             return torque_command, gripper_command
 
-        q, ee_pos, gripper_pos = self.get_state()
-        self.gripper_pos = gripper_pos # set gripper position to current position to avoid sudden jumps
+        current_state = self.get_state()
+        self.gripper_pos = current_state["gripper_pos"] # set gripper position to current position to avoid sudden jumps
 
         # if compliant control is already running, stop it (but do not switch back to high-level servoing mode)
         if self.cyclic_running:
@@ -1137,47 +1152,8 @@ class KinovaArm:
 def main():
     arm = KinovaArm()
     try:
-        # input("Press Enter to zero torque offsets")
-        # arm.zero_torque_offsets()
-
-        arm.set_tool("drink")
-        
-        max_until_now = 0
-        while True:
-
-            # read current state
-            q, dq, torque_reading = arm.get_state()
-
-            # Pinocchio joint configuration
-            arm.q_pin = np.array(
-                [
-                    math.cos(q[0]),
-                    math.sin(q[0]),
-                    q[1],
-                    math.cos(q[2]),
-                    math.sin(q[2]),
-                    q[3],
-                    math.cos(q[4]),
-                    math.sin(q[4]),
-                    q[5],
-                    math.cos(q[6]),
-                    math.sin(q[6]),
-                ]
-            )
-
-            gravity = pin.computeGeneralizedGravity(arm.model, arm.data, arm.q_pin)
-            torque_model = pin.rnea(arm.model, arm.data, arm.q_pin, dq, np.zeros(7))
-
-            error = np.abs(torque_reading - torque_model)
-
-            max_this_time = np.max(error)
-
-            if max_this_time > max_until_now:
-                max_until_now = max_this_time
-
-            np.set_printoptions(precision=2, suppress=True)
-            print("max error: ", max_this_time, " max until now: ", max_until_now)
-
+        input("Press Enter to zero torque offsets")
+        arm.zero_torque_offsets()
     finally:
         arm.disconnect()
 
