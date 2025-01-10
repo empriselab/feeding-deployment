@@ -317,6 +317,10 @@ class _Runner:
             self.current_atoms -= operator.delete_effects
             self.current_atoms |= operator.add_effects
 
+            # Super hack: the drink and wipe are always prepared.
+            self.current_atoms.add(ToolPrepared([self.wipe]))
+            self.current_atoms.add(ToolPrepared([self.drink]))
+
             # Save the latest state in case we want to resume execution
             # after a crash.
             self._save_state(sim_state, self.current_atoms)
