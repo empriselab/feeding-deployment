@@ -102,7 +102,7 @@ class KinovaArm:
     def __init__(self):
 
         # Using Hack: fix joint 6
-        self.fix_joint_hack = False
+        self.fix_joint_hack = True
 
         # rospy.init_node("kinova_controller", anonymous=True)
 
