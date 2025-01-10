@@ -258,7 +258,7 @@ class KinovaArm:
         )
 
     def set_tool(self, tool):
-        # assert not self.cyclic_running, "Arm must be in high-level servoing mode to set tool"
+        assert not self.cyclic_running, "Arm must be in high-level servoing mode to set tool"
         
         # updates the urdf being used by pinocchio to include tool mass
         if tool == "fork":
