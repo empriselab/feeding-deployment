@@ -317,6 +317,10 @@ class _Runner:
             self.current_atoms -= operator.delete_effects
             self.current_atoms |= operator.add_effects
 
+            # Super hack: the drink and wipe are always prepared.
+            self.current_atoms.add(ToolPrepared([self.wipe]))
+            self.current_atoms.add(ToolPrepared([self.drink]))
+
             # Save the latest state in case we want to resume execution
             # after a crash.
             self._save_state(sim_state, self.current_atoms)
@@ -459,10 +463,14 @@ def my_custom_gesture_detector(perception_interface, timeout):
             transfer_tool.process_behavior_tree_parameter_update(node_name, "InitiateTransferInteraction", "button")
             transfer_tool.process_behavior_tree_parameter_update(node_name, "TransferCompleteInteraction", "button")
 
+        # Example of retracting after transfer.
+        bite_transfer = GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,))
+        bite_transfer.process_behavior_tree_node_addition("Retract", {}, "TransferUtensil", "after")
+
         # Run some commands.
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": True} ))
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
     else:
