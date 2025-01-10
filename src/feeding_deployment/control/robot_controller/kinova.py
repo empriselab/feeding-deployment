@@ -271,7 +271,6 @@ class KinovaArm:
                     os.path.join(self.file_path, "hack_gen3_robotiq_2f_85_fork.urdf")
                 )
             else:
-                raise ValueError("URDF not available for fork tool without joint hack")
                 self.model = pin.buildModelFromUrdf(
                     os.path.join(self.file_path, "gen3_robotiq_2f_85_fork.urdf")
                 )
@@ -290,7 +289,6 @@ class KinovaArm:
                     os.path.join(self.file_path, "hack_gen3_robotiq_2f_85_wipe.urdf")
                 )
             else:
-                raise ValueError("URDF not available for wipe tool without joint hack")
                 self.model = pin.buildModelFromUrdf(
                     os.path.join(self.file_path, "gen3_robotiq_2f_85_wipe.urdf")
                 )
@@ -321,9 +319,8 @@ class KinovaArm:
                     os.path.join(self.file_path, current_drink_urdf)
                 )
             else:
-                raise ValueError("URDF not available for drink tool without joint hack")
                 self.model = pin.buildModelFromUrdf(
-                    os.path.join(self.file_path, "gen3_robotiq_2f_85.urdf")
+                    os.path.join(self.file_path, "gen3_robotiq_2f_85_drink.urdf")
                 )
             self.data = self.model.createData()
             self.q_pin = np.zeros(self.model.nq)
@@ -421,10 +418,18 @@ class KinovaArm:
             q, dq, tau, x, gripper_pos = self.get_update_state()
             if self.fix_joint_hack:
                 q = np.insert(q, 5, -1.18039928)
-                dq = np.insert(dq, 5, 0)
-                tau = np.insert(tau, 5, 0)
 
-            return q, x, gripper_pos
+                # Not returning below values as they are not correct
+                # dq = np.insert(dq, 5, 0)
+                # tau = np.insert(tau, 5, 0)
+
+            return {
+                "position": q,
+                "velocity": np.zeros(self.actuator_count),
+                "effort": np.zeros(self.actuator_count),
+                "ee_pos": x,
+                "gripper_pos": gripper_pos,
+            }
             
         assert (
             not self.cyclic_running
@@ -469,8 +474,13 @@ class KinovaArm:
             base_feedback.interconnect.gripper_feedback.motor[0].position / 100.0
         )
 
-        # return q, dq, tau, ee_pos, ee_vel, ee_force, gripper_pos
-        return q, ee_pos, gripper_pos
+        return {
+            "position": q,
+            "velocity": dq,
+            "effort": tau,
+            "ee_pos": ee_pos,
+            "gripper_pos": gripper_pos,
+        }
 
     def move_angular_trajectory(self, trajectory_joint_angles, blocking=True):
 
@@ -536,7 +546,8 @@ class KinovaArm:
             print("Waiting for angular movement to finish ...")
             self.end_or_abort_event.wait(KinovaArm.ACTION_TIMEOUT_DURATION)
             # read states and check if the arm actually reached the desired position
-            q, _, _ = self.get_state()
+            current_state = self.get_state()
+            q = current_state["position"]
             # find error while wrapping angles
             error = np.degrees(q - joint_angles)
             while np.any(error > 180) or np.any(error < -180):
@@ -574,7 +585,8 @@ class KinovaArm:
             print("Waiting for cartesian movement to finish ...")
             self.end_or_abort_event.wait(KinovaArm.ACTION_TIMEOUT_DURATION)
             # read states and check if the arm actually reached the desired position
-            _, x, _ = self.get_state()
+            current_state = self.get_state()
+            x = current_state["ee_pos"]
             if not np.allclose(x[:3], xyz, atol=0.01): # 1 cm
                 print("Arm did not reach desired position")
                 self.stop()
@@ -946,7 +958,6 @@ class KinovaArm:
         print("Arm is back in high-level servoing mode")
 
     def update_state(self):
-        assert self.cyclic_running, "Arm must be in low-level servoing mode"
 
         # Robot state
         for i in range(self.n_compliant_dofs):
@@ -1100,8 +1111,8 @@ class KinovaArm:
             gripper_command = arm.gripper_pos
             return torque_command, gripper_command
 
-        q, ee_pos, gripper_pos = self.get_state()
-        self.gripper_pos = gripper_pos # set gripper position to current position to avoid sudden jumps
+        current_state = self.get_state()
+        self.gripper_pos = current_state["gripper_pos"] # set gripper position to current position to avoid sudden jumps
 
         # if compliant control is already running, stop it (but do not switch back to high-level servoing mode)
         if self.cyclic_running:
@@ -1141,119 +1152,8 @@ class KinovaArm:
 def main():
     arm = KinovaArm()
     try:
-        # input("Press Enter to move to home pos")
-        # arm.home()
-
         input("Press Enter to zero torque offsets")
         arm.zero_torque_offsets()
-
-        # np.set_printoptions(precision=4, suppress=True)
-
-        # for i in range(10):
-        #     input("Press Enter to read current state")
-        #     ee_force = arm.get_ee_force()
-        #     print(f"End Effector Force: {ee_force}")
-
-        # input("Press Enter to move to home pos")
-        # arm.home()
-
-        # before_transfer_pos = [
-        #     -2.8655331,  
-        #     -1.61973777, 
-        #     -2.6097253, 
-        #     -1.37301134, 
-        #     1.11781087,
-        #     -1.18039928,
-        #     2.05515662
-        # ]
-
-        # before_transfer_tool_transform = np.zeros(7)
-        # before_transfer_tool_transform[:3] = [0.250, 0.271, 0.529]
-        # before_transfer_tool_transform[3:] = [0.539, -0.445, -0.526, 0.483]
-        
-        # input("Press Enter to move to before transfer pos")
-        # arm.move_angular(before_transfer_pos)
-
-        # input('Press Enter to switch to gravity compensation mode')
-        # arm.switch_to_gravity_compensation_mode()
-
-        # input('Press Enter to switch to joint compliant mode')
-        # command_queue = queue.Queue(1)
-        # arm.switch_to_joint_compliant_mode(command_queue)  
-
-        # input('Press Enter to switch to task compliant mode')
-        # command_queue = queue.Queue(1)
-        # arm.switch_to_task_compliant_mode(command_queue)
-
-        # for i in range(5):
-        #     input("Press Enter to read current state")
-        #     q, _, _, current_x, _ = arm.get_update_state()
-        #     print(f"Current q: {q}")
-        #     print(f"Goal q: {before_transfer_pos}")
-        #     print(f"Current x: {current_x[:3]}")
-        #     print(f"Goal x: {before_transfer_tool_transform[:3]}")
-
-        # input('Press Enter to switch to task compliant mode')
-        # command_queue = queue.Queue(1)
-        # arm.switch_to_task_compliant_mode(command_queue)
-
-        # _, _, _, initial_x, gripper_pos = arm.get_update_state()
-        # # send 5 commands to the robot
-        # for i in range(5):
-        #     _, _, _, current_x, _ = arm.get_update_state()
-        #     print(f"Current x: {current_x}")
-        #     # enter desired x
-        #     desired_x_x = float(input("Enter desired x x: "))
-        #     desired_x_y = float(input("Enter desired x y: "))
-        #     desired_x_z = float(input("Enter desired x z: "))
-        #     desired_x = np.array([desired_x_x, desired_x_y, desired_x_z, initial_x[3], initial_x[4], initial_x[5], initial_x[6]])
-        #     print(f"Desired x: {desired_x}")
-        #     command_queue.put((desired_x, gripper_pos))
-        #     time.sleep(1)
-
-        # input('Press Enter to switch out of joint compliant mode')
-        # arm.switch_out_of_compliant_mode()
-
-        # arm.home()
-
-        # home_pos = [
-        #     2.2912759438800285,
-        #     0.7308686750765581,
-        #     2.082994642398784,
-        #     4.109475142253324,
-        #     0.2853091081120964,
-        #     5.818345985240578,
-        #     5.988186420599291,
-        # ]
-        # home_pos = [math.degrees(angle) for angle in home_pos]
-
-        # infront_mount_position = [0.0, -0.17, 0.15]
-        # infront_mount_orientation = R.from_quat([0.7071068, -0.7071068, 0, 0]).as_euler('xyz', degrees=True)
-
-        # input("Press Enter to move to home pos")
-        # arm.move_angular(home_pos)
-
-        # input("Press Enter to move to infront mount pose")
-        # arm.move_cartesian(infront_mount_position, infront_mount_orientation)
-
-        # input("Press Enter to move to home config")
-        # arm.home()
-
-        # input("Press Enter to start gravity compensation")
-        # arm.switch_to_gravity_compensation_mode()
-
-        # input("Press Enter to move to home config")
-        # arm.home()
-
-        # input("Press Enter to start joint compliant mode")
-        # command_queue = queue.Queue(1)
-        # arm.switch_to_joint_compliant_mode(command_queue)
-
-        # input("Press Enter to move to retract config")
-        # arm.retract()
-
-        # arm.move_angular_trajectory([])
-
     finally:
         arm.disconnect()
 

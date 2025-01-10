@@ -222,7 +222,8 @@ class PerceptionInterface:
         
     def get_tool_tip_pose(self) -> np.ndarray:
 
-        arm_pos, ee_pose, gripper_pos = self.robot_interface.get_state()
+        current_state = self.robot_interface.get_state()
+        ee_pose = current_state["ee_pos"]
 
         tool_tip_pose = np.eye(4)
         tool_tip_pose[:3, 3] = ee_pose[:3]
