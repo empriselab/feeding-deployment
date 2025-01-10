@@ -18,7 +18,8 @@ dependencies = [
    "tomsutils@git+https://github.com/tomsilver/toms-utils.git",
    "opencv-python",
    "multiprocess",
-   "scikit-learn"
+   "scikit-learn",
+   "paramiko",
 ]
 
 [project.optional-dependencies]

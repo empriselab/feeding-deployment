@@ -11,6 +11,7 @@ import sys
 import signal
 import shutil
 import numpy as np
+from tomsutils.llm import OpenAILLM
 
 try:
     import rospy
@@ -28,8 +29,8 @@ from relational_structs import (
     PDDLProblem,
     Predicate,
 )
-from relational_structs.utils import parse_pddl_plan
-from tomsutils.pddl_planning import run_pyperplan_planning
+from relational_structs.utils import parse_pddl_plan, get_object_combinations
+from tomsutils.pddl_planning import run_pddl_planner
 from pybullet_helpers.geometry import Pose
 
 from feeding_deployment.actions.base import (
@@ -39,15 +40,19 @@ from feeding_deployment.actions.base import (
     PlateInView,
     ToolPrepared,
     ToolTransferDone,
+    EmulateTransferDone,
     ResetPos,
     tool_type,
     GroundHighLevelAction,
     ResetHLA,
     pddl_plan_to_hla_plan,
+    interpret_user_update_request,
+    NodeModificationUserUpdateRequest,
 )
 from feeding_deployment.actions.pick_tool import PickToolHLA
 from feeding_deployment.actions.stow_tool import StowToolHLA
 from feeding_deployment.actions.transfer_tool import TransferToolHLA
+from feeding_deployment.actions.emulate_transfer import EmulateTransferHLA
 from feeding_deployment.actions.acquisition import LookAtPlateHLA, AcquireBiteHLA
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
 from feeding_deployment.interfaces.web_interface import WebInterface
@@ -66,7 +71,7 @@ from feeding_deployment.actions.flair.flair import FLAIR
 
 
 # All the high level actions we want to consider.
-HLAS = {PickToolHLA, StowToolHLA, LookAtPlateHLA, AcquireBiteHLA, TransferToolHLA, ResetHLA}
+HLAS = {PickToolHLA, StowToolHLA, LookAtPlateHLA, AcquireBiteHLA, TransferToolHLA, EmulateTransferHLA, ResetHLA}
 
 assert os.environ.get("PYTHONHASHSEED") == "0", \
         "Please add `export PYTHONHASHSEED=0` to your bash profile!"
@@ -98,6 +103,11 @@ class _Runner:
 
         self.log_dir = Path(__file__).parent / "log"
         self.log_dir.mkdir(exist_ok=True)
+
+        self.llm = OpenAILLM(
+            model_name="gpt-4o",
+            cache_dir=self.log_dir / "llm_cache",
+        )
 
         # Initialize the perceiver (e.g., get joint states or human head poses).
         self.perception_interface = PerceptionInterface(robot_interface=self.robot_interface, simulate_head_perception=self.simulate_head_perception, log_dir=self.log_dir)
@@ -140,6 +150,13 @@ class _Runner:
         for original_bt_filename in original_behavior_tree_dir.glob("*.yaml"):
             shutil.copy(original_bt_filename, self.run_behavior_tree_dir)
 
+        # Copy the initial gesture detction file into a directory for this run,
+        # where it will be updated from LLM-based few-shot learning.
+        original_gesture_detection_filepath = Path(__file__).parents[1] / "perception" / "gestures_perception" / "synthesized_gesture_detectors.py"
+        assert original_gesture_detection_filepath.exists()
+        shutil.copy(original_gesture_detection_filepath, self.run_behavior_tree_dir)
+        self._gesture_detection_filepath = self.run_behavior_tree_dir / original_gesture_detection_filepath.name
+
         # Create skills for high-level planning.
         hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
         print("Creating HLAs...")
@@ -155,6 +172,7 @@ class _Runner:
             GripperFree,
             Holding,
             ToolTransferDone,
+            EmulateTransferDone,
             IsUtensil,
             PlateInView,
             ResetPos,
@@ -167,6 +185,11 @@ class _Runner:
         self.wipe = Object("wipe", tool_type)
         self.utensil = Object("utensil", tool_type)
         self.all_objects = {self.drink, self.wipe, self.utensil}
+        self.object_name_to_object = {
+            "drink": self.drink,
+            "wipe": self.wipe,
+            "utensil": self.utensil,
+        }
 
         # Track the current high-level state.
         self.current_atoms = {
@@ -224,11 +247,11 @@ class _Runner:
             or (msg_dict["status"] == "return_to_main" and msg_dict["state"] == "post_drink_transfer") \
             or (msg_dict["status"] == "back" and msg_dict["state"] == "bite_selection"): 
             user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["LookAtPlate"], (self.utensil,)
+                self.hla_name_to_hla["LookAtPlateWhileHolding"], (self.utensil,)
             )
         elif msg_dict["status"] == "aquire_food" or msg_dict["status"] == 0: # manual acquire food
             user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["AcquireBite"], (self.utensil,), params=msg_dict
+                self.hla_name_to_hla["AcquireBiteWithTool"], (self.utensil,), params=msg_dict
             )
         elif msg_dict["status"] == "bite_transfer":
             user_cmd = GroundHighLevelAction(
@@ -266,8 +289,8 @@ class _Runner:
             self.current_atoms,
             goal_atoms,
         )
-        plan_strs = run_pyperplan_planning(
-            str(self.domain), str(problem), heuristic="lmcut", search="astar"
+        plan_strs = run_pddl_planner(
+            str(self.domain), str(problem), planner="fd-opt",
         )
         assert plan_strs is not None
         plan_ops = parse_pddl_plan(plan_strs, self.domain, problem)
@@ -321,6 +344,50 @@ class _Runner:
                 
         print(f"Loaded system state from {self._saved_state_infile}")
 
+    def process_user_update_request(self, request_text: str) -> None:
+        """Validate and update behavior trees."""
+        available_hla_object_names = []
+        for hla_name, hla in sorted(self.hla_name_to_hla.items()):
+            types = [p.type for p in hla.get_operator().parameters]
+            for obj_combo in get_object_combinations(sorted(self.all_objects), types):
+                object_strs = [obj.name for obj in obj_combo]
+                objects_str = ", ".join(object_strs)
+                available_hla_object_name = f"hla_name={hla_name}, hla_object_names=({objects_str},)"
+                available_hla_object_names.append(available_hla_object_name)
+        requested_updates = interpret_user_update_request(request_text, self.llm, available_hla_object_names, self.run_behavior_tree_dir)
+        for update in requested_updates:
+            if isinstance(update, NodeModificationUserUpdateRequest):
+                if update.hla_name not in self.hla_name_to_hla:
+                    print(f"BT UPDATE FAILED: Unknown HLA name {update.hla_name}")
+                    continue
+                hla = self.hla_name_to_hla[update.hla_name]
+                hla_object_list = []
+                failed_object_name = None
+                for obj_name in update.hla_object_names:
+                    if obj_name not in self.object_name_to_object:
+                        failed_object_name = obj_name
+                        break
+                    hla_object_list.append(self.object_name_to_object[obj_name])
+                if failed_object_name is not None:
+                    print(f"BT UPDATE FAILED: Unknown object name {failed_object_name}")
+                    continue
+                assert update.hla_parameters is None
+                ground_hla = GroundHighLevelAction(hla, tuple(hla_object_list))
+                ground_hla.process_behavior_tree_parameter_update(update.node_name, update.parameter_name, update.new_value)
+            else:
+                # TODO: handle node additions
+                raise NotImplementedError
+            
+    def register_gesture_detector(self, gesture_fn_name: str, gesture_fn_text: str) -> bool:
+        """Add the gesture function to this run's python file."""
+        with open(self._gesture_detection_filepath, "r", encoding="utf-8") as f:
+            gesture_file_text = f.read()
+        assert f"def {gesture_fn_name}(" not in gesture_file_text
+        gesture_file_text += "\n" + gesture_fn_text + "\n"
+        with open(self._gesture_detection_filepath, "w", encoding="utf-8") as f:
+            f.write(gesture_file_text)
+        print(f"Registered new gesture detection function: {gesture_fn_name}")
+
 
 if __name__ == "__main__":
     import argparse
@@ -365,11 +432,26 @@ if __name__ == "__main__":
     # runner.hla_command_queue.put(drink_transfer_msg)
 
     if not args.use_interface:
-        # Example of updating a behavior tree parameer.
-        bite_acquisition = GroundHighLevelAction(runner.hla_name_to_hla["AcquireBite"], (runner.utensil,))
-        bite_acquisition.process_behavior_tree_update("AcquireBite", "Speed", 1.25)
+        # Example of using LLM to generate updates to behavior trees.
+        runner.process_user_update_request("Move a little bit faster while picking up the food")
+
+        # Example of directly updating the behavior trees.
+        bite_acquisition = GroundHighLevelAction(runner.hla_name_to_hla["AcquireBiteWithTool"], (runner.utensil,))
+
+        gesture_fn_text = """
+def my_custom_gesture_detector(perception_interface, timeout):
+    print("Detecting gesture...")
+    time.sleep(timeout)
+    return True
+"""
+        gesture_fn_name = "my_custom_gesture_detector"
+        runner.register_gesture_detector(gesture_fn_name, gesture_fn_text)
+
+        bite_acquisition.process_behavior_tree_node_addition("WaitForGesture", {"gesture_fn_name": gesture_fn_name}, "AcquireBite", "before")
+        bite_acquisition.process_behavior_tree_node_addition("Pause", {"duration": 0.5}, "AcquireBite", "after")
 
         # Run some commands.
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": True} ))
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))

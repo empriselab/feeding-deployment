@@ -1,5 +1,5 @@
-# Stow utensil.
 name: "StowUtensil"
+description: "Place the utensil in the tool mount."
 type: "Behavior"
 parameters: []
 fn: !hla stow_utensil

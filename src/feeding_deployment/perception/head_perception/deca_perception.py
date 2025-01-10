@@ -153,6 +153,14 @@ class HeadPerception:
         '''
         The realsense camera is inverted vertically, leading to flipped images.
         This function flips the image vertically before running DECA as DECA doesn't work well with flipped images.
+        returns (within a dictionary):
+         - head_pose,
+         - landmarks2d,
+         - tool_tip_target_pose,
+         - visualization_points_world_frame,
+         - reference_neck_frame,
+         - neck_frame,
+         - noisy_reading,
         '''
 
         image = cv2.flip(image, -1)
@@ -183,7 +191,7 @@ class HeadPerception:
         codedict, tform, images, src_pts = get_deca_codedict(image)
 
         if codedict is None:
-            return (None, None, None, None, None, None, None, None, None, None, None)
+            return None
 
         # original_images = torch.tensor(image/255).float().to(self.device)[None,...]
 
@@ -227,7 +235,7 @@ class HeadPerception:
 
         if len(valid_landmarks_selected_world) < 4:
             # print("Not enough landmarks to fit model.")
-            return (None, None, None, None, None, None, None, None, None, None, None)
+            return None
 
         valid_landmarks_selected_model = np.array(valid_landmarks_selected_model)
         valid_landmarks_selected_world = np.array(valid_landmarks_selected_world)
@@ -244,8 +252,6 @@ class HeadPerception:
 
         landmark2d[..., 0] = landmark2d[..., 0] * w / 2 + w / 2
         landmark2d[..., 1] = landmark2d[..., 1] * h / 2 + h / 2
-
-        mouth_state, dist = self.is_mouth_open(landmark2d)
 
         if visualize:
 
@@ -339,23 +345,15 @@ class HeadPerception:
 
             input("Press [ENTER] to update saved data... ")
 
-            landmark2d = None
-            landmarks3d = None
-            average_head_point = None
-
-            return (
-                landmark2d,
-                landmarks3d,
-                viz_image,
-                None,
-                average_head_point,
-                self.reference_tool_tip_transform,
-                visualization_points_world_frame,
-                neck_frame,
-                neck_frame,
-                None,
-                None,
-            )
+            return {
+                "head_pose": self.get_head_pose_from_neck_frame(neck_frame),
+                "landmarks2d": None,
+                "tool_tip_target_pose": self.reference_tool_tip_transform,
+                "visualization_points_world_frame": visualization_points_world_frame,
+                "reference_neck_frame": neck_frame,
+                "neck_frame": neck_frame,
+                "noisy_reading": False,
+            }
 
         else:
 
@@ -451,19 +449,15 @@ class HeadPerception:
                      or np.any( np.abs(rotation_from_reference) > self.max_rotation_threshold)):
                     # print("Noisy reading!")
 
-                    return (
-                        landmark2d,
-                        landmarks3d,
-                        viz_image,
-                        None,
-                        average_head_point,
-                        self.last_forque_target_pose,
-                        visualization_points_world_frame,
-                        self.reference_neck_frame,
-                        self.last_neck_frame,
-                        True,
-                        None,
-                    )
+                    return {
+                        "head_pose": self.get_head_pose_from_neck_frame(self.last_neck_frame),
+                        "landmarks2d": landmark2d,
+                        "tool_tip_target_pose": self.last_forque_target_pose,
+                        "visualization_points_world_frame": visualization_points_world_frame,
+                        "reference_neck_frame": self.reference_neck_frame,
+                        "neck_frame": self.last_neck_frame,
+                        "noisy_reading": True,
+                    }
 
             if self.last_neck_frame is not None:
                 current_rotation = neck_frame[:3, :3]
@@ -517,20 +511,16 @@ class HeadPerception:
                     and np.abs(trans[2, 3] - self.last_trans[2, 3]) < 0.005
                 ):
                     # print("Not updating forque target pose")
-
-                    return (
-                        landmark2d,
-                        landmarks3d,
-                        viz_image,
-                        mouth_state,
-                        average_head_point,
-                        self.last_forque_target_pose,
-                        self.last_visualization_points_world_frame,
-                        self.reference_neck_frame,
-                        self.last_neck_frame,
-                        False,
-                        neck_rotation,
-                    )
+                
+                    return {
+                        "head_pose": self.get_head_pose_from_neck_frame(self.last_neck_frame),
+                        "landmarks2d": landmark2d,
+                        "tool_tip_target_pose": self.last_forque_target_pose,
+                        "visualization_points_world_frame": self.last_visualization_points_world_frame,
+                        "reference_neck_frame": self.reference_neck_frame,
+                        "neck_frame": self.last_neck_frame,
+                        "noisy_reading": False,
+                    }
 
             self.last_trans = trans
             self.last_neck_frame = neck_frame
@@ -610,58 +600,37 @@ class HeadPerception:
                 cv2.imshow("viz_image",viz_image)
                 cv2.waitKey(10)
 
-            return (
-                landmark2d,
-                landmarks3d,
-                viz_image,
-                mouth_state,
-                average_head_point,
-                forque_target_pose,
-                visualization_points_world_frame,
-                self.reference_neck_frame,
-                neck_frame,
-                False,
-                neck_rotation,
-            )
+            return {
+                "head_pose": self.get_head_pose_from_neck_frame(neck_frame),
+                "landmarks2d": landmark2d,
+                "tool_tip_target_pose": forque_target_pose,
+                "visualization_points_world_frame": visualization_points_world_frame,
+                "reference_neck_frame": self.reference_neck_frame,
+                "neck_frame": neck_frame,
+                "noisy_reading": False,
+            }
+        
+    def get_head_pose_from_neck_frame(self, neck_frame):
 
-    def is_mouth_open(self, keypoints):
+        neck_position = neck_frame[:3, 3]
+        neck_orientation = Rotation.from_matrix(neck_frame[:3, :3]).as_euler("xyz", degrees=True)
 
-        if len(keypoints) != 68:
-            print("Not enough keypoints : ", np.array(keypoints).shape[0])
-            return
+        head_x = neck_position[0]
+        head_y = neck_position[1]
+        head_z = neck_position[2]
 
-        # print("Top Lower Lip: ", keypoints[66])
-        # print("Bottom Lower Lip: ", keypoints[57])
+        head_roll = neck_orientation[0]  # Rotation around x-axis
+        head_pitch = neck_orientation[1]  # Rotation around y-axis
+        head_yaw = neck_orientation[2]  # Rotation around z-axis
 
-        # print("Top Upper Lip: ", keypoints[51])
-        # print("Bottom Upper Lip: ", keypoints[62])
+        # because our axis if not the conventional one, we will switch to conventional axis
+        conventional_head_roll = head_yaw
+        conventional_head_pitch = head_roll
+        conventional_head_yaw = head_pitch
 
-        lipDist = np.sqrt(
-            (keypoints[66][0] - keypoints[62][0]) ** 2
-            + (keypoints[66][1] - keypoints[62][1]) ** 2
-        )
-
-        lipThickness = float(
-            np.sqrt(
-                (keypoints[51][0] - keypoints[62][0]) ** 2
-                + (keypoints[51][1] - keypoints[62][1]) ** 2
-            )
-            / 2
-        ) + float(
-            np.sqrt(
-                (keypoints[57][0] - keypoints[66][0]) ** 2
-                + (keypoints[57][1] - keypoints[66][1]) ** 2
-            )
-            / 2
-        )
-
-        # print("lipDist: ",lipDist)
-        # print("lipThickness: ",lipThickness)
-
-        if lipDist >= 1.5 * lipThickness:
-            return True, lipDist / lipThickness
-        else:
-            return False, lipDist / lipThickness
+        head_pose = (head_x, head_y, head_z, conventional_head_roll, conventional_head_pitch, conventional_head_yaw)
+        
+        return head_pose
 
     def bbox2Point(self, left, right, top, bottom, type="bbox"):
         """Bbox from detector and landmarks are different."""

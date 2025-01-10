@@ -1,5 +1,5 @@
-# Look at plate while holding utensil.
 name: "LookAtPlate"
+description: "Look at plate while holding utensil to detect various food items and predict next bite."
 type: "Behavior"
 parameters: []
 fn: !hla look_at_plate

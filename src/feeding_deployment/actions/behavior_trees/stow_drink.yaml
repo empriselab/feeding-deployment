@@ -1,5 +1,5 @@
-# Stow drink.
 name: "StowDrink"
+description: "Place the mug on the table."
 type: "Behavior"
 parameters: []
 fn: !hla stow_drink

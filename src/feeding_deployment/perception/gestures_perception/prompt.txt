@@ -1,20 +1,15 @@
-Using the given language description, create a corresponding gesture detection function that utilizes the appropriate parameters. You have access to these low-level functions:
+Using the given language description, create a corresponding gesture detection function that utilizes the appropriate parameters. You have access to the following head perception method which is a member of the perception_interface class:
 
-def get_head_pose():
-    '''
-    Detects the current head pose of the user in the camera frame (z forward, x up). 
+def get_head_perception_data():
+    """
+    Detects the current head pose of the user in the camera frame (z forward, x up) and face keypoints.
     Execution time: 0.1 sec.
-    Args: None
-    Returns: (x, y, z, roll, pitch, yaw) - tuple of ints
-    '''
-    pass
-
-def get_face_keypoints():
-    '''
-    Detects face keypoints. Execution time: 0.1 sec.
-    Args: None
-    Returns: keypoints (list): 68 face keypoints (x, y) in dlib format
-    '''
+    Returns:
+        dict: {
+            "head_pose": (x, y, z, roll, pitch, yaw),  # Tuple of ints
+            "face_keypoints": list[tuple[int, int]]   # 68 face keypoints (x, y) in dlib format
+        }
+    """
     pass
 
 
@@ -27,17 +22,17 @@ Language Description: "left to right head shake"
 
 Output:
 ##################
-def gesture_detector(robot, threshold, timeout):
+def gesture_detector(perception_interface, threshold, timeout):
 
     start_time = time.time()
     yaw_data = []
     direction_changes = 0  # Counts the number of left-right or right-left changes
 
-    id = 0
     while time.time() - start_time < timeout:
-        head_pose = robot.get_head_pose()
-        if head_pose is None:
-            break 
+        head_perception_data = perception_interface.get_head_perception_data()
+        if head_perception_data is None:
+            break
+        head_pose = head_perception_data["head_pose"]
 
         (head_x, head_y, head_z, head_roll, head_pitch, head_yaw) = head_pose
         yaw_data.append(head_yaw)
@@ -69,18 +64,18 @@ Language Description: "mouth open"
 
 Output:
 ##################
-def gesture_detector(robot, threshold, timeout):
+def gesture_detector(perception_interface, threshold, timeout):
 
     def euclidean_distance(p1, p2):
         """Calculate Euclidean distance between two points."""
         return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5
 
     start_time = time.time()
-
     while time.time() - start_time < timeout:
-        face_keypoints = robot.get_face_keypoints()
-        if face_keypoints is None:
+        head_perception_data = perception_interface.get_head_perception_data()
+        if head_perception_data is None:
             break
+        face_keypoints = head_perception_data["face_keypoints"]
         
         # Indices for mouth landmarks
         mouth_points = face_keypoints[48:68]

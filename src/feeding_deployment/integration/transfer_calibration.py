@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 import numpy as np
 from scipy.spatial.transform import Rotation
+import shutil
 
 try:
     import rospy
@@ -79,7 +80,16 @@ def _main(
         # Create skills for high-level planning.
         hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
 
-        high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_controller, flair=None, no_waits=False, log_path=None)
+        # Copy the initial behavior trees into a directory for this run, where
+        # they will be modified based on user feedback.
+        run_behavior_tree_dir = Path(__file__).parent / "log" / "behavior_trees"
+        run_behavior_tree_dir.mkdir(exist_ok=True)
+        original_behavior_tree_dir = Path(__file__).parents[1] / "actions" / "behavior_trees"
+        assert original_behavior_tree_dir.exists()
+        for original_bt_filename in original_behavior_tree_dir.glob("*.yaml"):
+            shutil.copy(original_bt_filename, run_behavior_tree_dir)
+
+        high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_controller, flair=None, behavior_tree_dir=run_behavior_tree_dir , no_waits=False, log_path=None)
 
         if tool == "fork":
             object = Object("utensil", tool_type)
