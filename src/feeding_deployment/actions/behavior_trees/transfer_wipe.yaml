@@ -1,5 +1,5 @@
-# Transfer wipe.
 name: "TransferWipe"
+description: "Bring the wipe to the user's mouth for a cleaning."
 type: "Behavior"
 parameters: []
 fn: !hla transfer_wipe

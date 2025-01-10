@@ -33,7 +33,7 @@ class LookAtPlateHLA(HighLevelAction):
     """Look at plate in preparation of bite acquisition."""
 
     def get_name(self) -> str:
-        return "LookAtPlate"
+        return "LookAtPlateWhileHolding"
 
     def get_operator(self) -> LiftedOperator:
         tool = Variable("?tool", tool_type)
@@ -83,7 +83,7 @@ class LookAtPlateHLA(HighLevelAction):
 
                     # items = self.flair.identify_plate(camera_color_data)
                     # items = ['cantaloupe', 'banana']
-                    items = ['banana']
+                    items = ['banana', 'watermelon', 'cantaloupe', 'grape']
                     self.flair.set_food_items(items)
                     items_detection = self.flair.detect_items(camera_color_data, camera_depth_data, camera_info_data, log_path=None)
 
@@ -232,9 +232,10 @@ class AcquireBiteHLA(HighLevelAction):
         super().__init__(*args, **kwargs)
 
         self.food_manipulation_skill_library = FoodManipulationSkillLibrary(self.sim, self.robot_interface, self.wrist_interface, self.perception_interface, self.rviz_interface, self.no_waits)
+        self.params = None
 
     def get_name(self) -> str:
-        return "AcquireBite"
+        return "AcquireBiteWithTool"
 
     def get_operator(self) -> LiftedOperator:
         tool = Variable("?tool", tool_type)
@@ -251,11 +252,18 @@ class AcquireBiteHLA(HighLevelAction):
         objects: tuple[Object, ...],
         params: dict[str, Any],
     ) -> str:
-        del params  # not used right now
         assert len(objects) == 1
         tool = objects[0]
         assert tool.name == "utensil"
         return "acquire_bite.yaml"
+    
+    def execute_action(
+        self,
+        objects: tuple[Object, ...],
+        params: dict[str, Any],
+    ) -> None:
+        self.params = params
+        return super().execute_action(objects, params)
     
     def acquire_bite(self, speed: float) -> None:
 
@@ -282,28 +290,28 @@ class AcquireBiteHLA(HighLevelAction):
                 next_food_item = next_action_prediction['labels_list'][next_action_prediction['food_id']]
                 bite_mask_idx = next_action_prediction['bite_mask_idx']
 
-                params = {
+                self.params = {
                     "status": "aquire_food",
                     "data": [next_food_item, bite_mask_idx],
                 }
 
-            if params["status"] == 0:
+            if self.params["status"] == 0:
 
                 detections = self.flair.get_items_detection()
                 plate_bounds = detections["plate_bounds"]
-                pos = params["positions"][0]
+                pos = self.params["positions"][0]
 
                 point_x = int(pos["x"]*plate_bounds[2]) + plate_bounds[0]
                 point_y = int(pos["y"]*plate_bounds[3]) + plate_bounds[1]
 
                 print("Plate Bounds:", plate_bounds)
-                print("Positions:", params["positions"])
+                print("Positions:", self.params["positions"])
                 print("Point:", point_x, point_y)
 
                 if not self.no_waits:
                     # visualize point on camera color image
                     viz = camera_color_data.copy()
-                    for pos in params["positions"]:
+                    for pos in self.params["positions"]:
                         cv2.circle(viz, (point_x, point_y), 5, (0, 255, 0), -1)
                     cv2.imshow("viz", viz)
                     cv2.waitKey(0)
@@ -314,13 +322,13 @@ class AcquireBiteHLA(HighLevelAction):
 
                 self.food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_center, major_axis = skewer_angle)
 
-            elif params["status"] == "aquire_food":
+            elif self.params["status"] == "aquire_food":
                 detections = self.flair.get_items_detection()
                 food_type_to_masks = detections["food_type_to_masks"]
                 food_type_to_skill = detections["food_type_to_skill"]
                 
-                food_type = params["data"][0]
-                item_id = params["data"][1] - 1
+                food_type = self.params["data"][0]
+                item_id = self.params["data"][1] - 1
 
                 mask = food_type_to_masks[food_type][item_id]
                 skill = food_type_to_skill[food_type]

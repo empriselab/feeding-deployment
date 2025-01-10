@@ -24,6 +24,7 @@ from std_msgs.msg import Bool
 import threading
 import time
 import numpy as np
+from pathlib import Path
 
 import rospy
 from std_msgs.msg import Bool
@@ -77,7 +78,7 @@ class WatchDog:
 
         self.watchdog_status_pub = rospy.Publisher("/watchdog_status", Bool, queue_size=1)
 
-        self.soft_anomaly = False
+        self.execution_log_path = Path(__file__).parent.parent / "integration" / "log" / "execution_log.txt"
 
         self.second_counter = 0
         time.sleep(3.0) # Wait for all queues to fill up / collision monitor to start
@@ -143,9 +144,11 @@ class WatchDog:
                 break
 
         if anomaly != AnomalyStatus.NO_ANOMALY:
+            self._arm_interface.emergency_stop()
             print(f"AnomalyStatus detected: {anomaly}")
             rospy.loginfo(f"AnomalyStatus detected: {anomaly}")
-            self._arm_interface.emergency_stop() 
+            with open(self.execution_log_path, 'a') as f:
+                f.write(f"Anomaly Detected: {AnomalyStatus.get_error_message(anomaly)}\n") 
 
         self.watchdog_status_pub.publish(Bool(data=anomaly == AnomalyStatus.NO_ANOMALY))
         return anomaly
@@ -155,8 +158,6 @@ class WatchDog:
             start_time = time.time()
             status = self.check_status()
             if status != AnomalyStatus.NO_ANOMALY:
-                print(f"AnomalyStatus detected: {status}")
-                rospy.loginfo(f"AnomalyStatus detected: {status}")
                 break
             end_time = time.time()
             # print(f"Time taken: {end_time - start_time}")

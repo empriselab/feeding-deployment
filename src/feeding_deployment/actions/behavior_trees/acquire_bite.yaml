@@ -1,5 +1,5 @@
-# Acquire a bite while holding utensil and looking at plate.
 name: "AcquireBite"
+description: "Pick up the appropriate food item from the plate."
 type: "Behavior"
 parameters:
   - name: "Speed"
@@ -9,4 +9,5 @@ parameters:
       upper: 1.5
     is_user_editable: True
     value: 1.0
+    description: "Speed of the robot during bite acquisition."
 fn: !hla acquire_bite

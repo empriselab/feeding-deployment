@@ -1,5 +1,5 @@
-# Bite transfer.
 name: "TransferUtensil"
+description: "Bring the utensil to the user's mouth for a bite."
 type: "Behavior"
 parameters: []
 fn: !hla transfer_utensil

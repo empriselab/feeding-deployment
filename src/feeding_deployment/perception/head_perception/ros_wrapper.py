@@ -42,29 +42,13 @@ class HeadPerceptionROSWrapper:
         self.voxel_publisher = rospy.Publisher(
             "/head_perception/voxels/marker_array", MarkerArray, queue_size=10
         )
-        # self.face_publisher =  rospy.Publisher("/head_perception/face/marker_array", MarkerArray, queue_size=10)
+
         self.tool_publisher = rospy.Publisher(
             "/head_perception/tool/marker_array", MarkerArray, queue_size=10
         )
 
-        self.pointcloud_publisher = rospy.Publisher(
-            "/head_perception/pointcloud2", PointCloud2, queue_size=10
-        )
-
-        self.mouth_state_publisher = rospy.Publisher(
-            "/head_perception/mouth_state", Bool, queue_size=10
-        )
-
-        self.head_distance_publisher = rospy.Publisher(
-            "/head_perception/head_distance", Float64MultiArray, queue_size=10
-        )
-
         self.noisy_reading_publisher = rospy.Publisher(
             "/head_perception/unexpected", Bool, queue_size=10
-        )
-
-        self.neck_rotation_publisher = rospy.Publisher(
-            "/head_perception/neck_rotation", Point, queue_size=10
         )
 
         self.tf_buffer_lock = Lock()
@@ -186,20 +170,7 @@ class HeadPerceptionROSWrapper:
         base_to_camera[3, 3] = 1
 
         run_deca_start_time = time.time()
-        # print("Calling DECA")
-        (
-            landmarks2d,
-            landmarks3d,
-            viz_image,
-            mouth_state,
-            average_head_point,
-            tool_tip_target_pose,
-            visualization_points_world_frame,
-            reference_neck_frame,
-            neck_frame,
-            noisy_reading,
-            neck_rotation,
-        ) = self.head_perception.run_deca(
+        head_perception_data = self.head_perception.run_deca(
             camera_color_data,
             camera_info_data,
             camera_depth_data,
@@ -211,43 +182,33 @@ class HeadPerceptionROSWrapper:
         run_deca_end_time = time.time()
         # print("Run DECA time: ", run_deca_end_time - run_deca_start_time)
 
-        if visualization_points_world_frame is not None:
+        if head_perception_data is not None:
 
-            if mouth_state is not None:
-                self.mouth_state_publisher.publish(mouth_state)
             if self.filter_noisy_readings: # do not shutdown robot if warm starting / kill_on_noisy_reading is False
-                if noisy_reading is not None:
-                    self.noisy_reading_publisher.publish(noisy_reading)
-            if neck_rotation is not None:
-                neck_rotation_msg = Point()
-                neck_rotation_msg.x = neck_rotation[0]
-                neck_rotation_msg.y = neck_rotation[1]
-                neck_rotation_msg.z = neck_rotation[2]
-                self.neck_rotation_publisher.publish(neck_rotation_msg)
+                if head_perception_data["noisy_reading"] is not None:
+                    self.noisy_reading_publisher.publish(head_perception_data["noisy_reading"])
 
-            if average_head_point is not None:  
-                head_distance_msg = Float64MultiArray()
-                head_distance_msg.data = [
-                    average_head_point[0],
-                    average_head_point[1],
-                    average_head_point[2],
-                ]
-                self.head_distance_publisher.publish(head_distance_msg)
-
-            self.visualizeToolTipTarget(tool_tip_target_pose)
-            self.visualizeVoxels(visualization_points_world_frame)
+            self.visualizeToolTipTarget(head_perception_data["tool_tip_target_pose"])
+            self.visualizeVoxels(head_perception_data["visualization_points_world_frame"])
 
             if self.head_perception.record_goal_pose:
-                self.updateTF("camera_color_optical_frame", "tool_tip_target", tool_tip_target_pose)
+                self.updateTF("camera_color_optical_frame", "tool_tip_target", head_perception_data["tool_tip_target_pose"])
             else:
-                self.updateTF("base_link", "tool_tip_target", tool_tip_target_pose)
-            self.updateTF("base_link", "head_pose", neck_frame)
-            self.updateTF("base_link", "reference_head_pose", reference_neck_frame)
+                self.updateTF("base_link", "tool_tip_target", head_perception_data["tool_tip_target_pose"])
+            self.updateTF("base_link", "head_pose", head_perception_data["neck_frame"])
+            self.updateTF("base_link", "reference_head_pose", head_perception_data["reference_neck_frame"])
+
+            return {
+                "head_pose": head_perception_data["head_pose"],
+                "face_keypoints": head_perception_data["landmarks2d"],
+                "tool_tip_target_pose": head_perception_data["tool_tip_target_pose"],
+            }
+
         else:
             if self.filter_noisy_readings:
                 self.noisy_reading_publisher.publish(Bool(data=True))
-
-        return tool_tip_target_pose, neck_frame
+            
+            return None
 
     def updateTF(self, source_frame, target_frame, pose):
 
@@ -400,7 +361,8 @@ if __name__ == "__main__":
 
     rospy.init_node("head_perception", anonymous=True)
 
-    head_perception_ros_wrapper = HeadPerceptionROSWrapper(record_goal_pose=args.record_goal_pose)
+    head_perception = HeadPerception(record_goal_pose=args.record_goal_pose)
+    head_perception_ros_wrapper = HeadPerceptionROSWrapper(head_perception)
     time.sleep(2.0)  # let the buffers fill up
 
     if args.set_tool_tip_transform:
