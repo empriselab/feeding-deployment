@@ -146,7 +146,7 @@ class TransferToolHLA(HighLevelAction):
             parameters=[tool],
             preconditions={Holding([tool]), ToolPrepared([tool])},
             add_effects={LiftedAtom(ToolTransferDone, [tool])},
-            delete_effects=set(),
+            delete_effects={ToolPrepared([tool])},
         )
     
     def get_behavior_tree_filename(
