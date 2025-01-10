@@ -57,25 +57,15 @@ class PerceptionInterface:
 
             self.speak_pub = rospy.Publisher('/speak', String, queue_size=1)
 
-            self.set_filter_noisy_readings_pub = rospy.Publisher('/head_perception/set_filter_noisy_readings', Bool, queue_size=1)
-
             self.transfer_button = False
             self.transfer_button_sub = rospy.Subscriber('/transfer_button', Bool, self.transfer_button_callback)
-
-            self.mouth_open = False
-            self.mouth_state_sub = rospy.Subscriber('/head_perception/mouth_state', Bool, self.mouth_state_callback)
             
             self.ft_threshold_exceeded = False
             self.ft_sensor_sub = rospy.Subscriber('/forque/forqueSensor', WrenchStamped, self.ft_callback)
 
-            self.head_shake_detected = False
-            self.head_still_detected = False
-            self.neck_rotation_sub = rospy.Subscriber('/head_perception/neck_rotation', Point, self.neck_rotation_callback)
-
-        self.tool_tip_target_lock = threading.Lock()
+        self.head_perception_data_lock = threading.Lock()
         # this term is updated in the run_head_perception method and read in the get_tool_tip_pose method
-        self.tool_tip_target_pose = None
-        self.neck_frame = None
+        self.head_perception_data = None
 
         # Head perception thread setup
         self.head_perception_thread = None
@@ -94,28 +84,6 @@ class PerceptionInterface:
         if self.simulation:
             return
         self.speak_pub.publish(String(data=text))
-
-    def neck_rotation_callback(self, msg):
-
-        neck_rotation = np.array([msg.x, msg.y, msg.z])
-        if neck_rotation[1] > 5: # in degrees
-            self.head_shake_detected = True
-        if np.abs(neck_rotation[0]) < 5 and np.abs(neck_rotation[1]) < 5 and np.abs(neck_rotation[2]) < 5:
-            self.head_still_detected = True
-        else:
-            self.head_still_detected = False
-
-    def detect_mouth_open(self):
-        print("Waiting for mouth open")
-        if self.simulation:
-            return True
-        
-        self.mouth_open = False
-        # wait for mouth to open
-        while not rospy.is_shutdown() and not self.mouth_open:
-            time.sleep(0.05)
-        self.mouth_open = False
-        return True
 
     def detect_button_press(self):
         print("Waiting for button press")
@@ -140,52 +108,6 @@ class PerceptionInterface:
             time.sleep(0.05)
         self.ft_threshold_exceeded = False
         return True
-    
-    def detect_head_shake(self):
-        print("Waiting for head shake")
-        if self.simulation:
-            return True
-        
-        self.set_filter_noisy_readings_pub.publish(Bool(data=False))
-        self.head_shake_detected = False
-        # wait for head shake
-        while not rospy.is_shutdown() and not self.head_shake_detected:
-            time.sleep(0.05)
-        self.set_filter_noisy_readings_pub.publish(Bool(data=True))
-        self.head_shake_detected = False
-        return True
-    
-    def detect_head_still(self):
-        print("Waiting for head still to be detected for 4 seconds")
-        if self.simulation:
-            return True
-        self.head_shake_detected = True
-        self.set_filter_noisy_readings_pub.publish(Bool(data=False))
-        while not rospy.is_shutdown():
-            head_still_start_time = time.time()
-            while not rospy.is_shutdown():
-                print("Head still detected: ",self.head_still_detected)
-                if not self.head_still_detected or time.time() - head_still_start_time > 4.0:
-                    break
-                if time.time() - head_still_start_time > 3.0:
-                    print("Waiting for head still to be detected for 1 more second")
-                elif time.time() - head_still_start_time > 2.0:
-                    print("Waiting for head still to be detected for 2 more seconds")
-                elif time.time() - head_still_start_time > 1.0:
-                    print("Waiting for head still to be detected for 3 more seconds")
-                time.sleep(0.05)
-            if time.time() - head_still_start_time > 4.0:
-                break
-        self.set_filter_noisy_readings_pub.publish(Bool(data=True))
-        self.head_still_detected = True
-        return True
-    
-    def auto_timeout(self, timeout=5.0):
-        print("Waiting for auto timeout")
-        if self.simulation:
-            return True
-        time.sleep(timeout)
-        return True
 
     def ft_callback(self, msg):
 
@@ -195,16 +117,9 @@ class PerceptionInterface:
         if np.abs(down_torque) > 0.1:
             self.ft_threshold_exceeded = True
 
-    def mouth_state_callback(self, msg):
-        self.mouth_open = msg.data
-
     def transfer_button_callback(self, msg):
         print("Transfer button pressed")
         self.transfer_button = True
-
-    def head_shake_callback(self, msg):
-        with self.head_shake_lock:
-            self.head_shake_detected = msg.data
         
     def get_robot_joints(self) -> "JointState":
         """Get the current robot joint state."""
@@ -237,11 +152,7 @@ class PerceptionInterface:
         return self.head_perception_running
 
     def start_head_perception_thread(self):
-        assert not self.head_perception_running, "Head perception thread is already running"
-
-        if self.robot_interface is not None:
-            # Filter noisy readings
-            self.set_filter_noisy_readings_pub.publish(Bool(data=True))
+        assert not self.head_perception_running, "Head perception thread is already running" 
 
         # Start head perception thread
         self.kill_the_thread = False
@@ -260,19 +171,16 @@ class PerceptionInterface:
             step_time = t_now - t_init
             if step_time >= 0.02:  # 50 Hz
                 if self._head_perception is not None and not self._simulate_head_perception:
-                    tool_tip_target_pose, neck_frame = self._head_perception.run_head_perception()
+                    head_perception_data = self._head_perception.run_head_perception()
                 else:
                     try:
                         # read from logged data
-                        with open(self.log_dir / f'head_perception_pose_{self.tool}.pkl', 'rb') as f:
-                            pose_data = pickle.load(f)
-                        tool_tip_target_pose = pose_data["tool_tip_target_pose"]
-                        neck_frame = pose_data["neck_frame"]
+                        with open(self.log_dir / f'head_perception_data_{self.tool}.pkl', 'rb') as f:
+                            head_perception_data = pickle.load(f)
                     except FileNotFoundError:
                         raise FileNotFoundError("No transfer logged data found for tool: ", self.tool)
-                with self.tool_tip_target_lock:
-                    self.tool_tip_target_pose = tool_tip_target_pose
-                    self.neck_frame = neck_frame
+                with self.head_perception_data_lock:
+                    self.head_perception_data = head_perception_data
         self.head_perception_running = False
 
     def stop_head_perception_thread(self):
@@ -283,24 +191,18 @@ class PerceptionInterface:
         else:
             print("Head perception thread is not running")
 
-    # Rajat ToDo: Change return type to Pose
-    def get_head_perception_tool_tip_target_pose(self) -> np.ndarray:
-        """Get a target of the forque from head perception."""
+    def get_head_perception_data(self) -> dict:
+        """Get head perception data (head pose, face keypoints, tool tip target pose)."""
 
-        with self.tool_tip_target_lock:
-            tool_tip_target_pose = self.tool_tip_target_pose
-            neck_frame = self.neck_frame
+        with self.head_perception_data_lock:
+            head_perception_data = self.head_perception_data
 
         # save them in a pickle file
-        if self.robot_interface is not None and self.log_dir is not None:
-            pose_data = {
-                "tool_tip_target_pose": tool_tip_target_pose,
-                "neck_frame": neck_frame
-            }
-            with open(self.log_dir / f'head_perception_pose_{self.tool}.pkl', 'wb') as f:
-                pickle.dump(pose_data, f)
+        if self.robot_interface is not None and self.log_dir is not None and self._simulate_head_perception == False:
+            with open(self.log_dir / f'head_perception_data_{self.tool}.pkl', 'wb') as f:
+                pickle.dump(head_perception_data, f)
             
-        return tool_tip_target_pose, neck_frame
+        return head_perception_data
         
     def get_tool_tip_pose(self) -> np.ndarray:
 
