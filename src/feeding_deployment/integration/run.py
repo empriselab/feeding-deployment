@@ -468,7 +468,6 @@ def my_custom_gesture_detector(perception_interface, timeout):
         bite_transfer.process_behavior_tree_node_addition("Retract", {}, "TransferUtensil", "after")
 
         # Run some commands.
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": True} ))
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))

@@ -30,7 +30,6 @@ class OutsideMouthTransfer(Transfer):
         head_perception_data = self.perception_interface.get_head_perception_data()
         forque_target_base = head_perception_data["tool_tip_target_pose"]
         head_pose = head_perception_data["head_pose"]
-        print("Head pose: ", head_pose)
         self.sim.set_head_pose(Pose(position=head_pose[:3], orientation=Rotation.from_euler('yxz', head_pose[3:], degrees=True).as_quat()))
 
         if self.robot_interface is not None:
@@ -42,17 +41,7 @@ class OutsideMouthTransfer(Transfer):
 
         # mouth is assumed to be facing away from the wheelchair
         infront_mouth_target[:3, :3] = Rotation.from_quat([0.478, -0.505, -0.515, 0.502]).as_matrix()
-        if self.tool == "fork":
-            wrist_to_tip = self.sim.scene_description.tool_frame_to_utensil_tip
-        elif self.tool == "drink":
-            wrist_to_tip = self.sim.scene_description.tool_frame_to_drink_tip
-        elif self.tool == "wipe":
-            wrist_to_tip = self.sim.scene_description.tool_frame_to_wipe_tip
-        else:
-            raise ValueError("Tool not recognized")
-        
-        tip_to_wrist = np.linalg.inv(wrist_to_tip.to_matrix())
-        tool_frame_target = infront_mouth_target @ tip_to_wrist
+        tool_frame_target = infront_mouth_target @ self.get_tip_wrist_transform()
 
         target_pose = Pose.from_matrix(tool_frame_target)
 

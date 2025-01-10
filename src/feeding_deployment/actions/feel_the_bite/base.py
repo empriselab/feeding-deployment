@@ -1,5 +1,6 @@
 
 import abc
+import numpy as np
 
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.control.robot_controller.arm_client import ArmInterfaceClient
@@ -29,6 +30,20 @@ class Transfer(abc.ABC):
 
     def set_tool(self, tool):
         self.tool = tool
+
+    def get_tip_wrist_transform(self):
+
+        if self.tool == "fork":
+            wrist_to_tip = self.sim.scene_description.tool_frame_to_utensil_tip
+        elif self.tool == "drink":
+            wrist_to_tip = self.sim.scene_description.tool_frame_to_drink_tip
+        elif self.tool == "wipe":
+            wrist_to_tip = self.sim.scene_description.tool_frame_to_wipe_tip
+        else:
+            raise ValueError("Tool not recognized")
+        
+        tip_to_wrist = np.linalg.inv(wrist_to_tip.to_matrix())
+        return tip_to_wrist
 
     def move_to_ee_pose(self, pose):
 
