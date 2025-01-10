@@ -46,8 +46,8 @@ class TransferToolHLA(HighLevelAction):
         else:
             raise ValueError("Bite transfer type not recognized")
 
-        self.ready_to_initiate_transfer_interaction = "voice" # "silent", "voice" or "led"
-        self.ready_for_transfer_interaction = "voice" # "silent", "voice" or "led"
+        self.ready_to_initiate_transfer_interaction = "led" # "silent", "voice" or "led"
+        self.ready_for_transfer_interaction = "led" # "silent", "voice" or "led"
         self.initiate_transfer_interaction = "open_mouth" # "button", "open_mouth" or "auto_timeout"
         self.transfer_complete_interaction = "sense" # "button", "sense" or "auto_timeout"
     
