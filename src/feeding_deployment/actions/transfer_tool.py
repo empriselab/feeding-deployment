@@ -160,8 +160,9 @@ class TransferToolHLA(HighLevelAction):
         assert tool.name in ["utensil", "drink", "wipe"]
         return f"transfer_{tool.name}.yaml"    
     
-    def transfer_utensil(self) -> None:
+    def transfer_utensil(self, *args, **kwargs) -> None:
         assert self.sim.held_object_name == "utensil"
+        self.update_interaction_modes(self.sim.held_object_name, *args, **kwargs)
 
         if self.wrist_interface is not None:
             # start the horizontal spoon thread if it is not already running
@@ -180,9 +181,10 @@ class TransferToolHLA(HighLevelAction):
         if self.web_interface is not None:
             self.web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
 
-    def transfer_drink(self) -> None:
+    def transfer_drink(self, *args, **kwargs) -> None:
         assert self.sim.held_object_name == "drink"
-        
+        self.update_interaction_modes(self.sim.held_object_name, *args, **kwargs)
+
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
         self.set_tool("drink")    
@@ -192,8 +194,9 @@ class TransferToolHLA(HighLevelAction):
         if self.web_interface is not None:
             self.web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})        
 
-    def transfer_wipe(self) -> None:
+    def transfer_wipe(self, *args, **kwargs) -> None:
         assert self.sim.held_object_name == "wipe"
+        self.update_interaction_modes(self.sim.held_object_name, *args, **kwargs)
         
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
@@ -203,3 +206,7 @@ class TransferToolHLA(HighLevelAction):
         # Send message to web interface indicating transfer is done.
         if self.web_interface is not None:
             self.web_interface.send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})
+
+    def update_interaction_modes(self, tool_name: str, ready_to_initiate_mode: str, ready_to_transfer_mode: str,
+                                 initiate_transfer_mode: str, transfer_complete_mode: str):
+        import ipdb; ipdb.set_trace()
