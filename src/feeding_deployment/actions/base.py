@@ -12,6 +12,7 @@ import functools
 from operator import attrgetter
 import itertools
 import string
+import traceback
 
 import yaml
 
@@ -835,7 +836,6 @@ class UserUpdateRequest:
 
     hla_name: str
     hla_object_names: tuple[str, ...]
-    hla_parameters: None   # not currently used
 
 
 @dataclass(frozen=True)
@@ -847,11 +847,23 @@ class NodeModificationUserUpdateRequest(UserUpdateRequest):
     new_value: Any
 
 
+@dataclass(frozen=True)
+class NodeAdditionUserRequest(UserUpdateRequest):
+    """A request to add a new node."""
+
+    new_node_type: str  # can be "Retract" or "Pause"
+    new_node_parameters: dict[str, Any]  # {} for Retract and {"duration": float} for Pause
+    anchor_node_name: str  # the name of an existing behavior tree node
+    before_or_after: str  # "before" or "after"
+
+
+
 def interpret_user_update_request(
     request_txt: str,
     llm: LargeLanguageModel,
     available_hla_object_names: list[str],
     behavior_log_path,
+    max_retries: int = 3,
 ) -> list[UserUpdateRequest]:
     """Use an LLM to convert natural language into a user update request."""
 
@@ -884,7 +896,7 @@ def interpret_user_update_request(
 
     hla_object_name_str = "\n".join(available_hla_object_names)
 
-    prompt = """Your job is to convert the following command into one or more structured outputs in a format that I will describe next.
+    prompt_prefix = """Your job is to convert the following command into one or more structured outputs in a format that I will describe next.
 
 The command is: %s
 
@@ -894,7 +906,6 @@ The available structured output types are:
 class UserUpdateRequest:
     hla_name: str
     hla_object_names: tuple[str, ...]
-    hla_parameters: None   # not currently used
 
 @dataclass(frozen=True)
 class NodeModificationUserUpdateRequest(UserUpdateRequest):
@@ -902,30 +913,115 @@ class NodeModificationUserUpdateRequest(UserUpdateRequest):
     parameter_name: str
     new_value: Any
 
+@dataclass(frozen=True)
+class NodeAdditionUserRequest(UserUpdateRequest):
+    new_node_type: str  # can be "Retract" or "Pause"
+    new_node_parameters: dict[str, Any]  # {} for Retract and {"duration": float} for Pause
+    anchor_node_name: str  # the name of an existing behavior tree node
+    before_or_after: str  # "before" or "after"
+
 The "hla" stands for high-level action. Each hla can be grounded with zero or more object names. The possible hla and object combinations are:
 %s
 
 IMPORTANT: make sure your hla_object_names and hla_name appear together in the list above!
 
-The hla parameters can be ignored for now.
-
 A NodeModificationUserUpdateRequest a request to modify one parameter for one node in a behavior tree associated with an hla.
+""" % (request_txt, hla_object_name_str)
 
+    behavior_tree_prompt = """
 Here are all behavior trees:
 %s
+""" % all_nodes_description
 
+    first_final_prompt = """
 Based on the information given, convert the original command into a list of one or more structured outputs.
 
 Return your answer in a format where calling eval() in python will directly produce a list of UserUpdateRequest instances.
-""" % (request_txt, hla_object_name_str, all_nodes_description)
-
+"""
+    prompt = prompt_prefix + behavior_tree_prompt + first_final_prompt
     response = llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
+    response = _strip_python_response(response)
+
+    final_fix_prompt = """Fix the code. Once again, only return your answer in a format where eval() can be called."""
+
+    # Validate the response.
+    for _ in range(max_retries):
+        response_prompt = """I previously asked you to do this and you returned the following:
+%s     
+""" % response
+        # Case 1: an error is raised when we call eval().
+        try:
+            # This is really not safe but I'm not actually worried.
+            pythonic_response = eval(response)
+        except BaseException as e:
+            tb = traceback.format_exception(e)
+            tb_str = "".join(tb)
+            # Reprompt to fix exception.
+            error_prompt = """Evaluating that code produced the following exception:
+%s
+""" % tb_str
+            prompt = prompt_prefix + first_final_prompt + response_prompt + error_prompt + final_fix_prompt
+            response = llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
+            response = _strip_python_response(response)
+            continue
+        error_prompt = None
+        for request in pythonic_response:
+            # Case 2: the request is not a NodeModificationUserUpdateRequest or NodeAdditionUserRequest.
+            if not isinstance(request, (NodeModificationUserUpdateRequest, NodeAdditionUserRequest)):
+                error_prompt = """The following request is invalid:
+
+%s
+
+because the request class is invalid. It should be either NodeModificationUserUpdateRequest or NodeAdditionUserRequest.
+""" % str(request)
+                break
+
+            # Case 3: hla_object_names and hla_name are invalid for some HLA.
+            objects_str = ", ".join(request.hla_object_names)
+            hla_str = f"hla_name={request.hla_name}, hla_object_names=({objects_str},)"
+            if hla_str not in available_hla_object_names:
+                error_prompt = """The following request is invalid:
+
+%s
+
+because the hla_name and hla_object_names do not appear in the list of possibilities above.
+""" % str(request)
+                break
+            # Case 4: node_name is invalid. For now we check this very weakly because
+            # it will require more changes to actually load the behavior trees.
+            if isinstance(request, NodeModificationUserUpdateRequest) and request.node_name not in behavior_tree_prompt:
+                error_prompt = """The following request is invalid:
+
+%s
+
+because the node_name is not in the behavior tree. Recall again all of the behavior trees:
+
+%s
+""" % (str(request), behavior_tree_prompt)
+                break
+            if isinstance(request, NodeAdditionUserRequest) and request.anchor_node_name not in behavior_tree_prompt:
+                error_prompt = """The following request is invalid:
+
+%s
+
+because the anchor_node_name is not in the behavior tree. Recall again all of the behavior trees:
+
+%s
+""" % (str(request), behavior_tree_prompt)
+                break
+        if error_prompt is not None:
+            prompt = prompt_prefix + first_final_prompt + response_prompt + error_prompt + final_fix_prompt
+            response = llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
+            response = _strip_python_response(response)
+            continue
+
+
+    return pythonic_response
+
+
+def _strip_python_response(response: str) -> str:
     if response.startswith("```python"):
         response = response[len("```python"):]
     if response.endswith("```"):
         response = response[:-len("```")]
-
-    # This is really not safe but I'm not actually worried.
-    pythonic_response = eval(response)
-
-    return pythonic_response
+    return response

@@ -1,0 +1,377 @@
+Your job is to convert the following command into one or more structured outputs in a format that I will describe next.
+
+The command is: Can you remain quiet the whole time?
+
+The available structured output types are:
+
+@dataclass(frozen=True)
+class UserUpdateRequest:
+    hla_name: str
+    hla_object_names: tuple[str, ...]
+
+@dataclass(frozen=True)
+class NodeModificationUserUpdateRequest(UserUpdateRequest):
+    node_name: str
+    parameter_name: str
+    new_value: Any
+
+@dataclass(frozen=True)
+class NodeAdditionUserRequest(UserUpdateRequest):
+    new_node_type: str  # can be "Retract" or "Pause"
+    new_node_parameters: dict[str, Any]  # {} for Retract and {"duration": float} for Pause
+    anchor_node_name: str  # the name of an existing behavior tree node
+    before_or_after: str  # "before" or "after"
+
+The "hla" stands for high-level action. Each hla can be grounded with zero or more object names. The possible hla and object combinations are:
+hla_name=AcquireBiteWithTool, hla_object_names=(drink,)
+hla_name=AcquireBiteWithTool, hla_object_names=(utensil,)
+hla_name=AcquireBiteWithTool, hla_object_names=(wipe,)
+hla_name=EmulateTransfer, hla_object_names=(,)
+hla_name=LookAtPlateWhileHolding, hla_object_names=(drink,)
+hla_name=LookAtPlateWhileHolding, hla_object_names=(utensil,)
+hla_name=LookAtPlateWhileHolding, hla_object_names=(wipe,)
+hla_name=PickTool, hla_object_names=(drink,)
+hla_name=PickTool, hla_object_names=(utensil,)
+hla_name=PickTool, hla_object_names=(wipe,)
+hla_name=Reset, hla_object_names=(,)
+hla_name=StowTool, hla_object_names=(drink,)
+hla_name=StowTool, hla_object_names=(utensil,)
+hla_name=StowTool, hla_object_names=(wipe,)
+hla_name=TransferTool, hla_object_names=(drink,)
+hla_name=TransferTool, hla_object_names=(utensil,)
+hla_name=TransferTool, hla_object_names=(wipe,)
+
+IMPORTANT: make sure your hla_object_names and hla_name appear together in the list above!
+
+A NodeModificationUserUpdateRequest a request to modify one parameter for one node in a behavior tree associated with an hla.
+
+Here are all behavior trees:
+Bite:
+name: "Root"
+description: "Pick up the utensil from the tool mount."
+type: "Sequence"
+children:
+  - name: "MoveToRetractPos"
+    description: "Move to the retract position."
+    type: "Behavior"
+    parameters:
+      - name: "RetractPosition"
+        description: "The retract position of the robot."
+        space:
+          type: "Box"
+          lower: !hla arm_joint_lower_limits
+          upper: !hla arm_joint_upper_limits
+        is_user_editable: False
+        value: !scene_description retract_pos
+    fn: !hla move_to_joint_positions
+  - name: "CloseGripper"
+    description: "Close the gripper."
+    type: "Behavior"
+    parameters: []
+    fn: !hla close_gripper
+  - name: "MoveToUtensilAboveMountPos"
+    description: "Move to a position just above the utensil mount."
+    type: "Behavior"
+    parameters:
+      - name: "UtensilAboveMountPos"
+        description: "The position just above the utensil mount."
+        space:
+          type: "Box"
+          lower: !hla arm_joint_lower_limits
+          upper: !hla arm_joint_upper_limits
+        is_user_editable: False
+        value: !scene_description utensil_above_mount_pos
+    fn: !hla move_to_joint_positions
+  - name: "MoveUtensilInsideMount"
+    description: "Move to inside the utensil mount."
+    type: "Behavior"
+    parameters:
+      - name: "UtensilInsideMountEE"
+        description: "The position inside the utensil mount."
+        space:
+          type: "PoseSpace"
+        is_user_editable: False
+        value: !scene_description utensil_inside_mount
+    fn: !hla move_to_ee_pose
+  - name: "GraspUtensil"
+    description: "Grasp the utensil."
+    type: "Behavior"
+    parameters:
+      - name: "Tool"
+        description: "The type of tool to grasp."
+        space:
+          type: "Enum"
+          elements: ["utensil", "drink", "wipe"]
+        is_user_editable: False
+        value: "utensil"
+    fn: !hla grasp_tool
+  - name: "MoveUtensilOutsideMount"
+    description: "Move to outside the utensil mount."
+    type: "Behavior"
+    parameters:
+      - name: "MoveUtensilOutsideMountEE"
+        description: "The position outside the utensil mount."
+        space:
+          type: "PoseSpace"
+        is_user_editable: False
+        value: !scene_description utensil_outside_mount
+    fn: !hla move_to_ee_pose
+  # Assuming here self.sim.scene_description.scene_label == "vention"
+  - name: "MoveUtensilOutsideAboveMount"
+    description: "Move a bit above the utensil mount."
+    type: "Behavior"
+    parameters:
+      - name: "MoveUtensilOutsideAboveMountEE"
+        description: "The position above the utensil mount."
+        space:
+          type: "PoseSpace"
+        is_user_editable: False
+        value: !scene_description utensil_outside_above_mount
+    fn: !hla move_to_ee_pose
+  - name: "MoveToRetractPos"
+    description: "Move to the retract position."
+    type: "Behavior"
+    parameters:
+      - name: "RetractPosition"
+        description: "The retract position of the robot."
+        space:
+          type: "Box"
+          lower: !hla arm_joint_lower_limits
+          upper: !hla arm_joint_upper_limits
+        is_user_editable: False
+        value: !scene_description retract_pos
+    fn: !hla move_to_joint_positions
+  # Pre-emptively move to the before_transfer_pos because moving to above_plate_pos
+  # from retract_pos is unsafe.
+  - name: "MoveToBeforeTransferPos"
+    description: "Move to the before transfer position."
+    type: "Behavior"
+    parameters:
+      - name: "BeforeTransferPos"
+        description: "The before transfer position of the robot."
+        space:
+          type: "Box"
+          lower: !hla arm_joint_lower_limits
+          upper: !hla arm_joint_upper_limits
+        is_user_editable: False
+        value: !scene_description before_transfer_pos
+    fn: !hla move_to_joint_positions
+
+---
+name: "LookAtPlate"
+description: "Look at plate while holding utensil to detect various food items and predict next bite."
+type: "Behavior"
+parameters: []
+fn: !hla look_at_plate
+
+---
+name: "AcquireBite"
+description: "Pick up the appropriate food item from the plate."
+type: "Behavior"
+parameters:
+  - name: "Speed"
+    space:
+      type: "Box"
+      lower: 0.5
+      upper: 1.5
+    is_user_editable: True
+    value: 1.0
+    description: "Speed of the robot during bite acquisition."
+fn: !hla acquire_bite
+
+---
+name: "TransferUtensil"
+description: "Bring the utensil to the user's mouth for a bite."
+type: "Behavior"
+parameters:
+  - name: "ReadyToInitiateTransferInteraction"
+    description: "Interaction mode for ready to initiate transfer."
+    space:
+      type: "Enum"
+      elements: ["silent", "voice", "led"]
+    is_user_editable: True
+    value: "led"
+  - name: "ReadyForTransferInteraction"
+    description: "Interaction mode for ready to transfer."
+    space:
+      type: "Enum"
+      elements: ["silent", "voice", "led"]
+    is_user_editable: True
+    value: "led"
+  - name: "InitiateTransferInteraction"
+    description: "Interaction mode for transfer."
+    space:
+      type: "Enum"
+      elements: ["button", "open_mouth", "auto_timeout"]
+    is_user_editable: True
+    value: "open_mouth"
+  - name: "TransferCompleteInteraction"
+    description: "Interaction mode for transfer completion."
+    space:
+      type: "Enum"
+      elements: ["button", "sense", "auto_timeout"]
+    is_user_editable: True
+    value: "sense"
+fn: !hla transfer_utensil
+
+---
+name: "StowUtensil"
+description: "Place the utensil in the tool mount."
+type: "Behavior"
+parameters: []
+fn: !hla stow_utensil
+
+---
+Drink:
+name: "PickDrink"
+description: "Detect where the mug is and pick it up."
+type: "Behavior"
+parameters: []
+fn: !hla pick_drink
+
+---
+name: "TransferDrink"
+description: "Bring the mug to the user's mouth for a sip."
+type: "Behavior"
+parameters:
+  - name: "ReadyToInitiateTransferInteraction"
+    description: "Interaction mode for ready to initiate transfer."
+    space:
+      type: "Enum"
+      elements: ["silent", "voice", "led"]
+    is_user_editable: True
+    value: "led"
+  - name: "ReadyForTransferInteraction"
+    description: "Interaction mode for ready to transfer."
+    space:
+      type: "Enum"
+      elements: ["silent", "voice", "led"]
+    is_user_editable: True
+    value: "led"
+  - name: "InitiateTransferInteraction"
+    description: "Interaction mode for transfer."
+    space:
+      type: "Enum"
+      elements: ["button", "open_mouth", "auto_timeout"]
+    is_user_editable: True
+    value: "open_mouth"
+  - name: "TransferCompleteInteraction"
+    description: "Interaction mode for transfer completion."
+    space:
+      type: "Enum"
+      elements: ["button", "sense", "auto_timeout"]
+    is_user_editable: True
+    value: "sense"
+fn: !hla transfer_drink
+
+---
+name: "StowDrink"
+description: "Place the mug on the table."
+type: "Behavior"
+parameters: []
+fn: !hla stow_drink
+
+---
+Wipe:
+name: "PickWipe"
+description: "Pick up the wipe from the tool mount."
+type: "Behavior"
+parameters: []
+fn: !hla pick_wipe
+
+---
+name: "TransferWipe"
+description: "Bring the wipe to the user's mouth for a cleaning."
+type: "Behavior"
+parameters:
+  - name: "ReadyToInitiateTransferInteraction"
+    description: "Interaction mode for ready to initiate transfer."
+    space:
+      type: "Enum"
+      elements: ["silent", "voice", "led"]
+    is_user_editable: True
+    value: "led"
+  - name: "ReadyForTransferInteraction"
+    description: "Interaction mode for ready to transfer."
+    space:
+      type: "Enum"
+      elements: ["silent", "voice", "led"]
+    is_user_editable: True
+    value: "led"
+  - name: "InitiateTransferInteraction"
+    description: "Interaction mode for transfer."
+    space:
+      type: "Enum"
+      elements: ["button", "open_mouth", "auto_timeout"]
+    is_user_editable: True
+    value: "open_mouth"
+  - name: "TransferCompleteInteraction"
+    description: "Interaction mode for transfer completion."
+    space:
+      type: "Enum"
+      elements: ["button", "sense", "auto_timeout"]
+    is_user_editable: True
+    value: "sense"
+fn: !hla transfer_wipe
+
+---
+name: "StowWipe"
+description: "Place the wipe in the tool mount."
+type: "Behavior"
+parameters: []
+fn: !hla stow_wipe
+
+---
+
+
+Based on the information given, convert the original command into a list of one or more structured outputs.
+
+Return your answer in a format where calling eval() in python will directly produce a list of UserUpdateRequest instances.
+
+####$$$###$$$####$$$$###$$$####$$$###$$$###
+```python
+[
+    NodeModificationUserUpdateRequest(
+        hla_name="TransferUtensil",
+        hla_object_names=("utensil",),
+        node_name="TransferUtensil",
+        parameter_name="ReadyToInitiateTransferInteraction",
+        new_value="silent"
+    ),
+    NodeModificationUserUpdateRequest(
+        hla_name="TransferUtensil",
+        hla_object_names=("utensil",),
+        node_name="TransferUtensil",
+        parameter_name="ReadyForTransferInteraction",
+        new_value="silent"
+    ),
+    NodeModificationUserUpdateRequest(
+        hla_name="TransferDrink",
+        hla_object_names=("drink",),
+        node_name="TransferDrink",
+        parameter_name="ReadyToInitiateTransferInteraction",
+        new_value="silent"
+    ),
+    NodeModificationUserUpdateRequest(
+        hla_name="TransferDrink",
+        hla_object_names=("drink",),
+        node_name="TransferDrink",
+        parameter_name="ReadyForTransferInteraction",
+        new_value="silent"
+    ),
+    NodeModificationUserUpdateRequest(
+        hla_name="TransferWipe",
+        hla_object_names=("wipe",),
+        node_name="TransferWipe",
+        parameter_name="ReadyToInitiateTransferInteraction",
+        new_value="silent"
+    ),
+    NodeModificationUserUpdateRequest(
+        hla_name="TransferWipe",
+        hla_object_names=("wipe",),
+        node_name="TransferWipe",
+        parameter_name="ReadyForTransferInteraction",
+        new_value="silent"
+    )
+]
+```
