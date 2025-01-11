@@ -68,6 +68,7 @@ from feeding_deployment.simulation.simulator import (
     FeedingDeploymentWorldState,
 )
 from feeding_deployment.actions.flair.flair import FLAIR
+from feeding_deployment.transparency.query_llm import TransparencyQuery
 
 
 # All the high level actions we want to consider.
@@ -199,6 +200,9 @@ class _Runner:
             IsUtensil([self.utensil]),
         }
 
+        self.transparency_query = TransparencyQuery()
+        print("Initialized transparency query.")
+
         if self._saved_state_infile:
             self._load_from_state()
             print("WARNING: The system state has been restored to:")
@@ -229,7 +233,15 @@ class _Runner:
 
     def parse_interface_msg(self, msg_dict: dict[str, Any]) -> None:
         """Pass high level action message from the web interface."""
-        if msg_dict["status"] == "finish_feeding":
+        if msg_dict["status"] == "transparency":
+            answer = self.transparency_query.answer_query(msg_dict["request"])
+            self.web_interface.send_web_interface_text(answer)
+            return 
+        elif msg_dict["status"] == "adaptability":
+            self.process_user_update_request(msg_dict["request"])
+            self.web_interface.send_web_interface_text("Adaptability request processed.")
+            return
+        elif msg_dict["status"] == "finish_feeding":
             user_cmd = GroundHighLevelAction(
                 self.hla_name_to_hla["Reset"], ()
             )

@@ -46,14 +46,44 @@ class WebInterface:
         self.web_interface_sub = rospy.Subscriber("WebAppComm", String, self._message_callback, queue_size=100)
         time.sleep(1.0)  # Wait for the subscriber to connect
 
+        self.state = "task_selection" # task_selection, transparency, or adaptability
+
     def _message_callback(self, msg: "String") -> None:
         """Callback for the web interface."""
         print("Received message on WebAppComm: ", msg.data)
-        msg_dict = json.loads(msg.data)
 
+        # if msg.data is not JSON, it is a text message
+        try:
+            msg_dict = json.loads(msg.data)
+        except json.JSONDecodeError:
+            if self.state == "transparency" or self.state == "adaptability":
+                print("Received personalization related text message from web interface.")
+                request = {
+                    "status": self.state,
+                    "request": msg.data,
+                    "state": None
+                }
+                self.hla_command_queue.put(request)
+                return
+            else:
+                print("WARNING: Unrecognized message from web interface, cannot decode JSON.")
+                return    
+        
         # hack to not run into errors when message does not contain state
         if "state" not in msg_dict:
             msg_dict["state"] = None
+
+        {"state":"order_selection","status":"opened_adaptability_page"}
+
+
+        if (msg_dict["state"] == "order_selection" and msg_dict["status"] == "opened_transparency_page"):
+            self.state = "transparency"
+            return
+        elif (msg_dict["state"] == "order_selection" and msg_dict["status"] == "opened_adaptability_page"):
+            self.state = "adaptability"
+            return
+        else:
+            self.state = "task_selection"
 
         if (msg_dict["state"] == "order_selection" and msg_dict["status"] != "ready_for_initial_data") \
             or (msg_dict["state"] == "voice"):
@@ -70,6 +100,11 @@ class WebInterface:
     def send_web_interface_message(self, msg_dict: dict[str, Any]) -> None:
         self.web_interface_publisher.publish(
             String(json.dumps(msg_dict))
+        )
+
+    def send_web_interface_text(self, text: str) -> None:
+        self.web_interface_publisher.publish(
+            String(text)
         )
 
     def send_web_interface_image(self, image) -> None:
