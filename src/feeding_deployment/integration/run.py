@@ -375,7 +375,6 @@ class _Runner:
                 if failed_object_name is not None:
                     print(f"BT UPDATE FAILED: Unknown object name {failed_object_name}")
                     continue
-                assert update.hla_parameters is None
                 ground_hla = GroundHighLevelAction(hla, tuple(hla_object_list))
                 ground_hla.process_behavior_tree_parameter_update(update.node_name, update.parameter_name, update.new_value)
             else:
@@ -437,6 +436,7 @@ if __name__ == "__main__":
 
     if not args.use_interface:
         # Example of using LLM to generate updates to behavior trees.
+        runner.process_user_update_request("Can you remain quiet the whole time?")
         runner.process_user_update_request("Move a little bit faster while picking up the food")
 
         # Example of directly updating the behavior trees.

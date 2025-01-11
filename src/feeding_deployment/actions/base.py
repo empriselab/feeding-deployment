@@ -835,7 +835,6 @@ class UserUpdateRequest:
 
     hla_name: str
     hla_object_names: tuple[str, ...]
-    hla_parameters: None   # not currently used
 
 
 @dataclass(frozen=True)
@@ -894,7 +893,6 @@ The available structured output types are:
 class UserUpdateRequest:
     hla_name: str
     hla_object_names: tuple[str, ...]
-    hla_parameters: None   # not currently used
 
 @dataclass(frozen=True)
 class NodeModificationUserUpdateRequest(UserUpdateRequest):
@@ -906,8 +904,6 @@ The "hla" stands for high-level action. Each hla can be grounded with zero or mo
 %s
 
 IMPORTANT: make sure your hla_object_names and hla_name appear together in the list above!
-
-The hla parameters can be ignored for now.
 
 A NodeModificationUserUpdateRequest a request to modify one parameter for one node in a behavior tree associated with an hla.
 
