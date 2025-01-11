@@ -915,12 +915,12 @@ Here are all behavior trees:
 %s
 """ % all_nodes_description
 
-    final_prompt = """
+    first_final_prompt = """
 Based on the information given, convert the original command into a list of one or more structured outputs.
 
 Return your answer in a format where calling eval() in python will directly produce a list of UserUpdateRequest instances.
 """
-    prompt = prompt_prefix + behavior_tree_prompt + final_prompt
+    prompt = prompt_prefix + behavior_tree_prompt + first_final_prompt
     response = llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
     response = _strip_python_response(response)
 
@@ -931,11 +931,10 @@ Return your answer in a format where calling eval() in python will directly prod
         response_prompt = """I previously asked you to do this and you returned the following:
 %s     
 """ % response
+        # Case 1: an error is raised when we call eval().
         try:
             # This is really not safe but I'm not actually worried.
             pythonic_response = eval(response)
-            # TODO remove
-            raise ValueError("This is a fake error to test reprompting")
         except BaseException as e:
             tb = traceback.format_exception(e)
             tb_str = "".join(tb)
@@ -943,10 +942,32 @@ Return your answer in a format where calling eval() in python will directly prod
             error_prompt = """Evaluating that code produced the following exception:
 %s
 """ % tb_str
-            prompt = prompt_prefix + response_prompt + error_prompt + final_fix_prompt
+            prompt = prompt_prefix + first_final_prompt + response_prompt + error_prompt + final_fix_prompt
             response = llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
             response = _strip_python_response(response)
-            
+            continue
+        # Case 2: hla_object_names and hla_name are invalid for some HLA.
+        # For now, assume LLM is good enough that the pythonic_response is
+        # actually a list of NodeModificationUserUpdateRequest().
+        error_prompt = None
+        for request in pythonic_response:
+            assert isinstance(request, NodeModificationUserUpdateRequest)
+            objects_str = ", ".join(request.hla_object_names)
+            hla_str = f"hla_name={request.hla_name}, hla_object_names=({objects_str},)"
+            if hla_str not in available_hla_object_names:
+                error_prompt = """The following request is invalid:
+
+%s
+
+because the hla_name and hla_object_names do not appear in the list of possibilities above.
+""" % str(request)
+                break
+        if error_prompt is not None:
+            prompt = prompt_prefix + first_final_prompt + response_prompt + error_prompt + final_fix_prompt
+            response = llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
+            response = _strip_python_response(response)
+            continue
+
 
     return pythonic_response
 
