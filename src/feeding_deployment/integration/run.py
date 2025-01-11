@@ -48,6 +48,8 @@ from feeding_deployment.actions.base import (
     pddl_plan_to_hla_plan,
     interpret_user_update_request,
     NodeModificationUserUpdateRequest,
+    NodeAdditionUserRequest,
+    UserUpdateRequest,
 )
 from feeding_deployment.actions.pick_tool import PickToolHLA
 from feeding_deployment.actions.stow_tool import StowToolHLA
@@ -360,25 +362,28 @@ class _Runner:
                 available_hla_object_names.append(available_hla_object_name)
         requested_updates = interpret_user_update_request(request_text, self.llm, available_hla_object_names, self.run_behavior_tree_dir)
         for update in requested_updates:
+            assert isinstance(update, UserUpdateRequest)
+            if update.hla_name not in self.hla_name_to_hla:
+                print(f"BT UPDATE FAILED: Unknown HLA name {update.hla_name}")
+                continue
+            hla = self.hla_name_to_hla[update.hla_name]
+            hla_object_list = []
+            failed_object_name = None
+            for obj_name in update.hla_object_names:
+                if obj_name not in self.object_name_to_object:
+                    failed_object_name = obj_name
+                    break
+                hla_object_list.append(self.object_name_to_object[obj_name])
+            if failed_object_name is not None:
+                print(f"BT UPDATE FAILED: Unknown object name {failed_object_name}")
+                continue
+            ground_hla = GroundHighLevelAction(hla, tuple(hla_object_list))            
             if isinstance(update, NodeModificationUserUpdateRequest):
-                if update.hla_name not in self.hla_name_to_hla:
-                    print(f"BT UPDATE FAILED: Unknown HLA name {update.hla_name}")
-                    continue
-                hla = self.hla_name_to_hla[update.hla_name]
-                hla_object_list = []
-                failed_object_name = None
-                for obj_name in update.hla_object_names:
-                    if obj_name not in self.object_name_to_object:
-                        failed_object_name = obj_name
-                        break
-                    hla_object_list.append(self.object_name_to_object[obj_name])
-                if failed_object_name is not None:
-                    print(f"BT UPDATE FAILED: Unknown object name {failed_object_name}")
-                    continue
-                ground_hla = GroundHighLevelAction(hla, tuple(hla_object_list))
                 ground_hla.process_behavior_tree_parameter_update(update.node_name, update.parameter_name, update.new_value)
+            elif isinstance(update, NodeAdditionUserRequest):
+                ground_hla.process_behavior_tree_node_addition(update.new_node_type, update.new_node_parameters,
+                                                               update.anchor_node_name, update.before_or_after)
             else:
-                # TODO: handle node additions
                 raise NotImplementedError
             
     def register_gesture_detector(self, gesture_fn_name: str, gesture_fn_text: str) -> bool:
@@ -464,8 +469,9 @@ def my_custom_gesture_detector(perception_interface, timeout):
             transfer_tool.process_behavior_tree_parameter_update(node_name, "TransferCompleteInteraction", "button")
 
         # Example of retracting after transfer.
-        bite_transfer = GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,))
-        bite_transfer.process_behavior_tree_node_addition("Retract", {}, "TransferUtensil", "after")
+        runner.process_user_update_request("Retract after transferring a bite.")
+        # bite_transfer = GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,))
+        # bite_transfer.process_behavior_tree_node_addition("Retract", {}, "TransferUtensil", "after")
 
         # Run some commands.
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))

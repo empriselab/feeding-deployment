@@ -847,6 +847,17 @@ class NodeModificationUserUpdateRequest(UserUpdateRequest):
     new_value: Any
 
 
+@dataclass(frozen=True)
+class NodeAdditionUserRequest(UserUpdateRequest):
+    """A request to add a new node."""
+
+    new_node_type: str  # can be "Retract" or "Pause"
+    new_node_parameters: dict[str, Any]  # {} for Retract and {"duration": float} for Pause
+    anchor_node_name: str  # the name of an existing behavior tree node
+    before_or_after: str  # "before" or "after"
+
+
+
 def interpret_user_update_request(
     request_txt: str,
     llm: LargeLanguageModel,
@@ -902,6 +913,13 @@ class NodeModificationUserUpdateRequest(UserUpdateRequest):
     parameter_name: str
     new_value: Any
 
+@dataclass(frozen=True)
+class NodeAdditionUserRequest(UserUpdateRequest):
+    new_node_type: str  # can be "Retract" or "Pause"
+    new_node_parameters: dict[str, Any]  # {} for Retract and {"duration": float} for Pause
+    anchor_node_name: str  # the name of an existing behavior tree node
+    before_or_after: str  # "before" or "after"
+
 The "hla" stands for high-level action. Each hla can be grounded with zero or more object names. The possible hla and object combinations are:
 %s
 
@@ -946,15 +964,19 @@ Return your answer in a format where calling eval() in python will directly prod
             response = llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
             response = _strip_python_response(response)
             continue
-        # Case 2: hla_object_names and hla_name are invalid for some HLA.
-        # For now, assume LLM is good enough that the pythonic_response is
-        # actually a list of NodeModificationUserUpdateRequest().
-        # Case 3: node_name is invalid. For now we check this very weakly because
-        # it will require more changes to actually load the behavior trees.
         error_prompt = None
         for request in pythonic_response:
-            assert isinstance(request, NodeModificationUserUpdateRequest)
-            # Case 2.
+            # Case 2: the request is not a NodeModificationUserUpdateRequest or NodeAdditionUserRequest.
+            if not isinstance(request, (NodeModificationUserUpdateRequest, NodeAdditionUserRequest)):
+                error_prompt = """The following request is invalid:
+
+%s
+
+because the request class is invalid. It should be either NodeModificationUserUpdateRequest or NodeAdditionUserRequest.
+""" % str(request)
+                break
+
+            # Case 3: hla_object_names and hla_name are invalid for some HLA.
             objects_str = ", ".join(request.hla_object_names)
             hla_str = f"hla_name={request.hla_name}, hla_object_names=({objects_str},)"
             if hla_str not in available_hla_object_names:
@@ -965,13 +987,24 @@ Return your answer in a format where calling eval() in python will directly prod
 because the hla_name and hla_object_names do not appear in the list of possibilities above.
 """ % str(request)
                 break
-            # Case 3.
-            if request.node_name not in behavior_tree_prompt:
+            # Case 4: node_name is invalid. For now we check this very weakly because
+            # it will require more changes to actually load the behavior trees.
+            if isinstance(request, NodeModificationUserUpdateRequest) and request.node_name not in behavior_tree_prompt:
                 error_prompt = """The following request is invalid:
 
 %s
 
 because the node_name is not in the behavior tree. Recall again all of the behavior trees:
+
+%s
+""" % (str(request), behavior_tree_prompt)
+                break
+            if isinstance(request, NodeAdditionUserRequest) and request.anchor_node_name not in behavior_tree_prompt:
+                error_prompt = """The following request is invalid:
+
+%s
+
+because the anchor_node_name is not in the behavior tree. Recall again all of the behavior trees:
 
 %s
 """ % (str(request), behavior_tree_prompt)
