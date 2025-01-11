@@ -28,9 +28,9 @@ joint_states_publisher_pid=$!  # Store the PID of joint_states_publisher
 # move to safety directory
 cd /home/isacc/deployment_ws/src/feeding-deployment/src/feeding_deployment/safety
 
-# # Start transfer button
-# python transfer_button_listener.py --button_id -1 &
-# transfer_button_pid=$!  # Store the PID of transfer_button_listener
+# Start transfer button
+python transfer_button_listener.py --button_id -1 &
+transfer_button_pid=$!  # Store the PID of transfer_button_listener
 
 # Start collision sensor
 python collision_sensor.py &
@@ -45,4 +45,4 @@ python watchdog.py
 cleanup  # Ensure cleanup is called when bulldog finishes
 wait $joint_states_publisher_pid
 wait $collision_sensor_pid
-# wait $transfer_button_pid
+wait $transfer_button_pid
