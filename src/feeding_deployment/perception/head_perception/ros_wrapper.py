@@ -185,8 +185,7 @@ class HeadPerceptionROSWrapper:
         if head_perception_data is not None:
 
             if self.filter_noisy_readings: # do not shutdown robot if warm starting / kill_on_noisy_reading is False
-                if head_perception_data["noisy_reading"] is not None:
-                    self.noisy_reading_publisher.publish(head_perception_data["noisy_reading"])
+                self.noisy_reading_publisher.publish(head_perception_data["noisy_reading"])
 
             self.visualizeToolTipTarget(head_perception_data["tool_tip_target_pose"])
             self.visualizeVoxels(head_perception_data["visualization_points_world_frame"])

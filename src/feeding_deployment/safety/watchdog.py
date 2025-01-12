@@ -134,7 +134,7 @@ class WatchDog:
             self.second_counter = 0
 
         for _unexpected, _anomaly in [
-                                    # (self.camera_unexpected, AnomalyStatus.CAMERA_UNEXPECTED),
+                                    (self.camera_unexpected, AnomalyStatus.CAMERA_UNEXPECTED),
                                     (self.ft_unexpected, AnomalyStatus.FT_UNEXPECTED),
                                     (self.collision_free_unexpected, AnomalyStatus.COLLISION_FREE_UNEXPECTED)]:
             if _unexpected:
