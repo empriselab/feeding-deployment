@@ -132,8 +132,8 @@ class _Runner:
 
         if self.use_interface:
             # Initialize the web interface.
-            self.hla_command_queue = queue.Queue()
-            self.web_interface = WebInterface(self.hla_command_queue)
+            self.task_selection_queue = queue.Queue()
+            self.web_interface = WebInterface(self.task_selection_queue)
         else:
             self.web_interface = None
 
@@ -222,67 +222,20 @@ class _Runner:
         
         while self.active:
             try:
-                hla_interface_msg = self.hla_command_queue.get(timeout=1)
+                task_selection_command = self.task_selection_queue.get(timeout=1)
                 self.parse_interface_msg(hla_interface_msg)
                 print("Ready for next user command.")
             except queue.Empty:
-                continue
+                if task_selection_command is None and self.web_interface.current_page != "task_selection":
+                    self.web_interface.ready_for_task_selection()
+                else:
+                    # Wait for user command
+                    continue
 
     def signal_handler(self, signal, frame):
         self.active = False
         print("\nprogram exiting gracefully")
         sys.exit(0)
-
-    def parse_interface_msg(self, msg_dict: dict[str, Any]) -> None:
-        """Pass high level action message from the web interface."""
-        if msg_dict["status"] == "transparency":
-            answer = self.transparency_query.answer_query(msg_dict["request"])
-            self.web_interface.send_web_interface_text(answer)
-            return 
-        elif msg_dict["status"] == "adaptability":
-            self.process_user_update_request(msg_dict["request"])
-            self.web_interface.send_web_interface_text("Adaptability request processed.")
-            return
-        elif msg_dict["status"] == "finish_feeding":
-            user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["Reset"], ()
-            )
-        elif msg_dict["status"] == "drink_pickup":
-            user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["PickTool"], (self.drink,)
-            )
-        elif msg_dict["status"] == "drink_transfer":
-            user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["TransferTool"], (self.drink,)
-            )
-        elif msg_dict["status"] == "move_to_above_plate" \
-            or (msg_dict["status"] == "return_to_main" and msg_dict["state"] == "post_bite_pickup") \
-            or (msg_dict["status"] == "return_to_main" and msg_dict["state"] == "post_bite_transfer") \
-            or (msg_dict["status"] == "return_to_main" and msg_dict["state"] == "post_drink_transfer") \
-            or (msg_dict["status"] == "back" and msg_dict["state"] == "bite_selection"): 
-            user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["LookAtPlateWhileHolding"], (self.utensil,)
-            )
-        elif msg_dict["status"] == "aquire_food" or msg_dict["status"] == 0: # manual acquire food
-            user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["AcquireBiteWithTool"], (self.utensil,), params=msg_dict
-            )
-        elif msg_dict["status"] == "bite_transfer":
-            user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["TransferTool"], (self.utensil,)
-            )
-        elif msg_dict["status"] == "mouth_wiping" and msg_dict["state"] == "bite_selection":
-            user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["PickTool"], (self.wipe,)
-            )
-        elif msg_dict["status"] == "move_to_wiping_position" and msg_dict["state"] == "prepared_mouth_wiping":
-            user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["TransferTool"], (self.wipe,)
-            )
-        else:
-            print("WARNING: Unrecognized high level action message from web interface.")
-            return
-        self.process_user_command(user_cmd)
 
     def process_user_command(
         self, user_command: GroundHighLevelAction | set[GroundAtom]

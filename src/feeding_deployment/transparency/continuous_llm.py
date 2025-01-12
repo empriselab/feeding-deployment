@@ -17,26 +17,38 @@ class TransparencyContinuous(TransparencyBase):
             self.prompt_skeleton = f.read()
         self.explanation_history = ""
 
+        self.last_behavior = self.load_behavior()
+        self.last_execution = self.load_execution()
+        self.last_sensor = self.load_sensor()
+
+    def update_history(self):
+        self.last_behavior = self.load_behavior()
+        self.last_execution = self.load_execution()
+        self.last_sensor = self.load_sensor()
+
+    def get_explanation(self):
+        """
+        Explains what the robot is doing right now.
+        """
+        behavior = self.load_behavior()
+        execution = self.load_execution()
+        sensor = self.load_sensor()
+
+        prompt = self.prompt_skeleton%(self.last_behavior, behavior, self.last_execution, execution, self.last_sensor, sensor, self.explanation_history)
+        response = self.llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
+        self.explanation_history += response + "\n"
+
+        self.last_behavior = behavior
+        self.last_execution = execution
+        self.last_sensor = sensor
+
+        return response
+
     def run(self):
-
-        old_behavior = self.load_behavior()
-        old_execution = self.load_execution()
-        old_sensor = self.load_sensor()
-
         while True:
             time.sleep(5)
-            behavior = self.load_behavior()
-            execution = self.load_execution()
-            sensor = self.load_sensor()
-
-            if behavior != old_behavior or execution != old_execution or sensor != old_sensor:
-                prompt = self.prompt_skeleton%(old_behavior, behavior, old_execution, execution, old_sensor, sensor, self.explanation_history)
-                response = self.llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
-                print(response)
-                self.explanation_history += response + "\n"
-                old_behavior, old_execution, old_sensor = behavior, execution, sensor
-            # else:
-                # print("No change in behavior, execution, or sensor.")
+            response = self.get_explanation()
+            print(response)
 
 def main():
     transparency_continuous = TransparencyContinuous()

@@ -29,14 +29,22 @@ try:
 except ModuleNotFoundError:
     pass
 
+from feeding_deployment.actions.base import GroundHighLevelAction
+from 
 
 class WebInterface:
     '''
     An interface to interact with the web interface.
     '''
-    def __init__(self, hla_command_queue: queue.Queue = None) -> None:
+    def __init__(self, task_selection_queue: queue.Queue = None, task_params_queue: queue.Queue = None) -> None:
 
-        self.hla_command_queue = hla_command_queue
+        # Objects of task_selection_queue are dicts and can be of the following types:
+        # {'task': 'meal_assistance', 'type': 'bite' / 'sip' / 'wipe'}
+        # {'task': 'personalization', 'type': 'transparency' / 'adaptability' / 'gesture'}
+        self.task_selection_queue = task_selection_queue
+
+        # Used for setting params within a certain task
+        self.task_params_queue = task_params_queue
         
         # Create a publisher for communication with the web interface.
         self.web_interface_publisher = rospy.Publisher("/ServerComm", String, queue_size=10)
@@ -46,56 +54,98 @@ class WebInterface:
         self.web_interface_sub = rospy.Subscriber("WebAppComm", String, self._message_callback, queue_size=100)
         time.sleep(1.0)  # Wait for the subscriber to connect
 
-        self.state = "task_selection" # task_selection, transparency, or adaptability
+        self.state = "assistance_task" # task_selection, transparency, or adaptability
+        self.current_page = "task_selection" # task_selection, meal_assistance, personalization, or explanation
+
+    def ready_for_task_selection(self, last_task_type, autocontinue_timeout = 10) -> None:
+        """Moves the web interface to the task selection page."""
+
+        # after bite and after sip are special, because they have bite and sip preselected for autocontinue with a timeout
+        if last_task_type == "bite":
+            self.send_web_interface_message({"state": "task_selection_after_bite", "status": "jump", "autocontinue_timeout": autocontinue_timeout})
+        elif last_task_type == "sip":
+            self.send_web_interface_message({"state": "task_selection_after_sip", "status": "jump", "autocontinue_timeout": autocontinue_timeout})
+        else:
+            self.send_web_interface_message({"state": "task_selection", "status": "jump"})
+        
+        self.current_page = "task_selection"
 
     def _message_callback(self, msg: "String") -> None:
         """Callback for the web interface."""
         print("Received message on WebAppComm: ", msg.data)
-
-        # if msg.data is not JSON, it is a text message
-        try:
-            msg_dict = json.loads(msg.data)
-        except json.JSONDecodeError:
-            if self.state == "transparency" or self.state == "adaptability":
-                print("Received personalization related text message from web interface.")
-                request = {
-                    "status": self.state,
-                    "request": msg.data,
-                    "state": None
-                }
-                self.hla_command_queue.put(request)
-                return
-            else:
-                print("WARNING: Unrecognized message from web interface, cannot decode JSON.")
-                return    
         
-        # hack to not run into errors when message does not contain state
-        if "state" not in msg_dict:
-            msg_dict["state"] = None
+        msg_dict = json.loads(msg.data)
 
-        {"state":"order_selection","status":"opened_adaptability_page"}
-
-
-        if (msg_dict["state"] == "order_selection" and msg_dict["status"] == "opened_transparency_page"):
-            self.state = "transparency"
-            return
-        elif (msg_dict["state"] == "order_selection" and msg_dict["status"] == "opened_adaptability_page"):
-            self.state = "adaptability"
-            return
+        if msg_dict["state"] == "task_selection":
+            if msg_dict["status"] == "bite":
+                task_selected = {
+                    "task": "meal_assistance",
+                    "type": "bite",
+                }
+            elif msg_dict["status"] == "sip":
+                task_selected = {
+                    "task": "meal_assistance",
+                    "type": "sip",
+                }
+            elif msg_dict["status"] == "wipe":
+                task_selected = {
+                    "task": "meal_assistance",
+                    "type": "wipe",
+                }
+            elif msg_dict["status"] == "transparency":
+                task_selected = {
+                    "task": "personalization",
+                    "type": "transparency",
+                }
+            elif msg_dict["status"] == "adaptability":
+                task_selected = {
+                    "task": "personalization",
+                    "type": "adaptability",
+                }
+            elif msg_dict["status"] == "gesture":
+                task_selected = {
+                    "task": "personalization",
+                    "type": "gesture",
+                }
+            else:
+                print("Invalid task selection status received from interface: ", msg_dict["status"])
+            
+            self.task_selection_queue.put(task_selected)
         else:
-            self.state = "task_selection"
+            self.task_params_queue.put(msg_dict)
 
-        if (msg_dict["state"] == "order_selection" and msg_dict["status"] != "ready_for_initial_data") \
-            or (msg_dict["state"] == "voice"):
-            self.user_preference = msg_dict["status"]
-            print("SETTING USER PREFERENCE: ", self.user_preference)
-        elif msg_dict["status"] in ["finish_feeding", "back", "move_to_wiping_position", "drink_pickup", "drink_transfer", "move_to_above_plate", "aquire_food", 0, "bite_skill_selection", "bite_transfer", "mouth_wiping", "return_to_main"]:
-            print("Received high-level action message from web interface.")
-            if self.hla_command_queue is not None:
-                self.hla_command_queue.put(msg_dict)
-        else:
-            print("WARNING: Unrecognized message from web interface.")
-            return
+        self.ready_from_explanation = True
+
+    def task_params_request(self, request_type: str) -> None:
+        """
+        Faciliates assistance task requesting params from the web interface.
+        Web interface will open the appropriate page for the user to provide the required information, 
+        and then return the provided information
+        """
+        while not self.task_params_queue.empty():
+            self.task_params_queue.get()
+        
+        # enumerate all the possible request types for the HLAs / transparency / adaptability
+        if request_type == "transparency":
+            pass
+        elif request_type == "adaptability":
+            pass
+        elif request_type == "flair_preference":
+            pass
+        elif request_type == "next_bite":
+            pass
+        elif request_type == "successful_pickup":
+            pass
+        elif request_type == "ready for transfer":
+            pass
+
+    def continuous_explanations(self) -> None:
+        """
+        If it has been two seconds since a task param
+        """
+        
+
+    def jump_to_state(self, state: str) -> None:
 
     def send_web_interface_message(self, msg_dict: dict[str, Any]) -> None:
         self.web_interface_publisher.publish(
@@ -109,6 +159,13 @@ class WebInterface:
 
     def send_web_interface_image(self, image) -> None:
         self.web_interface_image_publisher.publish(self.image_bridge.cv2_to_compressed_imgmsg(image))
+
+    # at any point in time,
+    # either the web interface is soliciting information from the user
+    # or the web interface is being transparent
+    # for soliciting, it would jump to a certain page
+    # otherwise, it should show the white page (how?)
+    
 
 if __name__ == "__main__":
     rospy.init_node("test_web_interface")
