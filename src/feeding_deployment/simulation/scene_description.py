@@ -233,7 +233,7 @@ class SceneDescription:
         / "wiping_utensil.urdf"
     )
     tool_frame_to_wipe_tip: Pose = Pose(
-        (0.089, -0.015, -0.018),
+        (0.139, -0.015, -0.018),
         (0.000, 0.707, 0.000, 0.707),
     )
 

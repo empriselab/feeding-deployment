@@ -20,7 +20,7 @@ try:
     from segment_anything import sam_model_registry, SamPredictor
     PATH_TO_GROUNDED_SAM = '/home/isacc/Grounded-Segment-Anything'
     PATH_TO_DEPTH_ANYTHING = '/home/isacc/Depth-Anything'
-    PATH_TO_SPAGHETTI_CHECKPOINTS = '/home/isacc/deployment_ws/src/FLAIR/bite_acquisition/spaghetti_checkpoints'
+    PATH_TO_SPAGHETTI_CHECKPOINTS = '/home/isacc/deployment_ws/src/feeding-deployment/src/feeding_deployment/actions/flair/spaghetti_checkpoints'
     USE_EFFICIENT_SAM = False
 
     sys.path.append(PATH_TO_DEPTH_ANYTHING)
