@@ -185,7 +185,10 @@ class HeadPerceptionROSWrapper:
         if head_perception_data is not None:
 
             if self.filter_noisy_readings: # do not shutdown robot if warm starting / kill_on_noisy_reading is False
-                self.noisy_reading_publisher.publish(head_perception_data["noisy_reading"])
+                if head_perception_data["noisy_reading"]:
+                    print("Noisy reading detected from DECA")
+                    self.noisy_reading_publisher.publish(Bool(data=True))
+                    return None
 
             self.visualizeToolTipTarget(head_perception_data["tool_tip_target_pose"])
             self.visualizeVoxels(head_perception_data["visualization_points_world_frame"])
@@ -205,6 +208,7 @@ class HeadPerceptionROSWrapper:
 
         else:
             if self.filter_noisy_readings:
+                print("None returned from DECA")
                 self.noisy_reading_publisher.publish(Bool(data=True))
             
             return None

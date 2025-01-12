@@ -85,9 +85,7 @@ class WatchDog:
         print("Initialized.")
 
     def cameraCallback(self, msg):
-
         self.camera_timestamps.put(time.time())
-        self.camera_unexpected = False
 
     def cameraUnexpectedCallback(self, msg):
         self.camera_unexpected = msg.data
