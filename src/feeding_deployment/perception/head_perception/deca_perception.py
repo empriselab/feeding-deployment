@@ -276,6 +276,12 @@ class HeadPerception:
 
             if self.tool is None:
                 raise ValueError("Head Perception Tool is not set.")
+            
+            user_input = input("Press 'y' to update saved data, 'n' to exit: ")
+            while user_input != "y" and user_input != "n":
+                user_input = input("Press 'y' to update saved data, 'n' to exit: ")
+            if user_input == "n":
+                return None
 
             print(
                 "landmarks_selected_model[:,:,np.newaxis].shape: ",
@@ -342,8 +348,6 @@ class HeadPerception:
                 self.current_filepath + "/config/" + self.tool + "/reference_neck_frame.npy",
                 neck_frame,
             )
-
-            input("Press [ENTER] to update saved data... ")
 
             return {
                 "head_pose": self.get_head_pose_from_neck_frame(neck_frame),

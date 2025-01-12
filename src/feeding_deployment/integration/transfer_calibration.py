@@ -8,6 +8,7 @@ import shutil
 
 try:
     import rospy
+    from std_msgs.msg import Bool
 
     ROSPY_IMPORTED = True
 except ModuleNotFoundError:
@@ -42,7 +43,8 @@ def _main(
     """Testing components of the system."""
 
     if ROSPY_IMPORTED:
-        rospy.init_node("test_actions")
+        rospy.init_node("transfer_calibration")
+        disable_collision_sensor_pub = rospy.Publisher("/disable_collision_sensor", Bool, queue_size=1)
     else:
         raise RuntimeError("ROS not imported. Please run this script in a ROS environment and with the real robot.")
 
@@ -57,16 +59,31 @@ def _main(
     perception_interface = PerceptionInterface(robot_interface = robot_interface, record_goal_pose = not test)
 
     if not test: # calibrate utensil tip
+        
+        # turn off collision sensor
+        disable_collision_sensor_pub.publish(Bool(data=True))
+        print("Sent message to turn off collision sensor")
+        
         # set tool transform - only required once globally
         perception_interface._head_perception.save_tool_tip_transform(args.tool)
         
         perception_interface._head_perception.set_tool(args.tool)
         while not rospy.is_shutdown():
-            perception_interface._head_perception.run_head_perception()
+            head_perception_data = perception_interface._head_perception.run_head_perception()
+            if head_perception_data is None:
+                break
+        
+        input("Can I turn the collision sensor back on? Press Enter to continue...")
+        # turn on collision sensor
+        disable_collision_sensor_pub.publish(Bool(data=False))
+        print("Sent message to turn on collision sensor")
+
     elif record_rom:
         perception_interface._head_perception.set_tool(args.tool)
         while not rospy.is_shutdown():
-            perception_interface._head_perception.run_head_perception()
+            head_perception_data = perception_interface._head_perception.run_head_perception()
+            if head_perception_data is None:
+                print("No head perception data")
     else: # actually do the transfer
         run_on_robot = True
 

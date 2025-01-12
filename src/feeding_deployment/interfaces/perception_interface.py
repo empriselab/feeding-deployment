@@ -76,6 +76,9 @@ class PerceptionInterface:
         self.kill_the_thread = False
         self.head_perception_running = False
 
+        # set led brightness
+        self.set_led_brightness()
+
     def zero_ft_sensor(self):
         print("Zeroing FT sensor")
         if self.simulation:
@@ -89,17 +92,28 @@ class PerceptionInterface:
             return
         self.speak_pub.publish(String(data=text))
 
+    def set_led_brightness(self, brightness: float = 0.2):
+        print("Setting LED Brightness")
+        if self.simulation:
+            return
+        with serial.Serial(LED_SERIAL_PORT, LED_BAUD_RATE, timeout=1) as ser:
+            ser.reset_input_buffer()
+            ser.reset_output_buffer()
+            # Convert brightness to string, encode to bytes, and concatenate
+            command = f"BRIGHTNESS {brightness}\r\n".encode()
+            ser.write(command)
+
     def turn_on_led(self):
         with serial.Serial(LED_SERIAL_PORT, LED_BAUD_RATE, timeout=1) as ser:
             ser.reset_input_buffer()  # Clear input buffer
             ser.reset_output_buffer()  # Clear output buffer
-            ser.write(b"on\r\n")  # Send the command
-    
+            ser.write(b"ON\r\n")  # Send the command
+
     def turn_off_led(self):
         with serial.Serial(LED_SERIAL_PORT, LED_BAUD_RATE, timeout=1) as ser:
             ser.reset_input_buffer()
             ser.reset_output_buffer()
-            ser.write(b"off\r\n")
+            ser.write(b"OFF\r\n")
 
     def detect_button_press(self):
         print("Waiting for button press")
@@ -213,11 +227,11 @@ class PerceptionInterface:
         with self.head_perception_data_lock:
             head_perception_data = self.head_perception_data
 
-        # Just for testing
-        benjamin_tool_tip_target_pose = np.eye(4)
-        benjamin_tool_tip_target_pose[:3, 3] = [-0.282, 0.540, 0.619]
-        benjamin_tool_tip_target_pose[:3, :3] = R.from_quat([-0.490, 0.510, 0.511, -0.489]).as_matrix()
-        head_perception_data["tool_tip_target_pose"] = benjamin_tool_tip_target_pose
+        # # Just for testing
+        # benjamin_tool_tip_target_pose = np.eye(4)
+        # benjamin_tool_tip_target_pose[:3, 3] = [-0.282, 0.540, 0.619]
+        # benjamin_tool_tip_target_pose[:3, :3] = R.from_quat([-0.490, 0.510, 0.511, -0.489]).as_matrix()
+        # head_perception_data["tool_tip_target_pose"] = benjamin_tool_tip_target_pose
 
         # save them in a pickle file
         if self.robot_interface is not None and self.log_dir is not None and self._simulate_head_perception == False:
