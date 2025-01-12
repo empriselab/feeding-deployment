@@ -452,44 +452,12 @@ if __name__ == "__main__":
     # runner.hla_command_queue.put(drink_transfer_msg)
 
     if not args.use_interface:
-        # Example of using LLM to generate updates to behavior trees.
-        runner.process_user_update_request("Can you remain quiet the whole time?")
-        runner.process_user_update_request("Move a little bit faster while picking up the food")
-
-        # Example of directly updating the behavior trees.
-        bite_acquisition = GroundHighLevelAction(runner.hla_name_to_hla["AcquireBiteWithTool"], (runner.utensil,))
-
-        gesture_fn_text = """
-def my_custom_gesture_detector(perception_interface, timeout):
-    print("Detecting gesture...")
-    time.sleep(timeout)
-    return True
-"""
-        gesture_fn_name = "my_custom_gesture_detector"
-        runner.register_gesture_detector(gesture_fn_name, gesture_fn_text)
-
-        bite_acquisition.process_behavior_tree_node_addition("WaitForGesture", {"gesture_fn_name": gesture_fn_name}, "AcquireBite", "before")
-        bite_acquisition.process_behavior_tree_node_addition("Pause", {"duration": 0.5}, "AcquireBite", "after")
-
-        # Examples of switching the interaction modes for transfer.
-        for tool_name, tool in runner.object_name_to_object.items():
-            transfer_tool = GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (tool,))
-            node_name = f"Transfer{tool_name.capitalize()}"
-            transfer_tool.process_behavior_tree_parameter_update(node_name, "ReadyToInitiateTransferInteraction", "silent")
-            transfer_tool.process_behavior_tree_parameter_update(node_name, "ReadyForTransferInteraction", "silent")
-            transfer_tool.process_behavior_tree_parameter_update(node_name, "InitiateTransferInteraction", "button")
-            transfer_tool.process_behavior_tree_parameter_update(node_name, "TransferCompleteInteraction", "button")
-
-        # Example of retracting after transfer.
-        runner.process_user_update_request("Retract after transferring a bite.")
-        # bite_transfer = GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,))
-        # bite_transfer.process_behavior_tree_node_addition("Retract", {}, "TransferUtensil", "after")
-
         # Run some commands.
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.utensil,)))
+        for i in range(5):
+            runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
+            runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
     else:
         runner.run()
 
