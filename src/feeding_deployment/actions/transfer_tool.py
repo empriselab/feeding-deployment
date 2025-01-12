@@ -7,6 +7,12 @@ from scipy.spatial.transform import Rotation
 
 from pybullet_helpers.geometry import Pose
 
+try:
+    import rospy
+    from std_msgs.msg import Bool
+except ModuleNotFoundError:
+    ROSPY_IMPORTED = False
+
 from relational_structs import (
     GroundAtom,
     GroundOperator,
@@ -45,6 +51,9 @@ class TransferToolHLA(HighLevelAction):
             self.transfer = OutsideMouthTransfer(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.no_waits)
         else:
             raise ValueError("Bite transfer type not recognized")
+
+        if self.robot_interface is not None:
+            self.disable_collision_sensor_pub = rospy.Publisher("/disable_collision_sensor", Bool, queue_size=1)
 
     def set_tool(self, tool):
         self.tool = tool
@@ -109,13 +118,16 @@ class TransferToolHLA(HighLevelAction):
         self.perception_interface.set_head_perception_tool(self.tool)
         self.perception_interface.start_head_perception_thread()
         if self.robot_interface is not None:
-            time.sleep(5.0) # let head perception thread warmstart / robot to stabilize
+            time.sleep(2.0) # let head perception thread warmstart / robot to stabilize
             self.robot_interface.set_tool(self.tool)
             self.perception_interface.zero_ft_sensor()
         else:
             time.sleep(1.0) # let sim head perception thread warmstart
 
         if self.sim.scene_description.transfer_type == "inside" and self.robot_interface is not None:
+            self.disable_collision_sensor_pub.publish(Bool(data=True))
+            print("Sent message to turn off collision sensor")
+            time.sleep(0.5) # let collision sensor turn off
             if not self.no_waits:
                 input("Press enter to switch to task compliant mode")
             self.robot_interface.switch_to_task_compliant_mode()
@@ -140,6 +152,8 @@ class TransferToolHLA(HighLevelAction):
             if not self.no_waits:
                 input("Press enter to switch out of compliant mode")
             self.robot_interface.switch_out_of_compliant_mode()
+            self.disable_collision_sensor_pub.publish(Bool(data=False))
+            print("Sent message to turn on collision sensor")
 
     def get_name(self) -> str:
         return "TransferTool"

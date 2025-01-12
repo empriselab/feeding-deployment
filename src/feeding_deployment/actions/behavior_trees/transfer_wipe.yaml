@@ -22,12 +22,12 @@ parameters:
       type: "Enum"
       elements: ["button", "open_mouth", "auto_timeout"]
     is_user_editable: True
-    value: "button"
+    value: "open_mouth"
   - name: "TransferCompleteInteraction"
     description: "Interaction mode for transfer completion."
     space:
       type: "Enum"
       elements: ["button", "sense", "auto_timeout"]
     is_user_editable: True
-    value: "button"
+    value: "sense"
 fn: !hla transfer_wipe
