@@ -32,6 +32,7 @@ class ArmInterface:
 
         # Lock to handle a corner case where the gravity compensation event is set by self.emergency_stop(),
         # but cleared by self.switch_out_of_compliant_mode().
+        # Also handles the corner case where emergency stop is pressed right when it is switching to compliant mode
         self.gravity_compensation_external_event_lock = threading.Lock()  
 
     def is_alive(self):
@@ -87,14 +88,14 @@ class ArmInterface:
 
         # switch to joint compliant mode
         print("Switching to joint compliant mode")
-
-        try:
-            self.arm.switch_to_task_compliant_mode(self.command_queue, self.gravity_compensation_external_event, self.gravity_compensation_internal_event)
-        except Exception as e:
-            print(f"Error in switch_to_task_compliant_mode: {e}")
-            # Re-raise a simplified exception to avoid pickling issues
-            raise Exception(f"Error in switch_to_task_compliant_mode: {str(e)}") from None # suppress original exception
-        self.in_compliant_mode = True
+        with self.gravity_compensation_external_event_lock:
+            try:
+                self.arm.switch_to_task_compliant_mode(self.command_queue, self.gravity_compensation_external_event, self.gravity_compensation_internal_event)
+            except Exception as e:
+                print(f"Error in switch_to_task_compliant_mode: {e}")
+                # Re-raise a simplified exception to avoid pickling issues
+                raise Exception(f"Error in switch_to_task_compliant_mode: {str(e)}") from None # suppress original exception
+            self.in_compliant_mode = True
 
     def switch_to_joint_compliant_mode(self):
 
@@ -109,13 +110,14 @@ class ArmInterface:
         # switch to joint compliant mode
         print("Switching to joint compliant mode")
 
-        try:
-            self.arm.switch_to_joint_compliant_mode(self.command_queue, self.gravity_compensation_external_event, self.gravity_compensation_internal_event)
-        except Exception as e:
-            print(f"Error in switch_to_joint_compliant_mode: {e}")
-            # Re-raise a simplified exception to avoid pickling issues
-            raise Exception(f"Error in switch_to_joint_compliant_mode: {str(e)}") from None
-        self.in_compliant_mode = True
+        with self.gravity_compensation_external_event_lock:
+            try:
+                self.arm.switch_to_joint_compliant_mode(self.command_queue, self.gravity_compensation_external_event, self.gravity_compensation_internal_event)
+            except Exception as e:
+                print(f"Error in switch_to_joint_compliant_mode: {e}")
+                # Re-raise a simplified exception to avoid pickling issues
+                raise Exception(f"Error in switch_to_joint_compliant_mode: {str(e)}") from None
+            self.in_compliant_mode = True
 
     def switch_out_of_compliant_mode(self):
 
