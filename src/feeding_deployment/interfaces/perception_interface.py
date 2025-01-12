@@ -213,6 +213,12 @@ class PerceptionInterface:
         with self.head_perception_data_lock:
             head_perception_data = self.head_perception_data
 
+        # Just for testing
+        benjamin_tool_tip_target_pose = np.eye(4)
+        benjamin_tool_tip_target_pose[:3, 3] = [-0.282, 0.540, 0.619]
+        benjamin_tool_tip_target_pose[:3, :3] = R.from_quat([-0.490, 0.510, 0.511, -0.489]).as_matrix()
+        head_perception_data["tool_tip_target_pose"] = benjamin_tool_tip_target_pose
+
         # save them in a pickle file
         if self.robot_interface is not None and self.log_dir is not None and self._simulate_head_perception == False:
             with open(self.log_dir / f'head_perception_data_{self.tool}.pkl', 'wb') as f:
