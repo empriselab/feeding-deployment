@@ -1,0 +1,5 @@
+Log file created at 2025-01-13 00:15:11
+set_joint_position: [-2.86554642 -1.61951779 -2.60986085 -1.37302839  1.11779249 -1.18028264
+  2.05515862]
+switch_to_task_compliant_mode
+emergency_stop
