@@ -15,19 +15,19 @@ parameters:
       type: "Enum"
       elements: ["silent", "voice", "led"]
     is_user_editable: True
-    value: "voice"
+    value: "silent"
   - name: "InitiateTransferInteraction"
     description: "Interaction mode for transfer."
     space:
       type: "Enum"
       elements: ["button", "open_mouth", "auto_timeout"]
     is_user_editable: True
-    value: "open_mouth"
+    value: "button"
   - name: "TransferCompleteInteraction"
     description: "Interaction mode for transfer completion."
     space:
       type: "Enum"
       elements: ["button", "sense", "auto_timeout"]
     is_user_editable: True
-    value: "sense"
+    value: "button"
 fn: !hla transfer_utensil

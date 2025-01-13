@@ -90,14 +90,14 @@ class HeadPerception:
 
         self.FLAME_neck_index = 2151
 
-        roll_threshold = np.pi / 7
-        pitch_threshold = np.pi / 7
-        yaw_threshold = np.pi / 7
+        roll_threshold = np.pi / 5
+        pitch_threshold = np.pi / 5
+        yaw_threshold = np.pi / 5
 
         self.max_rotation_threshold = np.array(
             [roll_threshold, pitch_threshold, yaw_threshold]
         )
-        self.max_distance_threshold = np.array([0.4, 0.4, 0.4])  # m
+        self.max_distance_threshold = np.array([0.5, 0.5, 0.5])  # m
 
         self.current_filepath = os.path.dirname(os.path.abspath(__file__))
 
