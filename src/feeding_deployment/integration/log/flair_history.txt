@@ -1,1 +1,0 @@
-{'bite_history': ['cantaloupe', 'cantaloupe', 'banana', 'cantaloupe', 'cantaloupe', 'watermelon', 'watermelon', 'watermelon', 'cantaloupe', 'cantaloupe', 'banana', 'watermelon', 'watermelon', 'banana', 'banana'], 'user_preference': 'Eat all the cantaloupes first'}
