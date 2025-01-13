@@ -314,7 +314,7 @@ Config: configuration {
   handle {
     identifier: 1
   }
-  error_threshold: 5.0
+  error_threshold: 10.0
   warning_threshold: 3.0
   enable {
     handle {
@@ -936,7 +936,7 @@ Config: configuration {
   handle {
     identifier: 1
   }
-  error_threshold: 5.0
+  error_threshold: 10.0
   warning_threshold: 3.0
   enable {
     handle {
@@ -1562,7 +1562,7 @@ Config: configuration {
   handle {
     identifier: 1
   }
-  error_threshold: 5.0
+  error_threshold: 10.0
   warning_threshold: 3.0
   enable {
     handle {
@@ -2184,7 +2184,7 @@ Config: configuration {
   handle {
     identifier: 1
   }
-  error_threshold: 5.0
+  error_threshold: 10.0
   warning_threshold: 3.0
   enable {
     handle {
@@ -2806,7 +2806,7 @@ Config: configuration {
   handle {
     identifier: 1
   }
-  error_threshold: 5.0
+  error_threshold: 10.0
   warning_threshold: 3.0
   enable {
     handle {
@@ -3432,7 +3432,7 @@ Config: configuration {
   handle {
     identifier: 1
   }
-  error_threshold: 5.0
+  error_threshold: 10.0
   warning_threshold: 3.0
   enable {
     handle {
@@ -4054,7 +4054,7 @@ Config: configuration {
   handle {
     identifier: 1
   }
-  error_threshold: 5.0
+  error_threshold: 10.0
   warning_threshold: 3.0
   enable {
     handle {

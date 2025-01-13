@@ -21,6 +21,7 @@ enable {
   handle {
     identifier: 1
   }
+  enable: true
 }
 
 Device 1
@@ -46,6 +47,7 @@ enable {
   handle {
     identifier: 1
   }
+  enable: true
 }
 
 Device 2
@@ -71,6 +73,7 @@ enable {
   handle {
     identifier: 1
   }
+  enable: true
 }
 
 Device 3
@@ -96,6 +99,7 @@ enable {
   handle {
     identifier: 1
   }
+  enable: true
 }
 
 Device 4
@@ -121,6 +125,7 @@ enable {
   handle {
     identifier: 1
   }
+  enable: true
 }
 
 Device 5
@@ -146,6 +151,7 @@ enable {
   handle {
     identifier: 1
   }
+  enable: true
 }
 
 Device 6
@@ -171,5 +177,6 @@ enable {
   handle {
     identifier: 1
   }
+  enable: true
 }
 

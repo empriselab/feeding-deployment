@@ -181,6 +181,15 @@ class KinovaArm:
         # Make sure arm is in high-level servoing mode
         self.set_arm_servoing_mode("high")
 
+        print("Setting joint following error threshold to 10 degrees")
+        # increase joint following error threshold to 10 degrees (upper hard limit)
+        joint_following_safety_threshold = DeviceConfig_pb2.SafetyThreshold()
+        joint_following_safety_threshold.handle.identifier = ActuatorConfig_pb2.SafetyIdentifierBankA.Value("FOLLOWING_ERROR")
+        joint_following_safety_threshold.value = 10
+
+        for device_id in self.actuator_device_ids:
+            self.device_config.SetSafetyErrorThreshold(joint_following_safety_threshold, device_id)
+
         # get and print safety information
         safety_info = []
         safety_configuration = []

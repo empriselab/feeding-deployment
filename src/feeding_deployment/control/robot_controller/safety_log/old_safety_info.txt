@@ -320,6 +320,7 @@ Config: configuration {
     handle {
       identifier: 1
     }
+    enable: true
   }
 }
 configuration {
@@ -941,6 +942,7 @@ Config: configuration {
     handle {
       identifier: 1
     }
+    enable: true
   }
 }
 configuration {
@@ -1566,6 +1568,7 @@ Config: configuration {
     handle {
       identifier: 1
     }
+    enable: true
   }
 }
 configuration {
@@ -2187,6 +2190,7 @@ Config: configuration {
     handle {
       identifier: 1
     }
+    enable: true
   }
 }
 configuration {
@@ -2808,6 +2812,7 @@ Config: configuration {
     handle {
       identifier: 1
     }
+    enable: true
   }
 }
 configuration {
@@ -3433,6 +3438,7 @@ Config: configuration {
     handle {
       identifier: 1
     }
+    enable: true
   }
 }
 configuration {
@@ -4054,6 +4060,7 @@ Config: configuration {
     handle {
       identifier: 1
     }
+    enable: true
   }
 }
 configuration {
