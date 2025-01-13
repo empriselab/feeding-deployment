@@ -331,6 +331,8 @@ class AcquireBiteHLA(HighLevelAction):
                 food_type = self.params["data"][0]
                 item_id = self.params["data"][1] - 1
 
+                self.flair.update_bite_history(food_type)
+
                 mask = food_type_to_masks[food_type][item_id]
                 skill = food_type_to_skill[food_type]
 

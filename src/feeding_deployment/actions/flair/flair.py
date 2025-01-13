@@ -17,17 +17,24 @@ class FLAIR:
         self.inference_server = BiteAcquisitionInference(mode='ours')
         print("inf server init")
 
-        history_path = Path(__file__).parent.parent / "integration" / "log" / "history.txt"
-        if not os.path.exists(history_path):
+        self.history_path = Path(__file__).parent.parent / "integration" / "log" / "flair_history.txt"
+        if not os.path.exists(self.history_path):
             self.bite_history = []
+            self.user_preference = None
         else:
-            with open('history.txt', 'r') as f:
-                self.bite_history = ast.literal_eval(f.read().strip())
+            # read in json format
+            with open(self.history_path, 'r') as f:
+                logged_history = ast.literal_eval(f.read())
+            
+            try:
+                self.bite_history = logged_history["bite_history"]
+                self.user_preference = logged_history["user_preference"]
+            except KeyError: # if the file is empty
+                self.bite_history = []
+                self.user_preference = None
 
-        print("History", self.bite_history)
-
-        # User preference
-        self.user_preference = None
+            print("Logged Bite History", self.bite_history)
+            print("Logged User Preference", self.user_preference)
 
         # Continue food
         self.continue_food_label = None
@@ -38,6 +45,14 @@ class FLAIR:
         # itermediate variables
         self.items_detection = None
         self.next_action_prediction = None
+
+    def log_history(self):
+        with open(self.history_path, 'w') as f:
+            f.write(str({"bite_history": self.bite_history, "user_preference": self.user_preference}))
+
+    def update_bite_history(self, acquired_food_label):
+        self.bite_history.append(acquired_food_label)
+        self.log_history()
         
     def identify_plate(self, camera_color_data):
 
@@ -58,6 +73,7 @@ class FLAIR:
 
     def set_preference(self, user_preference):
         self.user_preference = user_preference
+        self.log_history()
 
     def clear_preference(self):
         self.user_preference = None

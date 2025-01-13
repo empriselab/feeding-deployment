@@ -152,7 +152,11 @@ class InsideMouthTransfer(Transfer):
 
             self.set_filter_noisy_readings_pub.publish(Bool(data=False))
 
+        print("Finished moving to transfer state")
+
     def move_to_before_transfer_state(self):
+
+        print("Starting to move to before transfer state")
 
         if self.robot_interface is None:
             # In simulation, directly move to outside the mouth
