@@ -17,19 +17,20 @@ class FLAIR:
         self.inference_server = BiteAcquisitionInference(mode='ours')
         print("inf server init")
 
-        self.history_path = Path(__file__).parent.parent / "integration" / "log" / "flair_history.txt"
+        self.history_path = Path(__file__).parent.parent.parent / "integration" / "log" / "flair_history.txt"
         if not os.path.exists(self.history_path):
             self.bite_history = []
             self.user_preference = None
         else:
             # read in json format
-            with open(self.history_path, 'r') as f:
-                logged_history = ast.literal_eval(f.read())
-            
             try:
+                with open(self.history_path, 'r') as f:
+                    logged_history = ast.literal_eval(f.read())
                 self.bite_history = logged_history["bite_history"]
                 self.user_preference = logged_history["user_preference"]
-            except KeyError: # if the file is empty
+            except Exception as e:
+                print("Error reading history file", e)
+                print("Creating new history file...")
                 self.bite_history = []
                 self.user_preference = None
 
