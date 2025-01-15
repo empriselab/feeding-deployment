@@ -1,0 +1,182 @@
+Device 0
+Info: handle {
+  identifier: 1
+}
+can_change_safety_state: true
+has_warning_threshold: true
+has_error_threshold: true
+limit_type: MAXIMAL_LIMIT
+default_warning_threshold: 3.0
+default_error_threshold: 5.0
+upper_hard_limit: 10.0
+status: SAFETY_STATUS_NORMAL
+unit: DEGREE
+
+Config: handle {
+  identifier: 1
+}
+error_threshold: 10.0
+warning_threshold: 3.0
+enable {
+  handle {
+    identifier: 1
+  }
+  enable: true
+}
+
+Device 1
+Info: handle {
+  identifier: 1
+}
+can_change_safety_state: true
+has_warning_threshold: true
+has_error_threshold: true
+limit_type: MAXIMAL_LIMIT
+default_warning_threshold: 3.0
+default_error_threshold: 5.0
+upper_hard_limit: 10.0
+status: SAFETY_STATUS_NORMAL
+unit: DEGREE
+
+Config: handle {
+  identifier: 1
+}
+error_threshold: 10.0
+warning_threshold: 3.0
+enable {
+  handle {
+    identifier: 1
+  }
+  enable: true
+}
+
+Device 2
+Info: handle {
+  identifier: 1
+}
+can_change_safety_state: true
+has_warning_threshold: true
+has_error_threshold: true
+limit_type: MAXIMAL_LIMIT
+default_warning_threshold: 3.0
+default_error_threshold: 5.0
+upper_hard_limit: 10.0
+status: SAFETY_STATUS_NORMAL
+unit: DEGREE
+
+Config: handle {
+  identifier: 1
+}
+error_threshold: 10.0
+warning_threshold: 3.0
+enable {
+  handle {
+    identifier: 1
+  }
+  enable: true
+}
+
+Device 3
+Info: handle {
+  identifier: 1
+}
+can_change_safety_state: true
+has_warning_threshold: true
+has_error_threshold: true
+limit_type: MAXIMAL_LIMIT
+default_warning_threshold: 3.0
+default_error_threshold: 5.0
+upper_hard_limit: 10.0
+status: SAFETY_STATUS_NORMAL
+unit: DEGREE
+
+Config: handle {
+  identifier: 1
+}
+error_threshold: 10.0
+warning_threshold: 3.0
+enable {
+  handle {
+    identifier: 1
+  }
+  enable: true
+}
+
+Device 4
+Info: handle {
+  identifier: 1
+}
+can_change_safety_state: true
+has_warning_threshold: true
+has_error_threshold: true
+limit_type: MAXIMAL_LIMIT
+default_warning_threshold: 3.0
+default_error_threshold: 5.0
+upper_hard_limit: 10.0
+status: SAFETY_STATUS_NORMAL
+unit: DEGREE
+
+Config: handle {
+  identifier: 1
+}
+error_threshold: 10.0
+warning_threshold: 3.0
+enable {
+  handle {
+    identifier: 1
+  }
+  enable: true
+}
+
+Device 5
+Info: handle {
+  identifier: 1
+}
+can_change_safety_state: true
+has_warning_threshold: true
+has_error_threshold: true
+limit_type: MAXIMAL_LIMIT
+default_warning_threshold: 3.0
+default_error_threshold: 5.0
+upper_hard_limit: 10.0
+status: SAFETY_STATUS_NORMAL
+unit: DEGREE
+
+Config: handle {
+  identifier: 1
+}
+error_threshold: 10.0
+warning_threshold: 3.0
+enable {
+  handle {
+    identifier: 1
+  }
+  enable: true
+}
+
+Device 6
+Info: handle {
+  identifier: 1
+}
+can_change_safety_state: true
+has_warning_threshold: true
+has_error_threshold: true
+limit_type: MAXIMAL_LIMIT
+default_warning_threshold: 3.0
+default_error_threshold: 5.0
+upper_hard_limit: 10.0
+status: SAFETY_STATUS_NORMAL
+unit: DEGREE
+
+Config: handle {
+  identifier: 1
+}
+error_threshold: 10.0
+warning_threshold: 3.0
+enable {
+  handle {
+    identifier: 1
+  }
+  enable: true
+}
+

@@ -1,0 +1,63 @@
+Device 0
+Enable: handle {
+  identifier: 1
+}
+enable: true
+
+Enable Set: True
+Status: value: SAFETY_STATUS_NORMAL
+
+Device 1
+Enable: handle {
+  identifier: 1
+}
+enable: true
+
+Enable Set: True
+Status: value: SAFETY_STATUS_NORMAL
+
+Device 2
+Enable: handle {
+  identifier: 1
+}
+enable: true
+
+Enable Set: True
+Status: value: SAFETY_STATUS_NORMAL
+
+Device 3
+Enable: handle {
+  identifier: 1
+}
+enable: true
+
+Enable Set: True
+Status: value: SAFETY_STATUS_NORMAL
+
+Device 4
+Enable: handle {
+  identifier: 1
+}
+enable: true
+
+Enable Set: True
+Status: value: SAFETY_STATUS_NORMAL
+
+Device 5
+Enable: handle {
+  identifier: 1
+}
+enable: true
+
+Enable Set: True
+Status: value: SAFETY_STATUS_NORMAL
+
+Device 6
+Enable: handle {
+  identifier: 1
+}
+enable: true
+
+Enable Set: True
+Status: value: SAFETY_STATUS_NORMAL
+

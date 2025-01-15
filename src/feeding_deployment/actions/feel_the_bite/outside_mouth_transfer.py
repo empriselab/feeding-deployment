@@ -32,9 +32,6 @@ class OutsideMouthTransfer(Transfer):
         head_pose = head_perception_data["head_pose"]
         self.sim.set_head_pose(Pose(position=head_pose[:3], orientation=Rotation.from_euler('yxz', head_pose[3:], degrees=True).as_quat()))
 
-        if self.robot_interface is not None:
-            self.set_filter_noisy_readings_pub.publish(Bool(data=False))
-
         servo_point_forque_target = np.identity(4)
         servo_point_forque_target[:3,3] = np.array([0, 0, -DISTANCE_INFRONT_MOUTH]).reshape(1,3)
         infront_mouth_target = forque_target_base @ servo_point_forque_target
@@ -46,6 +43,9 @@ class OutsideMouthTransfer(Transfer):
         target_pose = Pose.from_matrix(tool_frame_target)
 
         self.move_to_ee_pose(target_pose)
+
+        if self.robot_interface is not None:
+            self.set_filter_noisy_readings_pub.publish(Bool(data=False))
 
     def move_to_before_transfer_state(self):
         self.move_to_ee_pose(self.sim.scene_description.before_transfer_pose)

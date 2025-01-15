@@ -8,6 +8,7 @@
 import queue
 import time
 import threading
+from pathlib import Path
 
 import numpy as np
 from multiprocess.managers import BaseManager as MPBaseManager
@@ -30,8 +31,15 @@ class ArmInterface:
         self.emergency_stop_active = False
         self.controller = None
 
+        # log file
+        self.log_file = Path(__file__).parent / "safety_log" / "arm_commands_log.txt"
+        # clear log file and set time stamp
+        with open(self.log_file, "w") as f:
+            f.write(f"Log file created at {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+
         # Lock to handle a corner case where the gravity compensation event is set by self.emergency_stop(),
         # but cleared by self.switch_out_of_compliant_mode().
+        # Also handles the corner case where emergency stop is pressed right when it is switching to compliant mode
         self.gravity_compensation_external_event_lock = threading.Lock()  
 
     def is_alive(self):
@@ -80,6 +88,10 @@ class ArmInterface:
         assert not self.emergency_stop_active, "Emergency stop is active"
         assert not self.in_compliant_mode, "Already in compliant mode"
 
+        # save in log file
+        with open(self.log_file, "a") as f:
+            f.write("switch_to_task_compliant_mode\n")
+
         # clear command queue
         print("Clearing command queue")
         while not self.command_queue.empty():
@@ -87,20 +99,24 @@ class ArmInterface:
 
         # switch to joint compliant mode
         print("Switching to joint compliant mode")
-
-        try:
-            self.arm.switch_to_task_compliant_mode(self.command_queue, self.gravity_compensation_external_event, self.gravity_compensation_internal_event)
-        except Exception as e:
-            print(f"Error in switch_to_task_compliant_mode: {e}")
-            # Re-raise a simplified exception to avoid pickling issues
-            raise Exception(f"Error in switch_to_task_compliant_mode: {str(e)}") from None # suppress original exception
-        self.in_compliant_mode = True
+        with self.gravity_compensation_external_event_lock:
+            try:
+                self.arm.switch_to_task_compliant_mode(self.command_queue, self.gravity_compensation_external_event, self.gravity_compensation_internal_event)
+            except Exception as e:
+                print(f"Error in switch_to_task_compliant_mode: {e}")
+                # Re-raise a simplified exception to avoid pickling issues
+                raise Exception(f"Error in switch_to_task_compliant_mode: {str(e)}") from None # suppress original exception
+            self.in_compliant_mode = True
 
     def switch_to_joint_compliant_mode(self):
 
         assert not self.emergency_stop_active, "Emergency stop is active"
         assert not self.in_compliant_mode, "Already in compliant mode"
 
+        # save in log file
+        with open(self.log_file, "a") as f:
+            f.write("switch_to_joint_compliant_mode\n")
+
         # clear command queue
         print("Clearing command queue")
         while not self.command_queue.empty():
@@ -109,18 +125,23 @@ class ArmInterface:
         # switch to joint compliant mode
         print("Switching to joint compliant mode")
 
-        try:
-            self.arm.switch_to_joint_compliant_mode(self.command_queue, self.gravity_compensation_external_event, self.gravity_compensation_internal_event)
-        except Exception as e:
-            print(f"Error in switch_to_joint_compliant_mode: {e}")
-            # Re-raise a simplified exception to avoid pickling issues
-            raise Exception(f"Error in switch_to_joint_compliant_mode: {str(e)}") from None
-        self.in_compliant_mode = True
+        with self.gravity_compensation_external_event_lock:
+            try:
+                self.arm.switch_to_joint_compliant_mode(self.command_queue, self.gravity_compensation_external_event, self.gravity_compensation_internal_event)
+            except Exception as e:
+                print(f"Error in switch_to_joint_compliant_mode: {e}")
+                # Re-raise a simplified exception to avoid pickling issues
+                raise Exception(f"Error in switch_to_joint_compliant_mode: {str(e)}") from None
+            self.in_compliant_mode = True
 
     def switch_out_of_compliant_mode(self):
 
         assert not self.emergency_stop_active, "Emergency stop is active"
         assert self.in_compliant_mode, "Not in compliant mode"
+
+        # save in log file
+        with open(self.log_file, "a") as f:
+            f.write("switch_out_of_compliant_mode\n")
 
         # first move to gravity compensation 
         print("Moving to gravity compensation")
@@ -150,6 +171,10 @@ class ArmInterface:
         assert not self.emergency_stop_active, "Emergency stop is active"
         assert self.in_compliant_mode, "Not in compliant mode"
 
+        # save in log file
+        with open(self.log_file, "a") as f:
+            f.write(f"compliant_set_joint_position: {command_pos}\n")
+
         # print(f"Received compliant joint pos command: {command_pos}")
         gripper_pos = 0
         self.command_queue.put((command_pos, gripper_pos))
@@ -158,6 +183,10 @@ class ArmInterface:
             
         assert not self.emergency_stop_active, "Emergency stop is active"
         assert self.in_compliant_mode, "Not in compliant mode"
+
+        # save in log file
+        with open(self.log_file, "a") as f:
+            f.write(f"compliant_set_ee_pose: {xyz}, {xyz_quat}\n")
 
         command_pose = np.zeros(7)
         command_pose[:3] = xyz
@@ -171,6 +200,10 @@ class ArmInterface:
         
         assert not self.emergency_stop_active, "Emergency stop is active"
         assert not self.in_compliant_mode, "In compliant mode"
+
+        # save in log file
+        with open(self.log_file, "a") as f:
+            f.write(f"set_joint_position: {command_pos}\n")
 
         print(f"Received joint pos command: {command_pos}")
 
@@ -201,6 +234,10 @@ class ArmInterface:
 
         assert not self.emergency_stop_active, "Emergency stop is active"
         assert not self.in_compliant_mode, "In compliant mode"
+
+        # save in log file
+        with open(self.log_file, "a") as f:
+            f.write(f"set_ee_pose: {xyz}, {xyz_quat}\n")
 
         print(f"Received cartesian pose command: {xyz}, {xyz_quat}")
 
@@ -286,6 +323,10 @@ class ArmInterface:
 
     def emergency_stop(self):
         assert not self.emergency_stop_active, "Emergency stop is already active"
+
+        # save in log file
+        with open(self.log_file, "a") as f:
+            f.write("emergency_stop\n")
 
         with self.gravity_compensation_external_event_lock:
             self.emergency_stop_active = True

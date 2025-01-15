@@ -1,0 +1,4366 @@
+Device 0
+Info: information {
+  handle {
+    identifier: 1
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 3.0
+  default_error_threshold: 5.0
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 2
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 180.0
+  default_error_threshold: 200.0
+  upper_hard_limit: 250.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE_PER_SECOND
+}
+information {
+  handle {
+    identifier: 4
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  upper_hard_limit: 2000.0
+  lower_hard_limit: -2000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 8
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MINIMAL_LIMIT
+  upper_hard_limit: 2000.0
+  lower_hard_limit: -2000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 16
+  }
+  can_change_safety_state: true
+  limit_type: MAXIMAL_LIMIT
+  status: SAFETY_STATUS_NORMAL
+  unit: NEWTON_METER
+}
+information {
+  handle {
+    identifier: 32
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 29.399999618530273
+  default_error_threshold: 51.29999923706055
+  upper_hard_limit: 52.0
+  status: SAFETY_STATUS_NORMAL
+  unit: NEWTON_METER
+}
+information {
+  handle {
+    identifier: 64
+  }
+  can_change_safety_state: true
+  limit_type: MAXIMAL_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 128
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 3.0
+  default_error_threshold: 5.0
+  upper_hard_limit: 20.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 256
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_error_threshold: 0.4284999966621399
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE_PER_MILLISECOND
+}
+information {
+  handle {
+    identifier: 512
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 1024
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 1.5
+  default_error_threshold: 2.0
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 2048
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 500.0
+  default_error_threshold: 1000.0
+  upper_hard_limit: 10000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: TICK
+}
+information {
+  handle {
+    identifier: 4096
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 10.0
+  default_error_threshold: 15.0
+  upper_hard_limit: 45.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 8192
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 6.0
+  default_error_threshold: 7.0
+  upper_hard_limit: 8.0
+  status: SAFETY_STATUS_NORMAL
+  unit: AMPERE
+}
+information {
+  handle {
+    identifier: 16384
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_error_threshold: 10.0
+  upper_hard_limit: 50.0
+  status: SAFETY_STATUS_NORMAL
+  unit: AMPERE
+}
+information {
+  handle {
+    identifier: 32768
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 30.0
+  default_error_threshold: 31.0
+  upper_hard_limit: 31.0
+  lower_hard_limit: 24.0
+  status: SAFETY_STATUS_NORMAL
+  unit: VOLT
+}
+information {
+  handle {
+    identifier: 65536
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MINIMAL_LIMIT
+  default_warning_threshold: 18.0
+  default_error_threshold: 16.0
+  upper_hard_limit: 24.0
+  lower_hard_limit: 16.0
+  status: SAFETY_STATUS_NORMAL
+  unit: VOLT
+}
+information {
+  handle {
+    identifier: 131072
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 60.0
+  default_error_threshold: 75.0
+  upper_hard_limit: 80.0
+  status: SAFETY_STATUS_NORMAL
+  unit: CELSIUS
+}
+information {
+  handle {
+    identifier: 262144
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 80.0
+  default_error_threshold: 90.0
+  upper_hard_limit: 100.0
+  status: SAFETY_STATUS_NORMAL
+  unit: CELSIUS
+}
+information {
+  handle {
+    identifier: 524288
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 1048576
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 2097152
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 4194304
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 100.0
+  default_error_threshold: 200.0
+  upper_hard_limit: 1000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: TICK
+}
+information {
+  handle {
+    identifier: 8388608
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 134217728
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 268435456
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+
+Config: configuration {
+  handle {
+    identifier: 1
+  }
+  error_threshold: 5.0
+  warning_threshold: 3.0
+  enable {
+    handle {
+      identifier: 1
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2
+  }
+  error_threshold: 200.0
+  warning_threshold: 180.0
+  enable {
+    handle {
+      identifier: 2
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4
+  }
+  enable {
+    handle {
+      identifier: 4
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 8
+  }
+  enable {
+    handle {
+      identifier: 8
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 16
+  }
+  enable {
+    handle {
+      identifier: 16
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 32
+  }
+  error_threshold: 51.29999923706055
+  warning_threshold: 29.399999618530273
+  enable {
+    handle {
+      identifier: 32
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 64
+  }
+  enable {
+    handle {
+      identifier: 64
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 128
+  }
+  error_threshold: 5.0
+  warning_threshold: 3.0
+  enable {
+    handle {
+      identifier: 128
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 256
+  }
+  error_threshold: 0.4284999966621399
+  enable {
+    handle {
+      identifier: 256
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 512
+  }
+  enable {
+    handle {
+      identifier: 512
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 1024
+  }
+  error_threshold: 2.0
+  warning_threshold: 1.5
+  enable {
+    handle {
+      identifier: 1024
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2048
+  }
+  error_threshold: 1000.0
+  warning_threshold: 500.0
+  enable {
+    handle {
+      identifier: 2048
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4096
+  }
+  error_threshold: 15.0
+  warning_threshold: 10.0
+  enable {
+    handle {
+      identifier: 4096
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 8192
+  }
+  error_threshold: 7.0
+  warning_threshold: 6.0
+  enable {
+    handle {
+      identifier: 8192
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 16384
+  }
+  error_threshold: 10.0
+  enable {
+    handle {
+      identifier: 16384
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 32768
+  }
+  error_threshold: 31.0
+  warning_threshold: 30.0
+  enable {
+    handle {
+      identifier: 32768
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 65536
+  }
+  error_threshold: 16.0
+  warning_threshold: 18.0
+  enable {
+    handle {
+      identifier: 65536
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 131072
+  }
+  error_threshold: 75.0
+  warning_threshold: 60.0
+  enable {
+    handle {
+      identifier: 131072
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 262144
+  }
+  error_threshold: 90.0
+  warning_threshold: 80.0
+  enable {
+    handle {
+      identifier: 262144
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 524288
+  }
+  enable {
+    handle {
+      identifier: 524288
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 1048576
+  }
+  enable {
+    handle {
+      identifier: 1048576
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2097152
+  }
+  enable {
+    handle {
+      identifier: 2097152
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4194304
+  }
+  error_threshold: 200.0
+  warning_threshold: 100.0
+  enable {
+    handle {
+      identifier: 4194304
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 8388608
+  }
+  enable {
+    handle {
+      identifier: 8388608
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 134217728
+  }
+  enable {
+    handle {
+      identifier: 134217728
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 268435456
+  }
+  enable {
+    handle {
+      identifier: 268435456
+    }
+    enable: true
+  }
+}
+
+Device 1
+Info: information {
+  handle {
+    identifier: 1
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 3.0
+  default_error_threshold: 5.0
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 2
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 180.0
+  default_error_threshold: 200.0
+  upper_hard_limit: 250.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE_PER_SECOND
+}
+information {
+  handle {
+    identifier: 4
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  upper_hard_limit: 2000.0
+  lower_hard_limit: -2000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 8
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MINIMAL_LIMIT
+  upper_hard_limit: 2000.0
+  lower_hard_limit: -2000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 16
+  }
+  can_change_safety_state: true
+  limit_type: MAXIMAL_LIMIT
+  status: SAFETY_STATUS_NORMAL
+  unit: NEWTON_METER
+}
+information {
+  handle {
+    identifier: 32
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 29.399999618530273
+  default_error_threshold: 51.29999923706055
+  upper_hard_limit: 52.0
+  status: SAFETY_STATUS_NORMAL
+  unit: NEWTON_METER
+}
+information {
+  handle {
+    identifier: 64
+  }
+  can_change_safety_state: true
+  limit_type: MAXIMAL_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 128
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 3.0
+  default_error_threshold: 5.0
+  upper_hard_limit: 20.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 256
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_error_threshold: 0.4284999966621399
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE_PER_MILLISECOND
+}
+information {
+  handle {
+    identifier: 512
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 1024
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 1.5
+  default_error_threshold: 2.0
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 2048
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 500.0
+  default_error_threshold: 1000.0
+  upper_hard_limit: 10000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: TICK
+}
+information {
+  handle {
+    identifier: 4096
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 10.0
+  default_error_threshold: 15.0
+  upper_hard_limit: 45.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 8192
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 6.0
+  default_error_threshold: 7.0
+  upper_hard_limit: 8.0
+  status: SAFETY_STATUS_NORMAL
+  unit: AMPERE
+}
+information {
+  handle {
+    identifier: 16384
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_error_threshold: 10.0
+  upper_hard_limit: 50.0
+  status: SAFETY_STATUS_NORMAL
+  unit: AMPERE
+}
+information {
+  handle {
+    identifier: 32768
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 30.0
+  default_error_threshold: 31.0
+  upper_hard_limit: 31.0
+  lower_hard_limit: 24.0
+  status: SAFETY_STATUS_NORMAL
+  unit: VOLT
+}
+information {
+  handle {
+    identifier: 65536
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MINIMAL_LIMIT
+  default_warning_threshold: 18.0
+  default_error_threshold: 16.0
+  upper_hard_limit: 24.0
+  lower_hard_limit: 16.0
+  status: SAFETY_STATUS_NORMAL
+  unit: VOLT
+}
+information {
+  handle {
+    identifier: 131072
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 60.0
+  default_error_threshold: 75.0
+  upper_hard_limit: 80.0
+  status: SAFETY_STATUS_NORMAL
+  unit: CELSIUS
+}
+information {
+  handle {
+    identifier: 262144
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 80.0
+  default_error_threshold: 90.0
+  upper_hard_limit: 100.0
+  status: SAFETY_STATUS_NORMAL
+  unit: CELSIUS
+}
+information {
+  handle {
+    identifier: 524288
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 1048576
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 2097152
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 4194304
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 100.0
+  default_error_threshold: 200.0
+  upper_hard_limit: 1000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: TICK
+}
+information {
+  handle {
+    identifier: 8388608
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 134217728
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 268435456
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+
+Config: configuration {
+  handle {
+    identifier: 1
+  }
+  error_threshold: 5.0
+  warning_threshold: 3.0
+  enable {
+    handle {
+      identifier: 1
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2
+  }
+  error_threshold: 200.0
+  warning_threshold: 180.0
+  enable {
+    handle {
+      identifier: 2
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4
+  }
+  error_threshold: 127.76958465576172
+  warning_threshold: 120.32112121582031
+  enable {
+    handle {
+      identifier: 4
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 8
+  }
+  error_threshold: -127.76958465576172
+  warning_threshold: -120.32112121582031
+  enable {
+    handle {
+      identifier: 8
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 16
+  }
+  enable {
+    handle {
+      identifier: 16
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 32
+  }
+  error_threshold: 51.29999923706055
+  warning_threshold: 29.399999618530273
+  enable {
+    handle {
+      identifier: 32
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 64
+  }
+  enable {
+    handle {
+      identifier: 64
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 128
+  }
+  error_threshold: 5.0
+  warning_threshold: 3.0
+  enable {
+    handle {
+      identifier: 128
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 256
+  }
+  error_threshold: 0.4284999966621399
+  enable {
+    handle {
+      identifier: 256
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 512
+  }
+  enable {
+    handle {
+      identifier: 512
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 1024
+  }
+  error_threshold: 2.0
+  warning_threshold: 1.5
+  enable {
+    handle {
+      identifier: 1024
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2048
+  }
+  error_threshold: 1000.0
+  warning_threshold: 500.0
+  enable {
+    handle {
+      identifier: 2048
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4096
+  }
+  error_threshold: 15.0
+  warning_threshold: 10.0
+  enable {
+    handle {
+      identifier: 4096
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 8192
+  }
+  error_threshold: 7.0
+  warning_threshold: 6.0
+  enable {
+    handle {
+      identifier: 8192
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 16384
+  }
+  error_threshold: 10.0
+  enable {
+    handle {
+      identifier: 16384
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 32768
+  }
+  error_threshold: 31.0
+  warning_threshold: 30.0
+  enable {
+    handle {
+      identifier: 32768
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 65536
+  }
+  error_threshold: 16.0
+  warning_threshold: 18.0
+  enable {
+    handle {
+      identifier: 65536
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 131072
+  }
+  error_threshold: 75.0
+  warning_threshold: 60.0
+  enable {
+    handle {
+      identifier: 131072
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 262144
+  }
+  error_threshold: 90.0
+  warning_threshold: 80.0
+  enable {
+    handle {
+      identifier: 262144
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 524288
+  }
+  enable {
+    handle {
+      identifier: 524288
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 1048576
+  }
+  enable {
+    handle {
+      identifier: 1048576
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2097152
+  }
+  enable {
+    handle {
+      identifier: 2097152
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4194304
+  }
+  error_threshold: 200.0
+  warning_threshold: 100.0
+  enable {
+    handle {
+      identifier: 4194304
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 8388608
+  }
+  enable {
+    handle {
+      identifier: 8388608
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 134217728
+  }
+  enable {
+    handle {
+      identifier: 134217728
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 268435456
+  }
+  enable {
+    handle {
+      identifier: 268435456
+    }
+    enable: true
+  }
+}
+
+Device 2
+Info: information {
+  handle {
+    identifier: 1
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 3.0
+  default_error_threshold: 5.0
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 2
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 180.0
+  default_error_threshold: 200.0
+  upper_hard_limit: 250.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE_PER_SECOND
+}
+information {
+  handle {
+    identifier: 4
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  upper_hard_limit: 2000.0
+  lower_hard_limit: -2000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 8
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MINIMAL_LIMIT
+  upper_hard_limit: 2000.0
+  lower_hard_limit: -2000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 16
+  }
+  can_change_safety_state: true
+  limit_type: MAXIMAL_LIMIT
+  status: SAFETY_STATUS_NORMAL
+  unit: NEWTON_METER
+}
+information {
+  handle {
+    identifier: 32
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 29.399999618530273
+  default_error_threshold: 51.29999923706055
+  upper_hard_limit: 52.0
+  status: SAFETY_STATUS_NORMAL
+  unit: NEWTON_METER
+}
+information {
+  handle {
+    identifier: 64
+  }
+  can_change_safety_state: true
+  limit_type: MAXIMAL_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 128
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 3.0
+  default_error_threshold: 5.0
+  upper_hard_limit: 20.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 256
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_error_threshold: 0.4284999966621399
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE_PER_MILLISECOND
+}
+information {
+  handle {
+    identifier: 512
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 1024
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 1.5
+  default_error_threshold: 2.0
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 2048
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 500.0
+  default_error_threshold: 1000.0
+  upper_hard_limit: 10000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: TICK
+}
+information {
+  handle {
+    identifier: 4096
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 10.0
+  default_error_threshold: 15.0
+  upper_hard_limit: 45.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 8192
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 6.0
+  default_error_threshold: 7.0
+  upper_hard_limit: 8.0
+  status: SAFETY_STATUS_NORMAL
+  unit: AMPERE
+}
+information {
+  handle {
+    identifier: 16384
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_error_threshold: 10.0
+  upper_hard_limit: 50.0
+  status: SAFETY_STATUS_NORMAL
+  unit: AMPERE
+}
+information {
+  handle {
+    identifier: 32768
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 30.0
+  default_error_threshold: 31.0
+  upper_hard_limit: 31.0
+  lower_hard_limit: 24.0
+  status: SAFETY_STATUS_NORMAL
+  unit: VOLT
+}
+information {
+  handle {
+    identifier: 65536
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MINIMAL_LIMIT
+  default_warning_threshold: 18.0
+  default_error_threshold: 16.0
+  upper_hard_limit: 24.0
+  lower_hard_limit: 16.0
+  status: SAFETY_STATUS_NORMAL
+  unit: VOLT
+}
+information {
+  handle {
+    identifier: 131072
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 60.0
+  default_error_threshold: 75.0
+  upper_hard_limit: 80.0
+  status: SAFETY_STATUS_NORMAL
+  unit: CELSIUS
+}
+information {
+  handle {
+    identifier: 262144
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 80.0
+  default_error_threshold: 90.0
+  upper_hard_limit: 100.0
+  status: SAFETY_STATUS_NORMAL
+  unit: CELSIUS
+}
+information {
+  handle {
+    identifier: 524288
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 1048576
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 2097152
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 4194304
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 100.0
+  default_error_threshold: 200.0
+  upper_hard_limit: 1000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: TICK
+}
+information {
+  handle {
+    identifier: 8388608
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 134217728
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 268435456
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+
+Config: configuration {
+  handle {
+    identifier: 1
+  }
+  error_threshold: 5.0
+  warning_threshold: 3.0
+  enable {
+    handle {
+      identifier: 1
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2
+  }
+  error_threshold: 200.0
+  warning_threshold: 180.0
+  enable {
+    handle {
+      identifier: 2
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4
+  }
+  enable {
+    handle {
+      identifier: 4
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 8
+  }
+  enable {
+    handle {
+      identifier: 8
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 16
+  }
+  enable {
+    handle {
+      identifier: 16
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 32
+  }
+  error_threshold: 51.29999923706055
+  warning_threshold: 29.399999618530273
+  enable {
+    handle {
+      identifier: 32
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 64
+  }
+  enable {
+    handle {
+      identifier: 64
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 128
+  }
+  error_threshold: 5.0
+  warning_threshold: 3.0
+  enable {
+    handle {
+      identifier: 128
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 256
+  }
+  error_threshold: 0.4284999966621399
+  enable {
+    handle {
+      identifier: 256
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 512
+  }
+  enable {
+    handle {
+      identifier: 512
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 1024
+  }
+  error_threshold: 2.0
+  warning_threshold: 1.5
+  enable {
+    handle {
+      identifier: 1024
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2048
+  }
+  error_threshold: 1000.0
+  warning_threshold: 500.0
+  enable {
+    handle {
+      identifier: 2048
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4096
+  }
+  error_threshold: 15.0
+  warning_threshold: 10.0
+  enable {
+    handle {
+      identifier: 4096
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 8192
+  }
+  error_threshold: 7.0
+  warning_threshold: 6.0
+  enable {
+    handle {
+      identifier: 8192
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 16384
+  }
+  error_threshold: 10.0
+  enable {
+    handle {
+      identifier: 16384
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 32768
+  }
+  error_threshold: 31.0
+  warning_threshold: 30.0
+  enable {
+    handle {
+      identifier: 32768
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 65536
+  }
+  error_threshold: 16.0
+  warning_threshold: 18.0
+  enable {
+    handle {
+      identifier: 65536
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 131072
+  }
+  error_threshold: 75.0
+  warning_threshold: 60.0
+  enable {
+    handle {
+      identifier: 131072
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 262144
+  }
+  error_threshold: 90.0
+  warning_threshold: 80.0
+  enable {
+    handle {
+      identifier: 262144
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 524288
+  }
+  enable {
+    handle {
+      identifier: 524288
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 1048576
+  }
+  enable {
+    handle {
+      identifier: 1048576
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2097152
+  }
+  enable {
+    handle {
+      identifier: 2097152
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4194304
+  }
+  error_threshold: 200.0
+  warning_threshold: 100.0
+  enable {
+    handle {
+      identifier: 4194304
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 8388608
+  }
+  enable {
+    handle {
+      identifier: 8388608
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 134217728
+  }
+  enable {
+    handle {
+      identifier: 134217728
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 268435456
+  }
+  enable {
+    handle {
+      identifier: 268435456
+    }
+    enable: true
+  }
+}
+
+Device 3
+Info: information {
+  handle {
+    identifier: 1
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 3.0
+  default_error_threshold: 5.0
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 2
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 100.0
+  default_error_threshold: 120.0
+  upper_hard_limit: 150.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE_PER_SECOND
+}
+information {
+  handle {
+    identifier: 4
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  upper_hard_limit: 2000.0
+  lower_hard_limit: -2000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 8
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MINIMAL_LIMIT
+  upper_hard_limit: 2000.0
+  lower_hard_limit: -2000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 16
+  }
+  can_change_safety_state: true
+  limit_type: MAXIMAL_LIMIT
+  status: SAFETY_STATUS_NORMAL
+  unit: NEWTON_METER
+}
+information {
+  handle {
+    identifier: 32
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 56.70000076293945
+  default_error_threshold: 104.5
+  upper_hard_limit: 105.0
+  status: SAFETY_STATUS_NORMAL
+  unit: NEWTON_METER
+}
+information {
+  handle {
+    identifier: 64
+  }
+  can_change_safety_state: true
+  limit_type: MAXIMAL_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 128
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 3.0
+  default_error_threshold: 5.0
+  upper_hard_limit: 20.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 256
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_error_threshold: 0.21449999511241913
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE_PER_MILLISECOND
+}
+information {
+  handle {
+    identifier: 512
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 1024
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 1.5
+  default_error_threshold: 2.0
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 2048
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 500.0
+  default_error_threshold: 1000.0
+  upper_hard_limit: 10000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: TICK
+}
+information {
+  handle {
+    identifier: 4096
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 10.0
+  default_error_threshold: 15.0
+  upper_hard_limit: 45.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 8192
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 10.0
+  default_error_threshold: 11.0
+  upper_hard_limit: 12.0
+  status: SAFETY_STATUS_NORMAL
+  unit: AMPERE
+}
+information {
+  handle {
+    identifier: 16384
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_error_threshold: 30.0
+  upper_hard_limit: 75.0
+  status: SAFETY_STATUS_NORMAL
+  unit: AMPERE
+}
+information {
+  handle {
+    identifier: 32768
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 30.0
+  default_error_threshold: 31.0
+  upper_hard_limit: 31.0
+  lower_hard_limit: 24.0
+  status: SAFETY_STATUS_NORMAL
+  unit: VOLT
+}
+information {
+  handle {
+    identifier: 65536
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MINIMAL_LIMIT
+  default_warning_threshold: 18.0
+  default_error_threshold: 16.0
+  upper_hard_limit: 24.0
+  lower_hard_limit: 16.0
+  status: SAFETY_STATUS_NORMAL
+  unit: VOLT
+}
+information {
+  handle {
+    identifier: 131072
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 60.0
+  default_error_threshold: 75.0
+  upper_hard_limit: 80.0
+  status: SAFETY_STATUS_NORMAL
+  unit: CELSIUS
+}
+information {
+  handle {
+    identifier: 262144
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 80.0
+  default_error_threshold: 90.0
+  upper_hard_limit: 100.0
+  status: SAFETY_STATUS_NORMAL
+  unit: CELSIUS
+}
+information {
+  handle {
+    identifier: 524288
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 1048576
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 2097152
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 4194304
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 100.0
+  default_error_threshold: 200.0
+  upper_hard_limit: 1000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: TICK
+}
+information {
+  handle {
+    identifier: 8388608
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 134217728
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 268435456
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+
+Config: configuration {
+  handle {
+    identifier: 1
+  }
+  error_threshold: 5.0
+  warning_threshold: 3.0
+  enable {
+    handle {
+      identifier: 1
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2
+  }
+  error_threshold: 120.0
+  warning_threshold: 100.0
+  enable {
+    handle {
+      identifier: 2
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4
+  }
+  enable {
+    handle {
+      identifier: 4
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 8
+  }
+  enable {
+    handle {
+      identifier: 8
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 16
+  }
+  enable {
+    handle {
+      identifier: 16
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 32
+  }
+  error_threshold: 104.5
+  warning_threshold: 56.70000076293945
+  enable {
+    handle {
+      identifier: 32
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 64
+  }
+  enable {
+    handle {
+      identifier: 64
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 128
+  }
+  error_threshold: 5.0
+  warning_threshold: 3.0
+  enable {
+    handle {
+      identifier: 128
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 256
+  }
+  error_threshold: 0.21449999511241913
+  enable {
+    handle {
+      identifier: 256
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 512
+  }
+  enable {
+    handle {
+      identifier: 512
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 1024
+  }
+  error_threshold: 2.0
+  warning_threshold: 1.5
+  enable {
+    handle {
+      identifier: 1024
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2048
+  }
+  error_threshold: 1000.0
+  warning_threshold: 500.0
+  enable {
+    handle {
+      identifier: 2048
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4096
+  }
+  error_threshold: 15.0
+  warning_threshold: 10.0
+  enable {
+    handle {
+      identifier: 4096
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 8192
+  }
+  error_threshold: 11.0
+  warning_threshold: 10.0
+  enable {
+    handle {
+      identifier: 8192
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 16384
+  }
+  error_threshold: 30.0
+  enable {
+    handle {
+      identifier: 16384
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 32768
+  }
+  error_threshold: 31.0
+  warning_threshold: 30.0
+  enable {
+    handle {
+      identifier: 32768
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 65536
+  }
+  error_threshold: 16.0
+  warning_threshold: 18.0
+  enable {
+    handle {
+      identifier: 65536
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 131072
+  }
+  error_threshold: 75.0
+  warning_threshold: 60.0
+  enable {
+    handle {
+      identifier: 131072
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 262144
+  }
+  error_threshold: 90.0
+  warning_threshold: 80.0
+  enable {
+    handle {
+      identifier: 262144
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 524288
+  }
+  enable {
+    handle {
+      identifier: 524288
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 1048576
+  }
+  enable {
+    handle {
+      identifier: 1048576
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2097152
+  }
+  enable {
+    handle {
+      identifier: 2097152
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4194304
+  }
+  error_threshold: 200.0
+  warning_threshold: 100.0
+  enable {
+    handle {
+      identifier: 4194304
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 8388608
+  }
+  enable {
+    handle {
+      identifier: 8388608
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 134217728
+  }
+  enable {
+    handle {
+      identifier: 134217728
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 268435456
+  }
+  enable {
+    handle {
+      identifier: 268435456
+    }
+    enable: true
+  }
+}
+
+Device 4
+Info: information {
+  handle {
+    identifier: 1
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 3.0
+  default_error_threshold: 5.0
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 2
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 100.0
+  default_error_threshold: 120.0
+  upper_hard_limit: 150.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE_PER_SECOND
+}
+information {
+  handle {
+    identifier: 4
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  upper_hard_limit: 2000.0
+  lower_hard_limit: -2000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 8
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MINIMAL_LIMIT
+  upper_hard_limit: 2000.0
+  lower_hard_limit: -2000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 16
+  }
+  can_change_safety_state: true
+  limit_type: MAXIMAL_LIMIT
+  status: SAFETY_STATUS_NORMAL
+  unit: NEWTON_METER
+}
+information {
+  handle {
+    identifier: 32
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 56.70000076293945
+  default_error_threshold: 104.5
+  upper_hard_limit: 105.0
+  status: SAFETY_STATUS_NORMAL
+  unit: NEWTON_METER
+}
+information {
+  handle {
+    identifier: 64
+  }
+  can_change_safety_state: true
+  limit_type: MAXIMAL_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 128
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 3.0
+  default_error_threshold: 5.0
+  upper_hard_limit: 20.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 256
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_error_threshold: 0.21449999511241913
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE_PER_MILLISECOND
+}
+information {
+  handle {
+    identifier: 512
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 1024
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 1.5
+  default_error_threshold: 2.0
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 2048
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 500.0
+  default_error_threshold: 1000.0
+  upper_hard_limit: 10000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: TICK
+}
+information {
+  handle {
+    identifier: 4096
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 10.0
+  default_error_threshold: 15.0
+  upper_hard_limit: 45.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 8192
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 10.0
+  default_error_threshold: 11.0
+  upper_hard_limit: 12.0
+  status: SAFETY_STATUS_NORMAL
+  unit: AMPERE
+}
+information {
+  handle {
+    identifier: 16384
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_error_threshold: 30.0
+  upper_hard_limit: 75.0
+  status: SAFETY_STATUS_NORMAL
+  unit: AMPERE
+}
+information {
+  handle {
+    identifier: 32768
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 30.0
+  default_error_threshold: 31.0
+  upper_hard_limit: 31.0
+  lower_hard_limit: 24.0
+  status: SAFETY_STATUS_NORMAL
+  unit: VOLT
+}
+information {
+  handle {
+    identifier: 65536
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MINIMAL_LIMIT
+  default_warning_threshold: 18.0
+  default_error_threshold: 16.0
+  upper_hard_limit: 24.0
+  lower_hard_limit: 16.0
+  status: SAFETY_STATUS_NORMAL
+  unit: VOLT
+}
+information {
+  handle {
+    identifier: 131072
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 60.0
+  default_error_threshold: 75.0
+  upper_hard_limit: 80.0
+  status: SAFETY_STATUS_NORMAL
+  unit: CELSIUS
+}
+information {
+  handle {
+    identifier: 262144
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 80.0
+  default_error_threshold: 90.0
+  upper_hard_limit: 100.0
+  status: SAFETY_STATUS_NORMAL
+  unit: CELSIUS
+}
+information {
+  handle {
+    identifier: 524288
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 1048576
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 2097152
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 4194304
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 100.0
+  default_error_threshold: 200.0
+  upper_hard_limit: 1000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: TICK
+}
+information {
+  handle {
+    identifier: 8388608
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 134217728
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 268435456
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+
+Config: configuration {
+  handle {
+    identifier: 1
+  }
+  error_threshold: 5.0
+  warning_threshold: 3.0
+  enable {
+    handle {
+      identifier: 1
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2
+  }
+  error_threshold: 120.0
+  warning_threshold: 100.0
+  enable {
+    handle {
+      identifier: 2
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4
+  }
+  error_threshold: 138.08282470703125
+  warning_threshold: 128.91549682617188
+  enable {
+    handle {
+      identifier: 4
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 8
+  }
+  error_threshold: -138.08282470703125
+  warning_threshold: -128.91549682617188
+  enable {
+    handle {
+      identifier: 8
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 16
+  }
+  enable {
+    handle {
+      identifier: 16
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 32
+  }
+  error_threshold: 104.5
+  warning_threshold: 56.70000076293945
+  enable {
+    handle {
+      identifier: 32
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 64
+  }
+  enable {
+    handle {
+      identifier: 64
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 128
+  }
+  error_threshold: 5.0
+  warning_threshold: 3.0
+  enable {
+    handle {
+      identifier: 128
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 256
+  }
+  error_threshold: 0.21449999511241913
+  enable {
+    handle {
+      identifier: 256
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 512
+  }
+  enable {
+    handle {
+      identifier: 512
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 1024
+  }
+  error_threshold: 2.0
+  warning_threshold: 1.5
+  enable {
+    handle {
+      identifier: 1024
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2048
+  }
+  error_threshold: 1000.0
+  warning_threshold: 500.0
+  enable {
+    handle {
+      identifier: 2048
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4096
+  }
+  error_threshold: 15.0
+  warning_threshold: 10.0
+  enable {
+    handle {
+      identifier: 4096
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 8192
+  }
+  error_threshold: 11.0
+  warning_threshold: 10.0
+  enable {
+    handle {
+      identifier: 8192
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 16384
+  }
+  error_threshold: 30.0
+  enable {
+    handle {
+      identifier: 16384
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 32768
+  }
+  error_threshold: 31.0
+  warning_threshold: 30.0
+  enable {
+    handle {
+      identifier: 32768
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 65536
+  }
+  error_threshold: 16.0
+  warning_threshold: 18.0
+  enable {
+    handle {
+      identifier: 65536
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 131072
+  }
+  error_threshold: 75.0
+  warning_threshold: 60.0
+  enable {
+    handle {
+      identifier: 131072
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 262144
+  }
+  error_threshold: 90.0
+  warning_threshold: 80.0
+  enable {
+    handle {
+      identifier: 262144
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 524288
+  }
+  enable {
+    handle {
+      identifier: 524288
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 1048576
+  }
+  enable {
+    handle {
+      identifier: 1048576
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2097152
+  }
+  enable {
+    handle {
+      identifier: 2097152
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4194304
+  }
+  error_threshold: 200.0
+  warning_threshold: 100.0
+  enable {
+    handle {
+      identifier: 4194304
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 8388608
+  }
+  enable {
+    handle {
+      identifier: 8388608
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 134217728
+  }
+  enable {
+    handle {
+      identifier: 134217728
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 268435456
+  }
+  enable {
+    handle {
+      identifier: 268435456
+    }
+    enable: true
+  }
+}
+
+Device 5
+Info: information {
+  handle {
+    identifier: 1
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 3.0
+  default_error_threshold: 5.0
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 2
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 100.0
+  default_error_threshold: 120.0
+  upper_hard_limit: 150.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE_PER_SECOND
+}
+information {
+  handle {
+    identifier: 4
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  upper_hard_limit: 2000.0
+  lower_hard_limit: -2000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 8
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MINIMAL_LIMIT
+  upper_hard_limit: 2000.0
+  lower_hard_limit: -2000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 16
+  }
+  can_change_safety_state: true
+  limit_type: MAXIMAL_LIMIT
+  status: SAFETY_STATUS_NORMAL
+  unit: NEWTON_METER
+}
+information {
+  handle {
+    identifier: 32
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 56.70000076293945
+  default_error_threshold: 104.5
+  upper_hard_limit: 105.0
+  status: SAFETY_STATUS_NORMAL
+  unit: NEWTON_METER
+}
+information {
+  handle {
+    identifier: 64
+  }
+  can_change_safety_state: true
+  limit_type: MAXIMAL_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 128
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 3.0
+  default_error_threshold: 5.0
+  upper_hard_limit: 20.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 256
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_error_threshold: 0.21449999511241913
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE_PER_MILLISECOND
+}
+information {
+  handle {
+    identifier: 512
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 1024
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 1.5
+  default_error_threshold: 2.0
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 2048
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 500.0
+  default_error_threshold: 1000.0
+  upper_hard_limit: 10000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: TICK
+}
+information {
+  handle {
+    identifier: 4096
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 10.0
+  default_error_threshold: 15.0
+  upper_hard_limit: 45.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 8192
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 10.0
+  default_error_threshold: 11.0
+  upper_hard_limit: 12.0
+  status: SAFETY_STATUS_NORMAL
+  unit: AMPERE
+}
+information {
+  handle {
+    identifier: 16384
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_error_threshold: 30.0
+  upper_hard_limit: 75.0
+  status: SAFETY_STATUS_NORMAL
+  unit: AMPERE
+}
+information {
+  handle {
+    identifier: 32768
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 30.0
+  default_error_threshold: 31.0
+  upper_hard_limit: 31.0
+  lower_hard_limit: 24.0
+  status: SAFETY_STATUS_NORMAL
+  unit: VOLT
+}
+information {
+  handle {
+    identifier: 65536
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MINIMAL_LIMIT
+  default_warning_threshold: 18.0
+  default_error_threshold: 16.0
+  upper_hard_limit: 24.0
+  lower_hard_limit: 16.0
+  status: SAFETY_STATUS_NORMAL
+  unit: VOLT
+}
+information {
+  handle {
+    identifier: 131072
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 60.0
+  default_error_threshold: 75.0
+  upper_hard_limit: 80.0
+  status: SAFETY_STATUS_NORMAL
+  unit: CELSIUS
+}
+information {
+  handle {
+    identifier: 262144
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 80.0
+  default_error_threshold: 90.0
+  upper_hard_limit: 100.0
+  status: SAFETY_STATUS_NORMAL
+  unit: CELSIUS
+}
+information {
+  handle {
+    identifier: 524288
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 1048576
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 2097152
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 4194304
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 100.0
+  default_error_threshold: 200.0
+  upper_hard_limit: 1000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: TICK
+}
+information {
+  handle {
+    identifier: 8388608
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 134217728
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 268435456
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+
+Config: configuration {
+  handle {
+    identifier: 1
+  }
+  error_threshold: 5.0
+  warning_threshold: 3.0
+  enable {
+    handle {
+      identifier: 1
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2
+  }
+  error_threshold: 120.0
+  warning_threshold: 100.0
+  enable {
+    handle {
+      identifier: 2
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4
+  }
+  enable {
+    handle {
+      identifier: 4
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 8
+  }
+  enable {
+    handle {
+      identifier: 8
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 16
+  }
+  enable {
+    handle {
+      identifier: 16
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 32
+  }
+  error_threshold: 104.5
+  warning_threshold: 56.70000076293945
+  enable {
+    handle {
+      identifier: 32
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 64
+  }
+  enable {
+    handle {
+      identifier: 64
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 128
+  }
+  error_threshold: 5.0
+  warning_threshold: 3.0
+  enable {
+    handle {
+      identifier: 128
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 256
+  }
+  error_threshold: 0.21449999511241913
+  enable {
+    handle {
+      identifier: 256
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 512
+  }
+  enable {
+    handle {
+      identifier: 512
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 1024
+  }
+  error_threshold: 2.0
+  warning_threshold: 1.5
+  enable {
+    handle {
+      identifier: 1024
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2048
+  }
+  error_threshold: 1000.0
+  warning_threshold: 500.0
+  enable {
+    handle {
+      identifier: 2048
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4096
+  }
+  error_threshold: 15.0
+  warning_threshold: 10.0
+  enable {
+    handle {
+      identifier: 4096
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 8192
+  }
+  error_threshold: 11.0
+  warning_threshold: 10.0
+  enable {
+    handle {
+      identifier: 8192
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 16384
+  }
+  error_threshold: 30.0
+  enable {
+    handle {
+      identifier: 16384
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 32768
+  }
+  error_threshold: 31.0
+  warning_threshold: 30.0
+  enable {
+    handle {
+      identifier: 32768
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 65536
+  }
+  error_threshold: 16.0
+  warning_threshold: 18.0
+  enable {
+    handle {
+      identifier: 65536
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 131072
+  }
+  error_threshold: 75.0
+  warning_threshold: 60.0
+  enable {
+    handle {
+      identifier: 131072
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 262144
+  }
+  error_threshold: 90.0
+  warning_threshold: 80.0
+  enable {
+    handle {
+      identifier: 262144
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 524288
+  }
+  enable {
+    handle {
+      identifier: 524288
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 1048576
+  }
+  enable {
+    handle {
+      identifier: 1048576
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2097152
+  }
+  enable {
+    handle {
+      identifier: 2097152
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4194304
+  }
+  error_threshold: 200.0
+  warning_threshold: 100.0
+  enable {
+    handle {
+      identifier: 4194304
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 8388608
+  }
+  enable {
+    handle {
+      identifier: 8388608
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 134217728
+  }
+  enable {
+    handle {
+      identifier: 134217728
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 268435456
+  }
+  enable {
+    handle {
+      identifier: 268435456
+    }
+    enable: true
+  }
+}
+
+Device 6
+Info: information {
+  handle {
+    identifier: 1
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 3.0
+  default_error_threshold: 5.0
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 2
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 100.0
+  default_error_threshold: 120.0
+  upper_hard_limit: 150.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE_PER_SECOND
+}
+information {
+  handle {
+    identifier: 4
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  upper_hard_limit: 2000.0
+  lower_hard_limit: -2000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 8
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MINIMAL_LIMIT
+  upper_hard_limit: 2000.0
+  lower_hard_limit: -2000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 16
+  }
+  can_change_safety_state: true
+  limit_type: MAXIMAL_LIMIT
+  status: SAFETY_STATUS_NORMAL
+  unit: NEWTON_METER
+}
+information {
+  handle {
+    identifier: 32
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 56.70000076293945
+  default_error_threshold: 104.5
+  upper_hard_limit: 105.0
+  status: SAFETY_STATUS_NORMAL
+  unit: NEWTON_METER
+}
+information {
+  handle {
+    identifier: 64
+  }
+  can_change_safety_state: true
+  limit_type: MAXIMAL_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 128
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 3.0
+  default_error_threshold: 5.0
+  upper_hard_limit: 20.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 256
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_error_threshold: 0.21449999511241913
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE_PER_MILLISECOND
+}
+information {
+  handle {
+    identifier: 512
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 1024
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 1.5
+  default_error_threshold: 2.0
+  upper_hard_limit: 10.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 2048
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 500.0
+  default_error_threshold: 1000.0
+  upper_hard_limit: 10000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: TICK
+}
+information {
+  handle {
+    identifier: 4096
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 10.0
+  default_error_threshold: 15.0
+  upper_hard_limit: 45.0
+  status: SAFETY_STATUS_NORMAL
+  unit: DEGREE
+}
+information {
+  handle {
+    identifier: 8192
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 10.0
+  default_error_threshold: 11.0
+  upper_hard_limit: 12.0
+  status: SAFETY_STATUS_NORMAL
+  unit: AMPERE
+}
+information {
+  handle {
+    identifier: 16384
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_error_threshold: 30.0
+  upper_hard_limit: 75.0
+  status: SAFETY_STATUS_NORMAL
+  unit: AMPERE
+}
+information {
+  handle {
+    identifier: 32768
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 30.0
+  default_error_threshold: 31.0
+  upper_hard_limit: 31.0
+  lower_hard_limit: 24.0
+  status: SAFETY_STATUS_NORMAL
+  unit: VOLT
+}
+information {
+  handle {
+    identifier: 65536
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MINIMAL_LIMIT
+  default_warning_threshold: 18.0
+  default_error_threshold: 16.0
+  upper_hard_limit: 24.0
+  lower_hard_limit: 16.0
+  status: SAFETY_STATUS_NORMAL
+  unit: VOLT
+}
+information {
+  handle {
+    identifier: 131072
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 60.0
+  default_error_threshold: 75.0
+  upper_hard_limit: 80.0
+  status: SAFETY_STATUS_NORMAL
+  unit: CELSIUS
+}
+information {
+  handle {
+    identifier: 262144
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 80.0
+  default_error_threshold: 90.0
+  upper_hard_limit: 100.0
+  status: SAFETY_STATUS_NORMAL
+  unit: CELSIUS
+}
+information {
+  handle {
+    identifier: 524288
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 1048576
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 2097152
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 4194304
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  has_error_threshold: true
+  limit_type: MAXIMAL_LIMIT
+  default_warning_threshold: 100.0
+  default_error_threshold: 200.0
+  upper_hard_limit: 1000.0
+  status: SAFETY_STATUS_NORMAL
+  unit: TICK
+}
+information {
+  handle {
+    identifier: 8388608
+  }
+  can_change_safety_state: true
+  has_warning_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 134217728
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+information {
+  handle {
+    identifier: 268435456
+  }
+  can_change_safety_state: true
+  has_error_threshold: true
+  limit_type: EVENT_LIMIT
+  status: SAFETY_STATUS_NORMAL
+}
+
+Config: configuration {
+  handle {
+    identifier: 1
+  }
+  error_threshold: 5.0
+  warning_threshold: 3.0
+  enable {
+    handle {
+      identifier: 1
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2
+  }
+  error_threshold: 120.0
+  warning_threshold: 100.0
+  enable {
+    handle {
+      identifier: 2
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4
+  }
+  error_threshold: 152.40676879882812
+  warning_threshold: 147.82310485839844
+  enable {
+    handle {
+      identifier: 4
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 8
+  }
+  error_threshold: -152.40676879882812
+  warning_threshold: -147.82310485839844
+  enable {
+    handle {
+      identifier: 8
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 16
+  }
+  enable {
+    handle {
+      identifier: 16
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 32
+  }
+  error_threshold: 104.5
+  warning_threshold: 56.70000076293945
+  enable {
+    handle {
+      identifier: 32
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 64
+  }
+  enable {
+    handle {
+      identifier: 64
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 128
+  }
+  error_threshold: 5.0
+  warning_threshold: 3.0
+  enable {
+    handle {
+      identifier: 128
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 256
+  }
+  error_threshold: 0.21449999511241913
+  enable {
+    handle {
+      identifier: 256
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 512
+  }
+  enable {
+    handle {
+      identifier: 512
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 1024
+  }
+  error_threshold: 2.0
+  warning_threshold: 1.5
+  enable {
+    handle {
+      identifier: 1024
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2048
+  }
+  error_threshold: 1000.0
+  warning_threshold: 500.0
+  enable {
+    handle {
+      identifier: 2048
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4096
+  }
+  error_threshold: 15.0
+  warning_threshold: 10.0
+  enable {
+    handle {
+      identifier: 4096
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 8192
+  }
+  error_threshold: 11.0
+  warning_threshold: 10.0
+  enable {
+    handle {
+      identifier: 8192
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 16384
+  }
+  error_threshold: 30.0
+  enable {
+    handle {
+      identifier: 16384
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 32768
+  }
+  error_threshold: 31.0
+  warning_threshold: 30.0
+  enable {
+    handle {
+      identifier: 32768
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 65536
+  }
+  error_threshold: 16.0
+  warning_threshold: 18.0
+  enable {
+    handle {
+      identifier: 65536
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 131072
+  }
+  error_threshold: 75.0
+  warning_threshold: 60.0
+  enable {
+    handle {
+      identifier: 131072
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 262144
+  }
+  error_threshold: 90.0
+  warning_threshold: 80.0
+  enable {
+    handle {
+      identifier: 262144
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 524288
+  }
+  enable {
+    handle {
+      identifier: 524288
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 1048576
+  }
+  enable {
+    handle {
+      identifier: 1048576
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 2097152
+  }
+  enable {
+    handle {
+      identifier: 2097152
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 4194304
+  }
+  error_threshold: 200.0
+  warning_threshold: 100.0
+  enable {
+    handle {
+      identifier: 4194304
+    }
+  }
+}
+configuration {
+  handle {
+    identifier: 8388608
+  }
+  enable {
+    handle {
+      identifier: 8388608
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 134217728
+  }
+  enable {
+    handle {
+      identifier: 134217728
+    }
+    enable: true
+  }
+}
+configuration {
+  handle {
+    identifier: 268435456
+  }
+  enable {
+    handle {
+      identifier: 268435456
+    }
+    enable: true
+  }
+}
+

@@ -44,7 +44,7 @@ from feeding_deployment.actions.flair.flair import FLAIR
 
 def test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, run_behavior_tree_dir, no_waits, log_path=None):
 
-    high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair=None, behavior_tree_dir=run_behavior_tree_dir , no_waits=False, log_path=None)    
+    high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair=None, behavior_tree_dir=run_behavior_tree_dir , no_waits=no_waits, log_path=None)    
 
     if tool == "fork":
         utensil = Object("utensil", tool_type)
@@ -180,6 +180,7 @@ def _main(
 
     # test_LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, tool, no_waits)
     # test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, tool, no_waits)
+    # for i in range(25):
     test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, run_behavior_tree_dir, no_waits, log_path=None)
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ except ModuleNotFoundError:
     ROSPY_IMPORTED = False
 
 # Parameters
-OPEN_LOOP_RADIUS = 0.03
+OPEN_LOOP_RADIUS = 0.02
 # OPEN_LOOP_RADIUS = 0.0
 INTERMEDIATE_THRESHOLD_RELAXED = 0.03
 INTERMEDIATE_ANGULAR_THRESHOLD_RELAXED = 7*np.pi/180
@@ -152,7 +152,11 @@ class InsideMouthTransfer(Transfer):
 
             self.set_filter_noisy_readings_pub.publish(Bool(data=False))
 
+        print("Finished moving to transfer state")
+
     def move_to_before_transfer_state(self):
+
+        print("Starting to move to before transfer state")
 
         if self.robot_interface is None:
             # In simulation, directly move to outside the mouth

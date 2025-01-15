@@ -8,14 +8,14 @@ parameters:
       type: "Enum"
       elements: ["silent", "voice", "led"]
     is_user_editable: True
-    value: "led"
+    value: "voice"
   - name: "ReadyForTransferInteraction"
     description: "Interaction mode for ready to transfer."
     space:
       type: "Enum"
       elements: ["silent", "voice", "led"]
     is_user_editable: True
-    value: "led"
+    value: "voice"
   - name: "InitiateTransferInteraction"
     description: "Interaction mode for transfer."
     space:
