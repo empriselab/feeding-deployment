@@ -12,6 +12,7 @@ import signal
 import shutil
 import numpy as np
 from tomsutils.llm import OpenAILLM
+import time
 
 try:
     import rospy
@@ -55,7 +56,7 @@ from feeding_deployment.actions.pick_tool import PickToolHLA
 from feeding_deployment.actions.stow_tool import StowToolHLA
 from feeding_deployment.actions.transfer_tool import TransferToolHLA
 from feeding_deployment.actions.emulate_transfer import EmulateTransferHLA
-from feeding_deployment.actions.acquisition import LookAtPlateHLA, AcquireBiteHLA
+from feeding_deployment.actions.acquisition import AcquireBiteHLA
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
 from feeding_deployment.interfaces.web_interface import WebInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
@@ -74,7 +75,7 @@ from feeding_deployment.transparency.query_llm import TransparencyQuery
 
 
 # All the high level actions we want to consider.
-HLAS = {PickToolHLA, StowToolHLA, LookAtPlateHLA, AcquireBiteHLA, TransferToolHLA, EmulateTransferHLA, ResetHLA}
+HLAS = {PickToolHLA, StowToolHLA, AcquireBiteHLA, TransferToolHLA, EmulateTransferHLA, ResetHLA}
 
 assert os.environ.get("PYTHONHASHSEED") == "0", \
         "Please add `export PYTHONHASHSEED=0` to your bash profile!"
@@ -223,13 +224,25 @@ class _Runner:
         while self.active:
             try:
                 task_selection_command = self.task_selection_queue.get(timeout=1)
-                self.parse_interface_msg(hla_interface_msg)
+                task, task_type = task_selection_command["task"], task_selection_command["type"]
+                if task == "meal_assistance":
+                    if task_type == "bite":
+                        self.process_user_command(GroundHighLevelAction(self.hla_name_to_hla["TransferTool"], (self.utensil,)))
+                    elif task_type == "sip":
+                        self.process_user_command(GroundHighLevelAction(self.hla_name_to_hla["TransferTool"], (self.drink,)))
+                    elif task_type == "wipe":
+                        self.process_user_command(GroundHighLevelAction(self.hla_name_to_hla["TransferTool"], (self.wipe,)))
+                elif task == "personalization":
+                    raise NotImplementedError
+                else:
+                    print(f"Invalid task selection: {task_selection_command}")
                 print("Ready for next user command.")
             except queue.Empty:
-                if task_selection_command is None and self.web_interface.current_page != "task_selection":
+                if self.web_interface.current_page != "task_selection":
                     self.web_interface.ready_for_task_selection()
                 else:
                     # Wait for user command
+                    time.sleep(0.1) 
                     continue
 
     def signal_handler(self, signal, frame):
