@@ -220,6 +220,8 @@ class _Runner:
         self.active = True
 
     def run(self) -> None:
+
+        assert self.web_interface is not None, "Run takes user commands from the web interface which is None."
         
         while self.active:
             try:
@@ -233,7 +235,21 @@ class _Runner:
                     elif task_type == "wipe":
                         self.process_user_command(GroundHighLevelAction(self.hla_name_to_hla["TransferTool"], (self.wipe,)))
                 elif task == "personalization":
-                    raise NotImplementedError
+                    if task_type == "transparency":
+                        while self.active:
+                            query = self.web_interface.get_transparency_query()
+                            if query:
+                                response = self.transparency_query.answer_query(query)
+                                self.web_interface.update_transparency_response(response)
+                            else:
+                                break
+                    elif task_type == "adaptability":
+                        while self.active:
+                            adaptation_request = self.web_interface.get_adaptability_request()
+                            if adaptation_request:
+                                self.process_user_update_request(adaptation_request)
+                            else:
+                                break
                 else:
                     print(f"Invalid task selection: {task_selection_command}")
                 print("Ready for next user command.")
@@ -242,6 +258,7 @@ class _Runner:
                     self.web_interface.ready_for_task_selection()
                 else:
                     # Wait for user command
+                    print("Current web interface page:", self.web_interface.current_page)
                     time.sleep(0.1) 
                     continue
 
