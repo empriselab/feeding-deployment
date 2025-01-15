@@ -60,7 +60,7 @@
         - `conda activate feed`
         - `source devel/setup.bash`
         - `cd src/feeding-deployment/src/feeding_deployment/integration`
-        - `python demo.py --run_on_robot`
+        - `python demo.py --run_on_robot --use_interface --no_waits`
 
 ### Calibrate tool offset for inside-mouth transfer
 

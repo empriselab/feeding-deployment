@@ -25,7 +25,7 @@ class CollisionSensor:
 
     def __init__(self):
 
-        assert ROSPY_IMPORTED, "ROS is required for CollisionMonitor"
+        assert ROSPY_IMPORTED, "ROS is required for CollisionSensor"
 
         self._print_once = True
         self.file_path = Path(__file__).parent.parent / "control" / "robot_controller" / "urdfs"
@@ -40,6 +40,18 @@ class CollisionSensor:
         self._joint_state_sub = rospy.Subscriber(
             "/robot_joint_states", JointState, self._joint_state_callback
         )
+
+        self._disable_collision_sensor = False
+        self._disable_collision_sensor_sub = rospy.Subscriber(
+            "/disable_collision_sensor", Bool, self._disable_collision_sensor_callback
+        )
+
+    def _disable_collision_sensor_callback(self, msg: "Bool") -> None:
+        if msg.data:
+            print("Collision sensor disabled")
+        else:
+            print("Collision sensor enabled")
+        self._disable_collision_sensor = msg.data
 
     def _joint_state_callback(self, joint_state_msg: "JointState") -> None:
         # Convert joint state message into JointPositions.
@@ -61,15 +73,18 @@ class CollisionSensor:
         assert len(joint_vel) == 8, "Expected 8 joint velocities"
         assert len(joint_tau) == 8, "Expected 8 joint torques"
         
-        has_collision = self.sense_collisions(joint_pos, joint_vel, joint_tau)
-        self._collision_pub.publish(Bool(data=not has_collision))
-        if has_collision and self._print_once:
-            print("Collision detected by CollisionMonitor")
-            self._print_once = False
+        if not self._disable_collision_sensor:
+            has_collision = self.sense_collisions(joint_pos, joint_vel, joint_tau)
+            self._collision_pub.publish(Bool(data=not has_collision))
+            if has_collision and self._print_once:
+                print("Collision detected by CollisionSensor")
+                self._print_once = False
+        else:
+            self._collision_pub.publish(Bool(data=True))
 
     # Todo: Add JointTorques to pybullet_helpers.joint 
     def sense_collisions(self, joint_positions: JointPositions, joint_velocities: JointVelocities, torque_readings: JointPositions) -> bool:
-        """Check collisions with all objects."""
+        """Senses collisions with environment."""
         
         # print("joint_positions: ", joint_positions)
         # print("joint_velocities: ", joint_velocities)

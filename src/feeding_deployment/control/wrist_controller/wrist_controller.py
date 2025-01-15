@@ -208,7 +208,7 @@ class WristInterface:
             wrist_state = SimpleJointAngleCommand()
             if not pitch_achieved:
                 if np.abs(desired_pitch - current_pitch) > 0.1:
-                    wrist_state.q0 = 1.35 * np.sign(desired_pitch - current_pitch)
+                    wrist_state.q0 = 1.0 * np.sign(desired_pitch - current_pitch)
                 else:
                     wrist_state.q0 = (desired_pitch - current_pitch) * 5
             else:

@@ -49,7 +49,7 @@ class StowToolHLA(HighLevelAction):
     def stow_utensil(self) -> None:
         assert self.sim.held_object_name == "utensil"
         
-        self.move_to_joint_positions(self.sim.scene_description.retract_pos)
+        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
         if self.sim.scene_description.scene_label == "vention":
             self.move_to_joint_positions(self.sim.scene_description.utensil_outside_above_mount_pos)

@@ -24,5 +24,18 @@ try:
         send_command("GREEN") # Set LEDs to GREEN
         send_command("BLUE")  # Set LEDs to BLUE
         send_command("OFF")   # Turn all LEDs OFF
+
+        send_command("ON")             # Turn all LEDs ON
+        send_command("BRIGHTNESS 0.9") # Set brightness to 90%
+        send_command("BRIGHTNESS 0.8") # Set brightness to 80%
+        send_command("BRIGHTNESS 0.7")
+        send_command("BRIGHTNESS 0.6")
+        send_command("BRIGHTNESS 0.5") # Set brightness to 50%
+        send_command("BRIGHTNESS 0.4")
+        send_command("BRIGHTNESS 0.3")
+        send_command("BRIGHTNESS 0.2")
+        send_command("BRIGHTNESS 0.1")  # Set brightness to 10%
+        send_command("BRIGHTNESS 1.0")
+        send_command("OFF")            # Turn all LEDs OFF
 except serial.SerialException as e:
     print(f"Serial error: {e}")

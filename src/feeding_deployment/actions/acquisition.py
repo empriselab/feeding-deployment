@@ -83,7 +83,8 @@ class LookAtPlateHLA(HighLevelAction):
 
                     # items = self.flair.identify_plate(camera_color_data)
                     # items = ['cantaloupe', 'banana']
-                    items = ['banana', 'watermelon', 'cantaloupe', 'grape']
+                    items = ['banana', 'watermelon', 'cantaloupe']
+                    # items = ['banana']
                     self.flair.set_food_items(items)
                     items_detection = self.flair.detect_items(camera_color_data, camera_depth_data, camera_info_data, log_path=None)
 
@@ -329,6 +330,8 @@ class AcquireBiteHLA(HighLevelAction):
                 
                 food_type = self.params["data"][0]
                 item_id = self.params["data"][1] - 1
+
+                self.flair.update_bite_history(food_type)
 
                 mask = food_type_to_masks[food_type][item_id]
                 skill = food_type_to_skill[food_type]

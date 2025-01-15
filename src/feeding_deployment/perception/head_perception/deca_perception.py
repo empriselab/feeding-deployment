@@ -90,14 +90,14 @@ class HeadPerception:
 
         self.FLAME_neck_index = 2151
 
-        roll_threshold = np.pi / 7
-        pitch_threshold = np.pi / 7
-        yaw_threshold = np.pi / 7
+        roll_threshold = np.pi / 5
+        pitch_threshold = np.pi / 5
+        yaw_threshold = np.pi / 5
 
         self.max_rotation_threshold = np.array(
             [roll_threshold, pitch_threshold, yaw_threshold]
         )
-        self.max_distance_threshold = np.array([0.4, 0.4, 0.4])  # m
+        self.max_distance_threshold = np.array([0.5, 0.5, 0.5])  # m
 
         self.current_filepath = os.path.dirname(os.path.abspath(__file__))
 
@@ -276,6 +276,12 @@ class HeadPerception:
 
             if self.tool is None:
                 raise ValueError("Head Perception Tool is not set.")
+            
+            user_input = input("Press 'y' to update saved data, 'n' to exit: ")
+            while user_input != "y" and user_input != "n":
+                user_input = input("Press 'y' to update saved data, 'n' to exit: ")
+            if user_input == "n":
+                return None
 
             print(
                 "landmarks_selected_model[:,:,np.newaxis].shape: ",
@@ -342,8 +348,6 @@ class HeadPerception:
                 self.current_filepath + "/config/" + self.tool + "/reference_neck_frame.npy",
                 neck_frame,
             )
-
-            input("Press [ENTER] to update saved data... ")
 
             return {
                 "head_pose": self.get_head_pose_from_neck_frame(neck_frame),
