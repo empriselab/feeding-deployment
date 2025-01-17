@@ -125,7 +125,7 @@ class WebInterface:
         while not self.received_web_interface_messages.empty():
             self.received_web_interface_messages.get()
 
-    def ready_for_task_selection(self, last_task_type = None, autocontinue_timeout = 5) -> None:
+    def ready_for_task_selection(self, last_task_type = None, autocontinue_timeout = 7) -> None:
         """Moves the web interface to the task selection page."""
 
         self.current_page = "task_selection"
@@ -135,14 +135,14 @@ class WebInterface:
         # after bite and after sip are special, because they have bite and sip preselected for autocontinue with a timeout
         if last_task_type == "bite":
             self._send_message({"state": "afterbitetransfer", "status": "jump"})
-            time.sleep(0.1)
+            time.sleep(0.5)
             self._send_message({"state": "auto_time", "status": str(autocontinue_timeout)})
         elif last_task_type == "sip":
             self._send_message({"state": "afterdrinktransfer", "status": "jump"})
-            time.sleep(0.1)
+            time.sleep(0.5)
             self._send_message({"state": "auto_time", "status": str(autocontinue_timeout)})
         else:
-            self._send_message({"state": "afterwipetransfer", "status": "jump"})
+            self._send_message({"state": "task_selection", "status": "jump"})
 
     def get_required_web_interface_message(self, condition) -> dict[str, Any]:
         """Parses through all messages received from the web interface and returns the oldest one satisfying the condition."""
@@ -173,6 +173,9 @@ class WebInterface:
             # Jump to bite ordering page
             self._send_message({"state": "newmealpage", "status": "jump"})
             
+            # Wait for the web interface to be ready for initial data
+            time.sleep(0.2)
+            
             # Send required data for the bite ordering page
             self._send_image(plate_image)
             self._send_message({"n_food_types": n_food_types, "data": data})
@@ -189,7 +192,7 @@ class WebInterface:
         bite_ordering_preference = msg_dict["status"]
         return bite_ordering_preference
     
-    def get_next_bite_selection(self, plate_image, n_food_types, data, predicted_bite, autocontinue_time=10) -> None:
+    def get_next_bite_selection(self, plate_image, n_food_types, data, predicted_bite, autocontinue_time=7) -> None:
 
         self.current_page = "meal_assistance"
 
@@ -199,12 +202,13 @@ class WebInterface:
             self._send_message({"state": "acquirebite", "status": "jump"})
 
             # Send required data for the next bite selection page
-            time.sleep(0.2) # simulate delay, needed for web interface
+            time.sleep(2.0) # simulate delay, needed for web interface
+
             self._send_image(plate_image)
             time.sleep(0.1)
             self._send_message({"n_food_types": n_food_types, "data": data, "current_bite": predicted_bite})  
             # set autocontinue time
-            time.sleep(0.1)
+            time.sleep(0.5)
             self._send_message({"state": "auto_time", "status": str(autocontinue_time)})
 
             # Get the user's next bite selection
@@ -450,13 +454,17 @@ class WebInterface:
                 break
 
             if msg_dict["status"] == "start":
-                start_timestamp = time.time()
-                # rostopic pub -1 /ServerComm std_msgs/String "{data: '{\"state\": \"gesture_response\", \"status\": \"This is a robot message\"}'}"
-                self._send_message({"state": "gesture_response", "status": f"Started recording gesture example: {len(timestamps) + 1}"})
-                print("Started recording gesture example: ", len(timestamps) + 1)
-            elif msg_dict["status"] == "stop":
-                end_timestamp = time.time()
                 if start_timestamp is not None:
+                    self._send_message({"state": "gesture_response", "status": "Invalid example: received start before stop. Please click on stop and then click on start."})
+                    print("Invalid example: received start before stop. Please click on stop and then click on start.")
+                else:
+                    start_timestamp = time.time()
+                    # rostopic pub -1 /ServerComm std_msgs/String "{data: '{\"state\": \"gesture_response\", \"status\": \"This is a robot message\"}'}"
+                    self._send_message({"state": "gesture_response", "status": f"Started recording gesture example: {len(timestamps) + 1}"})
+                    print("Started recording gesture example: ", len(timestamps) + 1)
+            elif msg_dict["status"] == "stop":
+                if start_timestamp is not None:
+                    end_timestamp = time.time()
                     self._send_message({"state": "gesture_response", "status": f"Recorded gesture example: {len(timestamps) + 1}"})
                     print("Recorded gesture example: ", len(timestamps) + 1)
                     timestamps.append((start_timestamp, end_timestamp))
