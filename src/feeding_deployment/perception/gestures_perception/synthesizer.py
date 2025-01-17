@@ -46,6 +46,7 @@ class PersonalizedGestureDetectorSynthesizer:
             self.prompt_skeleton = f.read()
 
         self.function_name = "gesture_detector"
+        self.adjustable_parameters_name = "ADJUSTABLE_PARAMETERS"
 
     def _load_from_data_path(self, gesture_datapath: Path):
         self.label = gesture_datapath.stem
@@ -72,30 +73,32 @@ class PersonalizedGestureDetectorSynthesizer:
 
         code_prefix = """import time
 import numpy as np
+from gymnasium.spaces import Box
 
 """
-        arg_idx_to_space = {3: Box(0.0, 1.0, shape=tuple())}  # this is threshold
-        arg_optimizer = GridSearchSynthesizedProgramArgumentOptimizer(arg_idx_to_space)
+        arg_optimizer = GridSearchSynthesizedProgramArgumentOptimizer()
         synthesized_program, synthesized_info = synthesize_python_function_with_llm(
             self.llm, self.function_name, self.input_output_examples, prompt,
             code_prefix=code_prefix,
             argument_optimizer=arg_optimizer,
+            arg_index_to_space_var_name=self.adjustable_parameters_name,
         )
         function_code = synthesized_program.code_str
-        threshold = synthesized_info.optimized_args[3]
         timeout = 20.0
-        print("Best Threshold: ", threshold)
+
+        print("Best Optimized Arguments: ", synthesized_info.optimized_args)
 
         print("Generated Function Code: ", function_code)
         try:
             exec(function_code, globals())  # Executes code in the global namespace
 
-            positive_accuracy, negative_accuracy = self.run_detector(gesture_detector, termination_event=None, timeout=timeout, threshold=threshold)
+            args = [synthesized_info.optimized_args[i] for i in sorted(synthesized_info.optimized_args)]
+            positive_accuracy, negative_accuracy = self.run_detector(gesture_detector, None, timeout, *args)
             print("Best Positive Accuracy: ", positive_accuracy)
             print("Best Negative Accuracy: ", negative_accuracy)
             accuracy = (positive_accuracy + negative_accuracy) / 2.0
             with open(Path(__file__).parent / "results" / f"{self.label}.txt", "a") as f:
-                f.write(f"\nBest Threshold: {threshold}\nBest Accuracy: {accuracy}")
+                f.write(f"\nnBest Accuracy: {accuracy}")
             
             # Code snippet to replace
             old_snippet = """
@@ -112,7 +115,9 @@ import numpy as np
         else:
             time.sleep(0.1) # Maintain 10 Hz rate
 """
-            updated_function_code = function_code.replace(old_snippet.strip(), new_snippet.strip())  
+            updated_function_code = function_code.replace(old_snippet.strip(), new_snippet.strip())
+
+            # TODO change this -- we're no longer using threshold!  
             function_code_with_threshold = f"""
 def {self.label}(perception_interface, termination_event, timeout):
     \"\"\"{self.language_description}\"\"\"
@@ -129,7 +134,7 @@ def {self.label}(perception_interface, termination_event, timeout):
     
     def test_in_context_examples(self):
         self._load_from_data_path(Path(__file__).parent / "gestures_examples" / "open_mouth.pkl")
-        positive_accuracy, negative_accuracy = self.run_detector(in_context_example1, termination_event=None, timeout=20, threshold=None)
+        positive_accuracy, negative_accuracy = self.run_detector(in_context_example1, None, 20, None)
         print("In-Context Example 1")
         print("Best Positive Accuracy: ", positive_accuracy)
         print("Best Negative Accuracy: ", negative_accuracy)
@@ -137,25 +142,25 @@ def {self.label}(perception_interface, termination_event, timeout):
         # /home/rkjenamani/sim_experiments/feeding-deployment/src/feeding_deployment/integration/log/gesture_examples/open_mouth.pkl
         # self._load_from_data_path(Path(__file__).parent.parent.parent / "integration" / "log" / "gesture_examples" / "open_mouth.pkl")
         self._load_from_data_path(Path(__file__).parent / "gestures_examples" / "head_nod.pkl")
-        positive_accuracy, negative_accuracy = self.run_detector(in_context_example2, termination_event=None, timeout=20, threshold=None)
+        positive_accuracy, negative_accuracy = self.run_detector(in_context_example2, None, 20, None)
         print("In-Context Example 2")
         print("Best Positive Accuracy: ", positive_accuracy)
         print("Best Negative Accuracy: ", negative_accuracy)
     
-    def run_detector(self, gesture_detector, **kwargs):
+    def run_detector(self, gesture_detector, *args):
         """
         Run the gesture detector on examples in self.examples_data_path
         """
         positive_correct = 0
         for positive_example in self.positive_examples:
             perception_interface = MockPerceptionInterface(head_perception_data=positive_example)
-            if gesture_detector(perception_interface, **kwargs):
+            if gesture_detector(perception_interface, *args):
                 positive_correct += 1
         
         negative_correct = 0
         for negative_example in self.negative_examples:
             perception_interface = MockPerceptionInterface(head_perception_data=negative_example)
-            if not gesture_detector(perception_interface, **kwargs):
+            if not gesture_detector(perception_interface, *args):
                 negative_correct += 1
         
         return positive_correct/len(self.positive_examples), negative_correct/len(self.negative_examples)

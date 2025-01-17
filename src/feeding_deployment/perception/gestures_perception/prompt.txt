@@ -22,9 +22,13 @@ Language Description: "mouth open"
 
 Output:
 ##################
-def gesture_detector(perception_interface, termination_event, timeout, threshold):
 
-    threshold = 0.45
+# Maps gesture_detector argument index to Box parameter space.
+ADJUSTABLE_PARAMETERS = {
+    3: Box(0, 1, shape=tuple()),  # mouth_open_threshold
+}
+
+def gesture_detector(perception_interface, termination_event, timeout, mouth_open_threshold):
 
     def euclidean_distance(p1, p2):
         """Calculate Euclidean distance between two points."""
@@ -48,7 +52,7 @@ def gesture_detector(perception_interface, termination_event, timeout, threshold
         C = euclidean_distance(mouth_points[0], mouth_points[6])   # 49, 55
 
         mar = (A + B) / (2.0 * C)
-        if mar > threshold:
+        if mar > mouth_open_threshold:
             return True
 
     return False
@@ -63,9 +67,14 @@ Language Description: "head nod"
 
 Output:
 ##################
-def gesture_detector(perception_interface, termination_event, timeout, threshold):
 
-    threshold = 0.6
+# Maps gesture_detector argument index to Box parameter space.
+ADJUSTABLE_PARAMETERS = [
+    3 : Box(0, 1, shape=tuple()),  # head_nod_threshold
+    4 : Box(0, 1000, shape=tuple()),  # max_pitch_data_size
+]
+
+def gesture_detector(perception_interface, termination_event, timeout, head_nod_threshold, max_pitch_data_size):
 
     start_time = time.time()
     pitch_data = []
@@ -83,15 +92,15 @@ def gesture_detector(perception_interface, termination_event, timeout, threshold
         # Check if there is enough data to detect direction change
         if len(pitch_data) >= 3:
 
-            if (pitch_data[-2] - pitch_data[-3] > threshold and pitch_data[-2] - pitch_data[-1] > threshold) or \
-            (pitch_data[-3] - pitch_data[-2] > threshold and pitch_data[-1] - pitch_data[-2] > threshold):
+            if (pitch_data[-2] - pitch_data[-3] > head_nod_threshold and pitch_data[-2] - pitch_data[-1] > head_nod_threshold) or \
+            (pitch_data[-3] - pitch_data[-2] > head_nod_threshold and pitch_data[-1] - pitch_data[-2] > head_nod_threshold):
                 direction_changes += 1
 
             if direction_changes >= 2:
                 return True
 
         # To avoid excessive memory usage, keep the pitch_data size small
-        if len(pitch_data) > 100:
+        if len(pitch_data) > max_pitch_data_size:
             pitch_data.pop(0)
 
     # If timeout expires without detecting the gesture, return False
