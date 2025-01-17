@@ -6,7 +6,8 @@ import time
 from pathlib import Path
 import textwrap
 import pickle
-from tomsutils.llm import OpenAILLM, synthesize_python_function_with_llm
+from tomsutils.llm import OpenAILLM, synthesize_python_function_with_llm, GridSearchSynthesizedProgramArgumentOptimizer
+from gymnasium.spaces import Box
 
 from feeding_deployment.perception.gestures_perception.in_context_examples import in_context_example1, in_context_example2
 
@@ -69,16 +70,30 @@ class PersonalizedGestureDetectorSynthesizer:
         self._load_from_data_path(gesture_datapath)
         prompt = self.prompt_skeleton%(self.language_description)
 
-        synthesized_program, _ = synthesize_python_function_with_llm(self.llm, self.function_name, self.input_output_examples, prompt)
+        code_prefix = """import time
+import numpy as np
+
+"""
+        arg_idx_to_space = {3: Box(0.0, 1.0, shape=tuple())}  # this is threshold
+        arg_optimizer = GridSearchSynthesizedProgramArgumentOptimizer(arg_idx_to_space)
+        synthesized_program, synthesized_info = synthesize_python_function_with_llm(
+            self.llm, self.function_name, self.input_output_examples, prompt,
+            code_prefix=code_prefix,
+            argument_optimizer=arg_optimizer,
+        )
         function_code = synthesized_program.code_str
+        threshold = synthesized_info.optimized_args[3]
+        timeout = 20.0
+        print("Best Threshold: ", threshold)
 
         print("Generated Function Code: ", function_code)
         try:
             exec(function_code, globals())  # Executes code in the global namespace
 
-            threshold, accuracy = self.search_threshold(gesture_detector)
-            print("Best Threshold: ", threshold)
-            print("Best Accuracy: ", accuracy)
+            positive_accuracy, negative_accuracy = self.run_detector(gesture_detector, termination_event=None, timeout=timeout, threshold=threshold)
+            print("Best Positive Accuracy: ", positive_accuracy)
+            print("Best Negative Accuracy: ", negative_accuracy)
+            accuracy = (positive_accuracy + negative_accuracy) / 2.0
             with open(Path(__file__).parent / "results" / f"{self.label}.txt", "a") as f:
                 f.write(f"\nBest Threshold: {threshold}\nBest Accuracy: {accuracy}")
             
@@ -144,23 +159,7 @@ def {self.label}(perception_interface, termination_event, timeout):
                 negative_correct += 1
         
         return positive_correct/len(self.positive_examples), negative_correct/len(self.negative_examples)
-    
-    def search_threshold(self, gesture_detector, timeout=20.0, threshold_range=(0.0, 1.0), step=0.1):
-        """
-        Search for the best threshold for the given gesture detector
-        """
-        best_threshold = None
-        best_accuracy = 0.0
 
-        for threshold in np.arange(threshold_range[0], threshold_range[1], step):
-            positive_accuracy, negative_accuracy = self.run_detector(gesture_detector, termination_event=None, timeout=timeout, threshold=threshold)
-            # print("Threshold: ", threshold, "Positive Accuracy: ", positive_accuracy, "Negative Accuracy: ", negative_accuracy)
-            accuracy = (positive_accuracy + negative_accuracy) / 2.0
-            if accuracy > best_accuracy:
-                best_accuracy = accuracy
-                best_threshold = threshold
-        
-        return best_threshold, best_accuracy
 
 def main():
 
