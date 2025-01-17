@@ -38,6 +38,7 @@ class PersonalizedGestureDetectorSynthesizer:
         self.llm = OpenAILLM(
             model_name="gpt-4o",
             cache_dir=log_dir / "llm_cache",
+            max_tokens=2500,
         )
 
         with open(Path(__file__).parent / "prompt.txt", 'r') as f:
