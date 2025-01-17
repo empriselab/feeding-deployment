@@ -436,9 +436,15 @@ class PerceptionInterface:
         start_time = timestamp[0]
         end_time = timestamp[1]
         
-        data_segment = []
+        data_segment = {
+            "head_pose": [],
+            "face_keypoints": [],
+            "tool_tip_target_pose": []
+        }
         for (timestamp, head_perception_data) in self.log_head_perception_data:
             if timestamp >= start_time and timestamp <= end_time:
-                data_segment.append((timestamp, head_perception_data))
+                data_segment["head_pose"].append(head_perception_data["head_pose"])
+                data_segment["face_keypoints"].append(head_perception_data["face_keypoints"])
+                data_segment["tool_tip_target_pose"].append(head_perception_data["tool_tip_target_pose"])
 
         return data_segment

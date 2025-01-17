@@ -17,7 +17,7 @@ class MockPerceptionInterface:
     def __init__(self, head_perception_data):
 
         self.face_keypoints = head_perception_data['face_keypoints']
-        self.head_pose = head_perception_data['head_poses']
+        self.head_pose = head_perception_data['head_pose']
         self.current_frame = 0
         self.max_frame = len(self.face_keypoints)
 
@@ -58,6 +58,7 @@ class PersonalizedGestureDetectorSynthesizer:
         prompt = self.prompt_skeleton%(self.language_description)
         response = self.llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
         function_code = response.strip("```python").strip("```")
+        print("Generated Function Code: ", function_code)
         try:
             exec(function_code, globals())  # Executes code in the global namespace
 
@@ -104,6 +105,8 @@ def {self.label}(perception_interface, termination_event, timeout):
         print("Best Threshold: ", threshold1)
         print("Best Accuracy: ", accuracy1)
 
+        # /home/rkjenamani/sim_experiments/feeding-deployment/src/feeding_deployment/integration/log/gesture_examples/open_mouth.pkl
+        # self._load_from_data_path(Path(__file__).parent.parent.parent / "integration" / "log" / "gesture_examples" / "open_mouth.pkl")
         self._load_from_data_path(Path(__file__).parent / "gestures_examples" / "open_mouth.pkl")
         threshold2, accuracy2 = self.search_threshold(in_context_example2)
         print("In-Context Example 2")
@@ -161,4 +164,25 @@ def main():
                 f.write(generated_function)
 
 if __name__ == '__main__':
-    main()
+
+    main()    
+    # gestures = ["blinking", "eyebrows_raised", "head_nod", "head_still_atleast_three_secs", "look_at_robot_atleast_three_secs", "talking", "open_mouth", "shake_my_head_from_left_to_right"]
+
+    # for gesture in gestures:
+
+    #     gesture_datapath = Path(__file__).parent / "gestures_examples" / f"{gesture}.pkl"
+    #     with open(gesture_datapath, 'rb') as f:
+    #         gesture_data = pickle.load(f)
+
+    #     # update the gesture data
+    #     for positive_example in gesture_data['positive_examples']:
+    #         positive_example['head_pose'] = positive_example['head_poses']
+    #         del positive_example['head_poses']
+
+    #     for negative_example in gesture_data['negative_examples']:
+    #         negative_example['head_pose'] = negative_example['head_poses']
+    #         del negative_example['head_poses']
+        
+    #     # overwrite original file
+    #     with open(gesture_datapath, 'wb') as f:
+    #         pickle.dump(gesture_data, f)
