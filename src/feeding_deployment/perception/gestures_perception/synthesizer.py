@@ -38,6 +38,7 @@ class PersonalizedGestureDetectorSynthesizer:
         self.llm = OpenAILLM(
             model_name="gpt-4o",
             cache_dir=log_dir / "llm_cache",
+            max_tokens=2500,
         )
 
         with open(Path(__file__).parent / "prompt.txt", 'r') as f:
@@ -151,9 +152,17 @@ def {self.label}(perception_interface, termination_event, timeout):
 def main():
 
     synthesizer = PersonalizedGestureDetectorSynthesizer()
-    synthesizer.test_in_context_examples()
+    # synthesizer.test_in_context_examples()
 
-    gestures = ["blinking", "eyebrows_raised", "head_nod", "head_still_atleast_three_secs", "look_at_robot_atleast_three_secs", "talking"]
+    gestures = [
+        "blinking",
+        # "eyebrows_raised",
+        # "head_nod",
+        # "head_still_atleast_three_secs",
+        # "look_at_robot_atleast_three_secs",
+        # "talking",
+        # "open_mouth",
+    ]
 
     for gesture in gestures:
         
