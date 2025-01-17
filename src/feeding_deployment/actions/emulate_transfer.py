@@ -177,7 +177,10 @@ class EmulateTransferHLA(HighLevelAction):
                         }, f)
 
                     input("Press enter to synthesize detector function")
-                    generated_function = self.detector_synthesizer.generate_function(gesture_datapath)
+                    # generated_function = self.detector_synthesizer.generate_function(gesture_datapath)
+                    # Hack to test the synthesizer
+                    hack_datapath = Path(__file__).parent.parent / "perception" / "gestures_perception" / "gestures_examples" / "open_mouth.pkl"
+                    generated_function = self.detector_synthesizer.generate_function(hack_datapath)
                     if generated_function is not None:
                         with open(self.synthesized_detectors_path, "a") as f:
                             f.write(generated_function)

@@ -1,3 +1,0 @@
-
-Best Threshold: 0.2
-Best Accuracy: 1.0
