@@ -76,6 +76,11 @@ class PerceptionInterface:
         self.kill_the_thread = False
         self.head_perception_running = False
 
+        # Head perception data logging setup
+        self.log_head_perception_data = []
+        self.log_head_perception_start_time = None
+        self.log_head_perception = False
+
         # set led brightness
         self.set_led_brightness()
 
@@ -209,6 +214,8 @@ class PerceptionInterface:
                             head_perception_data = pickle.load(f)
                     except FileNotFoundError:
                         raise FileNotFoundError("No transfer logged data found for tool: ", self.tool)
+                if self.log_head_perception:
+                    self.log_head_perception_data.append((time.time(), head_perception_data))
                 with self.head_perception_data_lock:
                     self.head_perception_data = head_perception_data
         self.head_perception_running = False
@@ -409,3 +416,35 @@ class PerceptionInterface:
         position = mat[:3, 3]
         orientation = R.from_matrix(mat[:3, :3]).as_quat()
         return Pose(position, orientation) 
+    
+    def start_logging_head_perception(self):
+        assert self.head_perception_running, "Head perception thread should be running to start logging"
+        self.log_head_perception_data = []
+        self.log_head_perception_start_time = time.time()
+        self.log_head_perception = True
+        return self.log_head_perception_start_time
+
+    def stop_logging_head_perception(self):
+        assert self.head_perception_running, "Head perception thread should be running to stop logging"
+        self.log_head_perception = False
+
+    def get_logged_head_perception_data(self):
+        return self.log_head_perception_data
+    
+    def extract_from_logged_head_perception_data(self, timestamp):
+
+        start_time = timestamp[0]
+        end_time = timestamp[1]
+        
+        data_segment = {
+            "head_pose": [],
+            "face_keypoints": [],
+            "tool_tip_target_pose": []
+        }
+        for (timestamp, head_perception_data) in self.log_head_perception_data:
+            if timestamp >= start_time and timestamp <= end_time:
+                data_segment["head_pose"].append(head_perception_data["head_pose"])
+                data_segment["face_keypoints"].append(head_perception_data["face_keypoints"])
+                data_segment["tool_tip_target_pose"].append(head_perception_data["tool_tip_target_pose"])
+
+        return data_segment

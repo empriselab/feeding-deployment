@@ -22,13 +22,14 @@ Language Description: "left to right head shake"
 
 Output:
 ##################
-def gesture_detector(perception_interface, threshold, timeout):
+def gesture_detector(perception_interface, termination_event, timeout, threshold):
 
     start_time = time.time()
     yaw_data = []
     direction_changes = 0  # Counts the number of left-right or right-left changes
+    
 
-    while time.time() - start_time < timeout:
+    while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
         head_perception_data = perception_interface.get_head_perception_data()
         if head_perception_data is None:
             break
@@ -41,7 +42,7 @@ def gesture_detector(perception_interface, threshold, timeout):
         if len(yaw_data) >= 3:
 
             if (yaw_data[-2] - yaw_data[-3] > threshold and yaw_data[-2] - yaw_data[-1] > threshold) or \
-               (yaw_data[-3] - yaw_data[-2] > threshold and yaw_data[-1] - yaw_data[-2] > threshold):
+            (yaw_data[-3] - yaw_data[-2] > threshold and yaw_data[-1] - yaw_data[-2] > threshold):
                 direction_changes += 1
 
             if direction_changes >= 2:
@@ -64,14 +65,14 @@ Language Description: "mouth open"
 
 Output:
 ##################
-def gesture_detector(perception_interface, threshold, timeout):
+def gesture_detector(perception_interface, termination_event, timeout, threshold):
 
     def euclidean_distance(p1, p2):
         """Calculate Euclidean distance between two points."""
         return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5
 
     start_time = time.time()
-    while time.time() - start_time < timeout:
+    while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
         head_perception_data = perception_interface.get_head_perception_data()
         if head_perception_data is None:
             break
@@ -90,7 +91,7 @@ def gesture_detector(perception_interface, threshold, timeout):
         mar = (A + B) / (2.0 * C)
         if mar > threshold:
             return True
-    
+
     return False
 ##################
 

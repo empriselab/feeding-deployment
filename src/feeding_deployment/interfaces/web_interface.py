@@ -13,30 +13,36 @@ from pybullet_helpers.joint import JointPositions
 from scipy.spatial.transform import Rotation as R
 import json
 import queue
-
+from pathlib import Path
 
 try:
     import rospy
-    from sensor_msgs.msg import JointState, CompressedImage
+    from sensor_msgs.msg import CompressedImage
     from std_msgs.msg import String
-    from visualization_msgs.msg import MarkerArray
-    import tf2_ros
-    from geometry_msgs.msg import TransformStamped
     from cv_bridge import CvBridge
 
-
-    from feeding_deployment.perception.head_perception.ros_wrapper import HeadPerceptionROSWrapper
 except ModuleNotFoundError:
     pass
 
+from feeding_deployment.transparency.continuous_llm import TransparencyContinuous
 
 class WebInterface:
     '''
     An interface to interact with the web interface.
     '''
-    def __init__(self, hla_command_queue: queue.Queue = None) -> None:
+    def __init__(self, task_selection_queue: queue.Queue = None) -> None:
 
-        self.hla_command_queue = hla_command_queue
+        # Used for generating continuous explanations.
+        self.transparency_continuous = TransparencyContinuous()
+
+        # Objects of task_selection_queue are dicts and can be of the following types:
+        # {'task': 'meal_assistance', 'type': 'bite' / 'sip' / 'wipe'}
+        # {'task': 'personalization', 'type': 'transparency' / 'adaptability' / 'gesture'}
+        self.task_selection_queue = task_selection_queue
+        self.task_selection_jump = False
+
+        # Queue containing all messages from the web interface.
+        self.received_web_interface_messages = queue.Queue()
         
         # Create a publisher for communication with the web interface.
         self.web_interface_publisher = rospy.Publisher("/ServerComm", String, queue_size=10)
@@ -46,200 +52,452 @@ class WebInterface:
         self.web_interface_sub = rospy.Subscriber("WebAppComm", String, self._message_callback, queue_size=100)
         time.sleep(1.0)  # Wait for the subscriber to connect
 
-        self.state = "task_selection" # task_selection, transparency, or adaptability
+        self.current_page = "task_selection" # task_selection, transparency, adaptability
+        self.explanation_lock = threading.Lock() # Lock for generating continuous explanations
+        
+        # Start the thread for generating continuous explanations.
+        self.transparency_continuous_thread = threading.Thread(target=self.provide_continuous_explanations)
+        self.transparency_continuous_thread.start()
+
+    def _send_message(self, msg_dict: dict[str, Any]) -> None:
+        self.web_interface_publisher.publish(String(json.dumps(msg_dict)))
+
+    def _send_image(self, image) -> None:
+        self.web_interface_image_publisher.publish(self.image_bridge.cv2_to_compressed_imgmsg(image))
 
     def _message_callback(self, msg: "String") -> None:
         """Callback for the web interface."""
         print("Received message on WebAppComm: ", msg.data)
+        
+        msg_dict = json.loads(msg.data)
 
-        # if msg.data is not JSON, it is a text message
-        try:
-            msg_dict = json.loads(msg.data)
-        except json.JSONDecodeError:
-            if self.state == "transparency" or self.state == "adaptability":
-                print("Received personalization related text message from web interface.")
-                request = {
-                    "status": self.state,
-                    "request": msg.data,
-                    "state": None
+        self.task_selection_jump = False
+        if msg_dict["state"] == "task_selection":
+            if msg_dict["status"] == "take_bite":
+                task_selected = {
+                    "task": "meal_assistance",
+                    "type": "bite",
                 }
-                self.hla_command_queue.put(request)
+            elif msg_dict["status"] == "take_sip":
+                task_selected = {
+                    "task": "meal_assistance",
+                    "type": "sip",
+                }
+            elif msg_dict["status"] == "mouth_wiping":
+                task_selected = {
+                    "task": "meal_assistance",
+                    "type": "wipe",
+                }
+            elif msg_dict["status"] == "transparency":
+                task_selected = {
+                    "task": "personalization",
+                    "type": "transparency",
+                }
+            elif msg_dict["status"] == "adaptability":
+                task_selected = {
+                    "task": "personalization",
+                    "type": "adaptability",
+                }
+            elif msg_dict["status"] == "gesture":
+                task_selected = {
+                    "task": "personalization",
+                    "type": "gesture",
+                }
+            elif msg_dict["status"] == "jump":
+                self.task_selection_jump = True
                 return
             else:
-                print("WARNING: Unrecognized message from web interface, cannot decode JSON.")
-                return    
-        
-        # hack to not run into errors when message does not contain state
-        if "state" not in msg_dict:
-            msg_dict["state"] = None
-
-        {"state":"order_selection","status":"opened_adaptability_page"}
-
-
-        if (msg_dict["state"] == "order_selection" and msg_dict["status"] == "opened_transparency_page"):
-            self.state = "transparency"
-            return
-        elif (msg_dict["state"] == "order_selection" and msg_dict["status"] == "opened_adaptability_page"):
-            self.state = "adaptability"
-            return
+                print("Invalid task selection status received from interface: ", msg_dict["status"])
+                return
+            
+            # remove explanation lock (if it exists)
+            if self.explanation_lock.locked():
+                self.explanation_lock.release()
+            
+            # set current page to task_selection (effectively reseting transparency and adaptability pages)
+            self.current_page = "task_selection"
+            
+            self.task_selection_queue.put(task_selected)
         else:
-            self.state = "task_selection"
+            self.received_web_interface_messages.put(msg_dict)
 
-        if (msg_dict["state"] == "order_selection" and msg_dict["status"] != "ready_for_initial_data") \
-            or (msg_dict["state"] == "voice"):
-            self.user_preference = msg_dict["status"]
-            print("SETTING USER PREFERENCE: ", self.user_preference)
-        elif msg_dict["status"] in ["finish_feeding", "back", "move_to_wiping_position", "drink_pickup", "drink_transfer", "move_to_above_plate", "aquire_food", 0, "bite_skill_selection", "bite_transfer", "mouth_wiping", "return_to_main"]:
-            print("Received high-level action message from web interface.")
-            if self.hla_command_queue is not None:
-                self.hla_command_queue.put(msg_dict)
+    def clear_received_messages(self) -> None:
+        while not self.received_web_interface_messages.empty():
+            self.received_web_interface_messages.get()
+
+    def ready_for_task_selection(self, last_task_type = None, autocontinue_timeout = 7) -> None:
+        """Moves the web interface to the task selection page."""
+
+        self.current_page = "task_selection"
+
+        print("Sending message to web interface to move to task selection page with last task type: ", last_task_type)
+
+        # after bite and after sip are special, because they have bite and sip preselected for autocontinue with a timeout
+        if last_task_type == "bite":
+            self._send_message({"state": "afterbitetransfer", "status": "jump"})
+            time.sleep(0.5)
+            self._send_message({"state": "auto_time", "status": str(autocontinue_timeout)})
+        elif last_task_type == "sip":
+            self._send_message({"state": "afterdrinktransfer", "status": "jump"})
+            time.sleep(0.5)
+            self._send_message({"state": "auto_time", "status": str(autocontinue_timeout)})
         else:
-            print("WARNING: Unrecognized message from web interface.")
-            return
+            self._send_message({"state": "task_selection", "status": "jump"})
 
-    def send_web_interface_message(self, msg_dict: dict[str, Any]) -> None:
-        self.web_interface_publisher.publish(
-            String(json.dumps(msg_dict))
-        )
-
-    def send_web_interface_text(self, text: str) -> None:
-        self.web_interface_publisher.publish(
-            String(text)
-        )
-
-    def send_web_interface_image(self, image) -> None:
-        self.web_interface_image_publisher.publish(self.image_bridge.cv2_to_compressed_imgmsg(image))
-
-if __name__ == "__main__":
-    rospy.init_node("test_web_interface")
-
-    # parse command line arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--test_manual_acquisition_pixels", action="store_true")
-    parser.add_argument("--test_image_streaming", action="store_true")
-    parser.add_argument("--test_dry_run", action="store_true")
-    args = parser.parse_args()
-
-    hla_command_queue = queue.Queue()
-    web_interface = WebInterface(hla_command_queue)
-
-    if args.test_dry_run:
-        meal_start_log = pickle.load(open("test_log/meal_start_log.pkl", "rb"))
-
-        plate_image = meal_start_log['plate_image']
-        plate_bounds = meal_start_log['plate_bounds']
-        food_type_to_data = meal_start_log['food_type_to_data']
-        ordering_options = meal_start_log['ordering_options']
-
-        n_food_types = len(food_type_to_data)
-        data = [{k: v} for k, v in food_type_to_data.items()]
-
-        input("Press Enter to send look at plate finished message")
-        web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
-        time.sleep(0.2) # simulate delay, also needed for web interface
-        web_interface.send_web_interface_image(plate_image)
-        # time.sleep(1.0)  # simulate delay, also needed for web interface
-        web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data})
-        web_interface.send_web_interface_message({"n_ordering": len(ordering_options), "data": ordering_options})
-
-
-        next_bite_log = pickle.load(open("test_log/next_bite_log.pkl", "rb"))
-        plate_image = next_bite_log['plate_image']
-        plate_bounds = next_bite_log['plate_bounds']
-        food_type_to_data = next_bite_log['food_type_to_data']
-        next_food_item = next_bite_log['next_food_item']
-        n_food_types = len(food_type_to_data)
-        data = [{k: v} for k, v in food_type_to_data.items() if k != next_food_item]
-        current_bite = {next_food_item: food_type_to_data[next_food_item]}
-
-        input("Press Enter to send bite acquisition ready message")
-        web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
-        time.sleep(0.2) # simulate delay, also needed for web interface
-        web_interface.send_web_interface_image(plate_image)
-        time.sleep(0.1)
-        web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data, "current_bite": current_bite})            
-
-        input("Press Enter to send bite acquisition completed message")
-        web_interface.send_web_interface_message({"state": "bite_pickup", "status": "completed"})
-
-        input("Press Enter to send bite transfer ready message")
-        web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
-
-        input("Press Enter to send bite acquisition ready message")
-        web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
-        time.sleep(0.2) # simulate delay, also needed for web interface
-        web_interface.send_web_interface_image(plate_image)
-        time.sleep(0.1)
-        web_interface.send_web_interface_message({"n_food_types": n_food_types, "data": data, "current_bite": current_bite})            
-
-        input("Press Enter to send bite acquisition completed message")
-        web_interface.send_web_interface_message({"state": "bite_pickup", "status": "completed"})
-
-        input("Press Enter to send bite transfer ready message")
-        web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
-
-        input("Press Enter to send drink pickup done message")
-        web_interface.send_web_interface_message({"state": "drink_pickup", "status": "completed"})
-
-        input("Press Enter to send drink transfer done message")
-        web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})
-
-        input("Press Enter to send mouth wiping picked up message")
-        web_interface.send_web_interface_message({"state": "prepare_mouth_wiping", "status": "completed"})
-
-        input("Press Enter to send mouth wiping done message")
-        web_interface.send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})
-
-    if args.test_manual_acquisition_pixels:
-        plate_log = pickle.load(open("test_log/plate_log.pkl", "rb"))
-        original_image = plate_log['original_image']
-        plate_image = plate_log['plate_image']
-        plate_bounds = plate_log['plate_bounds']
-        print("Original image shape: ", original_image.shape)
-        print("Plate image shape: ", plate_image.shape)
-        print("Plate bounds: ", plate_bounds)
-
-        cv2.imshow("plate_image", plate_image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
-        web_interface.send_web_interface_message({"state": "prepare_bite", "status": "completed"})
-        time.sleep(1.0) # simulate delay, also needed for web interface
-        web_interface.send_web_interface_image(plate_image)
-        time.sleep(1.0)  # simulate delay, also needed for web interface
-
-        while not rospy.is_shutdown():
+    def get_required_web_interface_message(self, condition) -> dict[str, Any]:
+        """Parses through all messages received from the web interface and returns the oldest one satisfying the condition."""
+        print_once = True
+        while True:
+            if self.task_selection_jump:
+                return None
             try:
-                msg_dict = hla_command_queue.get(timeout=1.0)
-                if msg_dict["status"] == 0:
-                    pos = msg_dict["positions"][0]
-
-                    point_x = int(pos["x"]*plate_bounds[2]) + plate_bounds[0]
-                    point_y = int(pos["y"]*plate_bounds[3]) + plate_bounds[1]
-
-                    print("Plate Bounds:", plate_bounds)
-                    print("Positions:", msg_dict["positions"])
-                    print("Point:", point_x, point_y)
-
-                    # visualize point on camera color image
-                    viz = original_image.copy()
-                    for pos in msg_dict["positions"]:
-                        cv2.circle(viz, (point_x, point_y), 5, (0, 255, 0), -1)
-                    
-                    cv2.imshow("viz", viz)
-                    cv2.waitKey(0)
-                    cv2.destroyAllWindows()
+                msg_dict = self.received_web_interface_messages.get_nowait()
+                if condition(msg_dict):
+                    print("Received required message from the web interface")
+                    return msg_dict
             except queue.Empty:
+                if print_once:
+                    print("Waiting for required message from the web interface ...")
+                    print_once = False
+                time.sleep(0.1)
                 continue
 
-    elif args.test_image_streaming:
-        for i in range(5):
-            # read image
-            image = cv2.imread(f"test_log/color_{i}.png")
-            # Send the plate image to the web interface.
-            input("Press Enter to send image to web interface.")
-            web_interface.send_web_interface_image(image)
+    #### Meal Assistance Pages ####
 
-    
+    def get_bite_ordering_preference(self, plate_image, n_food_types, data, ordering_options) -> None:
+
+        self.current_page = "meal_assistance"
+
+        with self.explanation_lock:
         
+            # Jump to bite ordering page
+            self._send_message({"state": "newmealpage", "status": "jump"})
+            
+            # Wait for the web interface to be ready for initial data
+            time.sleep(0.2)
+            
+            # Send required data for the bite ordering page
+            self._send_image(plate_image)
+            self._send_message({"n_food_types": n_food_types, "data": data})
+            self._send_message({"n_ordering": len(ordering_options), "data": ordering_options})
 
+            # Get the user's bite ordering preference
+            msg_dict = self.get_required_web_interface_message(
+                lambda msg_dict: (
+                    (msg_dict["state"] == "order_selection" and msg_dict["status"] != "ready_for_initial_data")
+                    or (msg_dict["state"] == "voice")
+                )
+            )
+
+        bite_ordering_preference = msg_dict["status"]
+        return bite_ordering_preference
+    
+    def get_next_bite_selection(self, plate_image, n_food_types, data, predicted_bite, autocontinue_time=7) -> None:
+
+        self.current_page = "meal_assistance"
+
+        with self.explanation_lock:
+
+            # Jump to next bite selection page
+            self._send_message({"state": "acquirebite", "status": "jump"})
+
+            # Send required data for the next bite selection page
+            time.sleep(2.0) # simulate delay, needed for web interface
+
+            self._send_image(plate_image)
+            time.sleep(0.1)
+            self._send_message({"n_food_types": n_food_types, "data": data, "current_bite": predicted_bite})  
+            # set autocontinue time
+            time.sleep(0.5)
+            self._send_message({"state": "auto_time", "status": str(autocontinue_time)})
+
+            # Get the user's next bite selection
+            msg_dict = self.get_required_web_interface_message(
+                lambda msg_dict: (
+                    (msg_dict["status"] == "aquire_food" or msg_dict["status"] == 0)
+                )
+            ) 
+
+        if msg_dict["status"] == "aquire_food": # autonomous bite acquisition
+            return "autonomous", msg_dict["data"]
+        elif msg_dict["status"] == 0: # manual skewering
+            return "manual_skewering", msg_dict["positions"]
+        elif msg_dict["status"] == 1: # manual scooping
+            return "manual_scooping", msg_dict["positions"]
+        else:
+            print("Unsupported message received from the web interface: ", msg_dict)
+
+    def get_successful_food_acquisition_confirmation(self) -> None:
+
+        self.current_page = "meal_assistance"
+
+        with self.explanation_lock:
+        
+            # Jump to successful food acquisition page
+            self._send_message({"state": "transfermeal", "status": "jump"})
+
+            # Wait until the user confirms that the food has been acquired
+            msg_dict = self.get_required_web_interface_message(
+                lambda msg_dict: (
+                    (msg_dict["state"] == "post_bite_pickup")
+                )
+            )
+
+        if msg_dict["status"] == "bite_transfer":
+            return True
+        elif msg_dict["status"] == "return_to_main":
+            return False
+        else:
+            print("Unsupported message received from the web interface: ", msg_dict)
+
+    def get_drink_transfer_confirmation(self) -> None:
+
+        self.current_page = "meal_assistance"
+
+        with self.explanation_lock:
+        
+            # Jump to ready for drink transfer page
+            self._send_message({"state": "transferdrinks", "status": "jump"})
+
+            # Wait until the user confirms that the drink has been transferred
+            self.get_required_web_interface_message(
+                lambda msg_dict: (
+                    (msg_dict["state"] == "post_drink_pickup" and msg_dict["status"] == "drink_transfer")
+                )
+            )
+
+    def get_wipe_transfer_confirmation(self) -> None:
+
+        self.current_page = "meal_assistance"
+
+        with self.explanation_lock:
+
+            # jump to ready for wipe transfer page
+            print("Jumping to mouth wiping transfer page")
+            self._send_message({"state": "wipingtrans", "status": "jump"})
+
+            # Wait until the user confirms that the wipe has been transferred
+            self.get_required_web_interface_message(
+                lambda msg_dict: (
+                    (msg_dict["state"] == "prepared_mouth_wiping" and msg_dict["status"] == "move_to_wiping_position")
+                )
+            )
+
+    #### Transparency Pages ####
+
+    def get_transparency_request(self) -> None:
+        
+        if self.current_page != "transparency":
+            
+            # acquire explanation lock continuously until we move back to task selection page (which releases the lock)
+            self.explanation_lock.acquire()
+
+            self.current_page = "transparency"
+
+            # Jump to transparency query page
+            self._send_message({"state": "transparency", "status": "jump"})
+
+        # Wait until the user provides a transparency query
+        msg_dict = self.get_required_web_interface_message(
+            lambda msg_dict: (
+                (msg_dict["state"] == "transparency_request")
+            )
+        )
+
+        if msg_dict is None:
+            return None
+        return msg_dict["status"]
+    
+    def update_transparency_response(self, response: str) -> None:
+        assert self.current_page == "transparency", "Cannot update transparency response when not on the transparency page."
+        self._send_message({"state": "transparency_response", "status": response})
+
+    #### Adaptability Pages ####
+    
+    def get_adaptability_request(self) -> None:
+        
+        if self.current_page != "adaptability":
+
+            # acquire explanation lock continuously until we move back to task selection page (which releases the lock)
+            self.explanation_lock.acquire()
+
+            self.current_page = "adaptability"
+
+            # Jump to adaptability query page
+            self._send_message({"state": "adaptability", "status": "jump"})
+
+        # Wait until the user provides an adaptability query
+        msg_dict = self.get_required_web_interface_message(
+            lambda msg_dict: (
+                (msg_dict["state"] == "adaptability_request")
+            )
+        )
+        print("Received adaptability request: ", msg_dict)
+
+        if msg_dict is None:
+            return None
+        return msg_dict["status"]
+    
+    def update_adaptability_response(self, response: str) -> None:
+        assert self.current_page == "adaptability", "Cannot update adaptability response when not on the adaptability page."
+        self._send_message({"state": "adaptability_response", "status": response})
+
+    #### Gesture Pages ####
+
+    def get_gesture_type(self) -> None:
+        """Get whether the user wants to add a gesture or test a gesture."""
+
+        self.current_page = "gesture"
+
+        msg_dict = self.get_required_web_interface_message(
+            lambda msg_dict: (
+                (msg_dict["state"] == "gesture_main")
+            )
+        )
+
+        return msg_dict["status"]
+    
+    def get_new_gesture_details(self) -> None:
+        """Get the gesture label and description from the user."""
+
+        self.current_page = "record_gesture"
+
+        # get first message from web interface (condition is always true)
+        msg_dict = self.get_required_web_interface_message(lambda msg_dict: True)
+
+        return msg_dict["state"], msg_dict["status"]
+    
+    def jump_to_test_gesture_page(self, available_gestures: list[str]) -> None:
+        """Send available gestures to the web interface."""
+        
+        self.current_page = "test_gesture"
+
+        # Jump to test gesture page
+        self._send_message({"state": "gesturetest", "status": "jump"})
+
+        # Send available gestures to the web interface
+        print("Length of available gestures: ", len(available_gestures))
+        print("Available gestures: ", available_gestures)
+        time.sleep(0.1)
+        self._send_message({"n_ordering": len(available_gestures), "data": available_gestures})
+    
+    def start_gesture_listener_thread(self, new_gesture_selected_event: threading.Event) -> None:
+        """Start the gesture listener thread."""
+        assert self.current_page == "test_gesture", "Cannot start gesture listener thread when not on the test gesture page."
+        self.new_gesture_selected_event = new_gesture_selected_event
+        self.selected_gesture = None
+        self.gesture_listener_thread = threading.Thread(target=self.gesture_listener_thread)
+        self.gesture_listener_thread.start()
+
+    def gesture_listener_thread(self) -> None:
+        
+        while True:
+            msg_dict = self.get_required_web_interface_message(
+                lambda msg_dict: (
+                    (msg_dict["state"] == "test_selection")
+                )
+            )
+
+            if msg_dict is None or msg_dict["status"] == "back":
+                self.selected_gesture = None
+                self.new_gesture_selected_event.set()
+                break
+
+            self.selected_gesture = msg_dict["status"]
+            self.new_gesture_selected_event.set()
+
+    def get_selected_gesture(self) -> None:
+        """Get the gesture selected by the user."""
+        if self.selected_gesture:
+            return self.selected_gesture
+
+    def stop_gesture_listener_thread(self) -> None:
+        """Stop the gesture listener thread."""
+        self.gesture_listener_thread.join()
+
+    def register_positive_gesture_detection(self) -> None:
+        """Register a positive gesture detection."""
+        self._send_message({"state": "gesture_response", "status": "Detected the selected gesture."})
+
+    def register_negative_gesture_detection(self) -> None:
+        """Register a negative gesture detection."""
+        self._send_message({"state": "gesture_response", "status": "Did not detect the selected gesture."})
+
+    def get_gesture_examples(self) -> None:
+        """Get gesture examples from the user."""
+        
+        # Jump to gesturerecording page
+        self._send_message({"state": "gesturerecording", "status": "jump"})
+
+        positive_timestamps = self.record_gesture_examples()
+        negative_timestamps = self.record_gesture_examples(positive=False)
+
+        return positive_timestamps, negative_timestamps
+
+    def record_gesture_examples(self, positive=True) -> None:
+        """Record gesture examples."""
+
+        if positive:
+            trigger_message = "gesture_add"
+        else:
+            trigger_message = "gesture_add_negative"
+
+        timestamps = []
+        start_timestamp, end_timestamp = None, None
+        while True:
+            msg_dict = self.get_required_web_interface_message(
+                lambda msg_dict: (
+                    (msg_dict["state"] == trigger_message)
+                )
+            )
+            if msg_dict is None:
+                break
+
+            if msg_dict["status"] == "start":
+                if start_timestamp is not None:
+                    self._send_message({"state": "gesture_response", "status": "Invalid example: received start before stop. Please click on stop and then click on start."})
+                    print("Invalid example: received start before stop. Please click on stop and then click on start.")
+                else:
+                    start_timestamp = time.time()
+                    # rostopic pub -1 /ServerComm std_msgs/String "{data: '{\"state\": \"gesture_response\", \"status\": \"This is a robot message\"}'}"
+                    self._send_message({"state": "gesture_response", "status": f"Started recording gesture example: {len(timestamps) + 1}"})
+                    print("Started recording gesture example: ", len(timestamps) + 1)
+            elif msg_dict["status"] == "stop":
+                if start_timestamp is not None:
+                    end_timestamp = time.time()
+                    self._send_message({"state": "gesture_response", "status": f"Recorded gesture example: {len(timestamps) + 1}"})
+                    print("Recorded gesture example: ", len(timestamps) + 1)
+                    timestamps.append((start_timestamp, end_timestamp))
+                else:
+                    self._send_message({"state": "gesture_response", "status": "Invalid example: received stop before start. Please click on start, then demonstrate the gesture, and then click on stop."})
+                    print("Invalid example: received stop before start. Please click on start, then demonstrate the gesture, and then click on stop.")
+                start_timestamp, end_timestamp = None, None
+            elif msg_dict["status"] == "delete":
+                if start_timestamp is None:
+                    if len(timestamps) > 0:
+                        self._send_message({"state": "gesture_response", "status": f"Deleted gesture example: {len(timestamps)}. {len(timestamps)-1} examples remain in recording history"})
+                        print("Deleted gesture example: ", len(timestamps))
+                        timestamps.pop()
+                        print(f"{len(timestamps)} examples remain in recording history")
+                    else:
+                        self._send_message({"state": "gesture_response", "status": "No examples to delete"})
+                        print("No examples to delete")
+                else:
+                    self._send_message({"state": "gesture_response", "status": "Cannot delete while recording. Please click on stop and then click on delete."})
+                    print("Cannot delete while recording. Please click on stop and then click on delete.")
+            elif msg_dict["status"] == "next" or msg_dict["status"] == "back":
+                break
+            else:
+                print("Unsupported message received from the web interface: ", msg_dict)
+        return timestamps
+
+    #### Continuous Explanations ####
+
+    def provide_continuous_explanations(self) -> None:
+        while True:
+            # Rajat ToDo: Do not provide explanations during transfer (when the user is expected to open their mouth)
+            time.sleep(5.0)
+            explanation_active = True
+            start_time = time.time()
+            current_explanation = self.transparency_continuous.get_explanation()
+            self._send_message({"state": "explanation", "status": current_explanation})

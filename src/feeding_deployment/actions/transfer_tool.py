@@ -62,7 +62,7 @@ class TransferToolHLA(HighLevelAction):
         if initiate_transfer_interaction == "button":
             self.perception_interface.detect_button_press()
         elif initiate_transfer_interaction == "open_mouth":
-            mouth_open_detector(self.perception_interface, timeout=600) # 10 minutes
+            mouth_open_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
         elif initiate_transfer_interaction == "auto_timeout":
             time.sleep(5.0)
         else:
@@ -195,30 +195,24 @@ class TransferToolHLA(HighLevelAction):
         self.set_tool("fork")
         self.execute_transfer(*args, **kwargs)
 
-        # Send message to web interface indicating transfer is done.
-        if self.web_interface is not None:
-            self.web_interface.send_web_interface_message({"state": "bite_transfer", "status": "completed"})
-
     def transfer_drink(self, *args, **kwargs) -> None:
         assert self.sim.held_object_name == "drink"
+        
+        if self.web_interface is not None:
+            self.web_interface.get_drink_transfer_confirmation()
 
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
         self.set_tool("drink")    
-        self.execute_transfer(*args, maintain_position_at_goal=True, **kwargs)
-
-        # Send message to web interface indicating transfer is done.
-        if self.web_interface is not None:
-            self.web_interface.send_web_interface_message({"state": "drink_transfer", "status": "completed"})        
+        self.execute_transfer(*args, maintain_position_at_goal=True, **kwargs)    
 
     def transfer_wipe(self, *args, **kwargs) -> None:
         assert self.sim.held_object_name == "wipe"
         
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
+        if self.web_interface is not None:
+            self.web_interface.get_wipe_transfer_confirmation()
+
         self.set_tool("wipe")
         self.execute_transfer(*args, maintain_position_at_goal=True, **kwargs)
-
-        # Send message to web interface indicating transfer is done.
-        if self.web_interface is not None:
-            self.web_interface.send_web_interface_message({"state": "moved_to_wiping_position", "status": "completed"})

@@ -1,6 +1,6 @@
 import time
 
-def in_context_example1(perception_interface, timeout, threshold):
+def in_context_example1(perception_interface, termination_event, timeout, threshold):
     """
     Verifies the in-context example 1 code (head shake left to right) provided in the prompt
     """
@@ -8,13 +8,12 @@ def in_context_example1(perception_interface, timeout, threshold):
     start_time = time.time()
     yaw_data = []
     direction_changes = 0  # Counts the number of left-right or right-left changes
+    
 
-    while time.time() - start_time < timeout:
+    while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
         head_perception_data = perception_interface.get_head_perception_data()
         if head_perception_data is None:
             break
-        # else:
-        #     time.sleep(0.1) # Maintain 10 Hz rate
         head_pose = head_perception_data["head_pose"]
 
         (head_x, head_y, head_z, head_roll, head_pitch, head_yaw) = head_pose
@@ -24,7 +23,7 @@ def in_context_example1(perception_interface, timeout, threshold):
         if len(yaw_data) >= 3:
 
             if (yaw_data[-2] - yaw_data[-3] > threshold and yaw_data[-2] - yaw_data[-1] > threshold) or \
-               (yaw_data[-3] - yaw_data[-2] > threshold and yaw_data[-1] - yaw_data[-2] > threshold):
+            (yaw_data[-3] - yaw_data[-2] > threshold and yaw_data[-1] - yaw_data[-2] > threshold):
                 direction_changes += 1
 
             if direction_changes >= 2:
@@ -37,7 +36,7 @@ def in_context_example1(perception_interface, timeout, threshold):
     # If timeout expires without detecting the gesture, return False
     return False
 
-def in_context_example2(perception_interface, threshold, timeout):
+def in_context_example2(perception_interface, termination_event, timeout, threshold):
     """ Verifies the in-context example 2 code (mouth open) provided in the prompt """
 
     def euclidean_distance(p1, p2):
@@ -45,12 +44,10 @@ def in_context_example2(perception_interface, threshold, timeout):
         return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5
 
     start_time = time.time()
-    while time.time() - start_time < timeout:
+    while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
         head_perception_data = perception_interface.get_head_perception_data()
         if head_perception_data is None:
             break
-        # else:
-        #     time.sleep(0.1) # Maintain 10 Hz rate
         face_keypoints = head_perception_data["face_keypoints"]
         
         # Indices for mouth landmarks
@@ -66,5 +63,5 @@ def in_context_example2(perception_interface, threshold, timeout):
         mar = (A + B) / (2.0 * C)
         if mar > threshold:
             return True
-    
+
     return False

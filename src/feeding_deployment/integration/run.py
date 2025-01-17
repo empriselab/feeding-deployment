@@ -12,6 +12,7 @@ import signal
 import shutil
 import numpy as np
 from tomsutils.llm import OpenAILLM
+import time
 
 try:
     import rospy
@@ -55,7 +56,7 @@ from feeding_deployment.actions.pick_tool import PickToolHLA
 from feeding_deployment.actions.stow_tool import StowToolHLA
 from feeding_deployment.actions.transfer_tool import TransferToolHLA
 from feeding_deployment.actions.emulate_transfer import EmulateTransferHLA
-from feeding_deployment.actions.acquisition import LookAtPlateHLA, AcquireBiteHLA
+from feeding_deployment.actions.acquisition import AcquireBiteHLA
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
 from feeding_deployment.interfaces.web_interface import WebInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
@@ -74,7 +75,7 @@ from feeding_deployment.transparency.query_llm import TransparencyQuery
 
 
 # All the high level actions we want to consider.
-HLAS = {PickToolHLA, StowToolHLA, LookAtPlateHLA, AcquireBiteHLA, TransferToolHLA, EmulateTransferHLA, ResetHLA}
+HLAS = {PickToolHLA, StowToolHLA, AcquireBiteHLA, TransferToolHLA, EmulateTransferHLA, ResetHLA}
 
 assert os.environ.get("PYTHONHASHSEED") == "0", \
         "Please add `export PYTHONHASHSEED=0` to your bash profile!"
@@ -132,8 +133,8 @@ class _Runner:
 
         if self.use_interface:
             # Initialize the web interface.
-            self.hla_command_queue = queue.Queue()
-            self.web_interface = WebInterface(self.hla_command_queue)
+            self.task_selection_queue = queue.Queue()
+            self.web_interface = WebInterface(self.task_selection_queue)
         else:
             self.web_interface = None
 
@@ -219,70 +220,72 @@ class _Runner:
         self.active = True
 
     def run(self) -> None:
+
+        assert self.web_interface is not None, "Run takes user commands from the web interface which is None."
         
+        last_task_type = None
         while self.active:
             try:
-                hla_interface_msg = self.hla_command_queue.get(timeout=1)
-                self.parse_interface_msg(hla_interface_msg)
+                task_selection_command = self.task_selection_queue.get(timeout=1)
+                self.web_interface.clear_received_messages() # So that only the latest message is processed
+                task, task_type = task_selection_command["task"], task_selection_command["type"]
+                if task == "meal_assistance":
+                    if task_type == "bite":
+                        self.process_user_command(GroundHighLevelAction(self.hla_name_to_hla["TransferTool"], (self.utensil,)))
+                    elif task_type == "sip":
+                        self.process_user_command(GroundHighLevelAction(self.hla_name_to_hla["TransferTool"], (self.drink,)))
+                    elif task_type == "wipe":
+                        self.process_user_command(GroundHighLevelAction(self.hla_name_to_hla["TransferTool"], (self.wipe,)))
+                    last_task_type = task_type
+                elif task == "personalization":
+                    if task_type == "transparency":
+                        while self.active:
+                            query = self.web_interface.get_transparency_request()
+                            if query:
+                                response = self.transparency_query.answer_query(query)
+                                self.web_interface.update_transparency_response(response)
+                            else:
+                                break
+                    elif task_type == "adaptability":
+                        while self.active:
+                            adaptation_request = self.web_interface.get_adaptability_request()
+                            if adaptation_request:
+                                try:
+                                    print("Processing user update request:", adaptation_request)
+                                    self.process_user_update_request(adaptation_request)
+                                    print('Processed user update request.')
+                                    self.web_interface.update_adaptability_response("Adaptation successful.")
+                                except Exception as e:
+                                    print(f"Adaptation failed: {e}")
+                                    self.web_interface.update_adaptability_response(f"Adaptation failed: {str(e)}")
+                            else:
+                                break
+                    elif task_type == "gesture":
+                        print("Triggered gesture")
+                        gesture_task_type = self.web_interface.get_gesture_type()
+                        print(f"Gesture task type: {gesture_task_type}")
+                        if gesture_task_type == "add":
+                            gesture_label, gesture_description = self.web_interface.get_new_gesture_details()
+                            self.process_user_command(GroundHighLevelAction(self.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": False, "gesture_label":gesture_label, "gesture_description": gesture_description} ))
+                        else: # test
+                            self.process_user_command(GroundHighLevelAction(self.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": True} ))
+                    last_task_type = task_type
+                else:
+                    print(f"Invalid task selection: {task_selection_command}")
                 print("Ready for next user command.")
             except queue.Empty:
-                continue
+                if self.web_interface.current_page != "task_selection":
+                    self.web_interface.ready_for_task_selection(last_task_type=last_task_type)
+                else:
+                    # Wait for user command
+                    print("Current web interface page:", self.web_interface.current_page)
+                    time.sleep(0.1) 
+                    continue
 
     def signal_handler(self, signal, frame):
         self.active = False
         print("\nprogram exiting gracefully")
         sys.exit(0)
-
-    def parse_interface_msg(self, msg_dict: dict[str, Any]) -> None:
-        """Pass high level action message from the web interface."""
-        if msg_dict["status"] == "transparency":
-            answer = self.transparency_query.answer_query(msg_dict["request"])
-            self.web_interface.send_web_interface_text(answer)
-            return 
-        elif msg_dict["status"] == "adaptability":
-            self.process_user_update_request(msg_dict["request"])
-            self.web_interface.send_web_interface_text("Adaptability request processed.")
-            return
-        elif msg_dict["status"] == "finish_feeding":
-            user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["Reset"], ()
-            )
-        elif msg_dict["status"] == "drink_pickup":
-            user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["PickTool"], (self.drink,)
-            )
-        elif msg_dict["status"] == "drink_transfer":
-            user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["TransferTool"], (self.drink,)
-            )
-        elif msg_dict["status"] == "move_to_above_plate" \
-            or (msg_dict["status"] == "return_to_main" and msg_dict["state"] == "post_bite_pickup") \
-            or (msg_dict["status"] == "return_to_main" and msg_dict["state"] == "post_bite_transfer") \
-            or (msg_dict["status"] == "return_to_main" and msg_dict["state"] == "post_drink_transfer") \
-            or (msg_dict["status"] == "back" and msg_dict["state"] == "bite_selection"): 
-            user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["LookAtPlateWhileHolding"], (self.utensil,)
-            )
-        elif msg_dict["status"] == "aquire_food" or msg_dict["status"] == 0: # manual acquire food
-            user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["AcquireBiteWithTool"], (self.utensil,), params=msg_dict
-            )
-        elif msg_dict["status"] == "bite_transfer":
-            user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["TransferTool"], (self.utensil,)
-            )
-        elif msg_dict["status"] == "mouth_wiping" and msg_dict["state"] == "bite_selection":
-            user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["PickTool"], (self.wipe,)
-            )
-        elif msg_dict["status"] == "move_to_wiping_position" and msg_dict["state"] == "prepared_mouth_wiping":
-            user_cmd = GroundHighLevelAction(
-                self.hla_name_to_hla["TransferTool"], (self.wipe,)
-            )
-        else:
-            print("WARNING: Unrecognized high level action message from web interface.")
-            return
-        self.process_user_command(user_cmd)
 
     def process_user_command(
         self, user_command: GroundHighLevelAction | set[GroundAtom]
@@ -373,11 +376,13 @@ class _Runner:
                 available_hla_object_name = f"hla_name={hla_name}, hla_object_names=({objects_str},)"
                 available_hla_object_names.append(available_hla_object_name)
         requested_updates = interpret_user_update_request(request_text, self.llm, available_hla_object_names, self.run_behavior_tree_dir)
+        if len(requested_updates) == 0:
+            raise ValueError("No valid updates requested.")
         for update in requested_updates:
             assert isinstance(update, UserUpdateRequest)
             if update.hla_name not in self.hla_name_to_hla:
                 print(f"BT UPDATE FAILED: Unknown HLA name {update.hla_name}")
-                continue
+                raise ValueError(f"BT UPDATE FAILED: Unknown HLA name {update.hla_name}")
             hla = self.hla_name_to_hla[update.hla_name]
             hla_object_list = []
             failed_object_name = None
@@ -388,7 +393,7 @@ class _Runner:
                 hla_object_list.append(self.object_name_to_object[obj_name])
             if failed_object_name is not None:
                 print(f"BT UPDATE FAILED: Unknown object name {failed_object_name}")
-                continue
+                raise ValueError(f"BT UPDATE FAILED: Unknown object name {failed_object_name}")
             ground_hla = GroundHighLevelAction(hla, tuple(hla_object_list))            
             if isinstance(update, NodeModificationUserUpdateRequest):
                 ground_hla.process_behavior_tree_parameter_update(update.node_name, update.parameter_name, update.new_value)
@@ -396,6 +401,7 @@ class _Runner:
                 ground_hla.process_behavior_tree_node_addition(update.new_node_type, update.new_node_parameters,
                                                                update.anchor_node_name, update.before_or_after)
             else:
+                print("Not implemented")
                 raise NotImplementedError
             
     def register_gesture_detector(self, gesture_fn_name: str, gesture_fn_text: str) -> bool:

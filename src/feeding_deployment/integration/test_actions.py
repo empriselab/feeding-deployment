@@ -29,7 +29,7 @@ from pybullet_helpers.link import get_link_pose, get_relative_link_pose
 
 from feeding_deployment.actions.base import tool_type
 from feeding_deployment.actions.transfer_tool import TransferToolHLA
-from feeding_deployment.actions.acquisition import LookAtPlateHLA, AcquireBiteHLA
+from feeding_deployment.actions.acquisition import AcquireBiteHLA
 from feeding_deployment.interfaces.perception_interface import PerceptionInterface
 from feeding_deployment.interfaces.web_interface import WebInterface
 from feeding_deployment.interfaces.rviz_interface import RVizInterface
@@ -71,27 +71,6 @@ def test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_
         sim.robot.robot_id, finger_frame_id, end_effector_link_id, sim.physics_client_id
     )
     sim.held_object_tf = utensil_from_end_effector
-
-    if robot_interface is not None:
-        rviz_interface.tool_update(True, sim.held_object_name, Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the tool in rviz
-
-    high_level_action.execute_action(objects=[utensil], params={})
-
-def test_LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, no_waits):
-
-    high_level_action = LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, no_waits, log_path=None)
-    utensil = Object("utensil", tool_type)
-
-    sim.held_object_name = "utensil"
-    sim.held_object_id = sim.utensil_id
-    sim.robot.set_finger_state(sim.scene_description.tool_grasp_fingers_value)
-    finger_frame_id = sim.robot.link_from_name("finger_tip")
-    end_effector_link_id = sim.robot.link_from_name(sim.robot.tool_link_name)
-    utensil_from_end_effector = get_relative_link_pose(
-        sim.robot.robot_id, finger_frame_id, end_effector_link_id, sim.physics_client_id
-    )
-    sim.held_object_tf = utensil_from_end_effector
-    print(f"utensil_from_end_effector: {utensil_from_end_effector}")
 
     if robot_interface is not None:
         rviz_interface.tool_update(True, sim.held_object_name, Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the tool in rviz
@@ -178,7 +157,6 @@ def _main(
     for original_bt_filename in original_behavior_tree_dir.glob("*.yaml"):
         shutil.copy(original_bt_filename, run_behavior_tree_dir)
 
-    # test_LookAtPlateHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, tool, no_waits)
     # test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, tool, no_waits)
     # for i in range(25):
     test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, run_behavior_tree_dir, no_waits, log_path=None)

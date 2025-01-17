@@ -91,10 +91,6 @@ class PickToolHLA(HighLevelAction):
 
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
-        # Send message to web interface.
-        if self.web_interface is not None:
-            self.web_interface.send_web_interface_message({"state": "drink_pickup", "status": "completed"})
-
     def pick_wipe(self) -> None:
         assert self.sim.held_object_name is None
 
@@ -115,7 +111,3 @@ class PickToolHLA(HighLevelAction):
             self.move_to_joint_positions(self.sim.scene_description.wipe_neutral_pos)
         self.move_to_joint_positions(self.sim.scene_description.retract_pos)
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
-
-        # Send message to web interface.
-        if self.web_interface is not None:
-            self.web_interface.send_web_interface_message({"state": "prepare_mouth_wiping", "status": "completed"})
