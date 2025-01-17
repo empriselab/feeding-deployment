@@ -265,8 +265,8 @@ class _Runner:
                         gesture_task_type = self.web_interface.get_gesture_type()
                         print(f"Gesture task type: {gesture_task_type}")
                         if gesture_task_type == "add":
-                            gesture_description = self.web_interface.get_new_gesture_description()
-                            self.process_user_command(GroundHighLevelAction(self.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": False, "gesture_description": gesture_description} ))
+                            gesture_label, gesture_description = self.web_interface.get_new_gesture_details()
+                            self.process_user_command(GroundHighLevelAction(self.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": False, "gesture_label":gesture_label, "gesture_description": gesture_description} ))
                         else: # test
                             self.process_user_command(GroundHighLevelAction(self.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": True} ))
                     last_task_type = task_type

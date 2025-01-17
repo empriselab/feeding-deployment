@@ -62,9 +62,6 @@ class WebInterface:
     def _send_message(self, msg_dict: dict[str, Any]) -> None:
         self.web_interface_publisher.publish(String(json.dumps(msg_dict)))
 
-    def _send_text(self, text: str) -> None:
-        self.web_interface_publisher.publish(String(text))
-
     def _send_image(self, image) -> None:
         self.web_interface_image_publisher.publish(self.image_bridge.cv2_to_compressed_imgmsg(image))
 
@@ -192,7 +189,7 @@ class WebInterface:
         bite_ordering_preference = msg_dict["status"]
         return bite_ordering_preference
     
-    def get_next_bite_selection(self, plate_image, n_food_types, data, predicted_bite) -> None:
+    def get_next_bite_selection(self, plate_image, n_food_types, data, predicted_bite, autocontinue_time=10) -> None:
 
         self.current_page = "meal_assistance"
 
@@ -206,6 +203,9 @@ class WebInterface:
             self._send_image(plate_image)
             time.sleep(0.1)
             self._send_message({"n_food_types": n_food_types, "data": data, "current_bite": predicted_bite})  
+            # set autocontinue time
+            time.sleep(0.1)
+            self._send_message({"state": "auto_time", "status": str(autocontinue_time)})
 
             # Get the user's next bite selection
             msg_dict = self.get_required_web_interface_message(
@@ -269,7 +269,8 @@ class WebInterface:
         with self.explanation_lock:
 
             # jump to ready for wipe transfer page
-            self._send_message({"state": "wippingtrans", "status": "jump"})
+            print("Jumping to mouth wiping transfer page")
+            self._send_message({"state": "wipingtrans", "status": "jump"})
 
             # Wait until the user confirms that the wipe has been transferred
             self.get_required_web_interface_message(
@@ -305,8 +306,7 @@ class WebInterface:
     
     def update_transparency_response(self, response: str) -> None:
         assert self.current_page == "transparency", "Cannot update transparency response when not on the transparency page."
-
-        self._send_text(response)
+        self._send_message({"state": "transparency_response", "status": response})
 
     #### Adaptability Pages ####
     
@@ -336,8 +336,7 @@ class WebInterface:
     
     def update_adaptability_response(self, response: str) -> None:
         assert self.current_page == "adaptability", "Cannot update adaptability response when not on the adaptability page."
-
-        self._send_text(response)
+        self._send_message({"state": "adaptability_response", "status": response})
 
     #### Gesture Pages ####
 
@@ -354,19 +353,15 @@ class WebInterface:
 
         return msg_dict["status"]
     
-    def get_new_gesture_description(self) -> None:
-        """Get the gesture description from the user."""
+    def get_new_gesture_details(self) -> None:
+        """Get the gesture label and description from the user."""
 
         self.current_page = "record_gesture"
 
-        # data: "{\"state\":\"voice\",\"status\":\"Not so random\"}"
-        msg_dict = self.get_required_web_interface_message(
-            lambda msg_dict: (
-                (msg_dict["state"] == "voice")
-            )
-        )
+        # get first message from web interface (condition is always true)
+        msg_dict = self.get_required_web_interface_message(lambda msg_dict: True)
 
-        return msg_dict["status"]
+        return msg_dict["state"], msg_dict["status"]
     
     def jump_to_test_gesture_page(self, available_gestures: list[str]) -> None:
         """Send available gestures to the web interface."""
@@ -456,24 +451,31 @@ class WebInterface:
 
             if msg_dict["status"] == "start":
                 start_timestamp = time.time()
+                # rostopic pub -1 /ServerComm std_msgs/String "{data: '{\"state\": \"gesture_response\", \"status\": \"This is a robot message\"}'}"
+                self._send_message({"state": "gesture_response", "status": f"Started recording gesture example: {len(timestamps) + 1}"})
                 print("Started recording gesture example: ", len(timestamps) + 1)
             elif msg_dict["status"] == "stop":
                 end_timestamp = time.time()
                 if start_timestamp is not None:
+                    self._send_message({"state": "gesture_response", "status": f"Recorded gesture example: {len(timestamps) + 1}"})
                     print("Recorded gesture example: ", len(timestamps) + 1)
                     timestamps.append((start_timestamp, end_timestamp))
                 else:
+                    self._send_message({"state": "gesture_response", "status": "Invalid example: received stop before start. Please click on start, then demonstrate the gesture, and then click on stop."})
                     print("Invalid example: received stop before start. Please click on start, then demonstrate the gesture, and then click on stop.")
                 start_timestamp, end_timestamp = None, None
             elif msg_dict["status"] == "delete":
                 if start_timestamp is None:
                     if len(timestamps) > 0:
-                        print("Deleted gesture example: ", len(timestamps) + 1)
+                        self._send_message({"state": "gesture_response", "status": f"Deleted gesture example: {len(timestamps)}. {len(timestamps)-1} examples remain in recording history"})
+                        print("Deleted gesture example: ", len(timestamps))
                         timestamps.pop()
                         print(f"{len(timestamps)} examples remain in recording history")
                     else:
+                        self._send_message({"state": "gesture_response", "status": "No examples to delete"})
                         print("No examples to delete")
                 else:
+                    self._send_message({"state": "gesture_response", "status": "Cannot delete while recording. Please click on stop and then click on delete."})
                     print("Cannot delete while recording. Please click on stop and then click on delete.")
             elif msg_dict["status"] == "next" or msg_dict["status"] == "back":
                 break
