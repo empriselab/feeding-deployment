@@ -1,18 +1,18 @@
 import time
 import numpy as np
 
-def mouth_open_detector(perception_interface, timeout):
+def mouth_open_detector(perception_interface, termination_event, timeout):
     """ Detect mouth open """
     threshold = 0.45
 
-    def gesture_detector(perception_interface, threshold, timeout):
+    def gesture_detector(perception_interface, termination_event, timeout, threshold):
 
         def euclidean_distance(p1, p2):
             """Calculate Euclidean distance between two points."""
             return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5
 
         start_time = time.time()
-        while time.time() - start_time < timeout:
+        while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
             head_perception_data = perception_interface.get_head_perception_data()
             if head_perception_data is None:
                 continue
@@ -36,20 +36,20 @@ def mouth_open_detector(perception_interface, timeout):
     
         return False
 
-    return gesture_detector(perception_interface, threshold, timeout)
+    return gesture_detector(perception_interface, termination_event, timeout, threshold)
 
-def head_shake_detector(perception_interface, timeout):
+def head_shake_detector(perception_interface, termination_event, timeout):
     """ Detect head shake """
     threshold = 2.0
 
-    def gesture_detector(perception_interface, threshold, timeout):
+    def gesture_detector(perception_interface, termination_event, timeout, threshold):
 
         start_time = time.time()
         yaw_data = []
         direction_changes = 0  # Counts the number of left-right or right-left changes
         
 
-        while time.time() - start_time < timeout:
+        while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
             head_perception_data = perception_interface.get_head_perception_data()
             if head_perception_data is None:
                 continue
@@ -77,21 +77,21 @@ def head_shake_detector(perception_interface, timeout):
         # If timeout expires without detecting the gesture, return False
         return False
     
-    return gesture_detector(perception_interface, threshold, timeout)
+    return gesture_detector(perception_interface, termination_event, timeout, threshold)
 
-def head_still_detector(perception_interface, timeout):
+def head_still_detector(perception_interface, termination_event, timeout):
     """ Detect head still for 5 seconds """
 
     distance_threshold = 0.02
     angle_threshold = 5.0
 
     # Rajat ToDo: Add support for multiple thresholds to synthesizer
-    def gesture_detector(perception_interface, distance_threshold, angle_threshold, timeout):
+    def gesture_detector(perception_interface, termination_event, timeout, distance_threshold, angle_threshold):
         start_time = time.time()
         last_head_pose = None
         head_still_start_time = time.time()
 
-        while time.time() - start_time < timeout:
+        while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
             head_perception_data = perception_interface.get_head_perception_data()
             if head_perception_data is None:
                 continue
@@ -109,4 +109,4 @@ def head_still_detector(perception_interface, timeout):
                 return True
         return False
     
-    return gesture_detector(perception_interface, distance_threshold, angle_threshold, timeout)
+    return gesture_detector(perception_interface, termination_event, timeout, distance_threshold, angle_threshold)

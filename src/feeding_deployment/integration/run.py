@@ -223,6 +223,7 @@ class _Runner:
 
         assert self.web_interface is not None, "Run takes user commands from the web interface which is None."
         
+        last_task_type = None
         while self.active:
             try:
                 task_selection_command = self.task_selection_queue.get(timeout=1)
@@ -234,10 +235,11 @@ class _Runner:
                         self.process_user_command(GroundHighLevelAction(self.hla_name_to_hla["TransferTool"], (self.drink,)))
                     elif task_type == "wipe":
                         self.process_user_command(GroundHighLevelAction(self.hla_name_to_hla["TransferTool"], (self.wipe,)))
+                    last_task_type = task_type
                 elif task == "personalization":
                     if task_type == "transparency":
                         while self.active:
-                            query = self.web_interface.get_transparency_query()
+                            query = self.web_interface.get_transparency_request()
                             if query:
                                 response = self.transparency_query.answer_query(query)
                                 self.web_interface.update_transparency_response(response)
@@ -247,15 +249,32 @@ class _Runner:
                         while self.active:
                             adaptation_request = self.web_interface.get_adaptability_request()
                             if adaptation_request:
-                                self.process_user_update_request(adaptation_request)
+                                try:
+                                    print("Processing user update request:", adaptation_request)
+                                    self.process_user_update_request(adaptation_request)
+                                    print('Processed user update request.')
+                                    self.web_interface.update_adaptability_response("Adaptation successful.")
+                                except Exception as e:
+                                    print(f"Adaptation failed: {e}")
+                                    self.web_interface.update_adaptability_response(f"Adaptation failed: {str(e)}")
                             else:
                                 break
+                    elif task_type == "gesture":
+                        print("Triggered gesture")
+                        gesture_task_type = self.web_interface.get_gesture_type()
+                        print(f"Gesture task type: {gesture_task_type}")
+                        if gesture_task_type == "add":
+                            gesture_description = self.web_interface.get_new_gesture_description()
+                            self.process_user_command(GroundHighLevelAction(self.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": False, "gesture_description": gesture_description} ))
+                        else: # test
+                            self.process_user_command(GroundHighLevelAction(self.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": True} ))
+                    last_task_type = task_type
                 else:
                     print(f"Invalid task selection: {task_selection_command}")
                 print("Ready for next user command.")
             except queue.Empty:
                 if self.web_interface.current_page != "task_selection":
-                    self.web_interface.ready_for_task_selection()
+                    self.web_interface.ready_for_task_selection(last_task_type=last_task_type)
                 else:
                     # Wait for user command
                     print("Current web interface page:", self.web_interface.current_page)
@@ -356,11 +375,13 @@ class _Runner:
                 available_hla_object_name = f"hla_name={hla_name}, hla_object_names=({objects_str},)"
                 available_hla_object_names.append(available_hla_object_name)
         requested_updates = interpret_user_update_request(request_text, self.llm, available_hla_object_names, self.run_behavior_tree_dir)
+        if len(requested_updates) == 0:
+            raise ValueError("No valid updates requested.")
         for update in requested_updates:
             assert isinstance(update, UserUpdateRequest)
             if update.hla_name not in self.hla_name_to_hla:
                 print(f"BT UPDATE FAILED: Unknown HLA name {update.hla_name}")
-                continue
+                raise ValueError(f"BT UPDATE FAILED: Unknown HLA name {update.hla_name}")
             hla = self.hla_name_to_hla[update.hla_name]
             hla_object_list = []
             failed_object_name = None
@@ -371,7 +392,7 @@ class _Runner:
                 hla_object_list.append(self.object_name_to_object[obj_name])
             if failed_object_name is not None:
                 print(f"BT UPDATE FAILED: Unknown object name {failed_object_name}")
-                continue
+                raise ValueError(f"BT UPDATE FAILED: Unknown object name {failed_object_name}")
             ground_hla = GroundHighLevelAction(hla, tuple(hla_object_list))            
             if isinstance(update, NodeModificationUserUpdateRequest):
                 ground_hla.process_behavior_tree_parameter_update(update.node_name, update.parameter_name, update.new_value)
@@ -379,6 +400,7 @@ class _Runner:
                 ground_hla.process_behavior_tree_node_addition(update.new_node_type, update.new_node_parameters,
                                                                update.anchor_node_name, update.before_or_after)
             else:
+                print("Not implemented")
                 raise NotImplementedError
             
     def register_gesture_detector(self, gesture_fn_name: str, gesture_fn_text: str) -> bool:

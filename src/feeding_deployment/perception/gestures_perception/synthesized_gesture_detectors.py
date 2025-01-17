@@ -1,23 +1,24 @@
 import time
 import numpy as np
 
-def eyebrows_raised(perception_interface, timeout):
+def eyebrows_raised(perception_interface, termination_event, timeout):
     """eyebrows raised"""
     threshold = 0.0
 
-    def gesture_detector(perception_interface, threshold, timeout):
+    def gesture_detector(perception_interface, termination_event, timeout, threshold):
 
         def euclidean_distance(p1, p2):
             """Calculate Euclidean distance between two points."""
             return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5
 
         start_time = time.time()
-        while time.time() - start_time < timeout:
+        while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
             head_perception_data = perception_interface.get_head_perception_data()
             if head_perception_data is None:
                 continue
             else:
                 time.sleep(0.1) # Maintain 10 Hz rate
+            print("Running eyebrows raised detector")
             face_keypoints = head_perception_data["face_keypoints"]
         
             # Indices for eyebrow and eye landmarks
@@ -35,24 +36,25 @@ def eyebrows_raised(perception_interface, timeout):
     
         return False
 
-    return gesture_detector(perception_interface, timeout, threshold)
+    return gesture_detector(perception_interface, termination_event, timeout, threshold)
 
-def head_nod(perception_interface, timeout):
+def head_nod(perception_interface, termination_event, timeout):
     """up-down head nod"""
     threshold = 0.6000000000000001
 
-    def gesture_detector(perception_interface, threshold, timeout):
+    def gesture_detector(perception_interface, termination_event, timeout, threshold):
 
         start_time = time.time()
         pitch_data = []
         direction_changes = 0  # Counts the number of up-down or down-up changes
 
-        while time.time() - start_time < timeout:
+        while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
             head_perception_data = perception_interface.get_head_perception_data()
             if head_perception_data is None:
                 continue
             else:
                 time.sleep(0.1) # Maintain 10 Hz rate
+            print("Running head nod detector")
             head_pose = head_perception_data["head_pose"]
 
             (head_x, head_y, head_z, head_roll, head_pitch, head_yaw) = head_pose
@@ -75,18 +77,18 @@ def head_nod(perception_interface, timeout):
         # If timeout expires without detecting the gesture, return False
         return False
 
-    return gesture_detector(perception_interface, timeout, threshold)
+    return gesture_detector(perception_interface, termination_event, timeout, threshold)
 
-def head_still_atleast_three_secs(perception_interface, timeout):
+def head_still_atleast_three_secs(perception_interface, timeout, termination_event = None):
     """head is still for atleast three seconds"""
     threshold = 0.0
 
-    def gesture_detector(perception_interface, threshold, timeout):
+    def gesture_detector(perception_interface, termination_event, timeout, threshold):
 
         start_time = time.time()
         still_start_time = None
 
-        while time.time() - start_time < timeout:
+        while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
             head_perception_data = perception_interface.get_head_perception_data()
             if head_perception_data is None:
                 continue
@@ -108,18 +110,18 @@ def head_still_atleast_three_secs(perception_interface, timeout):
 
         return False
 
-    return gesture_detector(perception_interface, timeout, threshold)
+    return gesture_detector(perception_interface, termination_event, timeout, threshold)
 
-def look_at_robot_atleast_three_secs(perception_interface, timeout):
+def look_at_robot_atleast_three_secs(perception_interface, termination_event, timeout):
     """looking at robot with head still for atleast three seconds"""
     threshold = 0.0
 
-    def gesture_detector(perception_interface, threshold, timeout):
+    def gesture_detector(perception_interface, termination_event, timeout, threshold):
 
         start_time = time.time()
         still_start_time = None
 
-        while time.time() - start_time < timeout:
+        while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
             head_perception_data = perception_interface.get_head_perception_data()
             if head_perception_data is None:
                 continue
@@ -140,13 +142,13 @@ def look_at_robot_atleast_three_secs(perception_interface, timeout):
 
         return False
 
-    return gesture_detector(perception_interface, timeout, threshold)
+    return gesture_detector(perception_interface, termination_event, timeout, threshold)
 
-def talking(perception_interface, timeout):
+def talking(perception_interface, termination_event, timeout):
     """talking"""
     threshold = 0.30000000000000004
 
-    def gesture_detector(perception_interface, threshold, timeout):
+    def gesture_detector(perception_interface, termination_event, timeout, threshold):
 
         def euclidean_distance(p1, p2):
             """Calculate Euclidean distance between two points."""
@@ -155,7 +157,7 @@ def talking(perception_interface, timeout):
         start_time = time.time()
         mouth_open_frames = 0
 
-        while time.time() - start_time < timeout:
+        while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
             head_perception_data = perception_interface.get_head_perception_data()
             if head_perception_data is None:
                 continue
@@ -185,4 +187,4 @@ def talking(perception_interface, timeout):
     
         return False
 
-    return gesture_detector(perception_interface, timeout, threshold)
+    return gesture_detector(perception_interface, termination_event, timeout, threshold)

@@ -14,14 +14,10 @@ class MockPerceptionInterface:
     """
     Simulate the perception interface for the robot with get_head_perception_data method
     """
-    def __init__(self, data_path):
+    def __init__(self, head_perception_data):
 
-        # load data from pickle file data_path
-        with open(data_path, 'rb') as f:
-            data = pickle.load(f)
-
-        self.face_keypoints = data['face_keypoints']
-        self.head_pose = data['head_poses']
+        self.face_keypoints = head_perception_data['face_keypoints']
+        self.head_pose = head_perception_data['head_poses']
         self.current_frame = 0
         self.max_frame = len(self.face_keypoints)
 
@@ -44,22 +40,31 @@ class PersonalizedGestureDetectorSynthesizer:
             cache_dir=log_dir / "llm_cache",
         )
 
-        with open('prompt.txt', 'r') as f:
+        with open(Path(__file__).parent / "prompt.txt", 'r') as f:
             self.prompt_skeleton = f.read()
+
+    def _load_from_data_path(self, gesture_datapath: Path):
+        self.label = gesture_datapath.name
+        with open(gesture_datapath, 'rb') as f:
+            gesture_data = pickle.load(f)
+        self.language_description = gesture_data['description']
+        self.positive_examples = gesture_data['positive_examples']
+        self.negative_examples = gesture_data['negative_examples']
     
-    def generate_function(self, label, language_description, examples_data_path):
-        prompt = self.prompt_skeleton%(language_description)
+    def generate_function(self, gesture_datapath: Path):
+        # label, language_description, examples_data_path
+        # label is the name of the datapath (last part of the datapath.pkl
+        self._load_from_data_path(gesture_datapath)
+        prompt = self.prompt_skeleton%(self.language_description)
         response = self.llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
         function_code = response.strip("```python").strip("```")
         try:
             exec(function_code, globals())  # Executes code in the global namespace
 
-            # Assumes that the data is stored in gesture_data/{label}/
-            self.examples_data_path = examples_data_path
             threshold, accuracy = self.search_threshold(gesture_detector)
             print("Best Threshold: ", threshold)
             print("Best Accuracy: ", accuracy)
-            with open(f"gesture_data/{label}/results/response.txt", "a") as f:
+            with open(f"gesture_data/{self.label}/results/response.txt", "a") as f:
                 f.write(f"\nBest Threshold: {threshold}\nBest Accuracy: {accuracy}")
             
             # Code snippet to replace
@@ -79,8 +84,8 @@ class PersonalizedGestureDetectorSynthesizer:
 """
             updated_function_code = function_code.replace(old_snippet.strip(), new_snippet.strip())  
             function_code_with_threshold = f"""
-def {label}(perception_interface, timeout):
-    \"\"\"{language_description}\"\"\"
+def {self.label}(perception_interface, timeout):
+    \"\"\"{self.language_description}\"\"\"
     threshold = {threshold}
 {textwrap.indent(updated_function_code, "    ")}
     return gesture_detector(perception_interface, timeout, threshold)
@@ -88,18 +93,18 @@ def {label}(perception_interface, timeout):
             return function_code_with_threshold
         except Exception as e:
             print("Error: ", e)
-            with open(f"gesture_data/{label}/results/response.txt", "a") as f:
+            with open(f"gesture_data/{self.label}/results/response.txt", "a") as f:
                 f.write(f"\nError: {e}")
             return None
     
     def test_in_context_examples(self):
-        self.examples_data_path = "gesture_data/shake_my_head_from_left_to_right"
+        self._load_from_data_path(Path(__file__).parent / "gestures_examples" / "shake_my_head_from_left_to_right.pkl")
         threshold1, accuracy1 = self.search_threshold(in_context_example1)
         print("In-Context Example 1")
         print("Best Threshold: ", threshold1)
         print("Best Accuracy: ", accuracy1)
 
-        self.examples_data_path = "gesture_data/open_mouth"
+        self._load_from_data_path(Path(__file__).parent / "gestures_examples" / "open_mouth.pkl")
         threshold2, accuracy2 = self.search_threshold(in_context_example2)
         print("In-Context Example 2")
         print("Best Threshold: ", threshold2)
@@ -110,18 +115,18 @@ def {label}(perception_interface, timeout):
         Run the gesture detector on examples in self.examples_data_path
         """
         positive_correct = 0
-        for i in range(5):
-            perception_interface = MockPerceptionInterface(self.examples_data_path + f'/positive_examples/{i}_parsed.pkl')
+        for positive_example in self.positive_examples:
+            perception_interface = MockPerceptionInterface(head_perception_data=positive_example)
             if gesture_detector(perception_interface, **kwargs):
                 positive_correct += 1
         
         negative_correct = 0
-        for i in range(5):
-            perception_interface = MockPerceptionInterface(self.examples_data_path + f'/negative_examples/{i}_parsed.pkl')
+        for negative_example in self.negative_examples:
+            perception_interface = MockPerceptionInterface(head_perception_data=negative_example)
             if not gesture_detector(perception_interface, **kwargs):
                 negative_correct += 1
         
-        return positive_correct/5.0, negative_correct/5.0
+        return positive_correct/len(self.positive_examples), negative_correct/len(self.negative_examples)
     
     def search_threshold(self, gesture_detector, timeout=20.0, threshold_range=(0.0, 1.0), step=0.1):
         """
@@ -140,30 +145,21 @@ def {label}(perception_interface, timeout):
         
         return best_threshold, best_accuracy
 
-
 def main():
 
     synthesizer = PersonalizedGestureDetectorSynthesizer()
     synthesizer.test_in_context_examples()
 
-    gestures = {
-        "blinking": "eyes blinking",
-        "eyebrows_raised": "eyebrows raised",
-        "head_nod": "up-down head nod",
-        "head_still_atleast_three_secs": "head is still for atleast three seconds",
-        "look_at_robot_atleast_three_secs": "looking at robot with head still for atleast three seconds",
-        "talking": "talking",
-    }
+    # gestures = ["blinking", "eyebrows_raised", "head_nod", "head_still_atleast_three_secs", "look_at_robot_atleast_three_secs", "talking"]
 
-    for gesture, language_description in gestures.items():
+    # for gesture in gestures:
+        
+    #     gesture_datapath = f"gestures_examples/{gesture}.pkl"
 
-        if not os.path.exists(f"gesture_data/{gesture}/results"):
-            os.makedirs(f"gesture_data/{gesture}/results")
-        examples_data_path = f"gesture_data/{gesture}"
-        generated_function = synthesizer.generate_function(gesture, language_description, examples_data_path)
-        if generated_function is not None:
-            with open("synthesized_gesture_detectors.py", "a") as f:
-                f.write(generated_function)
+    #     generated_function = synthesizer.generate_function(gesture_datapath)
+    #     # if generated_function is not None:
+    #     #     with open("synthesized_gesture_detectors.py", "a") as f:
+    #     #         f.write(generated_function)
 
 if __name__ == '__main__':
     main()
