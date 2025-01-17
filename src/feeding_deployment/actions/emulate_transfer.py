@@ -57,7 +57,7 @@ class EmulateTransferHLA(HighLevelAction):
         if self.initiate_transfer_interaction == "button":
             self.perception_interface.detect_button_press()
         elif self.initiate_transfer_interaction == "open_mouth":
-            static_gesture_detectors.mouth_open_detector(self.perception_interface, timeout=600) # 10 minutes
+            static_gesture_detectors.mouth_open_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
         elif self.initiate_transfer_interaction == "auto_timeout":
             time.sleep(5.0)
         print("Initiating transfer")
@@ -93,7 +93,7 @@ class EmulateTransferHLA(HighLevelAction):
 
     def emulate_transfer(self):
 
-        # self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
+        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
         self.perception_interface.set_head_perception_tool("fork")
         self.perception_interface.start_head_perception_thread()
@@ -108,8 +108,8 @@ class EmulateTransferHLA(HighLevelAction):
             self.relay_ready_to_initiate_transfer()
             self.detect_initiate_transfer()
 
-        # self.transfer.set_tool("fork")
-        # self.transfer.move_to_transfer_state()
+        self.transfer.set_tool("fork")
+        self.transfer.move_to_transfer_state()
 
         if self.robot_interface is not None:
             self.relay_ready_for_gestures()
@@ -177,10 +177,10 @@ class EmulateTransferHLA(HighLevelAction):
                         }, f)
 
                     input("Press enter to synthesize detector function")
-                    # generated_function = self.detector_synthesizer.generate_function(gesture_datapath)
+                    generated_function = self.detector_synthesizer.generate_function(gesture_datapath)
                     # Hack to test the synthesizer
-                    hack_datapath = Path(__file__).parent.parent / "perception" / "gestures_perception" / "gestures_examples" / "open_mouth.pkl"
-                    generated_function = self.detector_synthesizer.generate_function(hack_datapath)
+                    # hack_datapath = Path(__file__).parent.parent / "perception" / "gestures_perception" / "gestures_examples" / "open_mouth.pkl"
+                    # generated_function = self.detector_synthesizer.generate_function(hack_datapath)
                     if generated_function is not None:
                         with open(self.synthesized_detectors_path, "a") as f:
                             f.write(generated_function)
@@ -197,7 +197,7 @@ class EmulateTransferHLA(HighLevelAction):
         # shutdown the head perception thread
         self.perception_interface.stop_head_perception_thread()
 
-        # self.transfer.move_to_before_transfer_state()        
+        self.transfer.move_to_before_transfer_state()        
 
     def get_name(self) -> str:
         return "EmulateTransfer"

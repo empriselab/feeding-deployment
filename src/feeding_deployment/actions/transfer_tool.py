@@ -62,7 +62,7 @@ class TransferToolHLA(HighLevelAction):
         if initiate_transfer_interaction == "button":
             self.perception_interface.detect_button_press()
         elif initiate_transfer_interaction == "open_mouth":
-            mouth_open_detector(self.perception_interface, timeout=600) # 10 minutes
+            mouth_open_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
         elif initiate_transfer_interaction == "auto_timeout":
             time.sleep(5.0)
         else:

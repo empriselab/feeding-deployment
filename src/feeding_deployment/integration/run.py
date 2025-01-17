@@ -227,6 +227,7 @@ class _Runner:
         while self.active:
             try:
                 task_selection_command = self.task_selection_queue.get(timeout=1)
+                self.web_interface.clear_received_messages() # So that only the latest message is processed
                 task, task_type = task_selection_command["task"], task_selection_command["type"]
                 if task == "meal_assistance":
                     if task_type == "bite":

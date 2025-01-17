@@ -124,6 +124,10 @@ class WebInterface:
         else:
             self.received_web_interface_messages.put(msg_dict)
 
+    def clear_received_messages(self) -> None:
+        while not self.received_web_interface_messages.empty():
+            self.received_web_interface_messages.get()
+
     def ready_for_task_selection(self, last_task_type = None, autocontinue_timeout = 5) -> None:
         """Moves the web interface to the task selection page."""
 

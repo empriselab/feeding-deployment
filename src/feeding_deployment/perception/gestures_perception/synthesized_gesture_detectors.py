@@ -249,3 +249,61 @@ def talking(perception_interface, termination_event, timeout):
         return False
 
     return gesture_detector(perception_interface, termination_event, timeout, threshold)
+
+def three_eye_blinks(perception_interface, termination_event, timeout):
+    """three_eye_blinks"""
+    threshold = 0.2
+
+    def gesture_detector(perception_interface, termination_event, timeout, threshold):
+
+        def euclidean_distance(p1, p2):
+            """Calculate Euclidean distance between two points."""
+            return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5
+
+        start_time = time.time()
+        blink_count = 0
+        eye_aspect_ratio_threshold = threshold
+
+        while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
+            head_perception_data = perception_interface.get_head_perception_data()
+            if head_perception_data is None:
+                continue
+            else:
+                time.sleep(0.1) # Maintain 10 Hz rate
+            face_keypoints = head_perception_data["face_keypoints"]
+        
+            # Indices for eye landmarks
+            left_eye_points = face_keypoints[36:42]
+            right_eye_points = face_keypoints[42:48]
+        
+            # Calculate Eye Aspect Ratio (EAR) for both eyes
+            def calculate_ear(eye_points):
+                A = euclidean_distance(eye_points[1], eye_points[5])  # Vertical distance
+                B = euclidean_distance(eye_points[2], eye_points[4])  # Vertical distance
+                C = euclidean_distance(eye_points[0], eye_points[3])  # Horizontal distance
+                ear = (A + B) / (2.0 * C)
+                return ear
+        
+            left_ear = calculate_ear(left_eye_points)
+            right_ear = calculate_ear(right_eye_points)
+        
+            # Check if both eyes are closed
+            if left_ear < eye_aspect_ratio_threshold and right_ear < eye_aspect_ratio_threshold:
+                blink_count += 1
+                # Wait for eyes to open again
+                while left_ear < eye_aspect_ratio_threshold and right_ear < eye_aspect_ratio_threshold:
+                    head_perception_data = perception_interface.get_head_perception_data()
+                    if head_perception_data is None:
+                        break
+                    face_keypoints = head_perception_data["face_keypoints"]
+                    left_eye_points = face_keypoints[36:42]
+                    right_eye_points = face_keypoints[42:48]
+                    left_ear = calculate_ear(left_eye_points)
+                    right_ear = calculate_ear(right_eye_points)
+        
+            if blink_count >= 3:
+                return True
+
+        return False
+
+    return gesture_detector(perception_interface, termination_event, timeout, threshold)
