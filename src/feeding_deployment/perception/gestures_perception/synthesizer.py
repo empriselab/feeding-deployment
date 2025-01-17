@@ -100,7 +100,7 @@ def {self.label}(perception_interface, termination_event, timeout):
             return None
     
     def test_in_context_examples(self):
-        self._load_from_data_path(Path(__file__).parent / "gestures_examples" / "shake_my_head_from_left_to_right.pkl")
+        self._load_from_data_path(Path(__file__).parent / "gestures_examples" / "open_mouth.pkl")
         threshold1, accuracy1 = self.search_threshold(in_context_example1)
         print("In-Context Example 1")
         print("Best Threshold: ", threshold1)
@@ -108,7 +108,7 @@ def {self.label}(perception_interface, termination_event, timeout):
 
         # /home/rkjenamani/sim_experiments/feeding-deployment/src/feeding_deployment/integration/log/gesture_examples/open_mouth.pkl
         # self._load_from_data_path(Path(__file__).parent.parent.parent / "integration" / "log" / "gesture_examples" / "open_mouth.pkl")
-        self._load_from_data_path(Path(__file__).parent / "gestures_examples" / "open_mouth.pkl")
+        self._load_from_data_path(Path(__file__).parent / "gestures_examples" / "head_nod.pkl")
         threshold2, accuracy2 = self.search_threshold(in_context_example2)
         print("In-Context Example 2")
         print("Best Threshold: ", threshold2)
@@ -152,16 +152,16 @@ def {self.label}(perception_interface, termination_event, timeout):
 def main():
 
     synthesizer = PersonalizedGestureDetectorSynthesizer()
-    # synthesizer.test_in_context_examples()
+    synthesizer.test_in_context_examples()
 
     gestures = [
-        "blinking",
+        # "blinking",
         # "eyebrows_raised",
         # "head_nod",
         # "head_still_atleast_three_secs",
         # "look_at_robot_atleast_three_secs",
         # "talking",
-        # "open_mouth",
+        "open_mouth",
     ]
 
     for gesture in gestures:
