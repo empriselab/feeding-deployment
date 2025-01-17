@@ -129,18 +129,18 @@ def {self.label}(perception_interface, termination_event, timeout):
     
     def test_in_context_examples(self):
         self._load_from_data_path(Path(__file__).parent / "gestures_examples" / "open_mouth.pkl")
-        threshold1, accuracy1 = self.search_threshold(in_context_example1)
+        positive_accuracy, negative_accuracy = self.run_detector(in_context_example1, termination_event=None, timeout=20, threshold=None)
         print("In-Context Example 1")
-        print("Best Threshold: ", threshold1)
-        print("Best Accuracy: ", accuracy1)
+        print("Best Positive Accuracy: ", positive_accuracy)
+        print("Best Negative Accuracy: ", negative_accuracy)
 
         # /home/rkjenamani/sim_experiments/feeding-deployment/src/feeding_deployment/integration/log/gesture_examples/open_mouth.pkl
         # self._load_from_data_path(Path(__file__).parent.parent.parent / "integration" / "log" / "gesture_examples" / "open_mouth.pkl")
         self._load_from_data_path(Path(__file__).parent / "gestures_examples" / "head_nod.pkl")
-        threshold2, accuracy2 = self.search_threshold(in_context_example2)
+        positive_accuracy, negative_accuracy = self.run_detector(in_context_example2, termination_event=None, timeout=20, threshold=None)
         print("In-Context Example 2")
-        print("Best Threshold: ", threshold2)
-        print("Best Accuracy: ", accuracy2)
+        print("Best Positive Accuracy: ", positive_accuracy)
+        print("Best Negative Accuracy: ", negative_accuracy)
     
     def run_detector(self, gesture_detector, **kwargs):
         """
