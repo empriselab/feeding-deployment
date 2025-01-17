@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 import textwrap
 import pickle
-from tomsutils.llm import OpenAILLM
+from tomsutils.llm import OpenAILLM, synthesize_python_function_with_llm
 
 from feeding_deployment.perception.gestures_perception.in_context_examples import in_context_example1, in_context_example2
 
@@ -43,6 +43,8 @@ class PersonalizedGestureDetectorSynthesizer:
         with open(Path(__file__).parent / "prompt.txt", 'r') as f:
             self.prompt_skeleton = f.read()
 
+        self.function_name = "gesture_detector"
+
     def _load_from_data_path(self, gesture_datapath: Path):
         self.label = gesture_datapath.stem
         with open(gesture_datapath, 'rb') as f:
@@ -50,14 +52,25 @@ class PersonalizedGestureDetectorSynthesizer:
         self.language_description = gesture_data['description']
         self.positive_examples = gesture_data['positive_examples']
         self.negative_examples = gesture_data['negative_examples']
+        timeout = 20.0
+        threshold = 0.5  # this will be optimized after the initial synthesis
+        self.input_output_examples = [
+            ((MockPerceptionInterface(head_perception_data=example), None, timeout, threshold), True)
+            for example in self.positive_examples 
+        ] + [
+            ((MockPerceptionInterface(head_perception_data=example), None, timeout, threshold), False)
+            for example in self.negative_examples 
+        ]
     
     def generate_function(self, gesture_datapath: Path):
         # label, language_description, examples_data_path
         # label is the name of the datapath (last part of the datapath.pkl
         self._load_from_data_path(gesture_datapath)
         prompt = self.prompt_skeleton%(self.language_description)
-        response = self.llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
-        function_code = response.strip("```python").strip("```")
+
+        synthesized_program, _ = synthesize_python_function_with_llm(self.llm, self.function_name, self.input_output_examples, prompt)
+        function_code = synthesized_program.code_str
+
         print("Generated Function Code: ", function_code)
         try:
             exec(function_code, globals())  # Executes code in the global namespace
@@ -151,9 +164,17 @@ def {self.label}(perception_interface, termination_event, timeout):
 def main():
 
     synthesizer = PersonalizedGestureDetectorSynthesizer()
-    synthesizer.test_in_context_examples()
+    # synthesizer.test_in_context_examples()
 
-    gestures = ["blinking", "eyebrows_raised", "head_nod", "head_still_atleast_three_secs", "look_at_robot_atleast_three_secs", "talking"]
+    gestures = [
+        # "blinking",
+        # "eyebrows_raised",
+        # "head_nod",
+        # "head_still_atleast_three_secs",
+        # "look_at_robot_atleast_three_secs",
+        # "talking",
+        "open_mouth",
+    ]
 
     for gesture in gestures:
         
