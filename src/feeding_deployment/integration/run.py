@@ -475,7 +475,7 @@ if __name__ == "__main__":
         ## Variations on modifying the speed of the robot.
 
         # All fast.
-        # runner.process_user_update_request("Set the speed of the robot to high.") 
+        runner.process_user_update_request("Set the speed of the robot to high.") 
         # runner.process_user_update_request("Make the robot move fast.") 
         # runner.process_user_update_request("Can the robot move faster.") 
         # runner.process_user_update_request("The robot is too slow right now.") 
@@ -495,13 +495,14 @@ if __name__ == "__main__":
         # runner.process_user_update_request("When the robot is coming close to my mouth can it go more slowly") 
         # runner.process_user_update_request("When the robot is bringing food into my mouth can it not go so fast")  # currently updates all transfers, but that's okay
         # runner.process_user_update_request("I only wanted to update the speed for the food, not for the drink or the wipe. Can you set the drink and wipe back to normal") 
-        runner.process_user_update_request("When the robot is stabbing the food it is really slow right now") 
+        # runner.process_user_update_request("When the robot is stabbing the food it is really slow right now") 
 
-        # TODO Test selective speed edits (just acq, just transfer, just transfer with utensil and so on?)
-        # TODO I also pushed personalizing autocontinue time for drink and utensil transfer. Seems to work. Can you also run a few variations on this?
-
-
-
+        # Autocontinue times for transfer.
+        # runner.process_user_update_request("Stop waiting so long in between things") 
+        # runner.process_user_update_request("Can you wait just a little longer to let me decide if I want to continue") 
+        # runner.process_user_update_request("I need some more time to think")
+        # runner.process_user_update_request("I need some more time to think after taking a bite")
+        # runner.process_user_update_request("I don't need to wait so long after drinking")
 
 
         # runner.process_user_update_request("Set the outside mouth distance for transfer to 12 cms.") # Works

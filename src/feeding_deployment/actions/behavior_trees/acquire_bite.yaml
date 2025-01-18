@@ -9,7 +9,7 @@ parameters:
       elements: ["low", "medium", "high"]
     is_user_editable: True
     value: "medium"
-  - name: "WebAppAutocontinueTimeout"
+  - name: "TimeToWaitBeforeAutocontinue"
     description: "Time to wait before auto-continuing pickup bite button on the webapp."
     space:
       type: "Box"
