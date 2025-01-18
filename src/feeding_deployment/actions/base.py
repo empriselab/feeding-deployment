@@ -869,7 +869,7 @@ def interpret_user_update_request(
 
     # TODO refactor to avoid this copied code from query_llm.py. I'm not yet
     # sure where this code should live.
-    bite = ["pick_utensil", "look_at_plate", "acquire_bite", "transfer_utensil", "stow_utensil"]
+    bite = ["pick_utensil", "acquire_bite", "transfer_utensil", "stow_utensil"]
     drink = ["pick_drink", "transfer_drink", "stow_drink"]
     wipe = ["pick_wipe", "transfer_wipe", "stow_wipe"]
 

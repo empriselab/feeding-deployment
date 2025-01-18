@@ -6,7 +6,7 @@ parameters:
     description: "Speed of the robot during emulated transfer."
     space:
       type: Enum
-      elements: ["slow", "medium", "fast"]
+      elements: ["low", "medium", "high"]
     is_user_editable: True
     value: "medium"
 fn: !hla emulate_transfer

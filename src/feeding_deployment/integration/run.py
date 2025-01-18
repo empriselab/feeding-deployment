@@ -470,10 +470,13 @@ if __name__ == "__main__":
         # runner.process_user_update_request("Set the outside mouth distance for transfer to 12 cms.") # Works
         # runner.process_user_update_request("Remove all transfer confirmations from the web app.") # Works
         # runner.process_user_update_request("Remove all transfer confirmations.") # Doesn't remove bite transfer confirmation
+        runner.process_user_update_request("Set the speed of the robot to high.") 
+
+        input("Press Enter to continue...")
 
         # Run some commands.
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
         # for i in range(5):

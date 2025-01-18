@@ -6,7 +6,7 @@ parameters:
     description: "Speed of the robot during placing the mug."
     space:
       type: Enum
-      elements: ["slow", "medium", "fast"]
+      elements: ["low", "medium", "high"]
     is_user_editable: True
     value: "medium"
 fn: !hla stow_drink

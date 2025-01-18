@@ -64,12 +64,12 @@ class ArmInterfaceClient:
         return self._arm_interface.get_state()
     
     def get_speed(self):
-        return self._arm_interface.get_speed_preset()
+        return self._arm_interface.get_speed()
     
     def set_speed(self, speed: str):
         assert not self.in_compliant_mode, "Cannot set speed in compliant mode"
         assert speed in ["low", "medium", "high"], "Speed must be one of 'low', 'medium', 'high'"
-        self._arm_interface.set_speed_preset(speed)
+        self._arm_interface.set_speed(speed)
 
     def set_tool(self, tool: str):
         assert not self.in_compliant_mode, "Cannot set tool in compliant mode"
@@ -135,8 +135,18 @@ if __name__ == "__main__":
 
     arm_client_interface.execute_command(JointCommand(before_transfer_pos))
 
-    input("Press enter to go to compliance mode...")
-    arm_client_interface.switch_to_task_compliant_mode()
+    retract_pos = [0.0, -0.34903602299465675, -3.141591055693139, -2.5482592711638783, 0.0, -0.872688061814757, 1.57075917569769]
+
+    time.sleep(5.0)
+    arm_client_interface.execute_command(JointCommand(retract_pos))
+
+    time.sleep(5.0)
+    arm_client_interface.execute_command(JointCommand(before_transfer_pos))
+
+    arm_client_interface.execute_command(JointCommand(retract_pos))
+
+    # input("Press enter to go to compliance mode...")
+    # arm_client_interface.switch_to_task_compliant_mode()
 
     # arm_pos, ee_pose, gripper_pos = arm_client_interface.get_state()
     # drop_test_pose = np.zeros(7)
@@ -147,5 +157,5 @@ if __name__ == "__main__":
     # input("Press Enter to move to drop test pos")
     # arm_client_interface.execute_command(drop_test_task_command)
 
-    input('Press Enter to switch out of compliant mode')
-    arm_client_interface.switch_out_of_compliant_mode()
+    # input('Press Enter to switch out of compliant mode')
+    # arm_client_interface.switch_out_of_compliant_mode()
