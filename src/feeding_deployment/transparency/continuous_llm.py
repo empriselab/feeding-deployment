@@ -13,16 +13,17 @@ class TransparencyContinuous(TransparencyBase):
 
     def __init__(self):
         super().__init__()
-        with open(Path(__file__).parent / "continuous_prompt.txt", 'r') as f:
+        # with open(Path(__file__).parent / "continuous_prompt.txt", 'r') as f:
+        with open(Path(__file__).parent / "continuous_prompt_execution.txt", 'r') as f:
             self.prompt_skeleton = f.read()
         self.explanation_history = ""
 
-        self.last_behavior = self.load_behavior()
+        # self.last_behavior = self.load_behavior()
         self.last_execution = self.load_execution()
         self.last_sensor = self.load_sensor()
 
     def update_history(self):
-        self.last_behavior = self.load_behavior()
+        # self.last_behavior = self.load_behavior()
         self.last_execution = self.load_execution()
         self.last_sensor = self.load_sensor()
 
@@ -34,11 +35,16 @@ class TransparencyContinuous(TransparencyBase):
         execution = self.load_execution()
         sensor = self.load_sensor()
 
-        prompt = self.prompt_skeleton%(self.last_behavior, behavior, self.last_execution, execution, self.last_sensor, sensor, self.explanation_history)
+        if execution == self.last_execution and sensor == self.last_sensor:
+            return "No new explanation to provide"
+
+        # prompt = self.prompt_skeleton%(self.last_behavior, behavior, self.last_execution, execution, self.last_sensor, sensor, self.explanation_history)
+        prompt = self.prompt_skeleton%(behavior, self.last_execution, execution, self.last_sensor, sensor, self.explanation_history)
+
         response = self.llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
         self.explanation_history += response + "\n"
 
-        self.last_behavior = behavior
+        # self.last_behavior = behavior
         self.last_execution = execution
         self.last_sensor = sensor
 
@@ -46,9 +52,10 @@ class TransparencyContinuous(TransparencyBase):
 
     def run(self):
         while True:
-            time.sleep(5)
+            time.sleep(1.0)
             response = self.get_explanation()
-            print(response)
+            if response != "No new explanation to provide":
+                print(response)
 
 def main():
     transparency_continuous = TransparencyContinuous()
