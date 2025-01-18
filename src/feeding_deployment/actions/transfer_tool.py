@@ -60,33 +60,55 @@ class TransferToolHLA(HighLevelAction):
 
     def detect_initiate_transfer(self, initiate_transfer_interaction: str, ready_to_initiate_mode: str):
         if initiate_transfer_interaction == "button":
+            if self.web_interface is not None:
+                self.web_interface.fix_explanation("Please press the button to initiate transfer")
             self.perception_interface.detect_button_press()
         elif initiate_transfer_interaction == "open_mouth":
+            if self.web_interface is not None:
+                self.web_interface.fix_explanation("Please open your mouth to initiate transfer")
             mouth_open_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
         elif initiate_transfer_interaction == "auto_timeout":
+            if self.web_interface is not None:
+                self.web_interface.fix_explanation("Please wait for the transfer to initiate in 5 seconds")
             time.sleep(5.0)
         else:
             raise NotImplementedError
         print("Initiating transfer")
+
+        if self.web_interface is not None:
+            self.web_interface.clear_explanation()
 
         if ready_to_initiate_mode == "led":
             self.perception_interface.turn_off_led()
 
     def detect_transfer_complete(self, transfer_complete_interaction: str, ready_for_transfer_interaction: str):
         if transfer_complete_interaction == "button":
+            if self.web_interface is not None:
+                self.web_interface.fix_explanation("Please press the button to complete transfer")
             self.perception_interface.detect_button_press()
         elif transfer_complete_interaction == "sense":
             if self.tool == "fork":
+                if self.web_interface is not None:
+                    self.web_interface.fix_explanation("Please bite down on the fork to complete transfer")
                 self.perception_interface.detect_force_trigger()
             elif self.tool == "drink":
+                if self.web_interface is not None:
+                    self.web_interface.fix_explanation("Please do a head nod to complete transfer")
                 head_nod_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
             elif self.tool == "wipe":
+                if self.web_interface is not None:
+                    self.web_interface.fix_explanation("Please do a head nod to complete transfer")
                 head_nod_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
         elif transfer_complete_interaction == "auto_timeout":
+            if self.web_interface is not None:
+                self.web_interface.fix_explanation("Please wait for the transfer to complete in 5 seconds")
             time.sleep(5.0)
         else:
             raise NotImplementedError
         print("Detected transfer completion")
+
+        if self.web_interface is not None:
+            self.web_interface.clear_explanation()
 
         if ready_for_transfer_interaction == "led":
             self.perception_interface.turn_off_led()
