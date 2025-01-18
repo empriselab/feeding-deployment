@@ -91,11 +91,24 @@ class ArmInterface:
         
         print(f"Setting speed to {speed}")
         try:
-            self.arm.set_speed(speed)
+            self.arm.choose_from_speed_presets(speed)
         except Exception as e:
-            print(f"Error in set_speed: {e}")
+            print(f"Error in choose_from_speed_presets: {e}")
             # Re-raise a simplified exception to avoid pickling issues
-            raise Exception(f"Error in set_speed: {str(e)}") from None
+            raise Exception(f"Error in choose_from_speed_presets: {str(e)}") from None
+        
+    def get_speed(self):
+        assert not self.emergency_stop_active, "Emergency stop is active"
+        assert not self.in_compliant_mode, "Cannot get speed while in compliant mode"
+
+        try:
+            arm_speed = self.arm.get_speed_preset()
+        except Exception as e:
+            print(f"Error in get_speed: {e}")
+            # Re-raise a simplified exception to avoid pickling issues
+            raise Exception(f"Error in get_speed: {str(e)}") from None
+
+        return arm_speed
 
 
     def switch_to_task_compliant_mode(self):

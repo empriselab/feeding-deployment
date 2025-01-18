@@ -189,6 +189,9 @@ class KinovaArm:
         for device_id in self.actuator_device_ids:
             self.device_config.SetSafetyErrorThreshold(joint_following_safety_threshold, device_id)
 
+        # Tracks speed presets
+        self.speed_preset = "medium"
+
         # Torque control setup
         # Note: Torque commands are converted to current commands since
         # Kinova's torque controller is unable to achieve commanded torques.
@@ -629,6 +632,7 @@ class KinovaArm:
         acceleration_limits=(80, 80, 80, 80, 80, 80, 80),
         cartesian=False,
     ):
+        self.speed_preset = "custom"
         if cartesian:
             joint_speed_soft_limits = ControlConfig_pb2.JointSpeedSoftLimits()
             joint_speed_soft_limits.control_mode = (
@@ -655,20 +659,26 @@ class KinovaArm:
             )
 
     def choose_from_speed_presets(self, speed_preset):
+        assert not self.cyclic_running, "Arm must be in high-level servoing mode to choose speed preset"
+        assert speed_preset in ["low", "medium", "high"], "Invalid speed preset"
+        
+        self.speed_preset = speed_preset
         if speed_preset == "low":
             speed_limits = [12.5, 12.5, 12.5, 12.5, 12.5, 12.5, 12.5]
             acceleration_limits = [25, 25, 25, 25, 25, 25, 25]
         elif speed_preset == "medium":
             speed_limits = [25, 25, 25, 25, 25, 25, 25]
             acceleration_limits = [50, 50, 50, 50, 50, 50, 50]
-        elif speed_preset == "high":
+        else:
             speed_limits = [50, 50, 50, 50, 50, 50, 50]
             acceleration_limits = [100, 100, 100, 100, 100, 100, 100]
-        else:
-            raise ValueError("Invalid speed preset")
         self.set_joint_limits(speed_limits, acceleration_limits)
 
+    def get_speed_preset(self):
+        return self.speed_preset
+
     def set_max_joint_limits(self):
+        self.speed_preset = "max"
         speed_limits = self.control_config.GetKinematicHardLimits().joint_speed_limits
         acceleration_limits = (
             self.control_config.GetKinematicHardLimits().joint_acceleration_limits
@@ -690,6 +700,7 @@ class KinovaArm:
         return joint_limits
 
     def reset_joint_limits(self):
+        self.speed_preset = "default"
         control_mode_information = ControlConfig_pb2.ControlModeInformation()
         for control_mode in [
             ControlConfig_pb2.ANGULAR_JOYSTICK,
@@ -1180,25 +1191,25 @@ class KinovaArm:
 def main():
     arm = KinovaArm()
     try:
-        # input("Press Enter to zero torque offsets")
-        # arm.zero_torque_offsets()
+        input("Press Enter to zero torque offsets")
+        arm.zero_torque_offsets()
 
-        arm.retract()
+        # arm.retract()
 
-        def cycle_arm(arm):
-            input("Press Enter to move to home configuration")
-            arm.home()
-            input("Press Enter to move to retract configuration")
-            arm.retract()
+        # def cycle_arm(arm):
+        #     input("Press Enter to move to home configuration")
+        #     arm.home()
+        #     input("Press Enter to move to retract configuration")
+        #     arm.retract()
 
-        arm.choose_from_speed_presets("low")
-        cycle_arm(arm)
+        # arm.choose_from_speed_presets("low")
+        # cycle_arm(arm)
 
-        arm.choose_from_speed_presets("medium")
-        cycle_arm(arm)
+        # arm.choose_from_speed_presets("medium")
+        # cycle_arm(arm)
 
-        arm.choose_from_speed_presets("high")
-        cycle_arm(arm)
+        # arm.choose_from_speed_presets("high")
+        # cycle_arm(arm)
 
     finally:
         arm.disconnect()
