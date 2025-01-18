@@ -52,7 +52,7 @@ class StowToolHLA(HighLevelAction):
         if self.robot_interface is not None:
             self.robot_interface.set_speed(speed)
         
-        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
+        # self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
         if self.sim.scene_description.scene_label == "vention":
             self.move_to_joint_positions(self.sim.scene_description.utensil_outside_above_mount_pos)
