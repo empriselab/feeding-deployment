@@ -79,9 +79,9 @@ class TransferToolHLA(HighLevelAction):
             if self.tool == "fork":
                 self.perception_interface.detect_force_trigger()
             elif self.tool == "drink":
-                head_shake_detector(self.perception_interface, timeout=600) # 10 minutes
+                head_shake_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
             elif self.tool == "wipe":
-                head_still_detector(self.perception_interface, timeout=600) # 10 minutes
+                head_still_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
         elif transfer_complete_interaction == "auto_timeout":
             time.sleep(5.0)
         else:

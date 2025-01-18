@@ -54,10 +54,25 @@ class WebInterface:
 
         self.current_page = "task_selection" # task_selection, transparency, adaptability
         self.explanation_lock = threading.Lock() # Lock for generating continuous explanations
+
+        # for escaping out of while loops
+        self.active = True
         
         # Start the thread for generating continuous explanations.
         self.transparency_continuous_thread = threading.Thread(target=self.provide_continuous_explanations)
         self.transparency_continuous_thread.start()
+
+    def stop_all_threads(self) -> None:
+        self.active = False
+        try:
+            self.transparency_continuous_thread.join()
+        except Exception as e:
+            print("Error stopping transparency continuous thread: ", e)
+        try:
+            self.gesture_listener_thread.join()
+        except Exception as e:
+            print("Error stopping gesture listener thread: ", e)
+
 
     def _send_message(self, msg_dict: dict[str, Any]) -> None:
         self.web_interface_publisher.publish(String(json.dumps(msg_dict)))
@@ -147,7 +162,7 @@ class WebInterface:
     def get_required_web_interface_message(self, condition) -> dict[str, Any]:
         """Parses through all messages received from the web interface and returns the oldest one satisfying the condition."""
         print_once = True
-        while True:
+        while self.active:
             if self.task_selection_jump:
                 return None
             try:
@@ -202,7 +217,7 @@ class WebInterface:
             self._send_message({"state": "acquirebite", "status": "jump"})
 
             # Send required data for the next bite selection page
-            time.sleep(2.0) # simulate delay, needed for web interface
+            time.sleep(0.5) # simulate delay, needed for web interface
 
             self._send_image(plate_image)
             time.sleep(0.1)
@@ -391,7 +406,7 @@ class WebInterface:
 
     def gesture_listener_thread(self) -> None:
         
-        while True:
+        while self.active:
             msg_dict = self.get_required_web_interface_message(
                 lambda msg_dict: (
                     (msg_dict["state"] == "test_selection")
@@ -444,7 +459,7 @@ class WebInterface:
 
         timestamps = []
         start_timestamp, end_timestamp = None, None
-        while True:
+        while self.active:
             msg_dict = self.get_required_web_interface_message(
                 lambda msg_dict: (
                     (msg_dict["state"] == trigger_message)
@@ -494,7 +509,7 @@ class WebInterface:
     #### Continuous Explanations ####
 
     def provide_continuous_explanations(self) -> None:
-        while True:
+        while self.active:
             # Rajat ToDo: Do not provide explanations during transfer (when the user is expected to open their mouth)
             time.sleep(5.0)
             explanation_active = True

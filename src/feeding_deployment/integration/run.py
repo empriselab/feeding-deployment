@@ -278,12 +278,15 @@ class _Runner:
                     self.web_interface.ready_for_task_selection(last_task_type=last_task_type)
                 else:
                     # Wait for user command
-                    print("Current web interface page:", self.web_interface.current_page)
+                    # print("Current web interface page:", self.web_interface.current_page)
                     time.sleep(0.1) 
                     continue
 
     def signal_handler(self, signal, frame):
+        print("\nReceived SIGINT.")
         self.active = False
+        if self.web_interface is not None:
+            self.web_interface.stop_all_threads()
         print("\nprogram exiting gracefully")
         sys.exit(0)
 
@@ -420,7 +423,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--scene_config", type=str, default="vention")
-    parser.add_argument("--transfer_type", type=str, default="inside")
+    parser.add_argument("--transfer_type", type=str, default="outside")
     parser.add_argument("--run_on_robot", action="store_true")
     parser.add_argument("--use_interface", action="store_true")
     parser.add_argument("--use_gui", action="store_true")
@@ -459,9 +462,9 @@ if __name__ == "__main__":
 
     if not args.use_interface:
         # Run some commands.
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.utensil,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.wipe,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.wipe,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
         # for i in range(5):
         #     runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
         #     runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
