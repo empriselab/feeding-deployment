@@ -214,6 +214,7 @@ class _Runner:
             while resp not in ["y", "n"]:
                 resp = input("Please enter 'y' or 'n': ")
                 if resp == "n":
+                    self.stop_all_threads()
                     sys.exit(0)
 
         print("Runner is ready.")
@@ -223,6 +224,7 @@ class _Runner:
 
         assert self.web_interface is not None, "Run takes user commands from the web interface which is None."
         
+        self.web_interface.ready_for_task_selection()
         last_task_type = None
         while self.active:
             try:
@@ -272,21 +274,23 @@ class _Runner:
                     last_task_type = task_type
                 else:
                     print(f"Invalid task selection: {task_selection_command}")
+                    last_task_type = None
+                self.web_interface.ready_for_task_selection(last_task_type=last_task_type)
                 print("Ready for next user command.")
             except queue.Empty:
-                if self.web_interface.current_page != "task_selection":
-                    self.web_interface.ready_for_task_selection(last_task_type=last_task_type)
-                else:
-                    # Wait for user command
-                    # print("Current web interface page:", self.web_interface.current_page)
-                    time.sleep(0.1) 
-                    continue
+                # Wait for user command
+                print("Current web interface page:", self.web_interface.current_page)
+                time.sleep(0.1) 
+                continue
 
-    def signal_handler(self, signal, frame):
-        print("\nReceived SIGINT.")
+    def stop_all_threads(self) -> None:
         self.active = False
         if self.web_interface is not None:
             self.web_interface.stop_all_threads()
+
+    def signal_handler(self, signal, frame):
+        print("\nReceived SIGINT.")
+        self.stop_all_threads()
         print("\nprogram exiting gracefully")
         sys.exit(0)
 
@@ -463,7 +467,9 @@ if __name__ == "__main__":
     if not args.use_interface:
 
 
-        runner.process_user_update_request("Set the outside mouth distance for transfer to 12 cms.")
+        # runner.process_user_update_request("Set the outside mouth distance for transfer to 12 cms.") # Works
+        # runner.process_user_update_request("Remove all transfer confirmations from the web app.") # Works
+        # runner.process_user_update_request("Remove all transfer confirmations.") # Doesn't remove bite transfer confirmation
 
         # Run some commands.
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))

@@ -199,21 +199,31 @@ class TransferToolHLA(HighLevelAction):
     def transfer_drink(self, *args, **kwargs) -> None:
         assert self.sim.held_object_name == "drink"
         
-        if self.web_interface is not None:
+        # Assume the last item in args is the ask_confirmation
+        ask_confirmation = args[-1]
+        # All other items (everything except the last) should go on to the next call
+        remaining_args = args[:-1]
+
+        if self.web_interface is not None and ask_confirmation:
             self.web_interface.get_drink_transfer_confirmation()
 
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
         self.set_tool("drink")    
-        self.execute_transfer(*args, maintain_position_at_goal=True, **kwargs)    
+        self.execute_transfer(*remaining_args, maintain_position_at_goal=True, **kwargs)    
 
-    def transfer_wipe(self, *args, **kwargs) -> None:
+    def transfer_wipe(self, ask_confirmation, *args, **kwargs) -> None:
         assert self.sim.held_object_name == "wipe"
+
+        # Assume the last item in args is the ask_confirmation
+        ask_confirmation = args[-1]
+        # All other items (everything except the last) should go on to the next call
+        remaining_args = args[:-1]
         
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
-        if self.web_interface is not None:
+        if self.web_interface is not None and ask_confirmation:
             self.web_interface.get_wipe_transfer_confirmation()
 
         self.set_tool("wipe")
-        self.execute_transfer(*args, maintain_position_at_goal=True, **kwargs)
+        self.execute_transfer(*remaining_args, maintain_position_at_goal=True, **kwargs)
