@@ -55,6 +55,10 @@ class WebInterface:
         self.current_page = "task_selection" # task_selection, transparency, adaptability
         self.explanation_lock = threading.Lock() # Lock for generating continuous explanations
 
+        # for setting autocontinue time in task selection page
+        self.bite_autocontinue_timeout = 10.0
+        self.drink_autocontinue_timeout = 10.0
+
         # for escaping out of while loops
         self.active = True
         
@@ -140,7 +144,13 @@ class WebInterface:
         while not self.received_web_interface_messages.empty():
             self.received_web_interface_messages.get()
 
-    def ready_for_task_selection(self, last_task_type = None, autocontinue_timeout = 10) -> None:
+    def set_bite_autocontinue_timeout(self, timeout: float) -> None:
+        self.bite_autocontinue_timeout = timeout
+
+    def set_drink_autocontinue_timeout(self, timeout: float) -> None:
+        self.drink_autocontinue_timeout = timeout
+
+    def ready_for_task_selection(self, last_task_type = None) -> None:
         """Moves the web interface to the task selection page."""
 
         self.current_page = "task_selection"
@@ -151,11 +161,11 @@ class WebInterface:
         if last_task_type == "bite":
             self._send_message({"state": "afterbitetransfer", "status": "jump"})
             time.sleep(0.5)
-            self._send_message({"state": "auto_time", "status": str(autocontinue_timeout)})
+            self._send_message({"state": "auto_time", "status": str(self.bite_autocontinue_timeout)})
         elif last_task_type == "sip":
             self._send_message({"state": "afterdrinktransfer", "status": "jump"})
             time.sleep(0.5)
-            self._send_message({"state": "auto_time", "status": str(autocontinue_timeout)})
+            self._send_message({"state": "auto_time", "status": str(self.drink_autocontinue_timeout)})
         else:
             self._send_message({"state": "task_selection", "status": "jump"})
 
