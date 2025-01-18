@@ -867,6 +867,21 @@ def interpret_user_update_request(
 ) -> list[UserUpdateRequest]:
     """Use an LLM to convert natural language into a user update request."""
 
+    # First query the LLM to rephrase the original request into description of
+    # what should be changed. This can help with cases like "the robot is too slow"
+    # which otherwise can get mistaken for "make the robot slow" (probably because
+    # the main prompt is really long and it's easy to get distracted).
+    rephrase_prompt = """Given the following text from a person who is using an assisted feeding robot, briefly rephrase their request into something that should be changed in the robot's software.
+    
+For example, if the user said "I don't like the sound that the robot makes when it wants my attention", a good rephrasing would be "Use something other than the current sound to signal when the robot needs attention."
+
+Here is what the user said:
+
+"%s"
+""" % request_txt
+    
+    rephrased_txt = llm.sample_completions(rephrase_prompt, imgs=None, temperature=0.0, seed=0)[0]
+
     # TODO refactor to avoid this copied code from query_llm.py. I'm not yet
     # sure where this code should live.
     bite = ["pick_utensil", "acquire_bite", "transfer_utensil", "stow_utensil"]
@@ -926,7 +941,7 @@ The "hla" stands for high-level action. Each hla can be grounded with zero or mo
 IMPORTANT: make sure your hla_object_names and hla_name appear together in the list above!
 
 A NodeModificationUserUpdateRequest a request to modify one parameter for one node in a behavior tree associated with an hla.
-""" % (request_txt, hla_object_name_str)
+""" % (rephrased_txt, hla_object_name_str)
 
     behavior_tree_prompt = """
 Here are all behavior trees:

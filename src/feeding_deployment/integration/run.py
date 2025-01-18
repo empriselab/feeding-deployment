@@ -484,6 +484,12 @@ if __name__ == "__main__":
         # runner.process_user_update_request("The robot is too fast right now.") 
         runner.process_user_update_request("Go slower.") 
 
+        # TODO Test selective speed edits (just acq, just transfer, just transfer with utensil and so on?)
+        # TODO I also pushed personalizing autocontinue time for drink and utensil transfer. Seems to work. Can you also run a few variations on this?
+
+
+
+
 
         # runner.process_user_update_request("Set the outside mouth distance for transfer to 12 cms.") # Works
         # runner.process_user_update_request("Remove all transfer confirmations from the web app.") # Works
