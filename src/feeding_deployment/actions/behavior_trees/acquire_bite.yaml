@@ -9,7 +9,7 @@ parameters:
       elements: ["low", "medium", "high"]
     is_user_editable: True
     value: "medium"
-  - name: "WebAppAutocontinueTimeout"
+  - name: "TimeToWaitBeforeAutocontinue"
     description: "Time to wait before auto-continuing pickup bite button on the webapp."
     space:
       type: "Box"
@@ -17,7 +17,7 @@ parameters:
       upper: 100.0
     is_user_editable: True
     value: 10.0
-  - name: "AskForConfirmationInitiatingTransferSequence"
+  - name: "TransferAskForConfirmation"
     description: "Ask for confirmation on the web app before initiating the transfer sequence for a bite."
     space:
       type: "Enum"

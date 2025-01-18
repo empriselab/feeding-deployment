@@ -13,6 +13,7 @@ from operator import attrgetter
 import itertools
 import string
 import traceback
+import re
 
 import yaml
 
@@ -193,6 +194,7 @@ class HighLevelAction(abc.ABC):
         new_parameter_value: Any
     ) -> None:
         """Validate and update the behavior tree for this HLA."""
+        print(f"Attempting BT update for {self.get_name()} in node {node_name}... ", end="")
         # Load the current behavior tree.
         bt_filename = self.get_behavior_tree_filename(objects, params)
         bt_filepath = self.behavior_tree_dir / bt_filename
@@ -867,29 +869,69 @@ def interpret_user_update_request(
 ) -> list[UserUpdateRequest]:
     """Use an LLM to convert natural language into a user update request."""
 
+    # First query the LLM to rephrase the original request into description of
+    # what should be changed. This can help with cases like "the robot is too slow"
+    # which otherwise can get mistaken for "make the robot slow" (probably because
+    # the main prompt is really long and it's easy to get distracted).
+    rephrase_prompt = """Given the following text from a person who is using an assisted feeding robot, briefly rephrase their request into some kind of specific setting that should be changed in the robot's software.
+    
+For example, if the user said "I don't like the sound that the robot makes when it wants my attention", a good rephrasing would be "Use something other than the current sound to signal when the robot needs attention."
+
+Here is what the user said:
+
+"%s"
+""" % request_txt
+    
+    rephrased_txt = llm.sample_completions(rephrase_prompt, imgs=None, temperature=0.0, seed=0)[0]
+    print("Original user request:", request_txt)
+    print("Rephrased user request:", rephrased_txt)
+
     # TODO refactor to avoid this copied code from query_llm.py. I'm not yet
     # sure where this code should live.
     bite = ["pick_utensil", "acquire_bite", "transfer_utensil", "stow_utensil"]
     drink = ["pick_drink", "transfer_drink", "stow_drink"]
     wipe = ["pick_wipe", "transfer_wipe", "stow_wipe"]
+    all_bt_names = "\n".join(bite + drink + wipe)
+
+    select_relevant_bts_prompt = """Given the following request from a person who is using an assisted feeding robot:
+    
+%s
+
+You think they might mean:
+
+%s
+
+Which of the following skills may be relevant to this request?
+
+%s
+    """ % (request_txt, rephrased_txt, all_bt_names)
+
+    # relevant_bts_response = llm.sample_completions(select_relevant_bts_prompt, imgs=None, temperature=0.0, seed=0)[0]
+    # print("Selected relevant BTs:", relevant_bts_response)
 
     all_nodes_description = ""
     
     # Load the behavior trees.
     all_nodes_description += "Bite:\n"
     for bite_node in bite:
+        # if bite_node not in relevant_bts_response:
+        #     continue
         with open(behavior_log_path / f"{bite_node}.yaml", 'r') as f:
             node_description = f.read()
         all_nodes_description += node_description + "\n---\n"
 
     all_nodes_description += "Drink:\n"
     for drink_node in drink:
+        # if drink_node not in relevant_bts_response:
+        #     continue
         with open(behavior_log_path / f"{drink_node}.yaml", 'r') as f:
             node_description = f.read()
         all_nodes_description += node_description + "\n---\n"
 
     all_nodes_description += "Wipe:\n"
     for wipe_node in wipe:
+        # if wipe_node not in relevant_bts_response:
+        #     continue
         with open(behavior_log_path / f"{wipe_node}.yaml", 'r') as f:
             node_description = f.read()
         all_nodes_description += node_description + "\n---\n"
@@ -898,7 +940,8 @@ def interpret_user_update_request(
 
     prompt_prefix = """Your job is to convert the following command into one or more structured outputs in a format that I will describe next.
 
-The command is: %s
+The original command is: %s
+You think maybe what they mean is: %s
 
 The available structured output types are:
 
@@ -926,7 +969,7 @@ The "hla" stands for high-level action. Each hla can be grounded with zero or mo
 IMPORTANT: make sure your hla_object_names and hla_name appear together in the list above!
 
 A NodeModificationUserUpdateRequest a request to modify one parameter for one node in a behavior tree associated with an hla.
-""" % (request_txt, hla_object_name_str)
+""" % (request_txt, rephrased_txt, hla_object_name_str)
 
     behavior_tree_prompt = """
 Here are all behavior trees:
@@ -1002,12 +1045,24 @@ because the node_name is not in the behavior tree. Recall again all of the behav
 %s
 """ % (str(request), behavior_tree_prompt)
                 break
+            # Case 5: the anchor name is invalid.
             if isinstance(request, NodeAdditionUserRequest) and request.anchor_node_name not in behavior_tree_prompt:
                 error_prompt = """The following request is invalid:
 
 %s
 
 because the anchor_node_name is not in the behavior tree. Recall again all of the behavior trees:
+
+%s
+""" % (str(request), behavior_tree_prompt)
+                break
+            # Case 6: the parameter is invalid for the node.
+            if isinstance(request, NodeModificationUserUpdateRequest) and not _parameter_name_is_valid(request.parameter_name, request.node_name, behavior_tree_prompt):
+                error_prompt = """The following request is invalid:
+
+%s
+
+because the parameter_name is not in the given behavior tree node. Make sure that the parameter name and node appear TOGETHER in the behavior tree. Recall again all of the behavior trees:
 
 %s
 """ % (str(request), behavior_tree_prompt)
@@ -1028,3 +1083,13 @@ def _strip_python_response(response: str) -> str:
     if response.endswith("```"):
         response = response[:-len("```")]
     return response
+
+
+def _parameter_name_is_valid(parameter_name, node_name, behavior_tree_prompt):
+    node_name_substring = f'name: "{node_name}"'
+    for match in re.finditer(node_name_substring, behavior_tree_prompt):
+        idx = match.start()
+        end = behavior_tree_prompt[idx:].find("---")
+        if parameter_name in behavior_tree_prompt[idx:idx+end]:
+            return True
+    return False
