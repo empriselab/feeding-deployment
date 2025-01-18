@@ -905,32 +905,32 @@ Which of the following skills may be relevant to this request?
 %s
     """ % (request_txt, rephrased_txt, all_bt_names)
 
-    relevant_bts_response = llm.sample_completions(select_relevant_bts_prompt, imgs=None, temperature=0.0, seed=0)[0]
-    print("Selected relevant BTs:", relevant_bts_response)
+    # relevant_bts_response = llm.sample_completions(select_relevant_bts_prompt, imgs=None, temperature=0.0, seed=0)[0]
+    # print("Selected relevant BTs:", relevant_bts_response)
 
     all_nodes_description = ""
     
     # Load the behavior trees.
     all_nodes_description += "Bite:\n"
     for bite_node in bite:
-        if bite_node not in relevant_bts_response:
-            continue
+        # if bite_node not in relevant_bts_response:
+        #     continue
         with open(behavior_log_path / f"{bite_node}.yaml", 'r') as f:
             node_description = f.read()
         all_nodes_description += node_description + "\n---\n"
 
     all_nodes_description += "Drink:\n"
     for drink_node in drink:
-        if drink_node not in relevant_bts_response:
-            continue
+        # if drink_node not in relevant_bts_response:
+        #     continue
         with open(behavior_log_path / f"{drink_node}.yaml", 'r') as f:
             node_description = f.read()
         all_nodes_description += node_description + "\n---\n"
 
     all_nodes_description += "Wipe:\n"
     for wipe_node in wipe:
-        if wipe_node not in relevant_bts_response:
-            continue
+        # if wipe_node not in relevant_bts_response:
+        #     continue
         with open(behavior_log_path / f"{wipe_node}.yaml", 'r') as f:
             node_description = f.read()
         all_nodes_description += node_description + "\n---\n"
