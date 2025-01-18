@@ -68,7 +68,7 @@ class InsideMouthTransfer(Transfer):
         
         return next_waypoint
 
-    def move_to_transfer_state(self, maintain_position_at_goal = False):
+    def move_to_transfer_state(self, outside_mouth_distance, maintain_position_at_goal = False):
 
         if self.robot_interface is not None:
             self.set_filter_noisy_readings_pub.publish(Bool(data=True))

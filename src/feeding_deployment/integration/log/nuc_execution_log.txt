@@ -1,7 +1,2 @@
 Anomaly Detected: User emergency stop activated.
 Anomaly Detected: User emergency stop activated.
-Anomaly Detected: User emergency stop activated.
-Anomaly Detected: Experimenter emergency stop activated.
-Anomaly Detected: Experimenter emergency stop activated.
-Anomaly Detected: Experimenter emergency stop activated.
-Anomaly Detected: User emergency stop activated.

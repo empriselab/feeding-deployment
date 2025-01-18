@@ -21,7 +21,7 @@ class CollisionSensor:
     """See docstring above."""
 
     # Threshold for collision detection
-    COLLISION_THRESHOLD = 15.0
+    COLLISION_THRESHOLD = 20.0
 
     def __init__(self):
 

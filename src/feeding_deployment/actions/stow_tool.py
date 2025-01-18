@@ -46,10 +46,13 @@ class StowToolHLA(HighLevelAction):
         assert tool.name in ["utensil", "drink", "wipe"]
         return f"stow_{tool.name}.yaml"
 
-    def stow_utensil(self) -> None:
+    def stow_utensil(self, speed: str) -> None:
         assert self.sim.held_object_name == "utensil"
+
+        if self.robot_interface is not None:
+            self.robot_interface.set_speed(speed)
         
-        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
+        # self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
         if self.sim.scene_description.scene_label == "vention":
             self.move_to_joint_positions(self.sim.scene_description.utensil_outside_above_mount_pos)
@@ -62,8 +65,11 @@ class StowToolHLA(HighLevelAction):
         self.move_to_ee_pose(self.sim.scene_description.utensil_above_mount)
         self.move_to_joint_positions(self.sim.scene_description.retract_pos)
 
-    def stow_drink(self) -> None:
+    def stow_drink(self, speed: str) -> None:
         assert self.sim.held_object_name == "drink"
+
+        if self.robot_interface is not None:
+            self.robot_interface.set_speed(speed)
         
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
@@ -77,8 +83,11 @@ class StowToolHLA(HighLevelAction):
         self.move_to_joint_positions(self.sim.scene_description.drink_staging_pos)
         self.move_to_joint_positions(self.sim.scene_description.retract_pos)
 
-    def stow_wipe(self) -> None:
+    def stow_wipe(self, speed: str) -> None:
         assert self.sim.held_object_name == "wipe"
+
+        if self.robot_interface is not None:
+            self.robot_interface.set_speed(speed)
             
         self.move_to_joint_positions(self.sim.scene_description.retract_pos)
 

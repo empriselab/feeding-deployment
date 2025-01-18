@@ -13,6 +13,7 @@ from operator import attrgetter
 import itertools
 import string
 import traceback
+import re
 
 import yaml
 
@@ -139,17 +140,15 @@ class HighLevelAction(abc.ABC):
         new_node_parameters: dict[str, Any],
         anchor_node_name: str,
         before_or_after: str
-    ) -> None:
+    ) -> str:
         """Validate and add a new node into the behavior tree for this HLA."""
         # Create the dictionary for the new node.
         new_node_name = f"UserGeneratedNode{next(self.new_node_counter)}"
-        new_node_dict = self.create_user_addition_node_dict(new_node_name, new_node_type, new_node_parameters)
+        new_node_dict, node_dict_msg = self.create_user_addition_node_dict(new_node_name, new_node_type, new_node_parameters)
         if new_node_dict is None:  # node addition was misspecified / not safe
-            print(f"BT UPDATE FAILED in node addition (see error above).")
-            return
+            return f"The new node could not be added. {node_dict_msg}."
         if before_or_after not in ("before", "after"):
-            print(f"BT UPDATE FAILED. Invalid before or after: {before_or_after}")
-            return
+            return f"The new node could not be added. Invalid before or after: {before_or_after}"
         # Create the node itself.
         new_node = _parse_node(new_node_dict)
         # Load the current behavior tree.
@@ -160,8 +159,7 @@ class HighLevelAction(abc.ABC):
         # Get the anchor node.
         anchor_node = bt.get_node(anchor_node_name)
         if anchor_node is None or not isinstance(anchor_node, ParameterizedActionBehaviorTreeNode):
-            print(f"BT UPDATE FAILED. Invalid node name: {anchor_node_name}")
-            return
+            return f"Invalid node name: {anchor_node_name}"
         # Special case: the anchor node is not part of a sequence.
         if not isinstance(anchor_node.parent, SequenceBehaviorTreeNode):
             # For now we'll assume that this case only happens when the node is
@@ -176,13 +174,12 @@ class HighLevelAction(abc.ABC):
         if new_node_type == "Retract":
             # For now, totally restrict this.
             if anchor_node.name != "TransferUtensil":
-                print(f"BT UPDATE FAILED. Retract not allowed after {anchor_node.name}")
-                return
+                return f"Retract not allowed after {anchor_node.name}"
         # Add the node to the tree.
         anchor_node.parent.add_child(new_node, anchor_node, before_or_after)
-        print(f"BT UPDATE SUCCEEDED! New {new_node_type} node added")
         # Write the change to disk.
         save_behavior_tree(bt, bt_filepath, self)
+        return f"Success! New {new_node_type} node added"
 
     def process_behavior_tree_parameter_update(
         self,
@@ -193,6 +190,7 @@ class HighLevelAction(abc.ABC):
         new_parameter_value: Any
     ) -> None:
         """Validate and update the behavior tree for this HLA."""
+        print(f"Attempting BT update for {self.get_name()} in node {node_name}... ", end="")
         # Load the current behavior tree.
         bt_filename = self.get_behavior_tree_filename(objects, params)
         bt_filepath = self.behavior_tree_dir / bt_filename
@@ -201,44 +199,38 @@ class HighLevelAction(abc.ABC):
         # Get the node.
         node = bt.get_node(node_name)
         if node is None or not isinstance(node, ParameterizedActionBehaviorTreeNode):
-            print(f"BT UPDATE FAILED. Invalid node name: {node_name}")
-            return
+            return f"Invalid node name: {node_name}"
         # Get the parameter.
         parameter = node.get_parameter(parameter_name)
         if parameter is None:
-            print(f"BT UPDATE FAILED. Invalid parameter name: {parameter_name}")
-            return
+            return f"Invalid parameter name: {parameter_name}"
         # Ensure the parameter is allowed to be edited.
         if not parameter.is_user_editable:
-            print(f"BT UPDATE FAILED. Parameter not user editable: {parameter_name}")
-            return
+            return f"Parameter not user editable: {parameter_name}"
         # Ensure the new value is in bounds.
         if not parameter.space.contains(new_parameter_value):
-            print(f"BT UPDATE FAILED. Parameter value is out of bounds: {new_parameter_value} for {parameter_name}")
-            return
+            return f"Parameter value is out of bounds: {new_parameter_value} for {parameter_name}"
         # Update is valid! So update the tree.
-        print(f"BT UPDATE SUCCEEDED! New: {new_parameter_value} for {parameter_name}")
         node.set_parameter(parameter, new_parameter_value)
         # Write the change to disk.
         save_behavior_tree(bt, bt_filepath, self)
+        return f"Success! New: {new_parameter_value} for {parameter_name}"
 
     def create_user_addition_node_dict(
         self,
         new_node_name: str,
         new_node_type: str,
         new_node_parameters: dict[str, Any]
-    ) -> dict[str, Any] | None:
+    ) -> tuple[dict[str, Any] | None, str]:
         """Validate and create a new node from a user request."""
         if new_node_type == "Pause":
             if "duration" not in new_node_parameters:
-                print("BT UPDATE FAILED: missing parameter duration")
-                return
+                return None, "Missing parameter duration"
             duration = new_node_parameters["duration"]
             min_allowed_pause = 0.0
             max_allowed_pause = 10.0
             if not min_allowed_pause <= duration <= max_allowed_pause:
-                print(f"BT UPDATE FAILED: duration {duration} outside bounds")
-                return
+                return None, f"duration {duration} outside bounds"
             return {
                 "type": "Behavior",
                 "name": new_node_name,
@@ -257,12 +249,11 @@ class HighLevelAction(abc.ABC):
                 },
                 ],
                 "fn": self.pause,
-            }
+            }, "Success"
         
         if new_node_type == "WaitForGesture":
             if "gesture_fn_name" not in new_node_parameters:
-                print("BT UPDATE FAILED: missing parameter gesture_fn_name")
-                return
+                return None, "Missing parameter gesture_fn_name"
             gesture_fn_name = new_node_parameters["gesture_fn_name"]
             return {
                 "type": "Behavior",
@@ -280,7 +271,7 @@ class HighLevelAction(abc.ABC):
                 },
                 ],
                 "fn": self.wait_for_gesture,
-            }
+            }, "Success"
 
         if new_node_type == "Retract":
             return {
@@ -301,11 +292,9 @@ class HighLevelAction(abc.ABC):
                 },
                 ],
                 "fn": self.move_to_joint_positions,
-            }
+            }, "Success"
 
-
-        print(f"BT UPDATE FAILED: invalid new node type {new_node_type}")
-        return None
+        return None, f"Invalid new node type {new_node_type}"
 
     def move_to_joint_positions(self, joint_positions: list[float]) -> None:
         
@@ -422,13 +411,13 @@ class GroundHighLevelAction:
         self.hla.execute_action(self.objects, self.params)
 
     def process_behavior_tree_node_addition(self, new_node_type: str, new_node_parameters: dict[str, Any],
-                                            anchor_node_name: str, before_or_after: str) -> None:
+                                            anchor_node_name: str, before_or_after: str) -> str:
         """Validate and add a new node into the behavior tree."""
-        self.hla.process_behavior_tree_node_addition(self.objects, self.params, new_node_type, new_node_parameters, anchor_node_name, before_or_after)
+        return self.hla.process_behavior_tree_node_addition(self.objects, self.params, new_node_type, new_node_parameters, anchor_node_name, before_or_after)
 
-    def process_behavior_tree_parameter_update(self, node_name: str, parameter_name: str, new_parameter_value: Any) -> None:
+    def process_behavior_tree_parameter_update(self, node_name: str, parameter_name: str, new_parameter_value: Any) -> str:
         """Validate and update the behavior tree for this ground HLA."""
-        self.hla.process_behavior_tree_parameter_update(self.objects, self.params, node_name, parameter_name, new_parameter_value)
+        return self.hla.process_behavior_tree_parameter_update(self.objects, self.params, node_name, parameter_name, new_parameter_value)
 
 
 class ResetHLA(HighLevelAction):
@@ -867,29 +856,69 @@ def interpret_user_update_request(
 ) -> list[UserUpdateRequest]:
     """Use an LLM to convert natural language into a user update request."""
 
+    # First query the LLM to rephrase the original request into description of
+    # what should be changed. This can help with cases like "the robot is too slow"
+    # which otherwise can get mistaken for "make the robot slow" (probably because
+    # the main prompt is really long and it's easy to get distracted).
+    rephrase_prompt = """Given the following text from a person who is using an assisted feeding robot, briefly rephrase their request into some kind of specific setting that should be changed in the robot's software.
+    
+For example, if the user said "I don't like the sound that the robot makes when it wants my attention", a good rephrasing would be "Use something other than the current sound to signal when the robot needs attention."
+
+Here is what the user said:
+
+"%s"
+""" % request_txt
+    
+    rephrased_txt = llm.sample_completions(rephrase_prompt, imgs=None, temperature=0.0, seed=0)[0]
+    print("Original user request:", request_txt)
+    print("Rephrased user request:", rephrased_txt)
+
     # TODO refactor to avoid this copied code from query_llm.py. I'm not yet
     # sure where this code should live.
-    bite = ["pick_utensil", "look_at_plate", "acquire_bite", "transfer_utensil", "stow_utensil"]
+    bite = ["pick_utensil", "acquire_bite", "transfer_utensil", "stow_utensil"]
     drink = ["pick_drink", "transfer_drink", "stow_drink"]
     wipe = ["pick_wipe", "transfer_wipe", "stow_wipe"]
+    all_bt_names = "\n".join(bite + drink + wipe)
+
+    select_relevant_bts_prompt = """Given the following request from a person who is using an assisted feeding robot:
+    
+%s
+
+You think they might mean:
+
+%s
+
+Which of the following skills may be relevant to this request?
+
+%s
+    """ % (request_txt, rephrased_txt, all_bt_names)
+
+    # relevant_bts_response = llm.sample_completions(select_relevant_bts_prompt, imgs=None, temperature=0.0, seed=0)[0]
+    # print("Selected relevant BTs:", relevant_bts_response)
 
     all_nodes_description = ""
     
     # Load the behavior trees.
     all_nodes_description += "Bite:\n"
     for bite_node in bite:
+        # if bite_node not in relevant_bts_response:
+        #     continue
         with open(behavior_log_path / f"{bite_node}.yaml", 'r') as f:
             node_description = f.read()
         all_nodes_description += node_description + "\n---\n"
 
     all_nodes_description += "Drink:\n"
     for drink_node in drink:
+        # if drink_node not in relevant_bts_response:
+        #     continue
         with open(behavior_log_path / f"{drink_node}.yaml", 'r') as f:
             node_description = f.read()
         all_nodes_description += node_description + "\n---\n"
 
     all_nodes_description += "Wipe:\n"
     for wipe_node in wipe:
+        # if wipe_node not in relevant_bts_response:
+        #     continue
         with open(behavior_log_path / f"{wipe_node}.yaml", 'r') as f:
             node_description = f.read()
         all_nodes_description += node_description + "\n---\n"
@@ -898,7 +927,8 @@ def interpret_user_update_request(
 
     prompt_prefix = """Your job is to convert the following command into one or more structured outputs in a format that I will describe next.
 
-The command is: %s
+The original command is: %s
+You think maybe what they mean is: %s
 
 The available structured output types are:
 
@@ -926,7 +956,7 @@ The "hla" stands for high-level action. Each hla can be grounded with zero or mo
 IMPORTANT: make sure your hla_object_names and hla_name appear together in the list above!
 
 A NodeModificationUserUpdateRequest a request to modify one parameter for one node in a behavior tree associated with an hla.
-""" % (request_txt, hla_object_name_str)
+""" % (request_txt, rephrased_txt, hla_object_name_str)
 
     behavior_tree_prompt = """
 Here are all behavior trees:
@@ -934,7 +964,10 @@ Here are all behavior trees:
 """ % all_nodes_description
 
     first_final_prompt = """
-Based on the information given, convert the original command into a list of one or more structured outputs.
+Note that the units used for parameters are all speeds in degrees per second, all durations in seconds, and all distances in meters. Take this into account when user requests contain units and make sure to convert them to the appropriate units for the behavior tree.
+
+Based on the information given, convert the original command into a list of one or more structured outputs. 
+If the user does not specifically mention a certain tool, make the update for all tools.
 
 Return your answer in a format where calling eval() in python will directly produce a list of UserUpdateRequest instances.
 """
@@ -999,12 +1032,24 @@ because the node_name is not in the behavior tree. Recall again all of the behav
 %s
 """ % (str(request), behavior_tree_prompt)
                 break
+            # Case 5: the anchor name is invalid.
             if isinstance(request, NodeAdditionUserRequest) and request.anchor_node_name not in behavior_tree_prompt:
                 error_prompt = """The following request is invalid:
 
 %s
 
 because the anchor_node_name is not in the behavior tree. Recall again all of the behavior trees:
+
+%s
+""" % (str(request), behavior_tree_prompt)
+                break
+            # Case 6: the parameter is invalid for the node.
+            if isinstance(request, NodeModificationUserUpdateRequest) and not _parameter_name_is_valid(request.parameter_name, request.node_name, behavior_tree_prompt):
+                error_prompt = """The following request is invalid:
+
+%s
+
+because the parameter_name is not in the given behavior tree node. Make sure that the parameter name and node appear TOGETHER in the behavior tree. Recall again all of the behavior trees:
 
 %s
 """ % (str(request), behavior_tree_prompt)
@@ -1025,3 +1070,13 @@ def _strip_python_response(response: str) -> str:
     if response.endswith("```"):
         response = response[:-len("```")]
     return response
+
+
+def _parameter_name_is_valid(parameter_name, node_name, behavior_tree_prompt):
+    node_name_substring = f'name: "{node_name}"'
+    for match in re.finditer(node_name_substring, behavior_tree_prompt):
+        idx = match.start()
+        end = behavior_tree_prompt[idx:].find("---")
+        if parameter_name in behavior_tree_prompt[idx:idx+end]:
+            return True
+    return False

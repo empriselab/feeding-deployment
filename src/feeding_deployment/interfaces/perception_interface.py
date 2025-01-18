@@ -207,6 +207,7 @@ class PerceptionInterface:
             if step_time >= 0.02:  # 50 Hz
                 if self._head_perception is not None and not self._simulate_head_perception:
                     head_perception_data = self._head_perception.run_head_perception()
+                    # print("Head pose: ", head_perception_data["head_pose"])
                 else:
                     try:
                         # read from logged data
@@ -380,7 +381,7 @@ class PerceptionInterface:
 
     def get_inside_bottom_transform(self):
         tf = self.get_pre_grasp_transform()
-        tf[2, 3] = 0.01
+        tf[2, 3] = 0.017
         return tf
 
     def get_inside_top_transform(self):

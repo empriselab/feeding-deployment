@@ -88,7 +88,7 @@ class BiteAcquisitionInference:
                 PrepareForNet(),
             ])
 
-            self.FOOD_CLASSES = ["spaghetti", "meatball"]
+            self.FOOD_CLASSES = None
             self.BOX_THRESHOLD = 0.3
             self.TEXT_THRESHOLD = 0.2
             self.NMS_THRESHOLD = 0.4
@@ -554,6 +554,7 @@ class BiteAcquisitionInference:
     def detect_items(self, image, log_path = None):
 
         assert FOOD_MODELS_IMPORTS, "Food detection imports (Grounding DINO, Segment Anything, Depth Anything) required to run this function"
+        assert self.FOOD_CLASSES is not None, "Food classes not initialized"
         
         plate_mask = detect_plate(image, multiplier=2.0)
         plate_mask_vis = np.repeat(plate_mask[:,:,np.newaxis], 3, axis=2)
@@ -579,20 +580,30 @@ class BiteAcquisitionInference:
         # self.FOOD_CLASSES = [f.replace('fettuccine', 'noodles') for f in self.FOOD_CLASSES]
         # self.FOOD_CLASSES = [f.replace('spaghetti', 'noodles') for f in self.FOOD_CLASSES]
         # self.FOOD_CLASSES.append('blue plate')
-        self.FOOD_CLASSES = [f.replace('banana', 'circle yellow banana piece') for f in self.FOOD_CLASSES]
-        self.FOOD_CLASSES = [f.replace('watermelon', 'red watermelon piece') for f in self.FOOD_CLASSES]
-        self.FOOD_CLASSES = [f.replace('grape', 'round brown grape') for f in self.FOOD_CLASSES]
-        self.FOOD_CLASSES = [f.replace('baby carrot', 'baby carrot piece') for f in self.FOOD_CLASSES]
-        self.FOOD_CLASSES = [f.replace('cantaloupe', 'square orange cantaloupe piece') for f in self.FOOD_CLASSES]
-        self.FOOD_CLASSES = [f.replace('chicken nugget', 'chicken nugget piece') for f in self.FOOD_CLASSES]
-        # self.FOOD_CLASSES.append('banana piece')
 
-        print("Food Classes being detected: ", self.FOOD_CLASSES)
+        food_classes_being_detected = self.FOOD_CLASSES.copy() 
+
+        replacement_dict = {
+            "banana": "circle yellow banana piece",
+            "watermelon": "red watermelon piece",
+            "grape": "round brown grape",
+            "baby carrot": "baby carrot piece",
+            "cantaloupe": "square orange cantaloupe piece",
+            "chicken nugget": "chicken nugget piece",
+            "apple": "apple piece",
+            "mini donut": "mini donut piece",
+            "chicken": "chicken piece",
+        }
+
+        for key, value in replacement_dict.items():
+            food_classes_being_detected = [f.replace(key, value) for f in food_classes_being_detected]
+
+        print("Food Classes being detected: ", food_classes_being_detected)
 
         # detect objects
         detections = self.grounding_dino_model.predict_with_classes(
             image=cropped_image,
-            classes=self.FOOD_CLASSES,
+            classes=food_classes_being_detected,
             box_threshold=self.BOX_THRESHOLD,
             text_threshold=self.TEXT_THRESHOLD
         )
@@ -609,7 +620,7 @@ class BiteAcquisitionInference:
         # annotate image with detections
         box_annotator = sv.BoxAnnotator()
         labels = [
-            f"{self.FOOD_CLASSES[class_id]} {confidence:0.2f}" 
+            f"{food_classes_being_detected[class_id]} {confidence:0.2f}" 
             for _, _, confidence, class_id, _, _
             in detections]
         annotated_frame = box_annotator.annotate(scene=cropped_image.copy(), detections=detections, labels=labels)
@@ -676,7 +687,7 @@ class BiteAcquisitionInference:
         box_annotator = sv.BoxAnnotator()
         mask_annotator = sv.MaskAnnotator()
         labels = [
-            f"{self.FOOD_CLASSES[class_id]} {confidence:0.2f}" 
+            f"{food_classes_being_detected[class_id]} {confidence:0.2f}" 
             for _, _, confidence, class_id, _, _
             in detections]
 
@@ -834,14 +845,8 @@ class BiteAcquisitionInference:
                 portion_weights.append(max(1, mask_weight(food_enclosing_mask)/MIN_WEIGHT))
 
         print('Labels before replacement: ', labels)
-        # bring back labels for banana slices back to banana
-        labels = [l.replace('circle yellow banana piece', 'banana') for l in labels]
-        labels = [l.replace('red watermelon piece', 'watermelon') for l in labels]
-        labels = [l.replace('round brown grape', 'grape') for l in labels]
-        labels = [l.replace('baby carrot piece', 'baby carrot') for l in labels]
-        labels = [l.replace('square orange cantaloupe piece', 'cantaloupe') for l in labels]
-        labels = [l.replace('chicken nugget piece', 'chicken nugget') for l in labels]
-        # labels = [l.replace('banana piece', 'banana') for l in labels]    
+        for key, value in replacement_dict.items():
+            labels = [l.replace(value, key) for l in labels]
         print('Labels after replacement: ', labels)
 
         return annotated_image, detections, refined_masks, portion_weights, labels, plate_bounds
@@ -884,7 +889,7 @@ class BiteAcquisitionInference:
 
         else:
             prompt = """
-                    Acceptable outputs: ['noodles', 'meat/seafood', 'vegetable', 'brownie', 'dip', 'fruit', 'plate', 'semisolid']
+                    Acceptable outputs: ['noodles', 'meat/seafood', 'vegetable', 'brownie', 'dip', 'fruit', 'semisolid']
 
                     Input: 'noodles 0.69'
                     Output: 'noodles'
@@ -942,18 +947,6 @@ class BiteAcquisitionInference:
 
                     Input: 'oatmeal 0.43'
                     Output: 'semisolid'
-
-                    Input: 'blue'
-                    Output: 'plate'
-
-                    Input: 'blue'
-                    Output: 'plate'
-
-                    Input: 'blue plate'
-                    Output: 'plate'
-
-                    Input: 'blue plate'
-                    Output: 'plate'
 
                     Input: 'blueberry 0.87'
                     Output: 'fruit'
@@ -1092,7 +1085,7 @@ class BiteAcquisitionInference:
                 else:
                     efficiency_scores.append(2)
                     next_actions.append((idx, 'Push', {'start':filling_push_start, 'end':filling_push_end}))
-            elif categories[idx] in ['meat/seafood', 'vegetable', 'fruit', 'brownie']:
+            elif categories[idx] in ['solid', 'meat/seafood', 'vegetable', 'fruit', 'brownie']:
                 # if categories[idx] != 'brownie':
                 #     requires_cut, cut_point, cut_angle = self.get_cut_action(masks[idx], image)
                 #     if requires_cut:
@@ -1124,6 +1117,8 @@ class BiteAcquisitionInference:
                 print('Adding dip action for label: ', labels[idx])
                 dip_point = self.get_dip_action(masks[idx][0])
                 dip_actions.append((idx, 'Dip', {'point': dip_point}))
+            else:
+                raise ValueError(f"Category {categories[idx]} not recognized")
         
         print('Length of next actions: ', len(next_actions))
         # if len(next_actions) == 1: # Only one item left or if we are continuing to eat the same item

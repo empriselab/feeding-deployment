@@ -2,32 +2,55 @@ name: "TransferUtensil"
 description: "Bring the utensil to the user's mouth for a bite."
 type: "Behavior"
 parameters:
+  - name: "Speed"
+    description: "Speed of the robot during bringing the utensil to the user's mouth."
+    space:
+      type: "Enum"
+      elements: ["low", "medium", "high"]
+    is_user_editable: True
+    value: "medium"
   - name: "ReadyToInitiateTransferInteraction"
     description: "Interaction mode for ready to initiate transfer."
     space:
       type: "Enum"
       elements: ["silent", "voice", "led"]
     is_user_editable: True
-    value: "led"
+    value: "voice"
   - name: "ReadyForTransferInteraction"
     description: "Interaction mode for ready to transfer."
     space:
       type: "Enum"
       elements: ["silent", "voice", "led"]
     is_user_editable: True
-    value: "silent"
+    value: "voice"
   - name: "InitiateTransferInteraction"
     description: "Interaction mode for transfer."
     space:
       type: "Enum"
       elements: ["button", "open_mouth", "auto_timeout"]
     is_user_editable: True
-    value: "button"
+    value: "open_mouth"
   - name: "TransferCompleteInteraction"
     description: "Interaction mode for transfer completion."
     space:
       type: "Enum"
       elements: ["button", "sense", "auto_timeout"]
     is_user_editable: True
-    value: "button"
+    value: "sense"
+  - name: "OutsideMouthDistance"
+    description: "Distance from the tool tip to the user's mouth."
+    space:
+      type: "Box"
+      lower: 0.1
+      upper: 0.2
+    is_user_editable: True
+    value: 0.15
+  - name: "TimeToWaitBeforeAutocontinue"
+    description: "Autocontinue duration for re-selecting drinking transfer after a sip."
+    space:
+      type: "Box"
+      lower: 5.0
+      upper: 100.0
+    is_user_editable: True
+    value: 10.0
 fn: !hla transfer_utensil

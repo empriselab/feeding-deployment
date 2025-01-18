@@ -47,8 +47,11 @@ class PickToolHLA(HighLevelAction):
         assert tool.name in ["utensil", "drink", "wipe"]
         return f"pick_{tool.name}.yaml"
     
-    def pick_utensil(self) -> None:
+    def pick_utensil(self, speed: str) -> None:
         assert self.sim.held_object_name is None
+
+        if self.robot_interface is not None:
+            self.robot_interface.set_speed(speed)
             
         self.move_to_joint_positions(self.sim.scene_description.retract_pos)
         self.close_gripper()
@@ -71,8 +74,11 @@ class PickToolHLA(HighLevelAction):
         # Pre-emptively move to the before_transfer_pos because moving to above_plate_pos from retract_pos is unsafe.
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
         
-    def pick_drink(self) -> None:
+    def pick_drink(self, speed: str) -> None:
         assert self.sim.held_object_name is None
+
+        if self.robot_interface is not None:
+            self.robot_interface.set_speed(speed)
 
         self.move_to_joint_positions(self.sim.scene_description.retract_pos)
         self.close_gripper()
@@ -91,8 +97,11 @@ class PickToolHLA(HighLevelAction):
 
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
-    def pick_wipe(self) -> None:
+    def pick_wipe(self, speed: str) -> None:
         assert self.sim.held_object_name is None
+
+        if self.robot_interface is not None:
+            self.robot_interface.set_speed(speed)
 
         self.move_to_joint_positions(self.sim.scene_description.retract_pos)
         self.close_gripper()

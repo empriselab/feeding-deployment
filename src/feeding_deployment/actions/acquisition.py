@@ -59,18 +59,18 @@ class AcquireBiteHLA(HighLevelAction):
         assert tool.name == "utensil"
         return "acquire_bite.yaml"
     
-    def acquire_bite(self, speed: float) -> None:
+    def acquire_bite(self, speed: str, autocontinue_timeout: float, ask_confirmation: bool) -> None:
 
-        # TODO actually use speed
-        print("ACQUIRE BITE CALLED WITH SPEED: ", speed)
-
-        print("In AcquireBiteHLA")
         assert self.sim.held_object_name == "utensil"
+
+        if self.robot_interface is not None:
+            self.robot_interface.set_speed(speed)
 
         # stop the keep horizontal thread (incase we're trying to re-acquire a bite)
         if self.wrist_interface is not None:
             self.wrist_interface.stop_horizontal_spoon_thread()
 
+        # self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos) # leads to safer motion
         self.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
         
         while True:
@@ -78,31 +78,63 @@ class AcquireBiteHLA(HighLevelAction):
                 self.wrist_interface.set_velocity_mode()
                 self.wrist_interface.reset()
 
-            if self.robot_interface is not None:
+            if self.robot_interface is not None:   
+
                 # Run FLAIR perception.
                 camera_color_data, camera_info_data, camera_depth_data = (
                     self.perception_interface.get_camera_data()
                 )
-                # log the data
-                if self.log_path is not None:
 
+                items_detection = None
+                if not self.flair.is_preference_set():
+
+                    # Handle one-time preference setting for new meal.
                     # items = self.flair.identify_plate(camera_color_data)
+                    # print("Items detected:", items)
+                    # input("Press Enter to continue...")
                     # items = ['cantaloupe', 'banana']
-                    items = ['banana', 'watermelon', 'cantaloupe']
+                    # items = ['apple', 'mini donut']
+                    items = ['chicken']
                     # items = ['banana']
                     self.flair.set_food_items(items)
                     items_detection = self.flair.detect_items(camera_color_data, camera_depth_data, camera_info_data, log_path=None)
 
-                    # save food detection data
-                    food_detection_data = {
-                        "camera_color_data": camera_color_data,
-                        "camera_info_data": camera_info_data,
-                        "camera_depth_data": camera_depth_data,
-                        "items": items,
-                        "items_detection": items_detection,
-                    }
-                    with open(self.log_path / "food_detection_data.pkl", "wb") as f:
-                        pickle.dump(food_detection_data, f)
+                    food_type_to_data = items_detection['food_type_to_bounding_boxes_plate']
+                    n_food_types = len(food_type_to_data)
+                    data = [{k: v} for k, v in food_type_to_data.items()]
+
+                    food_types = food_type_to_data.keys()
+
+                    # TODO: generalize this...
+                    ordering_options = [f"Eat all the {food_type}s first" for food_type in food_types]
+                    ordering_options += ["No preference"]
+
+                    if self.web_interface is not None:
+                        bite_ordering_preference = self.web_interface.get_bite_ordering_preference(items_detection['plate_image'], n_food_types, data, ordering_options)
+                        print("User Preference:", bite_ordering_preference)
+                        self.flair.set_preference(bite_ordering_preference)
+                    else:
+                        # Use command line input for preference setting.
+                        print("Some example bite ordering preferences:")
+                        for ordering_option in ordering_options:
+                            print(" - ", ordering_option)
+                        preference = input("Enter preference: ")
+                        self.flair.set_preference(preference)
+
+                if items_detection is None:
+                    items_detection = self.flair.detect_items(camera_color_data, camera_depth_data, camera_info_data, log_path=None)
+
+                assert self.log_path is not None, "Log path must be set to save food detection data"
+                # save food detection data
+                food_detection_data = {
+                    "camera_color_data": camera_color_data,
+                    "camera_info_data": camera_info_data,
+                    "camera_depth_data": camera_depth_data,
+                    "items": self.flair.get_food_items(),
+                    "items_detection": items_detection,
+                }
+                with open(self.log_path / "food_detection_data.pkl", "wb") as f:
+                    pickle.dump(food_detection_data, f)
 
             else:
                 # read last logged data
@@ -117,43 +149,16 @@ class AcquireBiteHLA(HighLevelAction):
                     items_detection = food_detection_data["items_detection"]
 
                     self.flair.set_food_items(items)
-                    self.flair.set_items_detection(items_detection)
 
                 except FileNotFoundError:
                     raise FileNotFoundError("No logged data found for bite acquisition")
-            
-            if not self.flair.is_preference_set():
-
-                # Handle one-time preference setting.
-
-                food_type_to_data = items_detection['food_type_to_bounding_boxes_plate']
-                n_food_types = len(food_type_to_data)
-                data = [{k: v} for k, v in food_type_to_data.items()]
-
-                food_types = food_type_to_data.keys()
-
-                # TODO: generalize this...
-                ordering_options = [f"Eat all the {food_type}s first" for food_type in food_types]
-                ordering_options += ["No preference"]
-
-                if self.web_interface is not None:
-                    bite_ordering_preference = self.web_interface.get_bite_ordering_preference(items_detection['plate_image'], n_food_types, data, ordering_options)
-                    print("User Preference:", bite_ordering_preference)
-                    self.flair.set_preference(bite_ordering_preference)
-                else:
-                    # Use command line input for preference setting.
-                    print("Some example bite ordering preferences:")
-                    for ordering_option in ordering_options:
-                        print(" - ", ordering_option)
-                    preference = input("Enter preference: ")
-                    self.flair.set_preference(preference)
 
             # Prepare for bite acquisition.
             if self.wrist_interface is not None:
                 self.wrist_interface.set_velocity_mode()
                 self.wrist_interface.reset()
 
-            next_action_prediction = self.flair.predict_next_action(camera_color_data, items_detection=None, log_path=None)
+            next_action_prediction = self.flair.predict_next_action(camera_color_data, items_detection, log_path=None)
 
             next_food_item = next_action_prediction['labels_list'][next_action_prediction['food_id']]
             bite_mask_idx = next_action_prediction['bite_mask_idx']
@@ -168,16 +173,15 @@ class AcquireBiteHLA(HighLevelAction):
             predicted_bite = {next_food_item: food_type_to_data[next_food_item]}
 
             if self.web_interface is not None:
-                skill_type, skill_params = self.web_interface.get_next_bite_selection(items_detection['plate_image'], n_food_types, data, predicted_bite)         
+                skill_type, skill_params = self.web_interface.get_next_bite_selection(items_detection['plate_image'], n_food_types, data, predicted_bite, autocontinue_timeout=autocontinue_timeout)         
             else:
                 # params must be set to the autonomously selected values
                 skill_type = "autonomous"
                 skill_params = [next_food_item, bite_mask_idx]
 
             if skill_type == "autonomous":
-                detections = self.flair.get_items_detection()
-                food_type_to_masks = detections["food_type_to_masks"]
-                food_type_to_skill = detections["food_type_to_skill"]
+                food_type_to_masks = items_detection["food_type_to_masks"]
+                food_type_to_skill = items_detection["food_type_to_skill"]
                 
                 food_type = skill_params[0]
                 item_id = skill_params[1] - 1
@@ -195,8 +199,7 @@ class AcquireBiteHLA(HighLevelAction):
 
             if skill_type == "manual_skewering":
 
-                detections = self.flair.get_items_detection()
-                plate_bounds = detections["plate_bounds"]
+                plate_bounds = items_detection["plate_bounds"]
                 pos = skill_params[0]
 
                 point_x = int(pos["x"]*plate_bounds[2]) + plate_bounds[0]
@@ -222,7 +225,7 @@ class AcquireBiteHLA(HighLevelAction):
 
             self.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
 
-            if self.web_interface is not None:
+            if self.web_interface is not None and ask_confirmation:
                 get_success_confirmation = self.web_interface.get_successful_food_acquisition_confirmation()
                 if get_success_confirmation:
                     break

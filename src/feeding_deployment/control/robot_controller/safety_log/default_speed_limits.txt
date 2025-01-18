@@ -1,0 +1,60 @@
+Joint Limits: [control_mode: ANGULAR_JOYSTICK
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_acceleration_limits: 57.2957763671875
+joint_acceleration_limits: 57.2957763671875
+joint_acceleration_limits: 57.2957763671875
+joint_acceleration_limits: 57.2957763671875
+joint_acceleration_limits: 572.957763671875
+joint_acceleration_limits: 572.957763671875
+joint_acceleration_limits: 572.957763671875
+, control_mode: CARTESIAN_JOYSTICK
+twist_linear: 0.20000000298023224
+twist_angular: 20.001955032348633
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+, control_mode: ANGULAR_TRAJECTORY
+joint_speed_limits: 25.003875732421875
+joint_speed_limits: 25.003875732421875
+joint_speed_limits: 25.003875732421875
+joint_speed_limits: 25.003875732421875
+joint_speed_limits: 25.003875732421875
+joint_speed_limits: 25.003875732421875
+joint_speed_limits: 25.003875732421875
+joint_acceleration_limits: 51.56619644165039
+joint_acceleration_limits: 51.56619644165039
+joint_acceleration_limits: 51.56619644165039
+joint_acceleration_limits: 51.56619644165039
+joint_acceleration_limits: 515.6619873046875
+joint_acceleration_limits: 515.6619873046875
+joint_acceleration_limits: 515.6619873046875
+, control_mode: CARTESIAN_TRAJECTORY
+twist_linear: 0.10000000149011612
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+, control_mode: CARTESIAN_WAYPOINT_TRAJECTORY
+twist_linear: 0.10000000149011612
+twist_angular: 20.001955032348633
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+]

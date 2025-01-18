@@ -2,6 +2,13 @@ name: "TransferDrink"
 description: "Bring the mug to the user's mouth for a sip."
 type: "Behavior"
 parameters:
+  - name: "Speed"
+    description: "Speed of the robot during bringing the mug to the user's mouth."
+    space:
+      type: "Enum"
+      elements: ["low", "medium", "high"]
+    is_user_editable: True
+    value: "medium"
   - name: "ReadyToInitiateTransferInteraction"
     description: "Interaction mode for ready to initiate transfer."
     space:
@@ -29,5 +36,28 @@ parameters:
       type: "Enum"
       elements: ["button", "sense", "auto_timeout"]
     is_user_editable: True
-    value: "sense"
+    value: "button"
+  - name: "OutsideMouthDistance"
+    description: "Distance from the tool tip to the user's mouth."
+    space:
+      type: "Box"
+      lower: 0.1
+      upper: 0.2
+    is_user_editable: True
+    value: 0.15
+  - name: "AskForConfirmationInitiatingTransferSequence"
+    description: "Ask for confirmation on the web app before initiating the transfer sequence for drinking."
+    space:
+      type: "Enum"
+      elements: [0, 1]
+    is_user_editable: True
+    value: 1
+  - name: "TimeToWaitBeforeAutocontinue"
+    description: "Autocontinue duration for re-selecting drinking transfer after a sip."
+    space:
+      type: "Box"
+      lower: 5.0
+      upper: 100.0
+    is_user_editable: True
+    value: 10.0
 fn: !hla transfer_drink

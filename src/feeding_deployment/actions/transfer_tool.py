@@ -32,7 +32,7 @@ from feeding_deployment.actions.base import (
     ToolTransferDone,
 )
 
-from feeding_deployment.perception.gestures_perception.static_gesture_detectors import mouth_open_detector, head_shake_detector, head_still_detector
+from feeding_deployment.perception.gestures_perception.static_gesture_detectors import mouth_open_detector, head_nod_detector, head_shake_detector, head_still_detector
 
 from feeding_deployment.actions.feel_the_bite.inside_mouth_transfer import InsideMouthTransfer
 from feeding_deployment.actions.feel_the_bite.outside_mouth_transfer import OutsideMouthTransfer
@@ -60,33 +60,55 @@ class TransferToolHLA(HighLevelAction):
 
     def detect_initiate_transfer(self, initiate_transfer_interaction: str, ready_to_initiate_mode: str):
         if initiate_transfer_interaction == "button":
+            if self.web_interface is not None:
+                self.web_interface.fix_explanation("Please press the button to initiate transfer")
             self.perception_interface.detect_button_press()
         elif initiate_transfer_interaction == "open_mouth":
+            if self.web_interface is not None:
+                self.web_interface.fix_explanation("Please open your mouth to initiate transfer")
             mouth_open_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
         elif initiate_transfer_interaction == "auto_timeout":
+            if self.web_interface is not None:
+                self.web_interface.fix_explanation("Please wait for the transfer to initiate in 5 seconds")
             time.sleep(5.0)
         else:
             raise NotImplementedError
         print("Initiating transfer")
+
+        if self.web_interface is not None:
+            self.web_interface.clear_explanation()
 
         if ready_to_initiate_mode == "led":
             self.perception_interface.turn_off_led()
 
     def detect_transfer_complete(self, transfer_complete_interaction: str, ready_for_transfer_interaction: str):
         if transfer_complete_interaction == "button":
+            if self.web_interface is not None:
+                self.web_interface.fix_explanation("Please press the button to complete transfer")
             self.perception_interface.detect_button_press()
         elif transfer_complete_interaction == "sense":
             if self.tool == "fork":
+                if self.web_interface is not None:
+                    self.web_interface.fix_explanation("Please bite down on the fork to complete transfer")
                 self.perception_interface.detect_force_trigger()
             elif self.tool == "drink":
-                head_shake_detector(self.perception_interface, timeout=600) # 10 minutes
+                if self.web_interface is not None:
+                    self.web_interface.fix_explanation("Please do a head nod to complete transfer")
+                head_nod_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
             elif self.tool == "wipe":
-                head_still_detector(self.perception_interface, timeout=600) # 10 minutes
+                if self.web_interface is not None:
+                    self.web_interface.fix_explanation("Please do a head nod to complete transfer")
+                head_nod_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
         elif transfer_complete_interaction == "auto_timeout":
+            if self.web_interface is not None:
+                self.web_interface.fix_explanation("Please wait for the transfer to complete in 5 seconds")
             time.sleep(5.0)
         else:
             raise NotImplementedError
         print("Detected transfer completion")
+
+        if self.web_interface is not None:
+            self.web_interface.clear_explanation()
 
         if ready_for_transfer_interaction == "led":
             self.perception_interface.turn_off_led()
@@ -113,6 +135,7 @@ class TransferToolHLA(HighLevelAction):
 
     def execute_transfer(self, ready_to_initiate_mode: str, ready_to_transfer_mode: str,
                          initiate_transfer_mode: str, transfer_complete_mode: str,
+                         outside_mouth_distance: float = 0.0,
                          maintain_position_at_goal = False):
 
         self.perception_interface.set_head_perception_tool(self.tool)
@@ -137,7 +160,7 @@ class TransferToolHLA(HighLevelAction):
             self.detect_initiate_transfer(initiate_transfer_mode, ready_to_initiate_mode)
 
         self.transfer.set_tool(self.tool)
-        self.transfer.move_to_transfer_state(maintain_position_at_goal)
+        self.transfer.move_to_transfer_state(outside_mouth_distance, maintain_position_at_goal)
 
         if self.robot_interface is not None:
             self.relay_ready_for_transfer(ready_to_transfer_mode)
@@ -179,8 +202,20 @@ class TransferToolHLA(HighLevelAction):
         assert tool.name in ["utensil", "drink", "wipe"]
         return f"transfer_{tool.name}.yaml"    
     
-    def transfer_utensil(self, *args, **kwargs) -> None:
+    def transfer_utensil(self, speed: str, *args, **kwargs) -> None:
         assert self.sim.held_object_name == "utensil"
+
+        if self.robot_interface is not None:
+            self.robot_interface.set_speed(speed)
+
+        # Assume the last item in args is autocontinue time
+        bite_autocontinue_time = args[-1]
+
+        if self.web_interface is not None:
+            self.web_interface.set_bite_autocontinue_timeout(bite_autocontinue_time)
+
+        # All other items (everything except the last) should go on to the next call
+        remaining_args = args[:-1]
 
         if self.wrist_interface is not None:
             # start the horizontal spoon thread if it is not already running
@@ -193,26 +228,48 @@ class TransferToolHLA(HighLevelAction):
             self.wrist_interface.stop_horizontal_spoon_thread()
 
         self.set_tool("fork")
-        self.execute_transfer(*args, **kwargs)
+        self.execute_transfer(*remaining_args, **kwargs)
 
-    def transfer_drink(self, *args, **kwargs) -> None:
+    def transfer_drink(self, speed: str, *args, **kwargs) -> None:
         assert self.sim.held_object_name == "drink"
+
+        if self.robot_interface is not None:
+            self.robot_interface.set_speed(speed)
         
+        # Assume the second last item in args is the ask_confirmation
+        ask_confirmation = args[-2]
+
+        # Assume the last item in args is autocontinue time
+        drink_autocontinue_time = args[-1]
+
+        # All other items (everything except the last two) should go on to the next call
+        remaining_args = args[:-2]
+
         if self.web_interface is not None:
-            self.web_interface.get_drink_transfer_confirmation()
+            self.web_interface.set_drink_autocontinue_timeout(drink_autocontinue_time)
+            if ask_confirmation:
+                self.web_interface.get_drink_transfer_confirmation()
 
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
         self.set_tool("drink")    
-        self.execute_transfer(*args, maintain_position_at_goal=True, **kwargs)    
+        self.execute_transfer(*remaining_args, maintain_position_at_goal=True, **kwargs)    
 
-    def transfer_wipe(self, *args, **kwargs) -> None:
+    def transfer_wipe(self, speed: str, *args, **kwargs) -> None:
         assert self.sim.held_object_name == "wipe"
+
+        if self.robot_interface is not None:
+            self.robot_interface.set_speed(speed)
+
+        # Assume the last item in args is the ask_confirmation
+        ask_confirmation = args[-1]
+        # All other items (everything except the last) should go on to the next call
+        remaining_args = args[:-1]
         
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
-        if self.web_interface is not None:
+        if self.web_interface is not None and ask_confirmation:
             self.web_interface.get_wipe_transfer_confirmation()
 
         self.set_tool("wipe")
-        self.execute_transfer(*args, maintain_position_at_goal=True, **kwargs)
+        self.execute_transfer(*remaining_args, maintain_position_at_goal=True, **kwargs)

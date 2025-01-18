@@ -53,11 +53,31 @@ class WebInterface:
         time.sleep(1.0)  # Wait for the subscriber to connect
 
         self.current_page = "task_selection" # task_selection, transparency, adaptability
+
+        # for setting autocontinue time in task selection page
+        self.bite_autocontinue_timeout = 10.0
+        self.drink_autocontinue_timeout = 10.0
+
+        # for escaping out of while loops
+        self.active = True
+
         self.explanation_lock = threading.Lock() # Lock for generating continuous explanations
-        
+    
         # Start the thread for generating continuous explanations.
         self.transparency_continuous_thread = threading.Thread(target=self.provide_continuous_explanations)
         self.transparency_continuous_thread.start()
+
+    def stop_all_threads(self) -> None:
+        self.active = False
+        try:
+            self.transparency_continuous_thread.join()
+        except Exception as e:
+            print("Error stopping transparency continuous thread: ", e)
+        try:
+            self.gesture_listener_thread.join()
+        except Exception as e:
+            print("Error stopping gesture listener thread: ", e)
+
 
     def _send_message(self, msg_dict: dict[str, Any]) -> None:
         self.web_interface_publisher.publish(String(json.dumps(msg_dict)))
@@ -125,7 +145,13 @@ class WebInterface:
         while not self.received_web_interface_messages.empty():
             self.received_web_interface_messages.get()
 
-    def ready_for_task_selection(self, last_task_type = None, autocontinue_timeout = 7) -> None:
+    def set_bite_autocontinue_timeout(self, timeout: float) -> None:
+        self.bite_autocontinue_timeout = timeout
+
+    def set_drink_autocontinue_timeout(self, timeout: float) -> None:
+        self.drink_autocontinue_timeout = timeout
+
+    def ready_for_task_selection(self, last_task_type = None) -> None:
         """Moves the web interface to the task selection page."""
 
         self.current_page = "task_selection"
@@ -136,18 +162,18 @@ class WebInterface:
         if last_task_type == "bite":
             self._send_message({"state": "afterbitetransfer", "status": "jump"})
             time.sleep(0.5)
-            self._send_message({"state": "auto_time", "status": str(autocontinue_timeout)})
+            self._send_message({"state": "auto_time", "status": str(self.bite_autocontinue_timeout)})
         elif last_task_type == "sip":
             self._send_message({"state": "afterdrinktransfer", "status": "jump"})
             time.sleep(0.5)
-            self._send_message({"state": "auto_time", "status": str(autocontinue_timeout)})
+            self._send_message({"state": "auto_time", "status": str(self.drink_autocontinue_timeout)})
         else:
             self._send_message({"state": "task_selection", "status": "jump"})
 
     def get_required_web_interface_message(self, condition) -> dict[str, Any]:
         """Parses through all messages received from the web interface and returns the oldest one satisfying the condition."""
         print_once = True
-        while True:
+        while self.active:
             if self.task_selection_jump:
                 return None
             try:
@@ -168,55 +194,51 @@ class WebInterface:
 
         self.current_page = "meal_assistance"
 
-        with self.explanation_lock:
+        # Jump to bite ordering page
+        self._send_message({"state": "newmealpage", "status": "jump"})
         
-            # Jump to bite ordering page
-            self._send_message({"state": "newmealpage", "status": "jump"})
-            
-            # Wait for the web interface to be ready for initial data
-            time.sleep(0.2)
-            
-            # Send required data for the bite ordering page
-            self._send_image(plate_image)
-            self._send_message({"n_food_types": n_food_types, "data": data})
-            self._send_message({"n_ordering": len(ordering_options), "data": ordering_options})
+        # Wait for the web interface to be ready for initial data
+        time.sleep(0.2)
+        
+        # Send required data for the bite ordering page
+        self._send_image(plate_image)
+        self._send_message({"n_food_types": n_food_types, "data": data})
+        self._send_message({"n_ordering": len(ordering_options), "data": ordering_options})
 
-            # Get the user's bite ordering preference
-            msg_dict = self.get_required_web_interface_message(
-                lambda msg_dict: (
-                    (msg_dict["state"] == "order_selection" and msg_dict["status"] != "ready_for_initial_data")
-                    or (msg_dict["state"] == "voice")
-                )
+        # Get the user's bite ordering preference
+        msg_dict = self.get_required_web_interface_message(
+            lambda msg_dict: (
+                (msg_dict["state"] == "order_selection" and msg_dict["status"] != "ready_for_initial_data")
+                or (msg_dict["state"] == "voice")
             )
+        )
 
         bite_ordering_preference = msg_dict["status"]
         return bite_ordering_preference
     
-    def get_next_bite_selection(self, plate_image, n_food_types, data, predicted_bite, autocontinue_time=7) -> None:
+    def get_next_bite_selection(self, plate_image, n_food_types, data, predicted_bite, autocontinue_timeout) -> None:
 
         self.current_page = "meal_assistance"
 
-        with self.explanation_lock:
+        # Jump to next bite selection page
+        self._send_message({"state": "acquirebite", "status": "jump"})
 
-            # Jump to next bite selection page
-            self._send_message({"state": "acquirebite", "status": "jump"})
+        # Send required data for the next bite selection page
+        time.sleep(0.5) # simulate delay, needed for web interface
 
-            # Send required data for the next bite selection page
-            time.sleep(2.0) # simulate delay, needed for web interface
+        self._send_image(plate_image)
+        time.sleep(0.1)
+        self._send_message({"n_food_types": n_food_types, "data": data, "current_bite": predicted_bite})  
+        # set autocontinue timeout
+        time.sleep(0.5)
+        self._send_message({"state": "auto_time", "status": str(autocontinue_timeout)})
 
-            self._send_image(plate_image)
-            time.sleep(0.1)
-            self._send_message({"n_food_types": n_food_types, "data": data, "current_bite": predicted_bite})  
-            # set autocontinue time
-            time.sleep(0.5)
-            self._send_message({"state": "auto_time", "status": str(autocontinue_time)})
-
-            # Get the user's next bite selection
-            msg_dict = self.get_required_web_interface_message(
-                lambda msg_dict: (
-                    (msg_dict["status"] == "aquire_food" or msg_dict["status"] == 0)
-                )
-            ) 
+        # Get the user's next bite selection
+        msg_dict = self.get_required_web_interface_message(
+            lambda msg_dict: (
+                (msg_dict["status"] == "aquire_food" or msg_dict["status"] == 0)
+            )
+        ) 
 
         if msg_dict["status"] == "aquire_food": # autonomous bite acquisition
             return "autonomous", msg_dict["data"]
@@ -231,17 +253,15 @@ class WebInterface:
 
         self.current_page = "meal_assistance"
 
-        with self.explanation_lock:
-        
-            # Jump to successful food acquisition page
-            self._send_message({"state": "transfermeal", "status": "jump"})
+        # Jump to successful food acquisition page
+        self._send_message({"state": "transfermeal", "status": "jump"})
 
-            # Wait until the user confirms that the food has been acquired
-            msg_dict = self.get_required_web_interface_message(
-                lambda msg_dict: (
-                    (msg_dict["state"] == "post_bite_pickup")
-                )
+        # Wait until the user confirms that the food has been acquired
+        msg_dict = self.get_required_web_interface_message(
+            lambda msg_dict: (
+                (msg_dict["state"] == "post_bite_pickup")
             )
+        )
 
         if msg_dict["status"] == "bite_transfer":
             return True
@@ -254,46 +274,37 @@ class WebInterface:
 
         self.current_page = "meal_assistance"
 
-        with self.explanation_lock:
-        
-            # Jump to ready for drink transfer page
-            self._send_message({"state": "transferdrinks", "status": "jump"})
+        # Jump to ready for drink transfer page
+        self._send_message({"state": "transferdrinks", "status": "jump"})
 
-            # Wait until the user confirms that the drink has been transferred
-            self.get_required_web_interface_message(
-                lambda msg_dict: (
-                    (msg_dict["state"] == "post_drink_pickup" and msg_dict["status"] == "drink_transfer")
-                )
+        # Wait until the user confirms that the drink has been transferred
+        self.get_required_web_interface_message(
+            lambda msg_dict: (
+                (msg_dict["state"] == "post_drink_pickup" and msg_dict["status"] == "drink_transfer")
             )
+        )
 
     def get_wipe_transfer_confirmation(self) -> None:
 
         self.current_page = "meal_assistance"
 
-        with self.explanation_lock:
+        # jump to ready for wipe transfer page
+        print("Jumping to mouth wiping transfer page")
+        self._send_message({"state": "wipingtrans", "status": "jump"})
 
-            # jump to ready for wipe transfer page
-            print("Jumping to mouth wiping transfer page")
-            self._send_message({"state": "wipingtrans", "status": "jump"})
-
-            # Wait until the user confirms that the wipe has been transferred
-            self.get_required_web_interface_message(
-                lambda msg_dict: (
-                    (msg_dict["state"] == "prepared_mouth_wiping" and msg_dict["status"] == "move_to_wiping_position")
-                )
+        # Wait until the user confirms that the wipe has been transferred
+        self.get_required_web_interface_message(
+            lambda msg_dict: (
+                (msg_dict["state"] == "prepared_mouth_wiping" and msg_dict["status"] == "move_to_wiping_position")
             )
+        )
 
     #### Transparency Pages ####
 
     def get_transparency_request(self) -> None:
         
         if self.current_page != "transparency":
-            
-            # acquire explanation lock continuously until we move back to task selection page (which releases the lock)
-            self.explanation_lock.acquire()
-
             self.current_page = "transparency"
-
             # Jump to transparency query page
             self._send_message({"state": "transparency", "status": "jump"})
 
@@ -317,12 +328,7 @@ class WebInterface:
     def get_adaptability_request(self) -> None:
         
         if self.current_page != "adaptability":
-
-            # acquire explanation lock continuously until we move back to task selection page (which releases the lock)
-            self.explanation_lock.acquire()
-
             self.current_page = "adaptability"
-
             # Jump to adaptability query page
             self._send_message({"state": "adaptability", "status": "jump"})
 
@@ -391,7 +397,7 @@ class WebInterface:
 
     def gesture_listener_thread(self) -> None:
         
-        while True:
+        while self.active:
             msg_dict = self.get_required_web_interface_message(
                 lambda msg_dict: (
                     (msg_dict["state"] == "test_selection")
@@ -444,7 +450,7 @@ class WebInterface:
 
         timestamps = []
         start_timestamp, end_timestamp = None, None
-        while True:
+        while self.active:
             msg_dict = self.get_required_web_interface_message(
                 lambda msg_dict: (
                     (msg_dict["state"] == trigger_message)
@@ -493,11 +499,23 @@ class WebInterface:
 
     #### Continuous Explanations ####
 
+    def fix_explanation(self, explanation: str) -> None:
+        # Wait until the lock becomes available and then fix the explanation
+        self.explanation_lock.acquire()  # This will block until the lock is available
+        self._send_message({"state": "explanation", "status": explanation})
+
+    def clear_explanation(self) -> None:
+        # Release the lock to allow continuous explanations to proceed
+        if self.explanation_lock.locked():
+            self.explanation_lock.release()
+
     def provide_continuous_explanations(self) -> None:
-        while True:
-            # Rajat ToDo: Do not provide explanations during transfer (when the user is expected to open their mouth)
-            time.sleep(5.0)
-            explanation_active = True
-            start_time = time.time()
-            current_explanation = self.transparency_continuous.get_explanation()
-            self._send_message({"state": "explanation", "status": current_explanation})
+        current_explanation = ""
+        while self.active:
+            # Only provide continuous explanations if no one has fixed an explanation
+            if not self.explanation_lock.locked():
+                response = self.transparency_continuous.get_explanation()
+                if response != "No new explanation to provide" and response != current_explanation:
+                    current_explanation = response
+                self._send_message({"state": "explanation", "status": current_explanation})
+            time.sleep(1.0)  # Provide explanations at a rate of 1 Hz

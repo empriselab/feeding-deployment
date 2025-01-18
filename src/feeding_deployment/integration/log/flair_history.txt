@@ -1,1 +1,1 @@
-{'bite_history': ['banana', 'banana', 'banana', 'banana', 'banana', 'banana', 'banana', 'banana', 'banana', 'watermelon', 'watermelon', 'banana', 'banana', 'banana', 'banana'], 'user_preference': 'Waiting for content'}
+{'bite_history': ['chicken', 'chicken', 'chicken', 'chicken', 'chicken', 'chicken'], 'food_labels': ['chicken'], 'user_preference': 'Eat all the chickens first'}
