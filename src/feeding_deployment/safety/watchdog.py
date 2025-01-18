@@ -34,7 +34,7 @@ from feeding_deployment.control.robot_controller.arm_interface import ArmInterfa
 
 
 CAMERA_FREQUENCY_THRESHOLD = 10 # expected is 30 Hz
-FT_FREQUENCY_THRESHOLD = 800 # expected is 1000 Hz
+FT_FREQUENCY_THRESHOLD = 500 # expected is 1000 Hz
 FT_THRESHOLD = [30.0, 30.0, 30.0, 2.0, 2.0, 2.0]
 WITHIN_JOINT_LIMITS_FREQUENCY = 100 # expected is 100 Hz
 COLLISION_FREE_FREQUENCY_THRESHOLD = 100 # expected is 350 Hz (empirical)
@@ -81,7 +81,7 @@ class WatchDog:
         self.execution_log_path = Path(__file__).parent.parent / "integration" / "log" / "execution_log.txt"
 
         self.second_counter = 0
-        time.sleep(3.0) # Wait for all queues to fill up / collision monitor to start
+        time.sleep(5.0) # Wait for all queues to fill up / collision monitor to start
         print("Initialized.")
 
     def cameraCallback(self, msg):

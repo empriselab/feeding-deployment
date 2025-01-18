@@ -20,6 +20,7 @@ class FLAIR:
         self.history_path = Path(__file__).parent.parent.parent / "integration" / "log" / "flair_history.txt"
         if not os.path.exists(self.history_path):
             self.bite_history = []
+            self.inference_server.FOOD_CLASSES = None
             self.user_preference = None
         else:
             # read in json format
@@ -27,11 +28,13 @@ class FLAIR:
                 with open(self.history_path, 'r') as f:
                     logged_history = ast.literal_eval(f.read())
                 self.bite_history = logged_history["bite_history"]
+                self.inference_server.FOOD_CLASSES = logged_history["food_labels"]
                 self.user_preference = logged_history["user_preference"]
             except Exception as e:
                 print("Error reading history file", e)
                 print("Creating new history file...")
                 self.bite_history = []
+                self.inference_server.FOOD_CLASSES = None
                 self.user_preference = None
 
             print("Logged Bite History", self.bite_history)
@@ -41,15 +44,13 @@ class FLAIR:
         self.continue_food_label = None
         self.continue_dip_label = None
 
-        self.visualize = True
-
-        # itermediate variables
-        self.items_detection = None
-        self.next_action_prediction = None
-
     def log_history(self):
         with open(self.history_path, 'w') as f:
-            f.write(str({"bite_history": self.bite_history, "user_preference": self.user_preference}))
+            f.write(str({
+                "bite_history": self.bite_history,
+                "food_labels": self.inference_server.FOOD_CLASSES, 
+                "user_preference": self.user_preference
+            }))
 
     def update_bite_history(self, acquired_food_label):
         self.bite_history.append(acquired_food_label)
@@ -59,18 +60,14 @@ class FLAIR:
 
         items = self.inference_server.recognize_items(camera_color_data)
         print("Food Items recognized:", items)
-
-        # k = input("Did the robot recognize the food items correctly?")
-        k = 'n'
-        if k == 'n':
-            # Rajat ToDo: Implement manual input of food items        
-            items = ['yellow banana', 'baby carrot']
-            
-        self.inference_server.FOOD_CLASSES = items
         return items
 
     def set_food_items(self, items):
         self.inference_server.FOOD_CLASSES = items
+        self.log_history()
+
+    def get_food_items(self):
+        return self.inference_server.FOOD_CLASSES
 
     def set_preference(self, user_preference):
         self.user_preference = user_preference
@@ -143,7 +140,9 @@ class FLAIR:
         # cv2.imwrite(log_path + "_color.png", camera_color_data)
         # cv2.imwrite(log_path + "_depth.png", camera_depth_data)
 
-        categories = self.inference_server.categorize_items(item_labels) 
+        # categories = self.inference_server.categorize_items(item_labels, sim=False) 
+        # set all items to solids
+        categories = ['solid' for _ in item_labels]
 
         print("--------------------")
         print("Labels:", item_labels)
@@ -223,19 +222,9 @@ class FLAIR:
             'food_type_to_skill': food_type_to_skill
         }
 
-        self.items_detection = items_detection
         return items_detection
-    
-    def get_items_detection(self):
-        return self.items_detection
-    
-    def set_items_detection(self, items_detection):
-        self.items_detection = items_detection
 
     def predict_next_action(self, camera_color_data, items_detection, log_path):
-
-        if items_detection is None:
-            items_detection = self.items_detection
 
         annotated_image = items_detection['annotated_image']
         per_food_masks = items_detection['per_food_masks']
@@ -267,6 +256,4 @@ class FLAIR:
         }
 
         # Rajat ToDo: Update the detections with bite_mask_idx as the first mask for the food item
-        
-        self.next_action_prediction = next_action_prediction
         return next_action_prediction

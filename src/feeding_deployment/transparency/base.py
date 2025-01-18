@@ -29,7 +29,7 @@ class TransparencyBase(abc.ABC):
         """
 
         # For now I am sequencing them in a fixed order, but ideally this should reflect integration with the web interface.
-        bite = ["pick_utensil", "look_at_plate", "acquire_bite", "transfer_utensil", "stow_utensil"]
+        bite = ["pick_utensil", "acquire_bite", "transfer_utensil", "stow_utensil"]
         drink = ["pick_drink", "transfer_drink", "stow_drink"]
         wipe = ["pick_wipe", "transfer_wipe", "stow_wipe"]
 
@@ -54,6 +54,7 @@ class TransparencyBase(abc.ABC):
                 node_description = f.read()
             all_nodes_description += node_description + "\n---\n"
 
+        all_nodes_description += "Note that the units used for parameters are all speeds in degrees per second, all durations in seconds, and all distances in meters."
         return all_nodes_description
     
     def load_execution(self):

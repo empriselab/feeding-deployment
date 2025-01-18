@@ -1,5 +1,12 @@
 name: "StowWipe"
 description: "Place the wipe in the tool mount."
 type: "Behavior"
-parameters: []
+parameters:
+  - name: "Speed"
+    description: "Speed of the robot during placing the wipe."
+    space:
+      type: Enum
+      elements: ["low", "medium", "high"]
+    is_user_editable: True
+    value: "medium"
 fn: !hla stow_wipe

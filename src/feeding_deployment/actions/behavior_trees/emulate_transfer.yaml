@@ -1,5 +1,12 @@
 name: "EmulateTransfer"
 description: "Bring the empty gripper in front of the user's mouth to facilitate recording or testing gestures."
 type: "Behavior"
-parameters: []
+parameters:
+  - name: "Speed"
+    description: "Speed of the robot during emulated transfer."
+    space:
+      type: Enum
+      elements: ["low", "medium", "high"]
+    is_user_editable: True
+    value: "medium"
 fn: !hla emulate_transfer

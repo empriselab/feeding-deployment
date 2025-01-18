@@ -48,6 +48,8 @@ from feeding_deployment.actions.base import (
     ResetHLA,
     pddl_plan_to_hla_plan,
     interpret_user_update_request,
+    load_behavior_tree,
+    save_behavior_tree,
     NodeModificationUserUpdateRequest,
     NodeAdditionUserRequest,
     UserUpdateRequest,
@@ -131,13 +133,6 @@ class _Runner:
 
         self.flair = FLAIR()
 
-        if self.use_interface:
-            # Initialize the web interface.
-            self.task_selection_queue = queue.Queue()
-            self.web_interface = WebInterface(self.task_selection_queue)
-        else:
-            self.web_interface = None
-
         if self.run_on_robot:
             self.rviz_interface = RVizInterface(self.scene_description)
         else:
@@ -160,6 +155,13 @@ class _Runner:
         assert original_gesture_detection_filepath.exists()
         shutil.copy(original_gesture_detection_filepath, self.run_behavior_tree_dir)
         self._gesture_detection_filepath = self.run_behavior_tree_dir / original_gesture_detection_filepath.name
+
+        if self.use_interface:
+            # Initialize the web interface.
+            self.task_selection_queue = queue.Queue()
+            self.web_interface = WebInterface(self.task_selection_queue)
+        else:
+            self.web_interface = None
 
         # Create skills for high-level planning.
         hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
@@ -194,6 +196,27 @@ class _Runner:
             "wipe": self.wipe,
             "utensil": self.utensil,
         }
+        # Create all ground HLAs that will be used.
+        self._all_ground_hlas = []
+        for hla_name, hla in sorted(self.hla_name_to_hla.items()):
+            types = [p.type for p in hla.get_operator().parameters]
+            for obj_combo in get_object_combinations(sorted(self.all_objects), types):
+                # Major hack. The proper way to do this would be to define subtypes
+                # but I am too scared to make any change like that at this point.
+                if "AcquireBite" in hla_name:
+                    assert len(obj_combo) == 1
+                    if obj_combo[0].name != "utensil":
+                        continue
+                ground_hla = (hla, obj_combo)
+                self._all_ground_hlas.append(ground_hla)
+        # Rewrite the behavior trees to avoid any inconsistencies.
+        for hla, objs in self._all_ground_hlas:
+            try:
+                bt_filepath = hla.behavior_tree_dir / hla.get_behavior_tree_filename(objs, {})
+            except NotImplementedError:
+                continue
+            bt = load_behavior_tree(bt_filepath, hla)
+            save_behavior_tree(bt, bt_filepath, hla)
 
         # Track the current high-level state.
         self.current_atoms = {
@@ -214,6 +237,7 @@ class _Runner:
             while resp not in ["y", "n"]:
                 resp = input("Please enter 'y' or 'n': ")
                 if resp == "n":
+                    self.stop_all_threads()
                     sys.exit(0)
 
         print("Runner is ready.")
@@ -223,6 +247,7 @@ class _Runner:
 
         assert self.web_interface is not None, "Run takes user commands from the web interface which is None."
         
+        self.web_interface.ready_for_task_selection()
         last_task_type = None
         while self.active:
             try:
@@ -252,12 +277,12 @@ class _Runner:
                             if adaptation_request:
                                 try:
                                     print("Processing user update request:", adaptation_request)
-                                    self.process_user_update_request(adaptation_request)
+                                    update_summary = self.process_user_update_request(adaptation_request)
                                     print('Processed user update request.')
-                                    self.web_interface.update_adaptability_response("Adaptation successful.")
+                                    self.web_interface.update_adaptability_response(update_summary)
                                 except Exception as e:
                                     print(f"Adaptation failed: {e}")
-                                    self.web_interface.update_adaptability_response(f"Adaptation failed: {str(e)}")
+                                    self.web_interface.update_adaptability_response(f"Update failed: {str(e)}")
                             else:
                                 break
                     elif task_type == "gesture":
@@ -272,18 +297,23 @@ class _Runner:
                     last_task_type = task_type
                 else:
                     print(f"Invalid task selection: {task_selection_command}")
+                    last_task_type = None
+                self.web_interface.ready_for_task_selection(last_task_type=last_task_type)
                 print("Ready for next user command.")
             except queue.Empty:
-                if self.web_interface.current_page != "task_selection":
-                    self.web_interface.ready_for_task_selection(last_task_type=last_task_type)
-                else:
-                    # Wait for user command
-                    print("Current web interface page:", self.web_interface.current_page)
-                    time.sleep(0.1) 
-                    continue
+                # Wait for user command
+                print("Current web interface page:", self.web_interface.current_page)
+                time.sleep(0.1) 
+                continue
+
+    def stop_all_threads(self) -> None:
+        self.active = False
+        if self.web_interface is not None:
+            self.web_interface.stop_all_threads()
 
     def signal_handler(self, signal, frame):
-        self.active = False
+        print("\nReceived SIGINT.")
+        self.stop_all_threads()
         print("\nprogram exiting gracefully")
         sys.exit(0)
 
@@ -365,19 +395,19 @@ class _Runner:
                 
         print(f"Loaded system state from {self._saved_state_infile}")
 
-    def process_user_update_request(self, request_text: str) -> None:
+    def process_user_update_request(self, request_text: str) -> str:
         """Validate and update behavior trees."""
         available_hla_object_names = []
-        for hla_name, hla in sorted(self.hla_name_to_hla.items()):
-            types = [p.type for p in hla.get_operator().parameters]
-            for obj_combo in get_object_combinations(sorted(self.all_objects), types):
-                object_strs = [obj.name for obj in obj_combo]
-                objects_str = ", ".join(object_strs)
-                available_hla_object_name = f"hla_name={hla_name}, hla_object_names=({objects_str},)"
-                available_hla_object_names.append(available_hla_object_name)
+        for hla, obj_combo in self._all_ground_hlas:
+            hla_name = hla.get_name()
+            object_strs = [obj.name for obj in obj_combo]
+            objects_str = ", ".join(object_strs)
+            available_hla_object_name = f"hla_name={hla_name}, hla_object_names=({objects_str},)"
+            available_hla_object_names.append(available_hla_object_name)
         requested_updates = interpret_user_update_request(request_text, self.llm, available_hla_object_names, self.run_behavior_tree_dir)
         if len(requested_updates) == 0:
             raise ValueError("No valid updates requested.")
+        all_update_messages = []
         for update in requested_updates:
             assert isinstance(update, UserUpdateRequest)
             if update.hla_name not in self.hla_name_to_hla:
@@ -396,13 +426,35 @@ class _Runner:
                 raise ValueError(f"BT UPDATE FAILED: Unknown object name {failed_object_name}")
             ground_hla = GroundHighLevelAction(hla, tuple(hla_object_list))            
             if isinstance(update, NodeModificationUserUpdateRequest):
-                ground_hla.process_behavior_tree_parameter_update(update.node_name, update.parameter_name, update.new_value)
+                message = ground_hla.process_behavior_tree_parameter_update(update.node_name, update.parameter_name, update.new_value)
+                print(message)
+                all_update_messages.append((update, message))
             elif isinstance(update, NodeAdditionUserRequest):
-                ground_hla.process_behavior_tree_node_addition(update.new_node_type, update.new_node_parameters,
+                message = ground_hla.process_behavior_tree_node_addition(update.new_node_type, update.new_node_parameters,
                                                                update.anchor_node_name, update.before_or_after)
+                print(message)
+                all_update_messages.append((update, message))
             else:
                 print("Not implemented")
                 raise NotImplementedError
+        # TODO query LLM to summarize all_update_messages
+        all_update_str = ""
+        for request, message in all_update_messages:
+            all_update_str += f"\nRequest: {request}"
+            all_update_str += f"\nResult: {message}"
+        prompt = f"""A user requested the following change to a robot assisted feeding system:
+
+"{request_text}"
+                
+Here is a log of changes that were requested to behavior trees and the results:
+
+{all_update_str}
+
+Write a VERY BRIEF summary of all the changes for a non-technical end user. Make sure not to use technical terms like "behavior tree".
+"""
+        summary = self.llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
+        print("SUMMARY:", summary)
+        return summary
             
     def register_gesture_detector(self, gesture_fn_name: str, gesture_fn_text: str) -> bool:
         """Add the gesture function to this run's python file."""
@@ -420,7 +472,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--scene_config", type=str, default="vention")
-    parser.add_argument("--transfer_type", type=str, default="inside")
+    parser.add_argument("--transfer_type", type=str, default="outside")
     parser.add_argument("--run_on_robot", action="store_true")
     parser.add_argument("--use_interface", action="store_true")
     parser.add_argument("--use_gui", action="store_true")
@@ -458,9 +510,64 @@ if __name__ == "__main__":
     # runner.hla_command_queue.put(drink_transfer_msg)
 
     if not args.use_interface:
+
+        ## Variations on modifying the speed of the robot.
+
+        # All fast.
+        # runner.process_user_update_request("Set the speed of the robot to high.") 
+        # runner.process_user_update_request("Make the robot move fast.") 
+        # runner.process_user_update_request("Can the robot move faster.") 
+        # runner.process_user_update_request("The robot is too slow right now.") 
+        # runner.process_user_update_request("Go faster.") 
+
+        # All slow.
+        # runner.process_user_update_request("Set the speed of the robot to low.") 
+        # runner.process_user_update_request("Make the robot move slow.") 
+        # runner.process_user_update_request("Can the robot move slower.") 
+        # runner.process_user_update_request("The robot is too fast right now.") 
+        # runner.process_user_update_request("Go slower.")
+
+        # All medium.
+        # runner.process_user_update_request("Can the robot go not too fast but also not too slow?") 
+
+        # Selective speeds.
+        # runner.process_user_update_request("When the robot is coming close to my mouth can it go more slowly") 
+        # runner.process_user_update_request("When the robot is bringing food into my mouth can it not go so fast")  # currently updates all transfers, but that's okay
+        # runner.process_user_update_request("I only wanted to update the speed for the food, not for the drink or the wipe. Can you set the drink and wipe back to normal") 
+        # runner.process_user_update_request("When the robot is stabbing the food it is really slow right now") 
+
+        # Autocontinue times for transfer.
+        # runner.process_user_update_request("Stop waiting so long in between things") 
+        # runner.process_user_update_request("Can you wait just a little longer to let me decide if I want to continue") 
+        # runner.process_user_update_request("I need some more time to think")
+        # runner.process_user_update_request("I need some more time to think after taking a bite")  # updates more times than it should
+        # runner.process_user_update_request("I don't need to wait so long after drinking")  # updates more times than it should
+
+        # Outside mouth distance.
+        # runner.process_user_update_request("Set the outside mouth distance for transfer to 12 cms.")
+        # runner.process_user_update_request("Can you come closer to my mouth with the food?")
+        # runner.process_user_update_request("Please stay farther away from me")
+        # runner.process_user_update_request("Set the outside mouth distance for transfer to 0 cm.")  # should fail
+        # runner.process_user_update_request("Come just a tiny bit closer to my mouth.")
+
+        # NOTE: this is not working perfectly -- it updates the transfer distance for all 3 transfer skills.
+        # runner.process_user_update_request("Stay just a little farther away from my mouth when you are bringing the drink.")
+
+        # Removing the "Confirm Ready for Transfer" page on the web app.
+        # runner.process_user_update_request("Remove all transfer confirmations from the web app.")
+        # runner.process_user_update_request("Remove all transfer confirmations.")
+
+        # NOTE: this is not working perfectly -- it updates "silent for ReadyForTransferInteraction" instead of the web app confirmations.
+        runner.process_user_update_request("On the iPad, don't ask me to confirm when I'm ready.")
+
+
+        input("Press Enter to continue...")
+
         # Run some commands.
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.utensil,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.wipe,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
         # for i in range(5):
         #     runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))

@@ -1,5 +1,5 @@
 Objective: To determine the food items on the plate.
-Available items: ['shrimp', 'chicken', 'noodles', 'chicken', 'broccoli', 'fettucine', 'meatball', 'spaghetti', 'brownie', 'chocolate sauce', 'strawberry', 'celery', 'watermelon', 'ranch dressing', 'mashed potatoes', 'sausage']
+Available items: ['shrimp', 'noodles', 'chicken', 'broccoli', 'fettucine', 'meatball', 'spaghetti', 'brownie', 'chocolate sauce', 'strawberry', 'celery', 'watermelon', 'ranch dressing', 'mashed potatoes', 'sausage', 'apple']
 
 The first 3 images are in-context examples with the ground truth food items.
 Example Image 1: ['shrimp', 'chicken', 'noodles']
