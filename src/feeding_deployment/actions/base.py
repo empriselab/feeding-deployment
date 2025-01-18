@@ -140,17 +140,15 @@ class HighLevelAction(abc.ABC):
         new_node_parameters: dict[str, Any],
         anchor_node_name: str,
         before_or_after: str
-    ) -> None:
+    ) -> str:
         """Validate and add a new node into the behavior tree for this HLA."""
         # Create the dictionary for the new node.
         new_node_name = f"UserGeneratedNode{next(self.new_node_counter)}"
-        new_node_dict = self.create_user_addition_node_dict(new_node_name, new_node_type, new_node_parameters)
+        new_node_dict, node_dict_msg = self.create_user_addition_node_dict(new_node_name, new_node_type, new_node_parameters)
         if new_node_dict is None:  # node addition was misspecified / not safe
-            print(f"BT UPDATE FAILED in node addition (see error above).")
-            return
+            return f"The new node could not be added. {node_dict_msg}."
         if before_or_after not in ("before", "after"):
-            print(f"BT UPDATE FAILED. Invalid before or after: {before_or_after}")
-            return
+            return f"The new node could not be added. Invalid before or after: {before_or_after}"
         # Create the node itself.
         new_node = _parse_node(new_node_dict)
         # Load the current behavior tree.
@@ -161,8 +159,7 @@ class HighLevelAction(abc.ABC):
         # Get the anchor node.
         anchor_node = bt.get_node(anchor_node_name)
         if anchor_node is None or not isinstance(anchor_node, ParameterizedActionBehaviorTreeNode):
-            print(f"BT UPDATE FAILED. Invalid node name: {anchor_node_name}")
-            return
+            return f"Invalid node name: {anchor_node_name}"
         # Special case: the anchor node is not part of a sequence.
         if not isinstance(anchor_node.parent, SequenceBehaviorTreeNode):
             # For now we'll assume that this case only happens when the node is
@@ -177,13 +174,12 @@ class HighLevelAction(abc.ABC):
         if new_node_type == "Retract":
             # For now, totally restrict this.
             if anchor_node.name != "TransferUtensil":
-                print(f"BT UPDATE FAILED. Retract not allowed after {anchor_node.name}")
-                return
+                return f"Retract not allowed after {anchor_node.name}"
         # Add the node to the tree.
         anchor_node.parent.add_child(new_node, anchor_node, before_or_after)
-        print(f"BT UPDATE SUCCEEDED! New {new_node_type} node added")
         # Write the change to disk.
         save_behavior_tree(bt, bt_filepath, self)
+        return f"Success! New {new_node_type} node added"
 
     def process_behavior_tree_parameter_update(
         self,
@@ -203,44 +199,38 @@ class HighLevelAction(abc.ABC):
         # Get the node.
         node = bt.get_node(node_name)
         if node is None or not isinstance(node, ParameterizedActionBehaviorTreeNode):
-            print(f"BT UPDATE FAILED. Invalid node name: {node_name}")
-            return
+            return f"Invalid node name: {node_name}"
         # Get the parameter.
         parameter = node.get_parameter(parameter_name)
         if parameter is None:
-            print(f"BT UPDATE FAILED. Invalid parameter name: {parameter_name}")
-            return
+            return f"Invalid parameter name: {parameter_name}"
         # Ensure the parameter is allowed to be edited.
         if not parameter.is_user_editable:
-            print(f"BT UPDATE FAILED. Parameter not user editable: {parameter_name}")
-            return
+            return f"Parameter not user editable: {parameter_name}"
         # Ensure the new value is in bounds.
         if not parameter.space.contains(new_parameter_value):
-            print(f"BT UPDATE FAILED. Parameter value is out of bounds: {new_parameter_value} for {parameter_name}")
-            return
+            return f"Parameter value is out of bounds: {new_parameter_value} for {parameter_name}"
         # Update is valid! So update the tree.
-        print(f"BT UPDATE SUCCEEDED! New: {new_parameter_value} for {parameter_name}")
         node.set_parameter(parameter, new_parameter_value)
         # Write the change to disk.
         save_behavior_tree(bt, bt_filepath, self)
+        return f"Success! New: {new_parameter_value} for {parameter_name}"
 
     def create_user_addition_node_dict(
         self,
         new_node_name: str,
         new_node_type: str,
         new_node_parameters: dict[str, Any]
-    ) -> dict[str, Any] | None:
+    ) -> tuple[dict[str, Any] | None, str]:
         """Validate and create a new node from a user request."""
         if new_node_type == "Pause":
             if "duration" not in new_node_parameters:
-                print("BT UPDATE FAILED: missing parameter duration")
-                return
+                return None, "Missing parameter duration"
             duration = new_node_parameters["duration"]
             min_allowed_pause = 0.0
             max_allowed_pause = 10.0
             if not min_allowed_pause <= duration <= max_allowed_pause:
-                print(f"BT UPDATE FAILED: duration {duration} outside bounds")
-                return
+                return None, f"duration {duration} outside bounds"
             return {
                 "type": "Behavior",
                 "name": new_node_name,
@@ -259,12 +249,11 @@ class HighLevelAction(abc.ABC):
                 },
                 ],
                 "fn": self.pause,
-            }
+            }, "Success"
         
         if new_node_type == "WaitForGesture":
             if "gesture_fn_name" not in new_node_parameters:
-                print("BT UPDATE FAILED: missing parameter gesture_fn_name")
-                return
+                return None, "Missing parameter gesture_fn_name"
             gesture_fn_name = new_node_parameters["gesture_fn_name"]
             return {
                 "type": "Behavior",
@@ -282,7 +271,7 @@ class HighLevelAction(abc.ABC):
                 },
                 ],
                 "fn": self.wait_for_gesture,
-            }
+            }, "Success"
 
         if new_node_type == "Retract":
             return {
@@ -303,11 +292,9 @@ class HighLevelAction(abc.ABC):
                 },
                 ],
                 "fn": self.move_to_joint_positions,
-            }
+            }, "Success"
 
-
-        print(f"BT UPDATE FAILED: invalid new node type {new_node_type}")
-        return None
+        return None, f"Invalid new node type {new_node_type}"
 
     def move_to_joint_positions(self, joint_positions: list[float]) -> None:
         
@@ -424,13 +411,13 @@ class GroundHighLevelAction:
         self.hla.execute_action(self.objects, self.params)
 
     def process_behavior_tree_node_addition(self, new_node_type: str, new_node_parameters: dict[str, Any],
-                                            anchor_node_name: str, before_or_after: str) -> None:
+                                            anchor_node_name: str, before_or_after: str) -> str:
         """Validate and add a new node into the behavior tree."""
-        self.hla.process_behavior_tree_node_addition(self.objects, self.params, new_node_type, new_node_parameters, anchor_node_name, before_or_after)
+        return self.hla.process_behavior_tree_node_addition(self.objects, self.params, new_node_type, new_node_parameters, anchor_node_name, before_or_after)
 
-    def process_behavior_tree_parameter_update(self, node_name: str, parameter_name: str, new_parameter_value: Any) -> None:
+    def process_behavior_tree_parameter_update(self, node_name: str, parameter_name: str, new_parameter_value: Any) -> str:
         """Validate and update the behavior tree for this ground HLA."""
-        self.hla.process_behavior_tree_parameter_update(self.objects, self.params, node_name, parameter_name, new_parameter_value)
+        return self.hla.process_behavior_tree_parameter_update(self.objects, self.params, node_name, parameter_name, new_parameter_value)
 
 
 class ResetHLA(HighLevelAction):

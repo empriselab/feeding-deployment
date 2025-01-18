@@ -277,12 +277,12 @@ class _Runner:
                             if adaptation_request:
                                 try:
                                     print("Processing user update request:", adaptation_request)
-                                    self.process_user_update_request(adaptation_request)
+                                    update_summary = self.process_user_update_request(adaptation_request)
                                     print('Processed user update request.')
-                                    self.web_interface.update_adaptability_response("Adaptation successful.")
+                                    self.web_interface.update_adaptability_response(update_summary)
                                 except Exception as e:
                                     print(f"Adaptation failed: {e}")
-                                    self.web_interface.update_adaptability_response(f"Adaptation failed: {str(e)}")
+                                    self.web_interface.update_adaptability_response(f"Update failed: {str(e)}")
                             else:
                                 break
                     elif task_type == "gesture":
@@ -395,7 +395,7 @@ class _Runner:
                 
         print(f"Loaded system state from {self._saved_state_infile}")
 
-    def process_user_update_request(self, request_text: str) -> None:
+    def process_user_update_request(self, request_text: str) -> str:
         """Validate and update behavior trees."""
         available_hla_object_names = []
         for hla, obj_combo in self._all_ground_hlas:
@@ -407,6 +407,7 @@ class _Runner:
         requested_updates = interpret_user_update_request(request_text, self.llm, available_hla_object_names, self.run_behavior_tree_dir)
         if len(requested_updates) == 0:
             raise ValueError("No valid updates requested.")
+        all_update_messages = []
         for update in requested_updates:
             assert isinstance(update, UserUpdateRequest)
             if update.hla_name not in self.hla_name_to_hla:
@@ -425,13 +426,29 @@ class _Runner:
                 raise ValueError(f"BT UPDATE FAILED: Unknown object name {failed_object_name}")
             ground_hla = GroundHighLevelAction(hla, tuple(hla_object_list))            
             if isinstance(update, NodeModificationUserUpdateRequest):
-                ground_hla.process_behavior_tree_parameter_update(update.node_name, update.parameter_name, update.new_value)
+                message = ground_hla.process_behavior_tree_parameter_update(update.node_name, update.parameter_name, update.new_value)
+                print(message)
+                all_update_messages.append((update, message))
             elif isinstance(update, NodeAdditionUserRequest):
-                ground_hla.process_behavior_tree_node_addition(update.new_node_type, update.new_node_parameters,
+                message = ground_hla.process_behavior_tree_node_addition(update.new_node_type, update.new_node_parameters,
                                                                update.anchor_node_name, update.before_or_after)
+                print(message)
+                all_update_messages.append((update, message))
             else:
                 print("Not implemented")
                 raise NotImplementedError
+        # TODO query LLM to summarize all_update_messages
+        all_update_str = ""
+        for request, message in all_update_messages:
+            all_update_str += f"\nRequest: {request}"
+            all_update_str += f"\nResult: {message}"
+        prompt = f"""Given the log below of changes that were requested to behavior trees and the results, write a VERY BRIEF summary of all the changes for a non-technical end user.
+
+{all_update_str}        
+"""
+        summary = self.llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
+        print("SUMMARY:", summary)
+        return summary
             
     def register_gesture_detector(self, gesture_fn_name: str, gesture_fn_text: str) -> bool:
         """Add the gesture function to this run's python file."""
