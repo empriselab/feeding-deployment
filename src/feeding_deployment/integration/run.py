@@ -382,7 +382,7 @@ class _Runner:
                 # but I am too scared to make any change like that at this point.
                 if "AcquireBite" in hla_name:
                     assert len(obj_combo) == 1
-                    if obj_combo[0] != "utensil":
+                    if obj_combo[0].name != "utensil":
                         continue
                 object_strs = [obj.name for obj in obj_combo]
                 objects_str = ", ".join(object_strs)

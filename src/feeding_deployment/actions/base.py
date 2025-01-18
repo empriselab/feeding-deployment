@@ -890,24 +890,47 @@ Here is what the user said:
     bite = ["pick_utensil", "acquire_bite", "transfer_utensil", "stow_utensil"]
     drink = ["pick_drink", "transfer_drink", "stow_drink"]
     wipe = ["pick_wipe", "transfer_wipe", "stow_wipe"]
+    all_bt_names = "\n".join(bite + drink + wipe)
+
+    select_relevant_bts_prompt = """Given the following request from a person who is using an assisted feeding robot:
+    
+%s
+
+You think they might mean:
+
+%s
+
+Which of the following skills may be relevant to this request?
+
+%s
+    """ % (request_txt, rephrased_txt, all_bt_names)
+
+    relevant_bts_response = llm.sample_completions(select_relevant_bts_prompt, imgs=None, temperature=0.0, seed=0)[0]
+    print("Selected relevant BTs:", relevant_bts_response)
 
     all_nodes_description = ""
     
     # Load the behavior trees.
     all_nodes_description += "Bite:\n"
     for bite_node in bite:
+        if bite_node not in relevant_bts_response:
+            continue
         with open(behavior_log_path / f"{bite_node}.yaml", 'r') as f:
             node_description = f.read()
         all_nodes_description += node_description + "\n---\n"
 
     all_nodes_description += "Drink:\n"
     for drink_node in drink:
+        if drink_node not in relevant_bts_response:
+            continue
         with open(behavior_log_path / f"{drink_node}.yaml", 'r') as f:
             node_description = f.read()
         all_nodes_description += node_description + "\n---\n"
 
     all_nodes_description += "Wipe:\n"
     for wipe_node in wipe:
+        if wipe_node not in relevant_bts_response:
+            continue
         with open(behavior_log_path / f"{wipe_node}.yaml", 'r') as f:
             node_description = f.read()
         all_nodes_description += node_description + "\n---\n"
