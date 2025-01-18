@@ -83,8 +83,9 @@ from gymnasium.spaces import Box
             argument_optimizer=arg_optimizer,
             arg_index_to_space_var_name=self.adjustable_parameters_name,
         )
-        function_code = synthesized_program.code_str
-        timeout = 20.0
+
+        # Replace parameters!
+        function_code = synthesized_program.create_code_str_from_arg_values(synthesized_info.optimized_args)
 
         print("Best Optimized Arguments: ", synthesized_info.optimized_args)
 
@@ -92,8 +93,7 @@ from gymnasium.spaces import Box
         try:
             exec(function_code, globals())  # Executes code in the global namespace
 
-            args = [synthesized_info.optimized_args[i] for i in sorted(synthesized_info.optimized_args)]
-            positive_accuracy, negative_accuracy = self.run_detector(gesture_detector, None, timeout, *args)
+            positive_accuracy, negative_accuracy = self.run_detector(gesture_detector, None, 20.0)
             print("Best Positive Accuracy: ", positive_accuracy)
             print("Best Negative Accuracy: ", negative_accuracy)
             accuracy = (positive_accuracy + negative_accuracy) / 2.0
@@ -117,15 +117,7 @@ from gymnasium.spaces import Box
 """
             updated_function_code = function_code.replace(old_snippet.strip(), new_snippet.strip())
 
-            # TODO change this -- we're no longer using threshold!  
-            function_code_with_threshold = f"""
-def {self.label}(perception_interface, termination_event, timeout):
-    \"\"\"{self.language_description}\"\"\"
-    threshold = {threshold}
-{textwrap.indent(updated_function_code, "    ")}
-    return gesture_detector(perception_interface, termination_event, timeout, threshold)
-"""   
-            return function_code_with_threshold
+            return updated_function_code
         except Exception as e:
             print("Error: ", e)
             with open(Path(__file__).parent / "results" / f"{self.label}.txt", "a") as f:
