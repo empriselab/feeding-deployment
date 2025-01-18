@@ -48,6 +48,8 @@ from feeding_deployment.actions.base import (
     ResetHLA,
     pddl_plan_to_hla_plan,
     interpret_user_update_request,
+    load_behavior_tree,
+    save_behavior_tree,
     NodeModificationUserUpdateRequest,
     NodeAdditionUserRequest,
     UserUpdateRequest,
@@ -194,6 +196,27 @@ class _Runner:
             "wipe": self.wipe,
             "utensil": self.utensil,
         }
+        # Create all ground HLAs that will be used.
+        self._all_ground_hlas = []
+        for hla_name, hla in sorted(self.hla_name_to_hla.items()):
+            types = [p.type for p in hla.get_operator().parameters]
+            for obj_combo in get_object_combinations(sorted(self.all_objects), types):
+                # Major hack. The proper way to do this would be to define subtypes
+                # but I am too scared to make any change like that at this point.
+                if "AcquireBite" in hla_name:
+                    assert len(obj_combo) == 1
+                    if obj_combo[0].name != "utensil":
+                        continue
+                ground_hla = (hla, obj_combo)
+                self._all_ground_hlas.append(ground_hla)
+        # Rewrite the behavior trees to avoid any inconsistencies.
+        for hla, objs in self._all_ground_hlas:
+            try:
+                bt_filepath = hla.behavior_tree_dir / hla.get_behavior_tree_filename(objs, {})
+            except NotImplementedError:
+                continue
+            bt = load_behavior_tree(bt_filepath, hla)
+            save_behavior_tree(bt, bt_filepath, hla)
 
         # Track the current high-level state.
         self.current_atoms = {
@@ -375,19 +398,12 @@ class _Runner:
     def process_user_update_request(self, request_text: str) -> None:
         """Validate and update behavior trees."""
         available_hla_object_names = []
-        for hla_name, hla in sorted(self.hla_name_to_hla.items()):
-            types = [p.type for p in hla.get_operator().parameters]
-            for obj_combo in get_object_combinations(sorted(self.all_objects), types):
-                # Major hack. The proper way to do this would be to define subtypes
-                # but I am too scared to make any change like that at this point.
-                if "AcquireBite" in hla_name:
-                    assert len(obj_combo) == 1
-                    if obj_combo[0].name != "utensil":
-                        continue
-                object_strs = [obj.name for obj in obj_combo]
-                objects_str = ", ".join(object_strs)
-                available_hla_object_name = f"hla_name={hla_name}, hla_object_names=({objects_str},)"
-                available_hla_object_names.append(available_hla_object_name)
+        for hla, obj_combo in self._all_ground_hlas:
+            hla_name = hla.get_name()
+            object_strs = [obj.name for obj in obj_combo]
+            objects_str = ", ".join(object_strs)
+            available_hla_object_name = f"hla_name={hla_name}, hla_object_names=({objects_str},)"
+            available_hla_object_names.append(available_hla_object_name)
         requested_updates = interpret_user_update_request(request_text, self.llm, available_hla_object_names, self.run_behavior_tree_dir)
         if len(requested_updates) == 0:
             raise ValueError("No valid updates requested.")
