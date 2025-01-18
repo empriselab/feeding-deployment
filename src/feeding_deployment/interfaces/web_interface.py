@@ -510,9 +510,12 @@ class WebInterface:
             self.explanation_lock.release()
 
     def provide_continuous_explanations(self) -> None:
+        current_explanation = ""
         while self.active:
             # Only provide continuous explanations if no one has fixed an explanation
             if not self.explanation_lock.locked():
-                current_explanation = self.transparency_continuous.get_explanation()
+                response = self.transparency_continuous.get_explanation()
+                if response != "No new explanation to provide" and response != current_explanation:
+                    current_explanation = response
                 self._send_message({"state": "explanation", "status": current_explanation})
-            time.sleep(5.0)  # Adjust the frequency as needed
+            time.sleep(1.0)  # Provide explanations at a rate of 1 Hz
