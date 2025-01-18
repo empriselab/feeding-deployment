@@ -17,7 +17,7 @@ parameters:
       upper: 100.0
     is_user_editable: True
     value: 10.0
-  - name: "AskForConfirmationInitiatingTransferSequence"
+  - name: "TransferAskForConfirmation"
     description: "Ask for confirmation on the web app before initiating the transfer sequence for a bite."
     space:
       type: "Enum"

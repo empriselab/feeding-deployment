@@ -501,14 +501,26 @@ if __name__ == "__main__":
         # runner.process_user_update_request("Stop waiting so long in between things") 
         # runner.process_user_update_request("Can you wait just a little longer to let me decide if I want to continue") 
         # runner.process_user_update_request("I need some more time to think")
-        # runner.process_user_update_request("I need some more time to think after taking a bite")
-        # runner.process_user_update_request("I don't need to wait so long after drinking")
+        # runner.process_user_update_request("I need some more time to think after taking a bite")  # updates more times than it should
+        # runner.process_user_update_request("I don't need to wait so long after drinking")  # updates more times than it should
 
+        # Outside mouth distance.
+        # runner.process_user_update_request("Set the outside mouth distance for transfer to 12 cms.")
+        # runner.process_user_update_request("Can you come closer to my mouth with the food?")
+        # runner.process_user_update_request("Please stay farther away from me")
+        # runner.process_user_update_request("Set the outside mouth distance for transfer to 0 cm.")  # should fail
+        # runner.process_user_update_request("Come just a tiny bit closer to my mouth.")
 
-        # runner.process_user_update_request("Set the outside mouth distance for transfer to 12 cms.") # Works
-        # runner.process_user_update_request("Remove all transfer confirmations from the web app.") # Works
-        # runner.process_user_update_request("Remove all transfer confirmations.") # Doesn't remove bite transfer confirmation
-        # runner.process_user_update_request("Set the speed of the robot to high.") 
+        # NOTE: this is not working perfectly -- it updates the transfer distance for all 3 transfer skills.
+        # runner.process_user_update_request("Stay just a little farther away from my mouth when you are bringing the drink.")
+
+        # Removing the "Confirm Ready for Transfer" page on the web app.
+        # runner.process_user_update_request("Remove all transfer confirmations from the web app.")
+        # runner.process_user_update_request("Remove all transfer confirmations.")
+
+        # NOTE: this is not working perfectly -- it updates "silent for ReadyForTransferInteraction" instead of the web app confirmations.
+        # runner.process_user_update_request("On the iPad, don't ask me to confirm when I'm ready.")
+
 
         input("Press Enter to continue...")
 

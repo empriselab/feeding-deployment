@@ -13,6 +13,7 @@ from operator import attrgetter
 import itertools
 import string
 import traceback
+import re
 
 import yaml
 
@@ -1044,12 +1045,24 @@ because the node_name is not in the behavior tree. Recall again all of the behav
 %s
 """ % (str(request), behavior_tree_prompt)
                 break
+            # Case 5: the anchor name is invalid.
             if isinstance(request, NodeAdditionUserRequest) and request.anchor_node_name not in behavior_tree_prompt:
                 error_prompt = """The following request is invalid:
 
 %s
 
 because the anchor_node_name is not in the behavior tree. Recall again all of the behavior trees:
+
+%s
+""" % (str(request), behavior_tree_prompt)
+                break
+            # Case 6: the parameter is invalid for the node.
+            if isinstance(request, NodeModificationUserUpdateRequest) and not _parameter_name_is_valid(request.parameter_name, request.node_name, behavior_tree_prompt):
+                error_prompt = """The following request is invalid:
+
+%s
+
+because the parameter_name is not in the given behavior tree node. Make sure that the parameter name and node appear TOGETHER in the behavior tree. Recall again all of the behavior trees:
 
 %s
 """ % (str(request), behavior_tree_prompt)
@@ -1070,3 +1083,13 @@ def _strip_python_response(response: str) -> str:
     if response.endswith("```"):
         response = response[:-len("```")]
     return response
+
+
+def _parameter_name_is_valid(parameter_name, node_name, behavior_tree_prompt):
+    node_name_substring = f'name: "{node_name}"'
+    for match in re.finditer(node_name_substring, behavior_tree_prompt):
+        idx = match.start()
+        end = behavior_tree_prompt[idx:].find("---")
+        if parameter_name in behavior_tree_prompt[idx:idx+end]:
+            return True
+    return False
