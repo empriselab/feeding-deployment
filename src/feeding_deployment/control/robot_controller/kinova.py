@@ -654,12 +654,40 @@ class KinovaArm:
                 joint_acceleration_soft_limits
             )
 
+    def choose_from_speed_presets(self, speed_preset):
+        if speed_preset == "low":
+            speed_limits = [12.5, 12.5, 12.5, 12.5, 12.5, 12.5, 12.5]
+            acceleration_limits = [25, 25, 25, 25, 25, 25, 25]
+        elif speed_preset == "medium":
+            speed_limits = [25, 25, 25, 25, 25, 25, 25]
+            acceleration_limits = [50, 50, 50, 50, 50, 50, 50]
+        elif speed_preset == "high":
+            speed_limits = [50, 50, 50, 50, 50, 50, 50]
+            acceleration_limits = [100, 100, 100, 100, 100, 100, 100]
+        else:
+            raise ValueError("Invalid speed preset")
+        self.set_joint_limits(speed_limits, acceleration_limits)
+
     def set_max_joint_limits(self):
         speed_limits = self.control_config.GetKinematicHardLimits().joint_speed_limits
         acceleration_limits = (
             self.control_config.GetKinematicHardLimits().joint_acceleration_limits
         )
         self.set_joint_limits(speed_limits, acceleration_limits)
+
+    def get_joint_limits(self):
+        joint_limits = []
+        control_mode_information = ControlConfig_pb2.ControlModeInformation()
+        for control_mode in [
+            ControlConfig_pb2.ANGULAR_JOYSTICK,
+            ControlConfig_pb2.CARTESIAN_JOYSTICK,
+            ControlConfig_pb2.ANGULAR_TRAJECTORY,
+            ControlConfig_pb2.CARTESIAN_TRAJECTORY,
+            ControlConfig_pb2.CARTESIAN_WAYPOINT_TRAJECTORY,
+        ]:
+            control_mode_information.control_mode = control_mode
+            joint_limits.append(self.control_config.GetKinematicSoftLimits(control_mode_information))
+        return joint_limits
 
     def reset_joint_limits(self):
         control_mode_information = ControlConfig_pb2.ControlModeInformation()
@@ -1152,8 +1180,26 @@ class KinovaArm:
 def main():
     arm = KinovaArm()
     try:
-        input("Press Enter to zero torque offsets")
-        arm.zero_torque_offsets()
+        # input("Press Enter to zero torque offsets")
+        # arm.zero_torque_offsets()
+
+        arm.retract()
+
+        def cycle_arm(arm):
+            input("Press Enter to move to home configuration")
+            arm.home()
+            input("Press Enter to move to retract configuration")
+            arm.retract()
+
+        arm.choose_from_speed_presets("low")
+        cycle_arm(arm)
+
+        arm.choose_from_speed_presets("medium")
+        cycle_arm(arm)
+
+        arm.choose_from_speed_presets("high")
+        cycle_arm(arm)
+
     finally:
         arm.disconnect()
 

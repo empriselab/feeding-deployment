@@ -1,0 +1,60 @@
+[control_mode: ANGULAR_JOYSTICK
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_acceleration_limits: 57.2957763671875
+joint_acceleration_limits: 57.2957763671875
+joint_acceleration_limits: 57.2957763671875
+joint_acceleration_limits: 57.2957763671875
+joint_acceleration_limits: 572.957763671875
+joint_acceleration_limits: 572.957763671875
+joint_acceleration_limits: 572.957763671875
+, control_mode: CARTESIAN_JOYSTICK
+twist_linear: 0.20000000298023224
+twist_angular: 20.001955032348633
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+, control_mode: ANGULAR_TRAJECTORY
+joint_speed_limits: 80.00209045410156
+joint_speed_limits: 80.00209045410156
+joint_speed_limits: 80.00209045410156
+joint_speed_limits: 80.00209045410156
+joint_speed_limits: 70.00397491455078
+joint_speed_limits: 70.00397491455078
+joint_speed_limits: 70.00397491455078
+joint_acceleration_limits: 297.9380187988281
+joint_acceleration_limits: 297.9380187988281
+joint_acceleration_limits: 297.9380187988281
+joint_acceleration_limits: 297.9380187988281
+joint_acceleration_limits: 572.957763671875
+joint_acceleration_limits: 572.957763671875
+joint_acceleration_limits: 572.957763671875
+, control_mode: CARTESIAN_TRAJECTORY
+twist_linear: 0.10000000149011612
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+, control_mode: CARTESIAN_WAYPOINT_TRAJECTORY
+twist_linear: 0.10000000149011612
+twist_angular: 20.001955032348633
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+joint_speed_limits: 50.00202178955078
+]
