@@ -52,4 +52,12 @@ parameters:
       elements: [0, 1]
     is_user_editable: True
     value: 1
+  - name: "TaskSelectionAutocontinueTimeout"
+    description: "Autocontinue duration for re-selecting drinking transfer after a sip."
+    space:
+      type: "Box"
+      lower: 5.0
+      upper: 100.0
+    is_user_editable: True
+    value: 10.0
 fn: !hla transfer_drink
