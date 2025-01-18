@@ -461,6 +461,10 @@ if __name__ == "__main__":
     # runner.hla_command_queue.put(drink_transfer_msg)
 
     if not args.use_interface:
+
+
+        runner.process_user_update_request("Set the outside mouth distance for transfer to 12 cms.")
+
         # Run some commands.
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.wipe,)))

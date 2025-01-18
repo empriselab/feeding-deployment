@@ -32,7 +32,7 @@ from feeding_deployment.actions.base import (
     ToolTransferDone,
 )
 
-from feeding_deployment.perception.gestures_perception.static_gesture_detectors import mouth_open_detector, head_shake_detector, head_still_detector
+from feeding_deployment.perception.gestures_perception.static_gesture_detectors import mouth_open_detector, head_nod_detector, head_shake_detector, head_still_detector
 
 from feeding_deployment.actions.feel_the_bite.inside_mouth_transfer import InsideMouthTransfer
 from feeding_deployment.actions.feel_the_bite.outside_mouth_transfer import OutsideMouthTransfer
@@ -79,9 +79,9 @@ class TransferToolHLA(HighLevelAction):
             if self.tool == "fork":
                 self.perception_interface.detect_force_trigger()
             elif self.tool == "drink":
-                head_shake_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
+                head_nod_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
             elif self.tool == "wipe":
-                head_still_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
+                head_nod_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
         elif transfer_complete_interaction == "auto_timeout":
             time.sleep(5.0)
         else:
@@ -113,6 +113,7 @@ class TransferToolHLA(HighLevelAction):
 
     def execute_transfer(self, ready_to_initiate_mode: str, ready_to_transfer_mode: str,
                          initiate_transfer_mode: str, transfer_complete_mode: str,
+                         outside_mouth_distance: float = 0.0,
                          maintain_position_at_goal = False):
 
         self.perception_interface.set_head_perception_tool(self.tool)
@@ -137,7 +138,7 @@ class TransferToolHLA(HighLevelAction):
             self.detect_initiate_transfer(initiate_transfer_mode, ready_to_initiate_mode)
 
         self.transfer.set_tool(self.tool)
-        self.transfer.move_to_transfer_state(maintain_position_at_goal)
+        self.transfer.move_to_transfer_state(outside_mouth_distance, maintain_position_at_goal)
 
         if self.robot_interface is not None:
             self.relay_ready_for_transfer(ready_to_transfer_mode)

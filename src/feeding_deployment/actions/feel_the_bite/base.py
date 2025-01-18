@@ -54,7 +54,7 @@ class Transfer(abc.ABC):
             self.robot_interface.execute_command(CartesianCommand(pos=pose.position, quat=pose.orientation))
 
     @abc.abstractmethod
-    def move_to_transfer_state(self, maintain_position_at_goal = False):
+    def move_to_transfer_state(self, outside_mouth_distance, maintain_position_at_goal = False):
         """Move robot to the transfer state."""
 
     @abc.abstractmethod

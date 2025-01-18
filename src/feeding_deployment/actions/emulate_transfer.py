@@ -109,7 +109,7 @@ class EmulateTransferHLA(HighLevelAction):
             self.detect_initiate_transfer()
 
         self.transfer.set_tool("fork")
-        self.transfer.move_to_transfer_state()
+        self.transfer.move_to_transfer_state(outside_mouth_distance=0.15)
 
         if self.robot_interface is not None:
             self.relay_ready_for_gestures()

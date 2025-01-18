@@ -21,7 +21,7 @@ DISTANCE_INFRONT_MOUTH = 0.10
 
 class OutsideMouthTransfer(Transfer):
 
-    def move_to_transfer_state(self, maintain_position_at_goal = False):
+    def move_to_transfer_state(self, outside_mouth_distance, maintain_position_at_goal = False):
 
         if self.robot_interface is not None:
             self.set_filter_noisy_readings_pub.publish(Bool(data=True))
@@ -36,7 +36,7 @@ class OutsideMouthTransfer(Transfer):
         forque_target_base[:3, :3] = Rotation.from_quat([0.523, -0.503, -0.469, 0.503]).as_matrix()
         
         servo_point_forque_target = np.identity(4)
-        servo_point_forque_target[:3,3] = np.array([0, 0, -DISTANCE_INFRONT_MOUTH]).reshape(1,3)
+        servo_point_forque_target[:3,3] = np.array([0, 0, -outside_mouth_distance]).reshape(1,3)
         infront_mouth_target = forque_target_base @ servo_point_forque_target
 
         # # mouth is assumed to be facing away from the wheelchair

@@ -30,4 +30,12 @@ parameters:
       elements: ["button", "sense", "auto_timeout"]
     is_user_editable: True
     value: "sense"
+  - name: "OutsideMouthDistance"
+    description: "Distance from the tool tip to the user's mouth."
+    space:
+      type: "Box"
+      lower: 0.1
+      upper: 0.2
+    is_user_editable: True
+    value: 0.15
 fn: !hla transfer_wipe
