@@ -492,7 +492,10 @@ if __name__ == "__main__":
         # runner.process_user_update_request("Can the robot go not too fast but also not too slow?") 
 
         # Selective speeds.
-        runner.process_user_update_request("When the robot is coming close to my mouth can it go more slowly") 
+        # runner.process_user_update_request("When the robot is coming close to my mouth can it go more slowly") 
+        # runner.process_user_update_request("When the robot is bringing food into my mouth can it not go so fast")  # currently updates all transfers, but that's okay
+        # runner.process_user_update_request("I only wanted to update the speed for the food, not for the drink or the wipe. Can you set the drink and wipe back to normal") 
+        runner.process_user_update_request("When the robot is stabbing the food it is really slow right now") 
 
         # TODO Test selective speed edits (just acq, just transfer, just transfer with utensil and so on?)
         # TODO I also pushed personalizing autocontinue time for drink and utensil transfer. Seems to work. Can you also run a few variations on this?
