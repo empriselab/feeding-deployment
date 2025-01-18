@@ -52,7 +52,7 @@ parameters:
       elements: [0, 1]
     is_user_editable: True
     value: 1
-  - name: "TaskSelectionAutocontinueTimeout"
+  - name: "TimeToWaitBeforeAutocontinue"
     description: "Autocontinue duration for re-selecting drinking transfer after a sip."
     space:
       type: "Box"
