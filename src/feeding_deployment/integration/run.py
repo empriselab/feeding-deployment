@@ -378,6 +378,12 @@ class _Runner:
         for hla_name, hla in sorted(self.hla_name_to_hla.items()):
             types = [p.type for p in hla.get_operator().parameters]
             for obj_combo in get_object_combinations(sorted(self.all_objects), types):
+                # Major hack. The proper way to do this would be to define subtypes
+                # but I am too scared to make any change like that at this point.
+                if "AcquireBite" in hla_name:
+                    assert len(obj_combo) == 1
+                    if obj_combo[0] != "utensil":
+                        continue
                 object_strs = [obj.name for obj in obj_combo]
                 objects_str = ", ".join(object_strs)
                 available_hla_object_name = f"hla_name={hla_name}, hla_object_names=({objects_str},)"
@@ -466,11 +472,23 @@ if __name__ == "__main__":
 
     if not args.use_interface:
 
+        # Variations on modifying the speed of the robot.
+        # runner.process_user_update_request("Set the speed of the robot to high.") 
+        # runner.process_user_update_request("Make the robot move fast.") 
+        # runner.process_user_update_request("Can the robot move faster.") 
+        # runner.process_user_update_request("The robot is too slow right now.") 
+        # runner.process_user_update_request("Go faster.") 
+        # runner.process_user_update_request("Set the speed of the robot to low.") 
+        # runner.process_user_update_request("Make the robot move slow.") 
+        # runner.process_user_update_request("Can the robot move slower.") 
+        # runner.process_user_update_request("The robot is too fast right now.") 
+        runner.process_user_update_request("Go slower.") 
+
 
         # runner.process_user_update_request("Set the outside mouth distance for transfer to 12 cms.") # Works
         # runner.process_user_update_request("Remove all transfer confirmations from the web app.") # Works
         # runner.process_user_update_request("Remove all transfer confirmations.") # Doesn't remove bite transfer confirmation
-        runner.process_user_update_request("Set the speed of the robot to high.") 
+        # runner.process_user_update_request("Set the speed of the robot to high.") 
 
         input("Press Enter to continue...")
 
