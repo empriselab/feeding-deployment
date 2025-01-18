@@ -872,7 +872,7 @@ def interpret_user_update_request(
     # what should be changed. This can help with cases like "the robot is too slow"
     # which otherwise can get mistaken for "make the robot slow" (probably because
     # the main prompt is really long and it's easy to get distracted).
-    rephrase_prompt = """Given the following text from a person who is using an assisted feeding robot, briefly rephrase their request into something that should be changed in the robot's software.
+    rephrase_prompt = """Given the following text from a person who is using an assisted feeding robot, briefly rephrase their request into some kind of specific setting that should be changed in the robot's software.
     
 For example, if the user said "I don't like the sound that the robot makes when it wants my attention", a good rephrasing would be "Use something other than the current sound to signal when the robot needs attention."
 
@@ -916,7 +916,8 @@ Here is what the user said:
 
     prompt_prefix = """Your job is to convert the following command into one or more structured outputs in a format that I will describe next.
 
-The command is: %s
+The original command is: %s
+You think maybe what they mean is: %s
 
 The available structured output types are:
 
@@ -944,7 +945,7 @@ The "hla" stands for high-level action. Each hla can be grounded with zero or mo
 IMPORTANT: make sure your hla_object_names and hla_name appear together in the list above!
 
 A NodeModificationUserUpdateRequest a request to modify one parameter for one node in a behavior tree associated with an hla.
-""" % (rephrased_txt, hla_object_name_str)
+""" % (request_txt, rephrased_txt, hla_object_name_str)
 
     behavior_tree_prompt = """
 Here are all behavior trees:
