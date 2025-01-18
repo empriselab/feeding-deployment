@@ -59,7 +59,7 @@ class AcquireBiteHLA(HighLevelAction):
         assert tool.name == "utensil"
         return "acquire_bite.yaml"
     
-    def acquire_bite(self, speed: float) -> None:
+    def acquire_bite(self, speed: float, autocontinue_timeout: float, ask_confirmation: bool) -> None:
 
         # TODO actually use speed
         print("ACQUIRE BITE CALLED WITH SPEED: ", speed)
@@ -172,7 +172,7 @@ class AcquireBiteHLA(HighLevelAction):
             predicted_bite = {next_food_item: food_type_to_data[next_food_item]}
 
             if self.web_interface is not None:
-                skill_type, skill_params = self.web_interface.get_next_bite_selection(items_detection['plate_image'], n_food_types, data, predicted_bite)         
+                skill_type, skill_params = self.web_interface.get_next_bite_selection(items_detection['plate_image'], n_food_types, data, predicted_bite, autocontinue_timeout=autocontinue_timeout)         
             else:
                 # params must be set to the autonomously selected values
                 skill_type = "autonomous"
@@ -224,7 +224,7 @@ class AcquireBiteHLA(HighLevelAction):
 
             self.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
 
-            if self.web_interface is not None:
+            if self.web_interface is not None and ask_confirmation:
                 get_success_confirmation = self.web_interface.get_successful_food_acquisition_confirmation()
                 if get_success_confirmation:
                     break

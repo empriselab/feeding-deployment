@@ -140,7 +140,7 @@ class WebInterface:
         while not self.received_web_interface_messages.empty():
             self.received_web_interface_messages.get()
 
-    def ready_for_task_selection(self, last_task_type = None, autocontinue_timeout = 7) -> None:
+    def ready_for_task_selection(self, last_task_type = None, autocontinue_timeout = 10) -> None:
         """Moves the web interface to the task selection page."""
 
         self.current_page = "task_selection"
@@ -207,7 +207,7 @@ class WebInterface:
         bite_ordering_preference = msg_dict["status"]
         return bite_ordering_preference
     
-    def get_next_bite_selection(self, plate_image, n_food_types, data, predicted_bite, autocontinue_time=7) -> None:
+    def get_next_bite_selection(self, plate_image, n_food_types, data, predicted_bite, autocontinue_timeout) -> None:
 
         self.current_page = "meal_assistance"
 
@@ -222,9 +222,9 @@ class WebInterface:
             self._send_image(plate_image)
             time.sleep(0.1)
             self._send_message({"n_food_types": n_food_types, "data": data, "current_bite": predicted_bite})  
-            # set autocontinue time
+            # set autocontinue timeout
             time.sleep(0.5)
-            self._send_message({"state": "auto_time", "status": str(autocontinue_time)})
+            self._send_message({"state": "auto_time", "status": str(autocontinue_timeout)})
 
             # Get the user's next bite selection
             msg_dict = self.get_required_web_interface_message(
