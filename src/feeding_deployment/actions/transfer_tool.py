@@ -186,6 +186,15 @@ class TransferToolHLA(HighLevelAction):
         if self.robot_interface is not None:
             self.robot_interface.set_speed(speed)
 
+        # Assume the last item in args is autocontinue time
+        bite_autocontinue_time = args[-1]
+
+        if self.web_interface is not None:
+            self.web_interface.set_bite_autocontinue_timeout(bite_autocontinue_time)
+
+        # All other items (everything except the last) should go on to the next call
+        remaining_args = args[:-1]
+
         if self.wrist_interface is not None:
             # start the horizontal spoon thread if it is not already running
             self.wrist_interface.start_horizontal_spoon_thread()
@@ -197,7 +206,7 @@ class TransferToolHLA(HighLevelAction):
             self.wrist_interface.stop_horizontal_spoon_thread()
 
         self.set_tool("fork")
-        self.execute_transfer(*args, **kwargs)
+        self.execute_transfer(*remaining_args, **kwargs)
 
     def transfer_drink(self, speed: str, *args, **kwargs) -> None:
         assert self.sim.held_object_name == "drink"
@@ -205,13 +214,19 @@ class TransferToolHLA(HighLevelAction):
         if self.robot_interface is not None:
             self.robot_interface.set_speed(speed)
         
-        # Assume the last item in args is the ask_confirmation
-        ask_confirmation = args[-1]
-        # All other items (everything except the last) should go on to the next call
-        remaining_args = args[:-1]
+        # Assume the second last item in args is the ask_confirmation
+        ask_confirmation = args[-2]
 
-        if self.web_interface is not None and ask_confirmation:
-            self.web_interface.get_drink_transfer_confirmation()
+        # Assume the last item in args is autocontinue time
+        drink_autocontinue_time = args[-1]
+
+        # All other items (everything except the last two) should go on to the next call
+        remaining_args = args[:-2]
+
+        if self.web_interface is not None:
+            self.web_interface.set_drink_autocontinue_timeout(drink_autocontinue_time)
+            if ask_confirmation:
+                self.web_interface.get_drink_transfer_confirmation()
 
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
