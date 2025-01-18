@@ -131,13 +131,6 @@ class _Runner:
 
         self.flair = FLAIR()
 
-        if self.use_interface:
-            # Initialize the web interface.
-            self.task_selection_queue = queue.Queue()
-            self.web_interface = WebInterface(self.task_selection_queue)
-        else:
-            self.web_interface = None
-
         if self.run_on_robot:
             self.rviz_interface = RVizInterface(self.scene_description)
         else:
@@ -160,6 +153,13 @@ class _Runner:
         assert original_gesture_detection_filepath.exists()
         shutil.copy(original_gesture_detection_filepath, self.run_behavior_tree_dir)
         self._gesture_detection_filepath = self.run_behavior_tree_dir / original_gesture_detection_filepath.name
+
+        if self.use_interface:
+            # Initialize the web interface.
+            self.task_selection_queue = queue.Queue()
+            self.web_interface = WebInterface(self.task_selection_queue)
+        else:
+            self.web_interface = None
 
         # Create skills for high-level planning.
         hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}

@@ -70,7 +70,7 @@ class AcquireBiteHLA(HighLevelAction):
         if self.wrist_interface is not None:
             self.wrist_interface.stop_horizontal_spoon_thread()
 
-        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos) # leads to safer motion
+        # self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos) # leads to safer motion
         self.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
         
         while True:
@@ -94,7 +94,7 @@ class AcquireBiteHLA(HighLevelAction):
                     # input("Press Enter to continue...")
                     # items = ['cantaloupe', 'banana']
                     # items = ['apple', 'mini donut']
-                    items = ['watermelon']
+                    items = ['chicken']
                     # items = ['banana']
                     self.flair.set_food_items(items)
                     items_detection = self.flair.detect_items(camera_color_data, camera_depth_data, camera_info_data, log_path=None)

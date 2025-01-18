@@ -580,22 +580,30 @@ class BiteAcquisitionInference:
         # self.FOOD_CLASSES = [f.replace('fettuccine', 'noodles') for f in self.FOOD_CLASSES]
         # self.FOOD_CLASSES = [f.replace('spaghetti', 'noodles') for f in self.FOOD_CLASSES]
         # self.FOOD_CLASSES.append('blue plate')
-        self.FOOD_CLASSES = [f.replace('banana', 'circle yellow banana piece') for f in self.FOOD_CLASSES]
-        self.FOOD_CLASSES = [f.replace('watermelon', 'red watermelon piece') for f in self.FOOD_CLASSES]
-        self.FOOD_CLASSES = [f.replace('grape', 'round brown grape') for f in self.FOOD_CLASSES]
-        self.FOOD_CLASSES = [f.replace('baby carrot', 'baby carrot piece') for f in self.FOOD_CLASSES]
-        self.FOOD_CLASSES = [f.replace('cantaloupe', 'square orange cantaloupe piece') for f in self.FOOD_CLASSES]
-        self.FOOD_CLASSES = [f.replace('chicken nugget', 'chicken nugget piece') for f in self.FOOD_CLASSES]
-        self.FOOD_CLASSES = [f.replace('apple', 'apple piece') for f in self.FOOD_CLASSES]
-        self.FOOD_CLASSES = [f.replace('mini donut', 'mini donut piece') for f in self.FOOD_CLASSES]
-        # self.FOOD_CLASSES.append('banana piece')
 
-        print("Food Classes being detected: ", self.FOOD_CLASSES)
+        food_classes_being_detected = self.FOOD_CLASSES.copy() 
+
+        replacement_dict = {
+            "banana": "circle yellow banana piece",
+            "watermelon": "red watermelon piece",
+            "grape": "round brown grape",
+            "baby carrot": "baby carrot piece",
+            "cantaloupe": "square orange cantaloupe piece",
+            "chicken nugget": "chicken nugget piece",
+            "apple": "apple piece",
+            "mini donut": "mini donut piece",
+            "chicken": "chicken piece",
+        }
+
+        for key, value in replacement_dict.items():
+            food_classes_being_detected = [f.replace(key, value) for f in food_classes_being_detected]
+
+        print("Food Classes being detected: ", food_classes_being_detected)
 
         # detect objects
         detections = self.grounding_dino_model.predict_with_classes(
             image=cropped_image,
-            classes=self.FOOD_CLASSES,
+            classes=food_classes_being_detected,
             box_threshold=self.BOX_THRESHOLD,
             text_threshold=self.TEXT_THRESHOLD
         )
@@ -612,7 +620,7 @@ class BiteAcquisitionInference:
         # annotate image with detections
         box_annotator = sv.BoxAnnotator()
         labels = [
-            f"{self.FOOD_CLASSES[class_id]} {confidence:0.2f}" 
+            f"{food_classes_being_detected[class_id]} {confidence:0.2f}" 
             for _, _, confidence, class_id, _, _
             in detections]
         annotated_frame = box_annotator.annotate(scene=cropped_image.copy(), detections=detections, labels=labels)
@@ -679,7 +687,7 @@ class BiteAcquisitionInference:
         box_annotator = sv.BoxAnnotator()
         mask_annotator = sv.MaskAnnotator()
         labels = [
-            f"{self.FOOD_CLASSES[class_id]} {confidence:0.2f}" 
+            f"{food_classes_being_detected[class_id]} {confidence:0.2f}" 
             for _, _, confidence, class_id, _, _
             in detections]
 
@@ -837,16 +845,8 @@ class BiteAcquisitionInference:
                 portion_weights.append(max(1, mask_weight(food_enclosing_mask)/MIN_WEIGHT))
 
         print('Labels before replacement: ', labels)
-        # bring back labels for banana slices back to banana
-        labels = [l.replace('circle yellow banana piece', 'banana') for l in labels]
-        labels = [l.replace('red watermelon piece', 'watermelon') for l in labels]
-        labels = [l.replace('round brown grape', 'grape') for l in labels]
-        labels = [l.replace('baby carrot piece', 'baby carrot') for l in labels]
-        labels = [l.replace('square orange cantaloupe piece', 'cantaloupe') for l in labels]
-        labels = [l.replace('chicken nugget piece', 'chicken nugget') for l in labels]
-        labels = [l.replace('apple piece', 'apple') for l in labels]
-        labels = [l.replace('mini donut piece', 'mini donut') for l in labels]
-        # labels = [l.replace('banana piece', 'banana') for l in labels]    
+        for key, value in replacement_dict.items():
+            labels = [l.replace(value, key) for l in labels]
         print('Labels after replacement: ', labels)
 
         return annotated_image, detections, refined_masks, portion_weights, labels, plate_bounds

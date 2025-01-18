@@ -70,6 +70,7 @@ class ArmInterfaceClient:
         assert not self.in_compliant_mode, "Cannot set speed in compliant mode"
         assert speed in ["low", "medium", "high"], "Speed must be one of 'low', 'medium', 'high'"
         self._arm_interface.set_speed(speed)
+        time.sleep(1.0) # Make sure the arm has time to change speed
 
     def set_tool(self, tool: str):
         assert not self.in_compliant_mode, "Cannot set tool in compliant mode"
@@ -87,7 +88,10 @@ class ArmInterfaceClient:
             if self.in_compliant_mode:
                 return self._arm_interface.compliant_set_joint_position(cmd.pos)
             else:
-                return self._arm_interface.set_joint_position(cmd.pos)
+                joint_command_pos = cmd.pos
+                if isinstance(joint_command_pos, np.ndarray):
+                    joint_command_pos = joint_command_pos.tolist()  # Convert to a list if it's a NumPy array
+                return self._arm_interface.set_joint_position(joint_command_pos)
 
         if cmd.__class__.__name__ == "CartesianCommand":
             if self.in_compliant_mode:

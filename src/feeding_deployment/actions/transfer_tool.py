@@ -255,7 +255,7 @@ class TransferToolHLA(HighLevelAction):
         self.set_tool("drink")    
         self.execute_transfer(*remaining_args, maintain_position_at_goal=True, **kwargs)    
 
-    def transfer_wipe(self, speed: str, ask_confirmation, *args, **kwargs) -> None:
+    def transfer_wipe(self, speed: str, *args, **kwargs) -> None:
         assert self.sim.held_object_name == "wipe"
 
         if self.robot_interface is not None:
