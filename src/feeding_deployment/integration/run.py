@@ -507,6 +507,11 @@ if __name__ == "__main__":
         gesture_description = "shaking head from left to right"
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": False, "gesture_label":gesture_label, "gesture_description": gesture_description} ))        
 
+        # Test testing the new gesture.
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": True}))
+        import ipdb; ipdb.set_trace()
+
+
         ## Variations on modifying the speed of the robot.
 
         # All fast.

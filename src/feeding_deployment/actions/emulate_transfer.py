@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 import time
@@ -7,6 +7,7 @@ from scipy.spatial.transform import Rotation
 import inspect
 from pathlib import Path
 import threading
+import types
 
 from pybullet_helpers.geometry import Pose
 
@@ -118,14 +119,14 @@ class EmulateTransferHLA(HighLevelAction):
 
         if True: # TODO DO NOTE MERGE self.web_interface is not None:
             if self.test_mode:
-                # find all available gestures
+                # Start with the static, given gestures.
                 available_gestures = inspect.getmembers(static_gesture_detectors, inspect.isfunction)
 
-                # TODO remove this........
-                import feeding_deployment.perception.gestures_perception.synthesized_gesture_detectors as synthesized_gesture_detectors
-                available_gestures += inspect.getmembers(synthesized_gesture_detectors, inspect.isfunction)
-                gestures_dict = {gesture[0]: gesture[1] for gesture in available_gestures}
+                # Load the synthesized gestures.
+                synthesized_gestures = self.load_synthesized_gestures()
+                available_gestures += synthesized_gestures
 
+                gestures_dict = {gesture[0]: gesture[1] for gesture in available_gestures}
                 self.web_interface.jump_to_test_gesture_page(list(gestures_dict.keys()))
 
                 # Create a termination event to signal when to switch detectors
@@ -183,10 +184,9 @@ class EmulateTransferHLA(HighLevelAction):
 
                 #     input("Press enter to synthesize detector function")
                 #     generated_function_txt = self.detector_synthesizer.generate_function(gesture_datapath)
-
-                # TODO DO NOTE MERGE 
-                if True:
                 
+                if True:  # TODO DO NOT MERGE
+
                     # Hack to test the synthesizer
                     hack_datapath = Path(__file__).parent.parent / "perception" / "gestures_perception" / "gestures_examples" / "shake_my_head_from_left_to_right.pkl"
                     generated_function_txt = self.detector_synthesizer.generate_function(hack_datapath)
@@ -249,3 +249,11 @@ class EmulateTransferHLA(HighLevelAction):
         with open(self.gesture_detection_filepath, "w", encoding="utf-8") as f:
             f.write(gesture_file_text)
         print(f"Registered new gesture detection function: {gesture_fn_name}")    
+
+    def load_synthesized_gestures(self) -> list[tuple[str, Callable]]:
+        """Returns a list of function names and functions."""
+        with open(self.gesture_detection_filepath, "r", encoding="utf-8") as f:
+            gesture_file_text = f.read()
+        synthesized_gesture_module = types.ModuleType('synthesized_gestures')
+        exec(gesture_file_text, synthesized_gesture_module.__dict__)
+        return inspect.getmembers(synthesized_gesture_module, inspect.isfunction)
