@@ -359,9 +359,8 @@ class HighLevelAction(abc.ABC):
         assert gesture_fn_name in gestures
         gesture_fn = gestures[gesture_fn_name]
         while True:
-             # TODO: what's the termination event supposed to be?
              termination_event = None
-             timeout = 5.0
+             timeout = 600.0
              if gesture_fn(self.perception_interface, termination_event, timeout):
                  break
 
@@ -470,7 +469,7 @@ def pddl_plan_to_hla_plan(
     return hla_plan
 
 
-@dataclass(frozen=True)
+@dataclass
 class BehaviorTreeParameter:
     """A single parameter for a policy in a behavior tree.
     
@@ -577,6 +576,10 @@ class BehaviorTreeNode(abc.ABC):
     def get_yaml_dict(self, hla: HighLevelAction) -> dict[str, Any]:
         """Get a dictionary to pass to yaml.dump()."""
 
+    @abc.abstractmethod
+    def walk(self) -> list[BehaviorTreeNode]:
+        """Enumerate all nodes including this one."""
+
     def log_start(self) -> None:
         """Log the start of execution."""
         with open(self._execution_log_path, 'a') as f:
@@ -612,6 +615,9 @@ class ParameterizedActionBehaviorTreeNode(BehaviorTreeNode):
             return self
         return None
     
+    def walk(self) -> list[BehaviorTreeNode]:
+        return [self]
+
     def get_yaml_dict(self, hla: HighLevelAction) -> dict[str, Any]:
         fn_name = self._policy.get_function_name()
         assert hasattr(hla, fn_name)
@@ -666,6 +672,12 @@ class SequenceBehaviorTreeNode(BehaviorTreeNode):
             if child.get_node(name) is not None:
                 return child
         return None
+    
+    def walk(self) -> list[BehaviorTreeNode]:
+        lst = [self]
+        for child in self._children:
+            lst.extend(child.walk())
+        return lst
 
     def get_yaml_dict(self, hla: HighLevelAction) -> dict[str, Any]:
         child_dicts = [child.get_yaml_dict(hla) for child in self._children]

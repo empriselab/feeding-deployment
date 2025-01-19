@@ -34,6 +34,7 @@ from relational_structs import (
 )
 from relational_structs.utils import parse_pddl_plan, get_object_combinations
 from tomsutils.pddl_planning import run_pddl_planner
+from tomsutils.spaces import EnumSpace
 from pybullet_helpers.geometry import Pose
 
 from feeding_deployment.actions.base import (
@@ -55,6 +56,7 @@ from feeding_deployment.actions.base import (
     NodeModificationUserUpdateRequest,
     NodeAdditionUserRequest,
     UserUpdateRequest,
+    ParameterizedActionBehaviorTreeNode
 )
 from feeding_deployment.actions.pick_tool import PickToolHLA
 from feeding_deployment.actions.stow_tool import StowToolHLA
@@ -467,6 +469,31 @@ Write a VERY BRIEF summary of all the changes for a non-technical end user. Make
         gesture_file_text += "\n" + gesture_fn_text + "\n"
         with open(self._gesture_detection_filepath, "w", encoding="utf-8") as f:
             f.write(gesture_file_text)
+        # Immediately add the new gesture to specific BT nodes.
+        gesture_interaction_parameters = [
+            "InitiateTransferInteraction",
+            "TransferCompleteInteraction",
+        ]
+        for hla, objs in self._all_ground_hlas:
+            try:
+                bt_filepath = hla.behavior_tree_dir / hla.get_behavior_tree_filename(objs, {})
+            except NotImplementedError:
+                continue
+            bt = load_behavior_tree(bt_filepath, hla)
+            for node in bt.walk():
+                if isinstance(node, ParameterizedActionBehaviorTreeNode):
+                    for parameter_name in gesture_interaction_parameters:
+                        parameter = node.get_parameter(parameter_name)
+                        if parameter is None:
+                            continue
+                        assert parameter.is_user_editable
+                        assert isinstance(parameter.space, EnumSpace)
+                        current_choices = list(parameter.space.elements)
+                        new_choices = current_choices + [gesture_fn_name]
+                        new_parameter_space = EnumSpace(new_choices)
+                        parameter.space = new_parameter_space
+            save_behavior_tree(bt, bt_filepath, hla)
+            
         print(f"Registered new gesture detection function: {gesture_fn_name}")    
 
     def load_synthesized_gestures(self) -> list[tuple[str, Callable]]:
@@ -527,10 +554,11 @@ if __name__ == "__main__":
         gesture_description = "shaking head from left to right"
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": False, "gesture_label":gesture_label, "gesture_description": gesture_description} ))        
 
-        # Test testing the new gesture.
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": True}))
-        import ipdb; ipdb.set_trace()
+        # Test using the new gesture.
+        runner.process_user_update_request("Let me shake my head to tell the robot that I'm done.")
 
+        # Now try actually doing a transfer. The gesture should be used.
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
 
         ## Variations on modifying the speed of the robot.
 

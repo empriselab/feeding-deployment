@@ -117,7 +117,7 @@ class EmulateTransferHLA(HighLevelAction):
         if self.robot_interface is not None:
             self.relay_ready_for_gestures()
 
-        if True: # TODO DO NOTE MERGE self.web_interface is not None:
+        if self.web_interface is not None:
             if self.test_mode:
                 # Start with the static, given gestures.
                 available_gestures = inspect.getmembers(static_gesture_detectors, inspect.isfunction)
@@ -159,37 +159,36 @@ class EmulateTransferHLA(HighLevelAction):
                 # start logging perception data while user selects when to record and delete on the web interface,
                 # then extract relevant examples using timestamps
 
-                # logging_start_time = self.perception_interface.start_logging_head_perception()
-                # positive_examples_timestamps, negative_examples_timestamps = self.web_interface.get_gesture_examples()
-                # self.perception_interface.stop_logging_head_perception()
+                logging_start_time = self.perception_interface.start_logging_head_perception()
+                positive_examples_timestamps, negative_examples_timestamps = self.web_interface.get_gesture_examples()
+                self.perception_interface.stop_logging_head_perception()
                 
-                # if len(positive_examples_timestamps) > 0 and len(negative_examples_timestamps) > 0:
-                #     positive_examples = []
-                #     for timestamp in positive_examples_timestamps:
-                #         positive_examples.append(self.perception_interface.extract_from_logged_head_perception_data(timestamp))
+                if len(positive_examples_timestamps) > 0 and len(negative_examples_timestamps) > 0:
+                    positive_examples = []
+                    for timestamp in positive_examples_timestamps:
+                        positive_examples.append(self.perception_interface.extract_from_logged_head_perception_data(timestamp))
 
-                #     negative_examples = []
-                #     for timestamp in negative_examples_timestamps:
-                #         negative_examples.append(self.perception_interface.extract_from_logged_head_perception_data(timestamp))
+                    negative_examples = []
+                    for timestamp in negative_examples_timestamps:
+                        negative_examples.append(self.perception_interface.extract_from_logged_head_perception_data(timestamp))
 
-                #     # save the examples
-                #     gesture_datapath = self.gesture_examples_path / f"{self.gesture_label}.pkl"
-                #     with open(gesture_datapath, "wb") as f:
-                #         pickle.dump({
-                #             "label": self.gesture_label,
-                #             "description": self.gesture_description,
-                #             "positive_examples": positive_examples, 
-                #             "negative_examples": negative_examples
-                #         }, f)
+                    # save the examples
+                    gesture_datapath = self.gesture_examples_path / f"{self.gesture_label}.pkl"
+                    with open(gesture_datapath, "wb") as f:
+                        pickle.dump({
+                            "label": self.gesture_label,
+                            "description": self.gesture_description,
+                            "positive_examples": positive_examples, 
+                            "negative_examples": negative_examples
+                        }, f)
 
-                #     input("Press enter to synthesize detector function")
-                #     generated_function_txt = self.detector_synthesizer.generate_function(gesture_datapath)
+                    input("Press enter to synthesize detector function")
+                    generated_function_txt = self.detector_synthesizer.generate_function(gesture_datapath)
                 
-                if True:  # TODO DO NOT MERGE
 
                     # Hack to test the synthesizer
-                    hack_datapath = Path(__file__).parent.parent / "perception" / "gestures_perception" / "gestures_examples" / "shake_my_head_from_left_to_right.pkl"
-                    generated_function_txt = self.detector_synthesizer.generate_function(hack_datapath)
+                    # hack_datapath = Path(__file__).parent.parent / "perception" / "gestures_perception" / "gestures_examples" / "shake_my_head_from_left_to_right.pkl"
+                    # generated_function_txt = self.detector_synthesizer.generate_function(hack_datapath)
                     
                     if generated_function_txt is not None:
                         self.register_gesture_detector(self.gesture_label, generated_function_txt)
