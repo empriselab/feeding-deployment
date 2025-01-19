@@ -46,41 +46,25 @@ def mouth_open(perception_interface, termination_event, timeout):
 def head_nod(perception_interface, termination_event, timeout):
     """ Detect head nod """
 
-    threshold = 5.0
-
-    def gesture_detector(perception_interface, termination_event, timeout, threshold):
-
-        start_time = time.time()
-        pitch_data = []
-        direction_changes = 0  # Counts the number of up-down or down-up changes
-
-        while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
-            head_perception_data = perception_interface.get_head_perception_data()
-            if head_perception_data is None:
-                continue
-            else:
-                time.sleep(0.1) # Maintain 10 Hz rate
-            head_pose = head_perception_data["head_pose"]
-
-            (head_x, head_y, head_z, head_roll, head_pitch, head_yaw) = head_pose
-            pitch_data.append(head_pitch)
-
-            # Check if there is enough data to detect direction change
-            if len(pitch_data) >= 3:
-
-                print("Pitch differences: ", pitch_data[-2] - pitch_data[-3], pitch_data[-2] - pitch_data[-1])
-                if (pitch_data[-2] - pitch_data[-3] > threshold and pitch_data[-2] - pitch_data[-1] > threshold) or \
-                (pitch_data[-3] - pitch_data[-2] > threshold and pitch_data[-1] - pitch_data[-2] > threshold):
-                    direction_changes += 1
-
-                if direction_changes >= 2:
-                    return True
-
-            # To avoid excessive memory usage, keep the pitch_data size small
-            if len(pitch_data) > 100:
-                pitch_data.pop(0)
-
-        # If timeout expires without detecting the gesture, return False
-        return False
-    
-    return gesture_detector(perception_interface, termination_event, timeout, threshold)
+    head_nod_threshold = 2.0
+    max_pitch_data_size = 100.0
+    start_time = time.time()
+    pitch_data = []
+    direction_changes = 0
+    while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
+        head_perception_data = perception_interface.get_head_perception_data()
+        if head_perception_data is None:
+            continue
+        else:
+            time.sleep(0.1) # Maintain 10 Hz rate
+        head_pose = head_perception_data['head_pose']
+        (head_x, head_y, head_z, head_roll, head_pitch, head_yaw) = head_pose
+        pitch_data.append(head_pitch)
+        if len(pitch_data) >= 3:
+            if pitch_data[-2] - pitch_data[-3] > head_nod_threshold and pitch_data[-1] - pitch_data[-2] > head_nod_threshold or (pitch_data[-3] - pitch_data[-2] > head_nod_threshold and pitch_data[-2] - pitch_data[-1] > head_nod_threshold):
+                direction_changes += 1
+            if direction_changes >= 2:
+                return True
+        if len(pitch_data) > max_pitch_data_size:
+            pitch_data.pop(0)
+    return False

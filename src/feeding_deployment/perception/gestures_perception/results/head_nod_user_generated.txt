@@ -1,2 +1,4 @@
 
 nBest Accuracy: 0.6
+nBest Accuracy: 0.8
+nBest Accuracy: 1.0
