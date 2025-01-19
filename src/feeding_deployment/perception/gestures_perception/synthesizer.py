@@ -56,12 +56,11 @@ class PersonalizedGestureDetectorSynthesizer:
         self.positive_examples = gesture_data['positive_examples']
         self.negative_examples = gesture_data['negative_examples']
         timeout = 20.0
-        threshold = 0.5  # this will be optimized after the initial synthesis
         self.input_output_examples = [
-            ((MockPerceptionInterface(head_perception_data=example), None, timeout, threshold), True)
+            ((MockPerceptionInterface(head_perception_data=example), None, timeout), True)
             for example in self.positive_examples 
         ] + [
-            ((MockPerceptionInterface(head_perception_data=example), None, timeout, threshold), False)
+            ((MockPerceptionInterface(head_perception_data=example), None, timeout), False)
             for example in self.negative_examples 
         ]
     
