@@ -91,7 +91,10 @@ from gymnasium.spaces import Box
 
         print("Generated Function Code: ", function_code)
         try:
-            exec(function_code, globals())  # Executes code in the global namespace
+            workspace = locals().copy()
+            exec(function_code, workspace)
+            assert self.function_label in workspace
+            gesture_detector = workspace[self.function_label]
 
             positive_accuracy, negative_accuracy = self.run_detector(gesture_detector, None, 20.0)
             print("Best Positive Accuracy: ", positive_accuracy)
