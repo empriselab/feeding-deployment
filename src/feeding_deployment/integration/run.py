@@ -168,7 +168,7 @@ class _Runner:
         print("Creating HLAs...")
         self.hlas = {
             cls(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.web_interface, hla_hyperparams,
-                self.wrist_interface, self.flair, self.run_behavior_tree_dir, self.no_waits, self.log_dir) for cls in HLAS  # type: ignore
+                self.wrist_interface, self.flair, self.run_behavior_tree_dir, self.no_waits, self.log_dir, self.register_gesture_detector) for cls in HLAS  # type: ignore
         }
         print("HLAs created.")
         self.hla_name_to_hla = {hla.get_name(): hla for hla in self.hlas}

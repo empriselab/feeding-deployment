@@ -48,7 +48,6 @@ class EmulateTransferHLA(HighLevelAction):
         self.gesture_examples_path = Path(__file__).parent.parent / "integration" / "log" / "gesture_examples"
         if not self.gesture_examples_path.exists():
             self.gesture_examples_path.mkdir(parents=True)
-        self.synthesized_detectors_path = Path(__file__).parent.parent / "perception" / "gestures_perception" / "synthesized_gesture_detectors.py"
         self.detector_synthesizer = PersonalizedGestureDetectorSynthesizer()
 
         self.test_mode = False
@@ -117,11 +116,12 @@ class EmulateTransferHLA(HighLevelAction):
         if self.robot_interface is not None:
             self.relay_ready_for_gestures()
 
-        if True: # TODO DO NOT MERGE self.web_interface is not None:
+        if self.web_interface is not None:
             if self.test_mode:
                 # find all available gestures
                 available_gestures = inspect.getmembers(static_gesture_detectors, inspect.isfunction)
 
+                # TODO remove this........
                 import feeding_deployment.perception.gestures_perception.synthesized_gesture_detectors as synthesized_gesture_detectors
                 available_gestures += inspect.getmembers(synthesized_gesture_detectors, inspect.isfunction)
                 gestures_dict = {gesture[0]: gesture[1] for gesture in available_gestures}
@@ -158,43 +158,39 @@ class EmulateTransferHLA(HighLevelAction):
                 # start logging perception data while user selects when to record and delete on the web interface,
                 # then extract relevant examples using timestamps
 
-                # TODO DO NOT MERGE
-                # logging_start_time = self.perception_interface.start_logging_head_perception()
-                # positive_examples_timestamps, negative_examples_timestamps = self.web_interface.get_gesture_examples()
-                # self.perception_interface.stop_logging_head_perception()
+                logging_start_time = self.perception_interface.start_logging_head_perception()
+                positive_examples_timestamps, negative_examples_timestamps = self.web_interface.get_gesture_examples()
+                self.perception_interface.stop_logging_head_perception()
                 
-                # if len(positive_examples_timestamps) > 0 and len(negative_examples_timestamps) > 0:
-                #     positive_examples = []
-                #     for timestamp in positive_examples_timestamps:
-                #         positive_examples.append(self.perception_interface.extract_from_logged_head_perception_data(timestamp))
+                if len(positive_examples_timestamps) > 0 and len(negative_examples_timestamps) > 0:
+                    positive_examples = []
+                    for timestamp in positive_examples_timestamps:
+                        positive_examples.append(self.perception_interface.extract_from_logged_head_perception_data(timestamp))
 
-                #     negative_examples = []
-                #     for timestamp in negative_examples_timestamps:
-                #         negative_examples.append(self.perception_interface.extract_from_logged_head_perception_data(timestamp))
+                    negative_examples = []
+                    for timestamp in negative_examples_timestamps:
+                        negative_examples.append(self.perception_interface.extract_from_logged_head_perception_data(timestamp))
 
-                #     # save the examples
-                #     gesture_datapath = self.gesture_examples_path / f"{self.gesture_label}.pkl"
-                #     with open(gesture_datapath, "wb") as f:
-                #         pickle.dump({
-                #             "label": self.gesture_label,
-                #             "description": self.gesture_description,
-                #             "positive_examples": positive_examples, 
-                #             "negative_examples": negative_examples
-                #         }, f)
+                    # save the examples
+                    gesture_datapath = self.gesture_examples_path / f"{self.gesture_label}.pkl"
+                    with open(gesture_datapath, "wb") as f:
+                        pickle.dump({
+                            "label": self.gesture_label,
+                            "description": self.gesture_description,
+                            "positive_examples": positive_examples, 
+                            "negative_examples": negative_examples
+                        }, f)
 
-                #     input("Press enter to synthesize detector function")
-                #     generated_function = self.detector_synthesizer.generate_function(gesture_datapath)
+                    input("Press enter to synthesize detector function")
+                    generated_function = self.detector_synthesizer.generate_function(gesture_datapath)
                 
-                if True:
                     # Hack to test the synthesizer
-                    hack_datapath = Path(__file__).parent.parent / "perception" / "gestures_perception" / "gestures_examples" / "shake_my_head_from_left_to_right.pkl"
-                    with open(hack_datapath, "rb") as f:
-                        hack_data = pickle.load(f)
-                    generated_function = self.detector_synthesizer.generate_function(hack_datapath)
-                    import ipdb; ipdb.set_trace()
-                    if generated_function is not None:
-                        with open(self.synthesized_detectors_path, "a") as f:
-                            f.write(generated_function)
+                    # hack_datapath = Path(__file__).parent.parent / "perception" / "gestures_perception" / "gestures_examples" / "shake_my_head_from_left_to_right.pkl"
+                    # generated_function_txt = self.detector_synthesizer.generate_function(hack_datapath)
+                    
+                    if generated_function_txt is not None:
+                        assert self.gesture_register is not None
+                        self.gesture_register(self.gesture_label, generated_function_txt)
                     else:
                         print("Did not generate valid detector function")
                 else:
