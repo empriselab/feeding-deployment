@@ -198,7 +198,7 @@ class WebInterface:
         self._send_message({"state": "newmealpage", "status": "jump"})
         
         # Wait for the web interface to be ready for initial data
-        time.sleep(0.2)
+        time.sleep(0.5)
         
         # Send required data for the bite ordering page
         self._send_image(plate_image)
@@ -387,7 +387,7 @@ class WebInterface:
         # Send available gestures to the web interface
         print("Length of available gestures: ", len(available_gestures))
         print("Available gestures: ", available_gestures)
-        time.sleep(0.1)
+        time.sleep(0.5)
         self._send_message({"n_ordering": len(available_gestures), "data": available_gestures})
     
     def start_gesture_listener_thread(self, new_gesture_selected_event: threading.Event) -> None:

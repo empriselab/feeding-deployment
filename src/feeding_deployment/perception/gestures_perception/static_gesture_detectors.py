@@ -1,7 +1,12 @@
 import time
 import numpy as np
 
-def mouth_open_detector(perception_interface, termination_event, timeout):
+function_name_to_label = {
+    "mouth_open": "mouth open",
+    "head_nod": "head nod"
+}
+
+def mouth_open(perception_interface, termination_event, timeout):
     """ Detect mouth open """
     threshold = 0.45
 
@@ -38,7 +43,7 @@ def mouth_open_detector(perception_interface, termination_event, timeout):
 
     return gesture_detector(perception_interface, termination_event, timeout, threshold)
 
-def head_nod_detector(perception_interface, termination_event, timeout):
+def head_nod(perception_interface, termination_event, timeout):
     """ Detect head nod """
 
     threshold = 5.0

@@ -215,6 +215,7 @@ class PerceptionInterface:
                             head_perception_data = pickle.load(f)
                     except FileNotFoundError:
                         raise FileNotFoundError("No transfer logged data found for tool: ", self.tool)
+                    time.sleep(0.1) # Maintain 10 Hz rate that real perception would have
                 if self.log_head_perception:
                     self.log_head_perception_data.append((time.time(), head_perception_data))
                 with self.head_perception_data_lock:

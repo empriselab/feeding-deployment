@@ -32,7 +32,7 @@ from feeding_deployment.actions.base import (
     ToolTransferDone,
 )
 
-from feeding_deployment.perception.gestures_perception.static_gesture_detectors import mouth_open_detector, head_nod_detector
+from feeding_deployment.perception.gestures_perception.static_gesture_detectors import mouth_open, head_nod
 
 from feeding_deployment.actions.feel_the_bite.inside_mouth_transfer import InsideMouthTransfer
 from feeding_deployment.actions.feel_the_bite.outside_mouth_transfer import OutsideMouthTransfer
@@ -66,7 +66,7 @@ class TransferToolHLA(HighLevelAction):
         elif initiate_transfer_interaction == "open_mouth":
             if self.web_interface is not None:
                 self.web_interface.fix_explanation("Please open your mouth to initiate transfer")
-            mouth_open_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
+            mouth_open(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
         elif initiate_transfer_interaction == "auto_timeout":
             if self.web_interface is not None:
                 self.web_interface.fix_explanation("Please wait for the transfer to initiate in 5 seconds")
@@ -102,11 +102,11 @@ class TransferToolHLA(HighLevelAction):
             elif self.tool == "drink":
                 if self.web_interface is not None:
                     self.web_interface.fix_explanation("Please do a head nod to complete transfer")
-                head_nod_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
+                head_nod(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
             elif self.tool == "wipe":
                 if self.web_interface is not None:
                     self.web_interface.fix_explanation("Please do a head nod to complete transfer")
-                head_nod_detector(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
+                head_nod(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
         elif transfer_complete_interaction == "auto_timeout":
             if self.web_interface is not None:
                 self.web_interface.fix_explanation("Please wait for the transfer to complete in 5 seconds")
