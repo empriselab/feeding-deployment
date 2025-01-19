@@ -111,6 +111,13 @@ def detect_head_nod(perception_interface, termination_event, timeout, head_nod_t
 
 Using the In-Context Examples as reference, generate a detector for the following input. Generate output in the same format as the in-context examples - just the code with comments, and without any additional text explanations, as additional text will render the output unexecutable in python. Absolutely make sure that there are no time.sleep() calls in the function. If using a while loop, make sure that you have the code lines for breaking out if face_keypoints or head_pose is None.
 
+IMPORTANT: Have the following lines exactly as is in your code:
+```
+    while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
+        head_perception_data = perception_interface.get_head_perception_data()
+        if head_perception_data is None:
+            break
+```
 Input:
 ##################
 Language Description: %s

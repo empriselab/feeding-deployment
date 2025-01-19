@@ -305,9 +305,9 @@ class _Runner:
                     last_task_type = None
                 self.web_interface.ready_for_task_selection(last_task_type=last_task_type)
                 print("Ready for next user command.")
-            except queue.Empty:
-                # Wait for user command
                 print("Current web interface page:", self.web_interface.current_page)
+            except queue.Empty:
+                # Wait for user commands.
                 time.sleep(0.1) 
                 continue
 

@@ -395,10 +395,10 @@ class WebInterface:
         assert self.current_page == "test_gesture", "Cannot start gesture listener thread when not on the test gesture page."
         self.new_gesture_selected_event = new_gesture_selected_event
         self.selected_gesture = None
-        self.gesture_listener_thread = threading.Thread(target=self.gesture_listener_thread)
+        self.gesture_listener_thread = threading.Thread(target=self.run_gesture_listener_thread)
         self.gesture_listener_thread.start()
 
-    def gesture_listener_thread(self) -> None:
+    def run_gesture_listener_thread(self) -> None:
         
         while self.active:
             msg_dict = self.get_required_web_interface_message(

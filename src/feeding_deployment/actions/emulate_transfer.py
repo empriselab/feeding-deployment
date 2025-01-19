@@ -9,6 +9,7 @@ from pathlib import Path
 import threading
 import types
 import json
+import imageio
 
 from pybullet_helpers.geometry import Pose
 
@@ -175,33 +176,59 @@ class EmulateTransferHLA(HighLevelAction):
                         break
                 self.web_interface.stop_gesture_listener_thread()
 
+                # shutdown the head perception thread and move to before transfer state
+                self.perception_interface.stop_head_perception_thread()
+                self.transfer.move_to_before_transfer_state()  
+
             else:
                 # start logging perception data while user selects when to record and delete on the web interface,
                 # then extract relevant examples using timestamps
 
+                # load from synthesized_gestures_dict_path
+                with open(self.synthesized_gestures_dict_path, "r") as f:
+                    synthesized_gestures_dict = json.load(f)
+
+                # generate function name from gesture label by adding _
+                synthesized_gesture_function_name = self.gesture_label.replace(" ", "_").lower()
+
+                synthesized_gestures_dict[synthesized_gesture_function_name] = self.gesture_label
+                with open(self.synthesized_gestures_dict_path, "w") as f:
+                    json.dump(synthesized_gestures_dict, f)
+
                 logging_start_time = self.perception_interface.start_logging_head_perception()
                 positive_examples_timestamps, negative_examples_timestamps = self.web_interface.get_gesture_examples()
                 self.perception_interface.stop_logging_head_perception()
+
+                # shutdown the head perception thread and move to before transfer state
+                self.perception_interface.stop_head_perception_thread()
+                self.transfer.move_to_before_transfer_state()  
+
+                # Rajat ToDo: Remove this hack (just for testing)
+                video_segments_path = Path(__file__).parent.parent / "integration" / "log" / "gesture_examples" / "video_segments" / synthesized_gesture_function_name
+                if not video_segments_path.exists():
+                    video_segments_path.mkdir(parents=True)
+
+                def save_video(video_frames, video_path):
+                    # Save the video using imageio
+                    print(f"Saving {len(video_frames)} frames")
+                    with imageio.get_writer(video_path, fps=10, codec='libx264') as writer:
+                        for frame in video_frames:
+                            # Convert to RGB format for imageio if needed
+                            frame_rgb = frame[:, :, ::-1]  # Convert from BGR to RGB
+                            writer.append_data(frame_rgb)
                 
                 if len(positive_examples_timestamps) > 0 and len(negative_examples_timestamps) > 0:
                     positive_examples = []
                     for timestamp in positive_examples_timestamps:
-                        positive_examples.append(self.perception_interface.extract_from_logged_head_perception_data(timestamp))
+                        positive_example, positive_video = self.perception_interface.extract_from_logged_head_perception_data(timestamp)
+                        positive_examples.append(positive_example)
+                        save_video(positive_video, video_segments_path / f"positive_{len(positive_examples)}.mp4")
 
                     negative_examples = []
                     for timestamp in negative_examples_timestamps:
-                        negative_examples.append(self.perception_interface.extract_from_logged_head_perception_data(timestamp))
-
-                    # load from synthesized_gestures_dict_path
-                    with open(self.synthesized_gestures_dict_path, "r") as f:
-                        synthesized_gestures_dict = json.load(f)
-
-                    # generate function name from gesture label by adding _
-                    synthesized_gesture_function_name = self.gesture_label.replace(" ", "_").lower()
-
-                    synthesized_gestures_dict[synthesized_gesture_function_name] = self.gesture_label
-                    with open(self.synthesized_gestures_dict_path, "w") as f:
-                        json.dump(synthesized_gestures_dict, f)
+                        negative_example, negative_video = self.perception_interface.extract_from_logged_head_perception_data(timestamp)
+                        negative_examples.append(negative_example)
+                        save_video(negative_video, video_segments_path / f"negative_{len(negative_examples)}.mp4")
 
                     # save the examples
                     gesture_datapath = self.gesture_examples_path / f"{synthesized_gesture_function_name}.pkl"
@@ -228,14 +255,10 @@ class EmulateTransferHLA(HighLevelAction):
                     print("Gesture examples recording is not valid")
         else:
             print("Can record or test gestures only with real robot and web interface")
-        
-        if self.robot_interface is not None:
-            self.detect_transfer_complete()
 
-        # shutdown the head perception thread
-        self.perception_interface.stop_head_perception_thread()
-
-        self.transfer.move_to_before_transfer_state()        
+            # shutdown the head perception thread and move to before transfer state
+            self.perception_interface.stop_head_perception_thread()
+            self.transfer.move_to_before_transfer_state()        
 
     def get_name(self) -> str:
         return "EmulateTransfer"
@@ -265,6 +288,7 @@ class EmulateTransferHLA(HighLevelAction):
         if params["test_mode"]:
             self.test_mode = True
         else:
+            self.test_mode = False
             self.gesture_label = params["gesture_label"]
             self.gesture_description = params["gesture_description"]
         return super().execute_action(objects, params)

@@ -429,9 +429,6 @@ class PerceptionInterface:
     def stop_logging_head_perception(self):
         assert self.head_perception_running, "Head perception thread should be running to stop logging"
         self.log_head_perception = False
-
-    def get_logged_head_perception_data(self):
-        return self.log_head_perception_data
     
     def extract_from_logged_head_perception_data(self, timestamp):
 
@@ -443,10 +440,14 @@ class PerceptionInterface:
             "face_keypoints": [],
             "tool_tip_target_pose": []
         }
+
+        video_segment = []
+
         for (timestamp, head_perception_data) in self.log_head_perception_data:
             if timestamp >= start_time and timestamp <= end_time:
                 data_segment["head_pose"].append(head_perception_data["head_pose"])
                 data_segment["face_keypoints"].append(head_perception_data["face_keypoints"])
                 data_segment["tool_tip_target_pose"].append(head_perception_data["tool_tip_target_pose"])
+                video_segment.append(head_perception_data["camera_color_data"])
 
-        return data_segment
+        return data_segment, video_segment

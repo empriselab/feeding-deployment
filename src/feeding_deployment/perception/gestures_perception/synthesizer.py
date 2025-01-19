@@ -96,20 +96,21 @@ from gymnasium.spaces import Box
             assert self.function_label in workspace
             gesture_detector = workspace[self.function_label]
 
-            positive_accuracy, negative_accuracy = self.run_detector(gesture_detector, None, 20.0)
-            print("Best Positive Accuracy: ", positive_accuracy)
-            print("Best Negative Accuracy: ", negative_accuracy)
-            accuracy = (positive_accuracy + negative_accuracy) / 2.0
-            with open(Path(__file__).parent / "results" / f"{self.label}.txt", "a") as f:
-                f.write(f"\nnBest Accuracy: {accuracy}")
-            
-            # Code snippet to replace
+            # Make sure code snippet to replace is present in the generated function code (ensures breaking out of the loop)
             old_snippet = """
         head_perception_data = perception_interface.get_head_perception_data()
         if head_perception_data is None:
             break
 """
             assert old_snippet.strip() in function_code, "head perception snippet not found in the generated function code"
+
+            positive_accuracy, negative_accuracy = self.run_detector(gesture_detector, None, 20.0)
+            print("Best Positive Accuracy: ", positive_accuracy)
+            print("Best Negative Accuracy: ", negative_accuracy)
+            accuracy = (positive_accuracy + negative_accuracy) / 2.0
+            with open(Path(__file__).parent / "results" / f"{self.label}.txt", "a") as f:
+                f.write(f"\nnBest Accuracy: {accuracy}")
+        
             # Replacement snippet
             new_snippet = """
         head_perception_data = perception_interface.get_head_perception_data()
@@ -163,41 +164,43 @@ from gymnasium.spaces import Box
 
 def main():
 
-    gestures = {
-        "blinking": ("detect_blinking", "blinking eyes open and closed"),
-        "eyebrows_raised": ("detect_raised_eyebrows", "eyebrows are raised"),
-        "head_nod": ("detect_head_nod", "nodding head up and down"),
-        "head_still_atleast_three_secs": ("detect_head_still_atleast_three_secs", "head remains still for at least 3 seconds"),
-        "look_at_robot_atleast_three_secs": ("detect_look_at_robot_atleast_three_secs", "head looks directly forward at the robot for at least 3 seconds"),
-        "talking" : ("detect_talking", "mouth is talking"),
-        "open_mouth": ("detect_mouth_open", "mouth is wide open"),
-        "shake_my_head_from_left_to_right": ("detect_head_shake", "head is shaking from left to right")
-    }
+    # gestures = {
+    #     "blinking": ("detect_blinking", "blinking eyes open and closed"),
+    #     "eyebrows_raised": ("detect_raised_eyebrows", "eyebrows are raised"),
+    #     "head_nod": ("detect_head_nod", "nodding head up and down"),
+    #     "head_still_atleast_three_secs": ("detect_head_still_atleast_three_secs", "head remains still for at least 3 seconds"),
+    #     "look_at_robot_atleast_three_secs": ("detect_look_at_robot_atleast_three_secs", "head looks directly forward at the robot for at least 3 seconds"),
+    #     "talking" : ("detect_talking", "mouth is talking"),
+    #     "open_mouth": ("detect_mouth_open", "mouth is wide open"),
+    #     "shake_my_head_from_left_to_right": ("detect_head_shake", "head is shaking from left to right")
+    # }
 
-    # Re-configure gesture examples to include labels.
-    for gesture in gestures:
-        gesture_datapath = Path(__file__).parent / "gestures_examples" / f"{gesture}.pkl"
-        with open(gesture_datapath, "rb") as f:
-            data = pickle.load(f)
-        label, description = gestures[gesture]
-        with open(gesture_datapath, "wb") as f:
-            pickle.dump({
-                "gesture_label": label,
-                "gesture_description": description,
-                "positive_examples": data["positive_examples"], 
-                "negative_examples": data["negative_examples"], 
-            }, f)
+    # # Re-configure gesture examples to include labels.
+    # for gesture in gestures:
+    #     gesture_datapath = Path(__file__).parent / "gestures_examples" / f"{gesture}.pkl"
+    #     with open(gesture_datapath, "rb") as f:
+    #         data = pickle.load(f)
+    #     label, description = gestures[gesture]
+    #     with open(gesture_datapath, "wb") as f:
+    #         pickle.dump({
+    #             "gesture_label": label,
+    #             "gesture_description": description,
+    #             "positive_examples": data["positive_examples"], 
+    #             "negative_examples": data["negative_examples"], 
+    #         }, f)
         
 
     synthesizer = PersonalizedGestureDetectorSynthesizer()
-    synthesizer.test_in_context_examples()
+    gesture_data_path = Path(__file__).parent.parent.parent / "integration" / "log" / "gesture_examples" / "head_still.pkl"
+    generated_function_txt = synthesizer.generate_function(gesture_datapath=gesture_data_path)
+    # synthesizer.test_in_context_examples()
 
-    gesture_to_test = "shake_my_head_from_left_to_right"
-    gesture_datapath = Path(__file__).parent / "gestures_examples" / f"{gesture_to_test}.pkl"
-    generated_function = synthesizer.generate_function(gesture_datapath)
-    if generated_function is not None:
-        with open("synthesized_gesture_detectors.py", "a") as f:
-            f.write(generated_function)
+    # gesture_to_test = "shake_my_head_from_left_to_right"
+    # gesture_datapath = Path(__file__).parent / "gestures_examples" / f"{gesture_to_test}.pkl"
+    # generated_function = synthesizer.generate_function(gesture_datapath)
+    # if generated_function is not None:
+    #     with open("synthesized_gesture_detectors.py", "a") as f:
+    #         f.write(generated_function)
 
 
 

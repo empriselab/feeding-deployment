@@ -2,7 +2,7 @@
 *__pycache__
 *.traj
 .python-version
-*.mp4
+# *.mp4
 *.zip
 
 src/feeding_deployment/integration/saved_states/last_stage.p
