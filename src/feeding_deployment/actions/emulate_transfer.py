@@ -44,7 +44,7 @@ class EmulateTransferHLA(HighLevelAction):
         self.transfer = OutsideMouthTransfer(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.no_waits)
 
         self.ready_to_initiate_transfer_interaction = "voice" # "silent", "voice" or "led"
-        self.ready_for_transfer_interaction = "voice" # "silent", "voice" or "led"
+        self.ready_for_transfer_interaction = "button" # "silent", "voice" or "led"
         self.initiate_transfer_interaction = "open_mouth" # "button", "open_mouth" or "auto_timeout"
         self.transfer_complete_interaction = "button" # "button", "sense" or "auto_timeout"
 
@@ -85,7 +85,7 @@ class EmulateTransferHLA(HighLevelAction):
         if self.ready_to_initiate_transfer_interaction == "silent":
             pass
         elif self.ready_to_initiate_transfer_interaction == "voice":
-            self.perception_interface.speak("Please open your mouth when ready")
+            self.perception_interface.speak("Please press transfer button when ready")
         elif self.ready_to_initiate_transfer_interaction == "led":
             self.perception_interface.turn_on_led()
 
@@ -190,6 +190,13 @@ class EmulateTransferHLA(HighLevelAction):
 
                 # generate function name from gesture label by adding _
                 synthesized_gesture_function_name = self.gesture_label.replace(" ", "_").lower()
+
+                # check if the gesture is already synthesized / in static detectors
+                if synthesized_gesture_function_name in synthesized_gestures_dict or synthesized_gesture_function_name in static_gesture_detectors.function_name_to_label:
+                    print(f"Gesture {self.gesture_label} already synthesized or in static detectors")
+                    # slightly hacky way to uniquely name the synthesized gesture (assumption: only one user generated gesture per label)
+                    synthesized_gesture_function_name = synthesized_gesture_function_name + "_user_generated"
+                    self.gesture_label = self.gesture_label + " (user generated)"
 
                 synthesized_gestures_dict[synthesized_gesture_function_name] = self.gesture_label
                 with open(self.synthesized_gestures_dict_path, "w") as f:
