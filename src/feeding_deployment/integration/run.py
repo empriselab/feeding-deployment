@@ -281,7 +281,7 @@ class _Runner:
                                     print('Processed user update request.')
                                     self.web_interface.update_adaptability_response(update_summary)
                                 except Exception as e:
-                                    print(f"Adaptation failed: {e}")
+                                    print(f"Adaptation failed. Please try rephrasing the request.")
                                     self.web_interface.update_adaptability_response(f"Update failed: {str(e)}")
                             else:
                                 break

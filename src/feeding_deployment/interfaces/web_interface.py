@@ -340,6 +340,9 @@ class WebInterface:
         )
         print("Received adaptability request: ", msg_dict)
 
+        # reset the response text
+        self._send_message({"state": "adaptability_response", "status": ""})
+
         if msg_dict is None:
             return None
         return msg_dict["status"]
