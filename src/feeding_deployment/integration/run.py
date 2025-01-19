@@ -168,7 +168,7 @@ class _Runner:
         print("Creating HLAs...")
         self.hlas = {
             cls(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.web_interface, hla_hyperparams,
-                self.wrist_interface, self.flair, self.run_behavior_tree_dir, self.no_waits, self.log_dir, self.register_gesture_detector) for cls in HLAS  # type: ignore
+                self.wrist_interface, self.flair, self.run_behavior_tree_dir, self.no_waits, self.log_dir, self._gesture_detection_filepath) for cls in HLAS  # type: ignore
         }
         print("HLAs created.")
         self.hla_name_to_hla = {hla.get_name(): hla for hla in self.hlas}
@@ -455,16 +455,7 @@ Write a VERY BRIEF summary of all the changes for a non-technical end user. Make
         summary = self.llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
         print("SUMMARY:", summary)
         return summary
-            
-    def register_gesture_detector(self, gesture_fn_name: str, gesture_fn_text: str) -> bool:
-        """Add the gesture function to this run's python file."""
-        with open(self._gesture_detection_filepath, "r", encoding="utf-8") as f:
-            gesture_file_text = f.read()
-        assert f"def {gesture_fn_name}(" not in gesture_file_text
-        gesture_file_text += "\n" + gesture_fn_text + "\n"
-        with open(self._gesture_detection_filepath, "w", encoding="utf-8") as f:
-            f.write(gesture_file_text)
-        print(f"Registered new gesture detection function: {gesture_fn_name}")
+
 
 
 if __name__ == "__main__":

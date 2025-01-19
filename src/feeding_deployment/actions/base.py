@@ -85,7 +85,7 @@ class HighLevelAction(abc.ABC):
         behavior_tree_dir: Path,
         no_waits=False,
         log_path=None,
-        gesture_register=None,
+        gesture_detection_filepath=None,
     ) -> None:
         self.sim = sim
         self.robot_interface = robot_interface
@@ -99,7 +99,7 @@ class HighLevelAction(abc.ABC):
         self.gesture_detector_filepath = self.behavior_tree_dir / "synthesized_gesture_detectors.py"
         self.no_waits = no_waits
         self.log_path = log_path
-        self.gesture_register = gesture_register
+        self.gesture_detection_filepath = gesture_detection_filepath
         # NOTE: assuming 7-dof and that first 7 entries are arm joints (not gripper).
         self.arm_joint_lower_limits = self.sim.robot.joint_lower_limits[:7]
         self.arm_joint_upper_limits = self.sim.robot.joint_upper_limits[:7]
