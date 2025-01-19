@@ -89,7 +89,7 @@ assert os.environ.get("PYTHONHASHSEED") == "0", \
 class _Runner:
     """A class for running the integrated system."""
 
-    def __init__(self, scene_config: str, transfer_type: str, run_on_robot: bool, use_interface: bool, use_gui: bool, simulate_head_perception: bool, max_motion_planning_time: float,
+    def __init__(self, scene_config: str, user: str, scenario:str, transfer_type: str, run_on_robot: bool, use_interface: bool, use_gui: bool, simulate_head_perception: bool, max_motion_planning_time: float,
                  resume_from_state: str = "", no_waits: bool = False) -> None:
         self.run_on_robot = run_on_robot
         self.use_interface = use_interface  
@@ -97,7 +97,42 @@ class _Runner:
         self.max_motion_planning_time = max_motion_planning_time
         self.no_waits = no_waits
 
+        # logs are saved in user/scenario directory
+        self.log_dir = Path(__file__).parent / "log" / user / scenario
+        self.execution_log = Path(__file__).parent / "log" / "execution_log.txt" # in root log directory
+        self.run_behavior_tree_dir = self.log_dir / "behavior_trees"
+        self.gesture_detectors_dir = self.log_dir / "gesture_detectors"
+        self._gesture_detection_filepath = self.gesture_detectors_dir / "synthesized_gesture_detectors.py"
+        
+        if not self.log_dir.exists():
+            if not (self.log_dir.parent).exists(): # new user
+                assert scenario == "default", "First run with a new user must be in default scenario."
+                os.makedirs(self.log_dir, exist_ok=True)
+                
+                # Copy the initial behavior trees into a directory for this run, where
+                # they will be modified based on user feedback.
+                self.run_behavior_tree_dir.mkdir(exist_ok=True)
+                original_behavior_tree_dir = Path(__file__).parents[1] / "actions" / "behavior_trees"
+                assert original_behavior_tree_dir.exists()
+                for original_bt_filename in original_behavior_tree_dir.glob("*.yaml"):
+                    shutil.copy(original_bt_filename, self.run_behavior_tree_dir)
+
+                # Copy the initial gesture detection file into a directory for this run,
+                # where it will be updated from LLM-based few-shot learning.
+                self.gesture_detectors_dir.mkdir(exist_ok=True)
+                original_gesture_detection_filepath = Path(__file__).parents[1] / "perception" / "gestures_perception" / "synthesized_gesture_detectors.py"
+                assert original_gesture_detection_filepath.exists()
+                shutil.copy(original_gesture_detection_filepath, self.gesture_detectors_dir)
+
+            elif not (self.log_dir).exists(): # new scenario
+                assert (Path(__file__).parent / "log" / user / "default").exists(), "Do not have default scenario for this user."
+                os.makedirs(self.log_dir, exist_ok=True)
+                shutil.copytree(Path(__file__).parent / "log" / user / "default", self.log_dir)
+
         if resume_from_state == "":
+            # clear behavior tree execution log
+            with open(self.execution_log, "w") as f:
+                f.write("")
             self._saved_state_infile = None
         else:
             self._saved_state_infile = Path(__file__).parent / "saved_states" / (resume_from_state + ".p")
@@ -110,9 +145,6 @@ class _Runner:
         else:
             self.robot_interface = None
             self.wrist_interface = None
-
-        self.log_dir = Path(__file__).parent / "log"
-        self.log_dir.mkdir(exist_ok=True)
 
         self.llm = OpenAILLM(
             model_name="gpt-4o",
@@ -135,7 +167,7 @@ class _Runner:
         else:
             print("Running in simulation mode.")
 
-        self.flair = FLAIR()
+        self.flair = FLAIR(self.log_dir)
 
         if self.run_on_robot:
             self.rviz_interface = RVizInterface(self.scene_description)
@@ -144,26 +176,10 @@ class _Runner:
 
         self.sim = FeedingDeploymentPyBulletSimulator(self.scene_description, use_gui=use_gui, ignore_user=True)
 
-        # Copy the initial behavior trees into a directory for this run, where
-        # they will be modified based on user feedback.
-        self.run_behavior_tree_dir = self.log_dir / "behavior_trees"
-        self.run_behavior_tree_dir.mkdir(exist_ok=True)
-        original_behavior_tree_dir = Path(__file__).parents[1] / "actions" / "behavior_trees"
-        assert original_behavior_tree_dir.exists()
-        for original_bt_filename in original_behavior_tree_dir.glob("*.yaml"):
-            shutil.copy(original_bt_filename, self.run_behavior_tree_dir)
-
-        # Copy the initial gesture detction file into a directory for this run,
-        # where it will be updated from LLM-based few-shot learning.
-        original_gesture_detection_filepath = Path(__file__).parents[1] / "perception" / "gestures_perception" / "synthesized_gesture_detectors.py"
-        assert original_gesture_detection_filepath.exists()
-        shutil.copy(original_gesture_detection_filepath, self.run_behavior_tree_dir)
-        self._gesture_detection_filepath = self.run_behavior_tree_dir / original_gesture_detection_filepath.name
-
         if self.use_interface:
             # Initialize the web interface.
             self.task_selection_queue = queue.Queue()
-            self.web_interface = WebInterface(self.task_selection_queue)
+            self.web_interface = WebInterface(self.task_selection_queue, self.log_dir)
         else:
             self.web_interface = None
 
@@ -172,7 +188,7 @@ class _Runner:
         print("Creating HLAs...")
         self.hlas = {
             cls(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.web_interface, hla_hyperparams,
-                self.wrist_interface, self.flair, self.run_behavior_tree_dir, self.no_waits, self.log_dir,
+                self.wrist_interface, self.flair, self.no_waits, self.log_dir, self.run_behavior_tree_dir, self.execution_log, self.gesture_detectors_dir,
                 self.register_gesture_detector, self.load_synthesized_gestures) for cls in HLAS  # type: ignore
         }
         print("HLAs created.")
@@ -231,7 +247,7 @@ class _Runner:
             IsUtensil([self.utensil]),
         }
 
-        self.transparency_query = TransparencyQuery()
+        self.transparency_query = TransparencyQuery(self.log_dir)
         print("Initialized transparency query.")
 
         if self._saved_state_infile:
@@ -509,7 +525,9 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--scene_config", type=str, default="vention")
+    parser.add_argument("--scene_config", type=str, default="vention") # name of the scene config (rough head-plate-robot setup)
+    parser.add_argument("--user", type=str, default="") # name of the user
+    parser.add_argument("--scenario", type=str, default="default") # name of the scenario
     parser.add_argument("--transfer_type", type=str, default="outside")
     parser.add_argument("--run_on_robot", action="store_true")
     parser.add_argument("--use_interface", action="store_true")
@@ -521,6 +539,9 @@ if __name__ == "__main__":
     parser.add_argument("--no_waits", action="store_true")
     args = parser.parse_args()
 
+    if args.user == "":
+        raise ValueError("Please provide a user name.")
+
     if args.run_on_robot or args.use_interface:
         if not ROSPY_IMPORTED:
             raise ModuleNotFoundError("Need ROS to run on robot or use interface")
@@ -528,6 +549,8 @@ if __name__ == "__main__":
             rospy.init_node("feeding_deployment", anonymous=True)
 
     runner = _Runner(args.scene_config,
+                     args.user,
+                     args.scenario,
                      args.transfer_type,
                      args.run_on_robot, 
                      args.use_interface,
@@ -550,15 +573,15 @@ if __name__ == "__main__":
     if not args.use_interface:
 
         # Test adding a new gesture.
-        gesture_label = "detect_head_shake"
-        gesture_description = "shaking head from left to right"
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": False, "gesture_label":gesture_label, "gesture_description": gesture_description} ))        
+        # gesture_label = "detect_head_shake"
+        # gesture_description = "shaking head from left to right"
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": False, "gesture_label":gesture_label, "gesture_description": gesture_description} ))        
 
         # Test using the new gesture.
-        runner.process_user_update_request("Let me shake my head to tell the robot that I'm done.")
+        # runner.process_user_update_request("Let me shake my head to tell the robot that I'm done.")
 
         # Now try actually doing a transfer. The gesture should be used.
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
 
         ## Variations on modifying the speed of the robot.
 
@@ -607,7 +630,7 @@ if __name__ == "__main__":
         # runner.process_user_update_request("Remove all transfer confirmations.")
 
         # NOTE: this is not working perfectly -- it updates "silent for ReadyForTransferInteraction" instead of the web app confirmations.
-        runner.process_user_update_request("On the iPad, don't ask me to confirm when I'm ready.")
+        # runner.process_user_update_request("On the iPad, don't ask me to confirm when I'm ready.")
 
 
         input("Press Enter to continue...")

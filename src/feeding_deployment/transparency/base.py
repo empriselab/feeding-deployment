@@ -9,19 +9,17 @@ from pathlib import Path
 from tomsutils.llm import OpenAILLM
 
 class TransparencyBase(abc.ABC):
-    def __init__(self):
-
-        log_dir = Path(__file__).parent.parent / "integration" / "log"
+    def __init__(self, log_dir, cache_name = "llm_cache"):
 
         self.llm = OpenAILLM(
             model_name="gpt-4o",
-            cache_dir=log_dir / "llm_cache",
+            cache_dir = log_dir / cache_name,
         )
 
         self.behavior_log_path = log_dir / "behavior_trees"
-        self.execution_log_path = log_dir / "execution_log.txt"
-        self.nuc_execution_log_path = log_dir / "nuc_execution_log.txt"
         self.sensor_log_path = log_dir
+        self.execution_log_path = log_dir.parent.parent / "execution_log.txt"
+        self.nuc_execution_log_path = log_dir.parent.parent / "nuc_execution_log.txt"
 
     def load_behavior(self):
         """

@@ -11,8 +11,8 @@ from feeding_deployment.transparency.base import TransparencyBase
 
 class TransparencyContinuous(TransparencyBase):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, log_dir):
+        super().__init__(log_dir, cache_name = "llm_cache_continuous")
         # with open(Path(__file__).parent / "continuous_prompt.txt", 'r') as f:
         with open(Path(__file__).parent / "continuous_prompt_execution.txt", 'r') as f:
             self.prompt_skeleton = f.read()
@@ -58,6 +58,7 @@ class TransparencyContinuous(TransparencyBase):
                 print(response)
 
 def main():
+    raise NotImplementedError("Set log directory correctly")
     transparency_continuous = TransparencyContinuous()
     print("Generating continuous explanations...")
     transparency_continuous.run()

@@ -1,1 +1,0 @@
-{'bite_history': ['chicken'], 'food_labels': ['chicken'], 'user_preference': '"No preference"'}

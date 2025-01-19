@@ -56,8 +56,11 @@ class TransferToolHLA(HighLevelAction):
         if self.robot_interface is not None:
             self.disable_collision_sensor_pub = rospy.Publisher("/disable_collision_sensor", Bool, queue_size=1)
 
-        self.synthesized_gestures_dict_path = Path(__file__).parent.parent / "integration" / "log" / "behavior_trees" / "synthesized_gestures_dict.json"
-
+        self.synthesized_gestures_dict_path = self.gesture_detectors_dir / "synthesized_gestures_dict.json"
+        if not self.synthesized_gestures_dict_path.exists():
+            with open(self.synthesized_gestures_dict_path, "w") as f:
+                f.write("{}")
+        
     def set_tool(self, tool):
         self.tool = tool
 

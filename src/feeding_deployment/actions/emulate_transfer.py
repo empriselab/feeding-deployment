@@ -43,14 +43,14 @@ class EmulateTransferHLA(HighLevelAction):
 
         self.transfer = OutsideMouthTransfer(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.no_waits)
 
-        self.gesture_examples_path = Path(__file__).parent.parent / "integration" / "log" / "gesture_examples"
-        self.synthesized_gestures_dict_path = Path(__file__).parent.parent / "integration" / "log" / "behavior_trees" / "synthesized_gestures_dict.json"
+        self.gesture_examples_path = self.gesture_detectors_dir / "gesture_examples"
+        self.synthesized_gestures_dict_path = self.gesture_detectors_dir / "synthesized_gestures_dict.json"
         if not self.gesture_examples_path.exists():
             self.gesture_examples_path.mkdir(parents=True)
         if not self.synthesized_gestures_dict_path.exists():
             with open(self.synthesized_gestures_dict_path, "w") as f:
                 f.write("{}")
-        self.detector_synthesizer = PersonalizedGestureDetectorSynthesizer()
+        self.detector_synthesizer = PersonalizedGestureDetectorSynthesizer(self.log_dir)
 
         self.test_mode = False
 
@@ -167,8 +167,7 @@ class EmulateTransferHLA(HighLevelAction):
                 self.perception_interface.stop_head_perception_thread()
                 self.transfer.move_to_before_transfer_state()  
 
-                # Rajat ToDo: Remove this hack (just for testing)
-                video_segments_path = Path(__file__).parent.parent / "integration" / "log" / "gesture_examples" / "video_segments" / synthesized_gesture_function_name
+                video_segments_path = self.gesture_detectors_dir / "video_segments" / synthesized_gesture_function_name
                 if not video_segments_path.exists():
                     video_segments_path.mkdir(parents=True)
 

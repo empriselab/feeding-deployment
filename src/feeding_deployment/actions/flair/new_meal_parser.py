@@ -4,9 +4,7 @@ from pathlib import Path
 from tomsutils.llm import OpenAILLM
 
 class NewMealParser:
-    def __init__(self):
-
-        log_dir = Path(__file__).parent.parent.parent / "integration" / "log"
+    def __init__(self, log_dir):
 
         self.llm = OpenAILLM(
             model_name="gpt-4o",

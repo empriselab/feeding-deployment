@@ -37,8 +37,7 @@ class MockPerceptionInterface:
 
 
 class PersonalizedGestureDetectorSynthesizer:
-    def __init__(self):
-        log_dir = Path(__file__).parent.parent.parent / "integration" / "log"
+    def __init__(self, log_dir):
 
         self.llm = OpenAILLM(
             model_name="gpt-4o",
@@ -193,7 +192,7 @@ def main():
     #         }, f)
         
 
-    synthesizer = PersonalizedGestureDetectorSynthesizer()
+    synthesizer = PersonalizedGestureDetectorSynthesizer(log_dir=Path(__file__).parent / "log")
     gesture_data_path = Path(__file__).parent.parent.parent / "integration" / "log" / "gesture_examples" / "head_nod_user_generated.pkl"
     generated_function_txt = synthesizer.generate_function(gesture_datapath=gesture_data_path)
     synthesizer.test_in_context_examples()

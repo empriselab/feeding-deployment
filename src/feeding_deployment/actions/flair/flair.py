@@ -13,14 +13,14 @@ HOME_ORIENTATION = Rotation.from_quat([1/math.sqrt(2), 1/math.sqrt(2), 0, 0]).as
 DEFAULT_FORCE_THRESHOLD = [30.0, 30.0, 30.0, 30.0, 30.0, 30.0]
 
 class FLAIR:
-    def __init__(self):
+    def __init__(self, log_dir):
 
         self.inference_server = BiteAcquisitionInference(mode='ours')
         print("inf server init")
 
-        self.new_meal_parser = NewMealParser()
-
-        self.history_path = Path(__file__).parent.parent.parent / "integration" / "log" / "flair_history.txt"
+        self.new_meal_parser = NewMealParser(log_dir)   
+        self.history_path = log_dir / "flair_history.txt"
+        
         if not os.path.exists(self.history_path):
             self.bite_history = []
             self.inference_server.FOOD_CLASSES = None

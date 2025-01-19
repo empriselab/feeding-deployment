@@ -106,7 +106,7 @@ class AcquireBiteHLA(HighLevelAction):
 
                 items_detection = self.flair.detect_items(camera_color_data, camera_depth_data, camera_info_data, log_path=None)
 
-                assert self.log_path is not None, "Log path must be set to save food detection data"
+                assert self.log_dir is not None, "Log path must be set to save food detection data"
                 # save food detection data
                 food_detection_data = {
                     "camera_color_data": camera_color_data,
@@ -116,13 +116,13 @@ class AcquireBiteHLA(HighLevelAction):
                     "bite_ordering_preference": bite_ordering_preference,
                     "items_detection": items_detection,
                 }
-                with open(self.log_path / "food_detection_data.pkl", "wb") as f:
+                with open(self.log_dir / "food_detection_data.pkl", "wb") as f:
                     pickle.dump(food_detection_data, f)
 
             else:
                 # read last logged data
                 try:
-                    with open(self.log_path / "food_detection_data.pkl", "rb") as f:
+                    with open(self.log_dir / "food_detection_data.pkl", "rb") as f:
                         food_detection_data = pickle.load(f)
 
                     camera_color_data = food_detection_data["camera_color_data"]

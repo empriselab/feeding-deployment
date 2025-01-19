@@ -299,7 +299,7 @@ class PerceptionInterface:
         
         if self.simulation:
             # load them from a pickle file
-            with open(Path(__file__).parent.parent / 'integration' / 'log' / 'drink_pickup_pos.pkl', 'rb') as f:
+            with open(self.log_dir / 'drink_pickup_pos.pkl', 'rb') as f:
                 drink_pickup_pos = pickle.load(f)
             drink_poses = drink_pickup_pos["last_drink_poses"]
 
@@ -334,7 +334,7 @@ class PerceptionInterface:
             "last_drink_poses": self.last_drink_poses,
             "drink_pickup_joint_pos": self.drink_pickup_joint_pos
         }
-        with open(Path(__file__).parent.parent / 'integration' / 'log' / 'drink_pickup_pos.pkl', 'wb') as f:
+        with open(self.log_dir / 'drink_pickup_pos.pkl', 'wb') as f:
             pickle.dump(drink_pickup_pos, f)
         print("Drink pickup poses recorded")
 
@@ -350,7 +350,7 @@ class PerceptionInterface:
                 drink_pickup_joint_pos = self.drink_pickup_joint_pos
             except Exception as e:
                 print("Error loading drink pickup poses from script, using values from file instead")
-                with open(Path(__file__).parent.parent / 'integration' / 'log' / 'drink_pickup_pos.pkl', 'rb') as f:
+                with open(self.log_dir / 'drink_pickup_pos.pkl', 'rb') as f:
                     drink_pickup_pos = pickle.load(f)
                 last_drink_poses = drink_pickup_pos["last_drink_poses"]
                 drink_pickup_joint_pos = drink_pickup_pos["drink_pickup_joint_pos"]

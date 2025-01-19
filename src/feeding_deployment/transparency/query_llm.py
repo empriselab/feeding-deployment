@@ -11,8 +11,8 @@ from feeding_deployment.transparency.base import TransparencyBase
 
 class TransparencyQuery(TransparencyBase):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, log_dir):
+        super().__init__(log_dir)
         with open(Path(__file__).parent / "query_prompt.txt", 'r') as f:
             self.prompt_skeleton = f.read()
         self.query_history = ""
@@ -32,7 +32,8 @@ class TransparencyQuery(TransparencyBase):
         return response
 
 def main():
-    transparency_query = TransparencyQuery()
+    raise NotImplementedError("Set log directory correctly")
+    transparency_query = TransparencyQuery(log_dir = Path(__file__).parent.parent / "integration" / "log")
     print("Ready to answer queries. Type 'exit' to quit.")
     while True:
         query = input("Enter a query: ")

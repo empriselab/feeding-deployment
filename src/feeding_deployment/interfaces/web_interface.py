@@ -30,10 +30,10 @@ class WebInterface:
     '''
     An interface to interact with the web interface.
     '''
-    def __init__(self, task_selection_queue: queue.Queue = None) -> None:
+    def __init__(self, task_selection_queue: queue.Queue, log_dir: Path) -> None:
 
         # Used for generating continuous explanations.
-        self.transparency_continuous = TransparencyContinuous()
+        self.transparency_continuous = TransparencyContinuous(log_dir)
 
         # Objects of task_selection_queue are dicts and can be of the following types:
         # {'task': 'meal_assistance', 'type': 'bite' / 'sip' / 'wipe'}
