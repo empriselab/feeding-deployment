@@ -511,6 +511,11 @@ if __name__ == "__main__":
 
     if not args.use_interface:
 
+        # Test adding a new gesture.
+        gesture_label = "detect_head_shake"
+        gesture_description = "shaking head from left to right"
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": False, "gesture_label":gesture_label, "gesture_description": gesture_description} ))        
+
         ## Variations on modifying the speed of the robot.
 
         # All fast.

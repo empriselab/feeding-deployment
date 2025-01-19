@@ -17,7 +17,8 @@ In-Context Example 1:
 
 Input:
 ##################
-Language Description: "mouth open"
+Language Description: "mouth is wipe open"
+Function Name: detect_mouth_open
 ##################
 
 Output:
@@ -28,7 +29,7 @@ ADJUSTABLE_PARAMETERS = {
     3: Box(0, 1, shape=tuple()),  # mouth_open_threshold
 }
 
-def gesture_detector(perception_interface, termination_event, timeout, mouth_open_threshold):
+def detect_mouth_open(perception_interface, termination_event, timeout, mouth_open_threshold):
 
     def euclidean_distance(p1, p2):
         """Calculate Euclidean distance between two points."""
@@ -62,7 +63,8 @@ In-Context Example 2:
 
 Input:
 ##################
-Language Description: "head nod"
+Language Description: "nodding head up and down"
+Function Name: detect_head_nod
 ##################
 
 Output:
@@ -74,7 +76,7 @@ ADJUSTABLE_PARAMETERS = [
     4 : Box(0, 1000, shape=tuple()),  # max_pitch_data_size
 ]
 
-def gesture_detector(perception_interface, termination_event, timeout, head_nod_threshold, max_pitch_data_size):
+def detect_head_nod(perception_interface, termination_event, timeout, head_nod_threshold, max_pitch_data_size):
 
     start_time = time.time()
     pitch_data = []
@@ -112,6 +114,7 @@ Using the In-Context Examples as reference, generate a detector for the followin
 Input:
 ##################
 Language Description: %s
+Function Name: %s
 ##################
 
 Output:
