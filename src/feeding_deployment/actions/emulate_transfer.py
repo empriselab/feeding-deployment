@@ -43,11 +43,6 @@ class EmulateTransferHLA(HighLevelAction):
 
         self.transfer = OutsideMouthTransfer(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.no_waits)
 
-        self.ready_to_initiate_transfer_interaction = "voice" # "silent", "voice" or "led"
-        self.ready_for_transfer_interaction = "button" # "silent", "voice" or "led"
-        self.initiate_transfer_interaction = "open_mouth" # "button", "open_mouth" or "auto_timeout"
-        self.transfer_complete_interaction = "button" # "button", "sense" or "auto_timeout"
-
         self.gesture_examples_path = Path(__file__).parent.parent / "integration" / "log" / "gesture_examples"
         self.synthesized_gestures_dict_path = Path(__file__).parent.parent / "integration" / "log" / "behavior_trees" / "synthesized_gestures_dict.json"
         if not self.gesture_examples_path.exists():
@@ -58,44 +53,6 @@ class EmulateTransferHLA(HighLevelAction):
         self.detector_synthesizer = PersonalizedGestureDetectorSynthesizer()
 
         self.test_mode = False
-
-    def detect_initiate_transfer(self):
-        if self.initiate_transfer_interaction == "button":
-            self.perception_interface.detect_button_press()
-        elif self.initiate_transfer_interaction == "open_mouth":
-            static_gesture_detectors.mouth_open(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
-        elif self.initiate_transfer_interaction == "auto_timeout":
-            time.sleep(5.0)
-        print("Initiating transfer")
-
-        if self.ready_to_initiate_transfer_interaction == "led":
-            self.perception_interface.turn_off_led()
-
-    def detect_transfer_complete(self):
-        if self.transfer_complete_interaction == "button":
-            self.perception_interface.detect_button_press()
-        elif self.transfer_complete_interaction == "auto_timeout":
-            time.sleep(5.0)
-        print("Detected transfer completion")
-
-        if self.ready_for_transfer_interaction == "led":
-            self.perception_interface.turn_off_led()
-
-    def relay_ready_to_initiate_transfer(self):
-        if self.ready_to_initiate_transfer_interaction == "silent":
-            pass
-        elif self.ready_to_initiate_transfer_interaction == "voice":
-            self.perception_interface.speak("Please press transfer button when ready")
-        elif self.ready_to_initiate_transfer_interaction == "led":
-            self.perception_interface.turn_on_led()
-
-    def relay_ready_for_gestures(self):
-        if self.ready_for_transfer_interaction == "silent":
-            pass
-        elif self.ready_for_transfer_interaction == "voice":
-            self.perception_interface.speak("Ready for gestures")
-        elif self.ready_for_transfer_interaction == "led":
-            self.perception_interface.turn_on_led()
 
     def emulate_transfer(self, speed: str):
 
@@ -114,14 +71,14 @@ class EmulateTransferHLA(HighLevelAction):
             time.sleep(1.0) # let sim head perception thread warmstart
 
         if self.robot_interface is not None:
-            self.relay_ready_to_initiate_transfer()
-            self.detect_initiate_transfer()
+            self.perception_interface.speak("Please press transfer button when ready")
+            self.perception_interface.detect_button_press()
 
         self.transfer.set_tool("fork")
         self.transfer.move_to_transfer_state(outside_mouth_distance=0.15)
 
         if self.robot_interface is not None:
-            self.relay_ready_for_gestures()
+            self.perception_interface.speak("Ready for gestures")
 
         if self.web_interface is not None:
             if self.test_mode:
