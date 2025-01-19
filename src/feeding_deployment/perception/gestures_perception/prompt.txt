@@ -72,7 +72,7 @@ Output:
 
 # Maps gesture_detector argument index to Box parameter space.
 ADJUSTABLE_PARAMETERS = [
-    3 : Box(0, 1, shape=tuple()),  # head_nod_threshold
+    3 : Box(0, 10, shape=tuple()),  # head_nod_threshold
     4 : Box(0, 1000, shape=tuple()),  # max_pitch_data_size
 ]
 

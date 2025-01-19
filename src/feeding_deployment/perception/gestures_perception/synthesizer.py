@@ -9,7 +9,8 @@ import pickle
 from tomsutils.llm import OpenAILLM, synthesize_python_function_with_llm, GridSearchSynthesizedProgramArgumentOptimizer
 from gymnasium.spaces import Box
 
-from feeding_deployment.perception.gestures_perception.in_context_examples import in_context_example1, in_context_example2
+from feeding_deployment.perception.gestures_perception.in_context_examples import detect_mouth_open, detect_head_nod
+
 
 class MockPerceptionInterface:
     """
@@ -30,7 +31,10 @@ class MockPerceptionInterface:
                 'face_keypoints': self.face_keypoints[self.current_frame-1]
             }
             return head_perception_data
+        # Reset the current frame back to 0 to prepare for next call.
+        self.current_frame = 0
         return None
+
 
 class PersonalizedGestureDetectorSynthesizer:
     def __init__(self):
@@ -129,15 +133,15 @@ from gymnasium.spaces import Box
     
     def test_in_context_examples(self):
         self._load_from_data_path(Path(__file__).parent / "gestures_examples" / "open_mouth.pkl")
-        positive_accuracy, negative_accuracy = self.run_detector(in_context_example1, None, 20, None)
+        positive_accuracy, negative_accuracy = self.run_detector(detect_mouth_open, None, 20)
         print("In-Context Example 1")
         print("Best Positive Accuracy: ", positive_accuracy)
         print("Best Negative Accuracy: ", negative_accuracy)
 
         # /home/rkjenamani/sim_experiments/feeding-deployment/src/feeding_deployment/integration/log/gesture_examples/open_mouth.pkl
         # self._load_from_data_path(Path(__file__).parent.parent.parent / "integration" / "log" / "gesture_examples" / "open_mouth.pkl")
-        self._load_from_data_path(Path(__file__).parent / "gestures_examples" / "head_nod.pkl")
-        positive_accuracy, negative_accuracy = self.run_detector(in_context_example2, None, 20, None)
+        self._load_from_data_path(Path(__file__).parent.parent.parent / "integration" / "log" / "gesture_examples" / "head_nod_user_generated.pkl")
+        positive_accuracy, negative_accuracy = self.run_detector(detect_head_nod, None, 20)
         print("In-Context Example 2")
         print("Best Positive Accuracy: ", positive_accuracy)
         print("Best Negative Accuracy: ", negative_accuracy)
@@ -190,9 +194,9 @@ def main():
         
 
     synthesizer = PersonalizedGestureDetectorSynthesizer()
-    gesture_data_path = Path(__file__).parent.parent.parent / "integration" / "log" / "gesture_examples" / "head_still.pkl"
+    gesture_data_path = Path(__file__).parent.parent.parent / "integration" / "log" / "gesture_examples" / "head_nod_user_generated.pkl"
     generated_function_txt = synthesizer.generate_function(gesture_datapath=gesture_data_path)
-    # synthesizer.test_in_context_examples()
+    synthesizer.test_in_context_examples()
 
     # gesture_to_test = "shake_my_head_from_left_to_right"
     # gesture_datapath = Path(__file__).parent / "gestures_examples" / f"{gesture_to_test}.pkl"

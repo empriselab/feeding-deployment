@@ -1,10 +1,8 @@
 import time
 
-def in_context_example1(perception_interface, termination_event, timeout, threshold):
-    """
-    Verifies the in-context example 1 code (mouth open) provided in the prompt
-    """
-    threshold = 0.45
+def detect_mouth_open(perception_interface, termination_event, timeout):
+
+    mouth_open_threshold = 0.45
 
     def euclidean_distance(p1, p2):
         """Calculate Euclidean distance between two points."""
@@ -28,16 +26,16 @@ def in_context_example1(perception_interface, termination_event, timeout, thresh
         C = euclidean_distance(mouth_points[0], mouth_points[6])   # 49, 55
 
         mar = (A + B) / (2.0 * C)
-        if mar > threshold:
+        if mar > mouth_open_threshold:
             return True
 
     return False
 
 
-def in_context_example2(perception_interface, termination_event, timeout, threshold):
-    """ Verifies the in-context example 2 code (up-down head nod) provided in the prompt """
+def detect_head_nod(perception_interface, termination_event, timeout):
 
-    threshold = 0.6
+    head_nod_threshold = 3.0
+    max_pitch_data_size = 500
 
     start_time = time.time()
     pitch_data = []
@@ -55,15 +53,15 @@ def in_context_example2(perception_interface, termination_event, timeout, thresh
         # Check if there is enough data to detect direction change
         if len(pitch_data) >= 3:
 
-            if (pitch_data[-2] - pitch_data[-3] > threshold and pitch_data[-2] - pitch_data[-1] > threshold) or \
-            (pitch_data[-3] - pitch_data[-2] > threshold and pitch_data[-1] - pitch_data[-2] > threshold):
+            if (pitch_data[-2] - pitch_data[-3] > head_nod_threshold and pitch_data[-2] - pitch_data[-1] > head_nod_threshold) or \
+            (pitch_data[-3] - pitch_data[-2] > head_nod_threshold and pitch_data[-1] - pitch_data[-2] > head_nod_threshold):
                 direction_changes += 1
 
             if direction_changes >= 2:
                 return True
 
         # To avoid excessive memory usage, keep the pitch_data size small
-        if len(pitch_data) > 100:
+        if len(pitch_data) > max_pitch_data_size:
             pitch_data.pop(0)
 
     # If timeout expires without detecting the gesture, return False
