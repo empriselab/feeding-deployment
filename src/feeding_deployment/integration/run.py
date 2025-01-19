@@ -3,7 +3,7 @@
 import json
 from collections import namedtuple
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 import pickle
 import queue
 import os
@@ -13,6 +13,8 @@ import shutil
 import numpy as np
 from tomsutils.llm import OpenAILLM
 import time
+import types
+import inspect
 
 try:
     import rospy
@@ -32,6 +34,7 @@ from relational_structs import (
 )
 from relational_structs.utils import parse_pddl_plan, get_object_combinations
 from tomsutils.pddl_planning import run_pddl_planner
+from tomsutils.spaces import EnumSpace
 from pybullet_helpers.geometry import Pose
 
 from feeding_deployment.actions.base import (
@@ -53,6 +56,7 @@ from feeding_deployment.actions.base import (
     NodeModificationUserUpdateRequest,
     NodeAdditionUserRequest,
     UserUpdateRequest,
+    ParameterizedActionBehaviorTreeNode
 )
 from feeding_deployment.actions.pick_tool import PickToolHLA
 from feeding_deployment.actions.stow_tool import StowToolHLA
@@ -168,7 +172,8 @@ class _Runner:
         print("Creating HLAs...")
         self.hlas = {
             cls(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.web_interface, hla_hyperparams,
-                self.wrist_interface, self.flair, self.run_behavior_tree_dir, self.no_waits, self.log_dir) for cls in HLAS  # type: ignore
+                self.wrist_interface, self.flair, self.run_behavior_tree_dir, self.no_waits, self.log_dir,
+                self.register_gesture_detector, self.load_synthesized_gestures) for cls in HLAS  # type: ignore
         }
         print("HLAs created.")
         self.hla_name_to_hla = {hla.get_name(): hla for hla in self.hlas}
@@ -455,7 +460,7 @@ Write a VERY BRIEF summary of all the changes for a non-technical end user. Make
         summary = self.llm.sample_completions(prompt, imgs=None, temperature=0.0, seed=0)[0]
         print("SUMMARY:", summary)
         return summary
-            
+
     def register_gesture_detector(self, gesture_fn_name: str, gesture_fn_text: str) -> bool:
         """Add the gesture function to this run's python file."""
         with open(self._gesture_detection_filepath, "r", encoding="utf-8") as f:
@@ -464,7 +469,40 @@ Write a VERY BRIEF summary of all the changes for a non-technical end user. Make
         gesture_file_text += "\n" + gesture_fn_text + "\n"
         with open(self._gesture_detection_filepath, "w", encoding="utf-8") as f:
             f.write(gesture_file_text)
-        print(f"Registered new gesture detection function: {gesture_fn_name}")
+        # Immediately add the new gesture to specific BT nodes.
+        gesture_interaction_parameters = [
+            "InitiateTransferInteraction",
+            "TransferCompleteInteraction",
+        ]
+        for hla, objs in self._all_ground_hlas:
+            try:
+                bt_filepath = hla.behavior_tree_dir / hla.get_behavior_tree_filename(objs, {})
+            except NotImplementedError:
+                continue
+            bt = load_behavior_tree(bt_filepath, hla)
+            for node in bt.walk():
+                if isinstance(node, ParameterizedActionBehaviorTreeNode):
+                    for parameter_name in gesture_interaction_parameters:
+                        parameter = node.get_parameter(parameter_name)
+                        if parameter is None:
+                            continue
+                        assert parameter.is_user_editable
+                        assert isinstance(parameter.space, EnumSpace)
+                        current_choices = list(parameter.space.elements)
+                        new_choices = current_choices + [gesture_fn_name]
+                        new_parameter_space = EnumSpace(new_choices)
+                        parameter.space = new_parameter_space
+            save_behavior_tree(bt, bt_filepath, hla)
+            
+        print(f"Registered new gesture detection function: {gesture_fn_name}")    
+
+    def load_synthesized_gestures(self) -> list[tuple[str, Callable]]:
+        """Returns a list of function names and functions."""
+        with open(self._gesture_detection_filepath, "r", encoding="utf-8") as f:
+            gesture_file_text = f.read()
+        synthesized_gesture_module = types.ModuleType('synthesized_gestures')
+        exec(gesture_file_text, synthesized_gesture_module.__dict__)
+        return inspect.getmembers(synthesized_gesture_module, inspect.isfunction)
 
 
 if __name__ == "__main__":
@@ -510,6 +548,17 @@ if __name__ == "__main__":
     # runner.hla_command_queue.put(drink_transfer_msg)
 
     if not args.use_interface:
+
+        # Test adding a new gesture.
+        gesture_label = "detect_head_shake"
+        gesture_description = "shaking head from left to right"
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": False, "gesture_label":gesture_label, "gesture_description": gesture_description} ))        
+
+        # Test using the new gesture.
+        runner.process_user_update_request("Let me shake my head to tell the robot that I'm done.")
+
+        # Now try actually doing a transfer. The gesture should be used.
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
 
         ## Variations on modifying the speed of the robot.
 

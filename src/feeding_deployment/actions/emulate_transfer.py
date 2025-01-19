@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 import time
@@ -7,6 +7,7 @@ from scipy.spatial.transform import Rotation
 import inspect
 from pathlib import Path
 import threading
+import types
 
 from pybullet_helpers.geometry import Pose
 
@@ -48,7 +49,6 @@ class EmulateTransferHLA(HighLevelAction):
         self.gesture_examples_path = Path(__file__).parent.parent / "integration" / "log" / "gesture_examples"
         if not self.gesture_examples_path.exists():
             self.gesture_examples_path.mkdir(parents=True)
-        self.synthesized_detectors_path = Path(__file__).parent.parent / "perception" / "gestures_perception" / "synthesized_gesture_detectors.py"
         self.detector_synthesizer = PersonalizedGestureDetectorSynthesizer()
 
         self.test_mode = False
@@ -119,13 +119,14 @@ class EmulateTransferHLA(HighLevelAction):
 
         if self.web_interface is not None:
             if self.test_mode:
-                # find all available gestures
+                # Start with the static, given gestures.
                 available_gestures = inspect.getmembers(static_gesture_detectors, inspect.isfunction)
 
-                import feeding_deployment.perception.gestures_perception.synthesized_gesture_detectors as synthesized_gesture_detectors
-                available_gestures += inspect.getmembers(synthesized_gesture_detectors, inspect.isfunction)
-                gestures_dict = {gesture[0]: gesture[1] for gesture in available_gestures}
+                # Load the synthesized gestures.
+                synthesized_gestures = self.load_synthesized_gestures()
+                available_gestures += synthesized_gestures
 
+                gestures_dict = {gesture[0]: gesture[1] for gesture in available_gestures}
                 self.web_interface.jump_to_test_gesture_page(list(gestures_dict.keys()))
 
                 # Create a termination event to signal when to switch detectors
@@ -157,6 +158,7 @@ class EmulateTransferHLA(HighLevelAction):
             else:
                 # start logging perception data while user selects when to record and delete on the web interface,
                 # then extract relevant examples using timestamps
+
                 logging_start_time = self.perception_interface.start_logging_head_perception()
                 positive_examples_timestamps, negative_examples_timestamps = self.web_interface.get_gesture_examples()
                 self.perception_interface.stop_logging_head_perception()
@@ -171,22 +173,24 @@ class EmulateTransferHLA(HighLevelAction):
                         negative_examples.append(self.perception_interface.extract_from_logged_head_perception_data(timestamp))
 
                     # save the examples
-                    gesture_datapath = self.gesture_examples_path / f"{self.gesture_description}.pkl"
+                    gesture_datapath = self.gesture_examples_path / f"{self.gesture_label}.pkl"
                     with open(gesture_datapath, "wb") as f:
                         pickle.dump({
-                            "description": self.gesture_description,
+                            "gesture_label": self.gesture_label,
+                            "gesture_description": self.gesture_description,
                             "positive_examples": positive_examples, 
                             "negative_examples": negative_examples
                         }, f)
 
                     input("Press enter to synthesize detector function")
-                    generated_function = self.detector_synthesizer.generate_function(gesture_datapath)
+                    generated_function_txt = self.detector_synthesizer.generate_function(gesture_datapath)
+                
                     # Hack to test the synthesizer
-                    # hack_datapath = Path(__file__).parent.parent / "perception" / "gestures_perception" / "gestures_examples" / "open_mouth.pkl"
-                    # generated_function = self.detector_synthesizer.generate_function(hack_datapath)
-                    if generated_function is not None:
-                        with open(self.synthesized_detectors_path, "a") as f:
-                            f.write(generated_function)
+                    # hack_datapath = Path(__file__).parent.parent / "perception" / "gestures_perception" / "gestures_examples" / "shake_my_head_from_left_to_right.pkl"
+                    # generated_function_txt = self.detector_synthesizer.generate_function(hack_datapath)
+                    
+                    if generated_function_txt is not None:
+                        self.register_gesture_detector(self.gesture_label, generated_function_txt)
                     else:
                         print("Did not generate valid detector function")
                 else:
@@ -230,5 +234,6 @@ class EmulateTransferHLA(HighLevelAction):
         if params["test_mode"]:
             self.test_mode = True
         else:
+            self.gesture_label = params["gesture_label"]
             self.gesture_description = params["gesture_description"]
         return super().execute_action(objects, params)

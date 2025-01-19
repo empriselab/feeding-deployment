@@ -45,14 +45,14 @@ class PersonalizedGestureDetectorSynthesizer:
         with open(Path(__file__).parent / "prompt.txt", 'r') as f:
             self.prompt_skeleton = f.read()
 
-        self.function_name = "gesture_detector"
         self.adjustable_parameters_name = "ADJUSTABLE_PARAMETERS"
 
     def _load_from_data_path(self, gesture_datapath: Path):
         self.label = gesture_datapath.stem
         with open(gesture_datapath, 'rb') as f:
             gesture_data = pickle.load(f)
-        self.language_description = gesture_data['description']
+        self.language_description = gesture_data['gesture_description']
+        self.function_label = gesture_data['gesture_label']
         self.positive_examples = gesture_data['positive_examples']
         self.negative_examples = gesture_data['negative_examples']
         timeout = 20.0
@@ -69,7 +69,7 @@ class PersonalizedGestureDetectorSynthesizer:
         # label, language_description, examples_data_path
         # label is the name of the datapath (last part of the datapath.pkl
         self._load_from_data_path(gesture_datapath)
-        prompt = self.prompt_skeleton%(self.language_description)
+        prompt = self.prompt_skeleton % (self.language_description, self.function_label)
 
         code_prefix = """import time
 import numpy as np
@@ -78,7 +78,7 @@ from gymnasium.spaces import Box
 """
         arg_optimizer = GridSearchSynthesizedProgramArgumentOptimizer()
         synthesized_program, synthesized_info = synthesize_python_function_with_llm(
-            self.llm, self.function_name, self.input_output_examples, prompt,
+            self.llm, self.function_label, self.input_output_examples, prompt,
             code_prefix=code_prefix,
             argument_optimizer=arg_optimizer,
             arg_index_to_space_var_name=self.adjustable_parameters_name,
@@ -91,7 +91,10 @@ from gymnasium.spaces import Box
 
         print("Generated Function Code: ", function_code)
         try:
-            exec(function_code, globals())  # Executes code in the global namespace
+            workspace = locals().copy()
+            exec(function_code, workspace)
+            assert self.function_label in workspace
+            gesture_detector = workspace[self.function_label]
 
             positive_accuracy, negative_accuracy = self.run_detector(gesture_detector, None, 20.0)
             print("Best Positive Accuracy: ", positive_accuracy)
@@ -160,26 +163,43 @@ from gymnasium.spaces import Box
 
 def main():
 
+    gestures = {
+        "blinking": ("detect_blinking", "blinking eyes open and closed"),
+        "eyebrows_raised": ("detect_raised_eyebrows", "eyebrows are raised"),
+        "head_nod": ("detect_head_nod", "nodding head up and down"),
+        "head_still_atleast_three_secs": ("detect_head_still_atleast_three_secs", "head remains still for at least 3 seconds"),
+        "look_at_robot_atleast_three_secs": ("detect_look_at_robot_atleast_three_secs", "head looks directly forward at the robot for at least 3 seconds"),
+        "talking" : ("detect_talking", "mouth is talking"),
+        "open_mouth": ("detect_mouth_open", "mouth is wide open"),
+        "shake_my_head_from_left_to_right": ("detect_head_shake", "head is shaking from left to right")
+    }
+
+    # Re-configure gesture examples to include labels.
+    for gesture in gestures:
+        gesture_datapath = Path(__file__).parent / "gestures_examples" / f"{gesture}.pkl"
+        with open(gesture_datapath, "rb") as f:
+            data = pickle.load(f)
+        label, description = gestures[gesture]
+        with open(gesture_datapath, "wb") as f:
+            pickle.dump({
+                "gesture_label": label,
+                "gesture_description": description,
+                "positive_examples": data["positive_examples"], 
+                "negative_examples": data["negative_examples"], 
+            }, f)
+        
+
     synthesizer = PersonalizedGestureDetectorSynthesizer()
     synthesizer.test_in_context_examples()
 
-    gestures = [
-        # "blinking",
-        # "eyebrows_raised",
-        # "head_nod",
-        # "head_still_atleast_three_secs",
-        # "look_at_robot_atleast_three_secs",
-        # "talking",
-        "open_mouth",
-    ]
+    gesture_to_test = "shake_my_head_from_left_to_right"
+    gesture_datapath = Path(__file__).parent / "gestures_examples" / f"{gesture_to_test}.pkl"
+    generated_function = synthesizer.generate_function(gesture_datapath)
+    if generated_function is not None:
+        with open("synthesized_gesture_detectors.py", "a") as f:
+            f.write(generated_function)
 
-    for gesture in gestures:
-        
-        gesture_datapath = Path(__file__).parent / "gestures_examples" / f"{gesture}.pkl"
-        generated_function = synthesizer.generate_function(gesture_datapath)
-        if generated_function is not None:
-            with open("synthesized_gesture_detectors.py", "a") as f:
-                f.write(generated_function)
+
 
 if __name__ == '__main__':
 

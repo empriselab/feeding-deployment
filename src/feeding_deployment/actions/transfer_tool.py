@@ -32,7 +32,7 @@ from feeding_deployment.actions.base import (
     ToolTransferDone,
 )
 
-from feeding_deployment.perception.gestures_perception.static_gesture_detectors import mouth_open_detector, head_nod_detector, head_shake_detector, head_still_detector
+from feeding_deployment.perception.gestures_perception.static_gesture_detectors import mouth_open_detector, head_nod_detector
 
 from feeding_deployment.actions.feel_the_bite.inside_mouth_transfer import InsideMouthTransfer
 from feeding_deployment.actions.feel_the_bite.outside_mouth_transfer import OutsideMouthTransfer
@@ -72,7 +72,15 @@ class TransferToolHLA(HighLevelAction):
                 self.web_interface.fix_explanation("Please wait for the transfer to initiate in 5 seconds")
             time.sleep(5.0)
         else:
-            raise NotImplementedError
+            # Check if the initiate_transfer_interaction is a synthesized gesture.
+            gestures = dict(self.load_synthesized_gestures())
+            if initiate_transfer_interaction in gestures:
+                # TODO now I realize we need to hang onto the gesture description to use it here...
+                # or we could just use an LLM to convert the function name into an explanation
+                gesture_fn = gestures[initiate_transfer_interaction]
+                gesture_fn(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
+            else:
+                raise NotImplementedError
         print("Initiating transfer")
 
         if self.web_interface is not None:
@@ -104,7 +112,15 @@ class TransferToolHLA(HighLevelAction):
                 self.web_interface.fix_explanation("Please wait for the transfer to complete in 5 seconds")
             time.sleep(5.0)
         else:
-            raise NotImplementedError
+            # Check if the initiate_transfer_interaction is a synthesized gesture.
+            gestures = dict(self.load_synthesized_gestures())
+            if transfer_complete_interaction in gestures:
+                # TODO now I realize we need to hang onto the gesture description to use it here...
+                # or we could just use an LLM to convert the function name into an explanation
+                gesture_fn = gestures[transfer_complete_interaction]
+                gesture_fn(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
+            else:
+                raise NotImplementedError
         print("Detected transfer completion")
 
         if self.web_interface is not None:
@@ -137,7 +153,7 @@ class TransferToolHLA(HighLevelAction):
                          initiate_transfer_mode: str, transfer_complete_mode: str,
                          outside_mouth_distance: float = 0.0,
                          maintain_position_at_goal = False):
-
+        
         self.perception_interface.set_head_perception_tool(self.tool)
         self.perception_interface.start_head_perception_thread()
         if self.robot_interface is not None:

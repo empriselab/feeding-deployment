@@ -79,11 +79,21 @@ def _main(
         print("Sent message to turn on collision sensor")
 
     elif record_rom:
+        # turn off collision sensor
+        disable_collision_sensor_pub.publish(Bool(data=True))
+        print("Sent message to turn off collision sensor")
+
         perception_interface._head_perception.set_tool(args.tool)
         while not rospy.is_shutdown():
             head_perception_data = perception_interface._head_perception.run_head_perception()
             if head_perception_data is None:
                 print("No head perception data")
+
+        input("Can I turn the collision sensor back on? Press Enter to continue...")
+        # turn on collision sensor
+        disable_collision_sensor_pub.publish(Bool(data=False))
+        print("Sent message to turn on collision sensor")
+        
     else: # actually do the transfer
         run_on_robot = True
 

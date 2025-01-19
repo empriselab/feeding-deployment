@@ -14,6 +14,7 @@ import itertools
 import string
 import traceback
 import re
+import inspect
 
 import yaml
 
@@ -56,6 +57,7 @@ from feeding_deployment.simulation.planning import (
 )
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.simulation.state import FeedingDeploymentWorldState
+import feeding_deployment.perception.gestures_perception.static_gesture_detectors as static_gesture_detectors
 
 # Define some predicates that can be used for sequencing the high-level actions.
 tool_type = Type("tool")  # utensil, drink, or wiping tool
@@ -84,7 +86,9 @@ class HighLevelAction(abc.ABC):
         flair,
         behavior_tree_dir: Path,
         no_waits=False,
-        log_path=None
+        log_path=None,
+        register_gesture_detector=None,
+        load_synthesized_gestures=None,
     ) -> None:
         self.sim = sim
         self.robot_interface = robot_interface
@@ -95,9 +99,10 @@ class HighLevelAction(abc.ABC):
         self.wrist_interface = wrist_interface
         self.flair = flair
         self.behavior_tree_dir = behavior_tree_dir
-        self.gesture_detector_filepath = self.behavior_tree_dir / "synthesized_gesture_detectors.py"
         self.no_waits = no_waits
         self.log_path = log_path
+        self.register_gesture_detector = register_gesture_detector
+        self.load_synthesized_gestures = load_synthesized_gestures
         # NOTE: assuming 7-dof and that first 7 entries are arm joints (not gripper).
         self.arm_joint_lower_limits = self.sim.robot.joint_lower_limits[:7]
         self.arm_joint_upper_limits = self.sim.robot.joint_upper_limits[:7]
@@ -349,23 +354,15 @@ class HighLevelAction(abc.ABC):
         time.sleep(duration)
 
     def wait_for_gesture(self, gesture_fn_name: str) -> None:
-        # Create a local namespace with gesture detector code.
-        local_namespace = globals().copy()
-
-        # Add the saved gesture detection code to the local namespace.
-        with open(self.gesture_detector_filepath, "r", encoding="utf-8") as f:
-            gesture_detector_code_text = f.read()
-        exec(gesture_detector_code_text, local_namespace)
-        assert gesture_fn_name in local_namespace
-
-        # Add constants that we will pass to the gesture detector.
-        local_namespace["PERCEPTION_INTERFACE"] = self.perception_interface
-        local_namespace["TIMEOUT"] = 5.0
-
-        # Create a snippet that will actually run gesture detection in a loop.
-        wait_for_gesture_code_text = f"""{gesture_fn_name}(PERCEPTION_INTERFACE, TIMEOUT)"""
-        # Run the code.
-        exec(wait_for_gesture_code_text, local_namespace)
+        static_gestures = inspect.getmembers(static_gesture_detectors, inspect.isfunction)
+        gestures = dict(static_gestures + self.load_synthesized_gestures())
+        assert gesture_fn_name in gestures
+        gesture_fn = gestures[gesture_fn_name]
+        while True:
+             termination_event = None
+             timeout = 600.0
+             if gesture_fn(self.perception_interface, termination_event, timeout):
+                 break
 
     def execute_robot_command(self, robot_command: KinovaCommand, plan_viz: list[FeedingDeploymentWorldState] = None, tool_update: str = None) -> None:
         """Execute the given commands on the robot."""
@@ -472,7 +469,7 @@ def pddl_plan_to_hla_plan(
     return hla_plan
 
 
-@dataclass(frozen=True)
+@dataclass
 class BehaviorTreeParameter:
     """A single parameter for a policy in a behavior tree.
     
@@ -579,6 +576,10 @@ class BehaviorTreeNode(abc.ABC):
     def get_yaml_dict(self, hla: HighLevelAction) -> dict[str, Any]:
         """Get a dictionary to pass to yaml.dump()."""
 
+    @abc.abstractmethod
+    def walk(self) -> list[BehaviorTreeNode]:
+        """Enumerate all nodes including this one."""
+
     def log_start(self) -> None:
         """Log the start of execution."""
         with open(self._execution_log_path, 'a') as f:
@@ -614,6 +615,9 @@ class ParameterizedActionBehaviorTreeNode(BehaviorTreeNode):
             return self
         return None
     
+    def walk(self) -> list[BehaviorTreeNode]:
+        return [self]
+
     def get_yaml_dict(self, hla: HighLevelAction) -> dict[str, Any]:
         fn_name = self._policy.get_function_name()
         assert hasattr(hla, fn_name)
@@ -668,6 +672,12 @@ class SequenceBehaviorTreeNode(BehaviorTreeNode):
             if child.get_node(name) is not None:
                 return child
         return None
+    
+    def walk(self) -> list[BehaviorTreeNode]:
+        lst = [self]
+        for child in self._children:
+            lst.extend(child.walk())
+        return lst
 
     def get_yaml_dict(self, hla: HighLevelAction) -> dict[str, Any]:
         child_dicts = [child.get_yaml_dict(hla) for child in self._children]
