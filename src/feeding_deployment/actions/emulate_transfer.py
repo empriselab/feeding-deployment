@@ -176,8 +176,8 @@ class EmulateTransferHLA(HighLevelAction):
                     gesture_datapath = self.gesture_examples_path / f"{self.gesture_label}.pkl"
                     with open(gesture_datapath, "wb") as f:
                         pickle.dump({
-                            "label": self.gesture_label,
-                            "description": self.gesture_description,
+                            "gesture_label": self.gesture_label,
+                            "gesture_description": self.gesture_description,
                             "positive_examples": positive_examples, 
                             "negative_examples": negative_examples
                         }, f)
@@ -185,7 +185,6 @@ class EmulateTransferHLA(HighLevelAction):
                     input("Press enter to synthesize detector function")
                     generated_function_txt = self.detector_synthesizer.generate_function(gesture_datapath)
                 
-
                     # Hack to test the synthesizer
                     # hack_datapath = Path(__file__).parent.parent / "perception" / "gestures_perception" / "gestures_examples" / "shake_my_head_from_left_to_right.pkl"
                     # generated_function_txt = self.detector_synthesizer.generate_function(hack_datapath)
