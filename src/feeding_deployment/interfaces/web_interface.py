@@ -190,6 +190,24 @@ class WebInterface:
 
     #### Meal Assistance Pages ####
 
+    def get_new_meal_input(self, plate_image) -> None:
+
+        self.current_page = "meal_assistance"
+
+        # Jump to new meal input page
+        self._send_message({"state": "newmealpage", "status": "jump"})
+
+        # Wait for the web interface to be ready for initial data
+        time.sleep(0.5)
+
+        # Send the plate image to the web interface
+        self._send_image(plate_image)
+
+        # Get the user's new meal input (always true)
+        msg_dict = self.get_required_web_interface_message(lambda msg_dict: True)
+
+        return msg_dict["state"], msg_dict["status"]
+
     def get_bite_ordering_preference(self, plate_image, n_food_types, data, ordering_options) -> None:
 
         self.current_page = "meal_assistance"
