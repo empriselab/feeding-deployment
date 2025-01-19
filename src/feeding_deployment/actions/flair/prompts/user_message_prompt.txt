@@ -1,0 +1,36 @@
+Objective: Parse user-provided input to extract a clean list of food items and a clear language description of their bite ordering preference. Fix typos, grammatical errors, and inconsistencies in the input. Remove qualifiers from food items and standardize the language description based on the examples provided.
+
+Examples:
+
+1.  
+User Input Food Items: "Some chicken nuggets and fries"  
+User Input Bite Preference Ordering: "I would like to eat the nuggets first"  
+
+Output:  
+Parsed Food Items: ["chicken", "fries"]  
+Parsed Bite Preference Ordering: "I would like to eat the chicken first"  
+
+2.  
+User Input Food Items: "Few pieces of shrimp tempura"  
+User Input Bite Preference Ordering: "No specific order"  
+
+Output:  
+Parsed Food Items: ["shrimp"]  
+Parsed Bite Preference Ordering: "No preference"  
+
+3.  
+User Input Food Items: "potates and meat"  
+User Input Bite Preference Ordering: "I do not like potatoes"  
+
+Output:  
+Parsed Food Items: ["potatoes", "meat"]  
+Parsed Bite Preference Ordering: "I would like to eat the meat first"  
+
+Using the examples above as a guide, process the following inputs. Ensure typos, grammar issues, and inconsistencies are corrected:
+
+User Input Food Items: %s  
+User Input Bite Preference Ordering: %s  
+
+Format your response exactly as:  
+Parsed Food Items: List of food items (e.g., ["item1", "item2"])  
+Parsed Bite Preference Ordering: Single string description

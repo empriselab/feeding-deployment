@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 
 from feeding_deployment.actions.flair.inference_class import BiteAcquisitionInference
+from feeding_deployment.actions.flair.new_meal_parser import NewMealParser
 
 HOME_ORIENTATION = Rotation.from_quat([1/math.sqrt(2), 1/math.sqrt(2), 0, 0]).as_matrix()
 DEFAULT_FORCE_THRESHOLD = [30.0, 30.0, 30.0, 30.0, 30.0, 30.0]
@@ -16,6 +17,8 @@ class FLAIR:
 
         self.inference_server = BiteAcquisitionInference(mode='ours')
         print("inf server init")
+
+        self.new_meal_parser = NewMealParser()
 
         self.history_path = Path(__file__).parent.parent.parent / "integration" / "log" / "flair_history.txt"
         if not os.path.exists(self.history_path):
@@ -55,12 +58,15 @@ class FLAIR:
     def update_bite_history(self, acquired_food_label):
         self.bite_history.append(acquired_food_label)
         self.log_history()
-        
-    def identify_plate(self, camera_color_data):
 
-        items = self.inference_server.recognize_items(camera_color_data)
-        print("Food Items recognized:", items)
-        return items
+    def parse_new_meal(self, food_items, bite_ordering_preference):
+        return self.new_meal_parser.parse_user_message(food_items, bite_ordering_preference)
+        
+    # def identify_plate(self, camera_color_data):
+
+    #     items = self.inference_server.recognize_items(camera_color_data)
+    #     print("Food Items recognized:", items)
+    #     return items
 
     def set_food_items(self, items):
         self.inference_server.FOOD_CLASSES = items
@@ -78,6 +84,9 @@ class FLAIR:
 
     def is_preference_set(self):
         return self.user_preference is not None
+    
+    def crop_plate(self, camera_color_data):
+        return self.inference_server.crop_plate(camera_color_data)
 
     def detect_items(self, camera_color_data, camera_depth_data, camera_info_data, log_path):
 
