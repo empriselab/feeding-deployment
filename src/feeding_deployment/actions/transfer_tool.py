@@ -4,7 +4,8 @@ import numpy as np
 import time
 import pickle
 from scipy.spatial.transform import Rotation
-
+from pathlib import Path
+import json
 from pybullet_helpers.geometry import Pose
 
 try:
@@ -55,6 +56,8 @@ class TransferToolHLA(HighLevelAction):
         if self.robot_interface is not None:
             self.disable_collision_sensor_pub = rospy.Publisher("/disable_collision_sensor", Bool, queue_size=1)
 
+        self.synthesized_gestures_dict_path = Path(__file__).parent.parent / "integration" / "log" / "behavior_trees" / "synthesized_gestures_dict.json"
+
     def set_tool(self, tool):
         self.tool = tool
 
@@ -74,9 +77,13 @@ class TransferToolHLA(HighLevelAction):
         else:
             # Check if the initiate_transfer_interaction is a synthesized gesture.
             gestures = dict(self.load_synthesized_gestures())
+
+            # load from synthesized_gestures_dict_path
+            with open(self.synthesized_gestures_dict_path, "r") as f:
+                synthesized_gesture_function_name_to_label = json.load(f)
+
             if initiate_transfer_interaction in gestures:
-                # TODO now I realize we need to hang onto the gesture description to use it here...
-                # or we could just use an LLM to convert the function name into an explanation
+                self.web_interface.fix_explanation(f"Please do a {synthesized_gesture_function_name_to_label[initiate_transfer_interaction]} to initiate transfer")
                 gesture_fn = gestures[initiate_transfer_interaction]
                 gesture_fn(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
             else:
@@ -114,9 +121,13 @@ class TransferToolHLA(HighLevelAction):
         else:
             # Check if the initiate_transfer_interaction is a synthesized gesture.
             gestures = dict(self.load_synthesized_gestures())
+
+            # load from synthesized_gestures_dict_path
+            with open(self.synthesized_gestures_dict_path, "r") as f:
+                synthesized_gesture_function_name_to_label = json.load(f)
+            
             if transfer_complete_interaction in gestures:
-                # TODO now I realize we need to hang onto the gesture description to use it here...
-                # or we could just use an LLM to convert the function name into an explanation
+                self.web_interface.fix_explanation(f"Please do a {synthesized_gesture_function_name_to_label[transfer_complete_interaction]} to complete transfer")
                 gesture_fn = gestures[transfer_complete_interaction]
                 gesture_fn(self.perception_interface, termination_event=None, timeout=600) # 10 minutes
             else:

@@ -39,7 +39,7 @@ except ModuleNotFoundError as e:
 
 from feeding_deployment.actions.flair.vision_utils import detect_densest, new_detect_densest, detect_sparsest, detect_centroid, detect_angular_bbox, detect_convex_hull, detect_filling_push_noodles, detect_filling_push_semisolid, efficient_sam_box_prompt_segment, outpaint_masks, detect_blue, proj_pix2mask, cleanup_mask, visualize_keypoints, visualize_skewer, visualize_push, detect_plate, mask_weight, nearest_neighbor, nearest_point_to_mask, detect_furthest_unobstructed_boundary_point, calculate_heatmap_density, calculate_heatmap_entropy, resize_to_square, fill_enclosing_polygon, detect_fillings_in_mask, expanded_detect_furthest_unobstructed_boundary_point
 from feeding_deployment.actions.flair.preference_planner import PreferencePlanner
-from feeding_deployment.actions.flair.food_identification import GPT4VFoodIdentification
+# from feeding_deployment.actions.flair.food_identification import GPT4VFoodIdentification
 
 class BiteAcquisitionInference:
     def __init__(self, mode):
@@ -112,20 +112,20 @@ class BiteAcquisitionInference:
             self.seg_net.to(self.DEVICE)
             self.seg_net_transform = transforms.Compose([transforms.ToTensor()])
 
-        print("Initializing GPT4V Food Identification")
-        self.api_key =  os.environ['OPENAI_API_KEY']
-        self.gpt4v_client = GPT4VFoodIdentification(self.api_key, os.path.dirname(os.path.realpath(__file__)) + '/prompts/identification')
-        self.client = OpenAI(api_key=self.api_key)
+        # print("Initializing GPT4V Food Identification")
+        # self.api_key =  os.environ['OPENAI_API_KEY']
+        # self.gpt4v_client = GPT4VFoodIdentification(self.api_key, os.path.dirname(os.path.realpath(__file__)) + '/prompts/identification')
+        # self.client = OpenAI(api_key=self.api_key)
         
         print("Initializing Preference Planner")
         self.preference_planner = PreferencePlanner()
 
         self.mode = mode
 
-    def recognize_items(self, image):
-        response = self.gpt4v_client.prompt(image).strip()
-        items = ast.literal_eval(response)
-        return items
+    # def recognize_items(self, image):
+    #     response = self.gpt4v_client.prompt(image).strip()
+    #     items = ast.literal_eval(response)
+    #     return items
 
     def chat_with_openai(self, prompt):
         """
@@ -550,6 +550,20 @@ class BiteAcquisitionInference:
             print('----!!!---\nInvalid plate depth!')
             return False
         return True
+    
+    def crop_plate(self, image):
+
+        plate_mask = detect_plate(image)
+        plate_mask_vis = np.repeat(plate_mask[:,:,np.newaxis], 3, axis=2)
+
+        # get bounding box of the plate
+        non_zero_points = cv2.findNonZero(plate_mask)
+        x, y, w, h = cv2.boundingRect(non_zero_points)
+        plate_bounds = [x, y, w, h]
+
+        cropped_image = image.copy()[y:y+h, x:x+w]
+
+        return cropped_image
 
     def detect_items(self, image, log_path = None):
 
