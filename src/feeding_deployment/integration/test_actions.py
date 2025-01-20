@@ -41,6 +41,14 @@ from feeding_deployment.simulation.scene_description import (
 )
 from feeding_deployment.simulation.simulator import FeedingDeploymentPyBulletSimulator
 from feeding_deployment.actions.flair.flair import FLAIR
+from feeding_deployment.actions.flair.food_manipulation_skill_library import FoodManipulationSkillLibrary
+
+def test_FoodManipulationSkillLibrary(sim, robot_interface, wrist_interface, perception_interface, rviz_interface, no_waits):
+    
+    food_manipulation_skill_library = FoodManipulationSkillLibrary(sim, robot_interface, wrist_interface, perception_interface, rviz_interface, no_waits)
+    food_manipulation_skill_library.reset()
+    camera_color_data, camera_info_data, camera_depth_data = perception_interface.get_camera_data()
+    food_manipulation_skill_library.dipping_skill(camera_color_data, camera_depth_data, camera_info_data)
 
 def test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, run_behavior_tree_dir, no_waits, log_path=None):
 
@@ -113,19 +121,18 @@ def _main(
     else:
         assert not args.run_on_robot, "Need ROS to run on robot"
 
+    log_dir = Path(__file__).parent / "log" / "test_actions_log"
+    log_dir.mkdir(exist_ok=True)
+
     # Initialize the interface to the robot.
     if run_on_robot:
-        use_interface = True
         robot_interface = ArmInterfaceClient()  # type: ignore  # pylint: disable=no-member
         wrist_interface = WristInterface()
-        flair = FLAIR()
     else:
         robot_interface = None
         wrist_interface = None
-        flair = None
 
-    log_dir = Path(__file__).parent / "log"
-    log_dir.mkdir(exist_ok=True)
+    flair = FLAIR(log_dir)
 
     if use_interface:
         web_interface = WebInterface()
@@ -145,21 +152,22 @@ def _main(
     else:
         rviz_interface = None
 
-    # Create skills for high-level planning.
-    hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
+    # # Create skills for high-level planning.
+    # hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
 
-    # Copy the initial behavior trees into a directory for this run, where
-    # they will be modified based on user feedback.
-    run_behavior_tree_dir = Path(__file__).parent / "log" / "behavior_trees"
-    run_behavior_tree_dir.mkdir(exist_ok=True)
-    original_behavior_tree_dir = Path(__file__).parents[1] / "actions" / "behavior_trees"
-    assert original_behavior_tree_dir.exists()
-    for original_bt_filename in original_behavior_tree_dir.glob("*.yaml"):
-        shutil.copy(original_bt_filename, run_behavior_tree_dir)
+    # # Copy the initial behavior trees into a directory for this run, where
+    # # they will be modified based on user feedback.
+    # run_behavior_tree_dir = Path(__file__).parent / "log" / "test_actions" / "behavior_trees"
+    # run_behavior_tree_dir.mkdir(exist_ok=True)
+    # original_behavior_tree_dir = Path(__file__).parents[1] / "actions" / "behavior_trees"
+    # assert original_behavior_tree_dir.exists()
+    # for original_bt_filename in original_behavior_tree_dir.glob("*.yaml"):
+    #     shutil.copy(original_bt_filename, run_behavior_tree_dir)
 
+    test_FoodManipulationSkillLibrary(sim, robot_interface, wrist_interface, perception_interface, rviz_interface, no_waits)
     # test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, tool, no_waits)
     # for i in range(25):
-    test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, run_behavior_tree_dir, no_waits, log_path=None)
+    # test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, run_behavior_tree_dir, no_waits, log_path=None)
 
 if __name__ == "__main__":
     import argparse

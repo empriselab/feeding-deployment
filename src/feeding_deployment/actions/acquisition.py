@@ -164,6 +164,7 @@ class AcquireBiteHLA(HighLevelAction):
                 skill_type = "autonomous"
                 skill_params = [next_food_item, bite_mask_idx]
 
+            skill_success = False
             if skill_type == "autonomous":
                 food_type_to_masks = items_detection["food_type_to_masks"]
                 food_type_to_skill = items_detection["food_type_to_skill"]
@@ -178,11 +179,13 @@ class AcquireBiteHLA(HighLevelAction):
 
                 if skill == "Skewer":
                     skewer_point, skewer_angle = self.flair.inference_server.get_skewer_action(mask)
-                    self.food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_point, major_axis = skewer_angle)
+                    skill_success = self.food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_point, major_axis = skewer_angle)
                 elif skill == "Scoop":
                     raise NotImplementedError("Scoop skill not yet implemented")
-
-            if skill_type == "manual_skewering":
+                elif skill == "Dip":
+                    dip_point = self.flair.inference_server.get_dip_action(mask)
+                    skill_success = self.food_manipulation_skill_library.dipping_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = dip_point)
+            elif skill_type == "manual_skewering":
 
                 plate_bounds = items_detection["plate_bounds"]
                 pos = skill_params[0]
@@ -206,10 +209,40 @@ class AcquireBiteHLA(HighLevelAction):
                 skewer_center = (point_x, point_y)
                 skewer_angle = -np.pi/2
 
-                self.food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_center, major_axis = skewer_angle)            
+                skill_success = self.food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_center, major_axis = skewer_angle)            
+            elif skill_type == "manual_scooping":
+                raise NotImplementedError("Scoop skill not yet implemented")
+            elif skill_type == "manual_dipping":
+
+                plate_bounds = items_detection["plate_bounds"]
+                pos = skill_params[0]
+
+                point_x = int(pos["x"]*plate_bounds[2]) + plate_bounds[0]
+                point_y = int(pos["y"]*plate_bounds[3]) + plate_bounds[1]
+
+                print("Plate Bounds:", plate_bounds)
+                print("Positions:", skill_params)
+                print("Point:", point_x, point_y)
+
+                if not self.no_waits:
+                    # visualize point on camera color image
+                    viz = camera_color_data.copy()
+                    for pos in skill_params:
+                        cv2.circle(viz, (point_x, point_y), 5, (0, 255, 0), -1)
+                    cv2.imshow("viz", viz)
+                    cv2.waitKey(0)
+                    cv2.destroyAllWindows()
+
+                dip_point = (point_x, point_y)
+
+                skill_success = self.food_manipulation_skill_library.dipping_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = dip_point)
 
             self.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
 
+            if not skill_success:
+                print("Skill failed. Retrying ...")
+                continue
+            
             if self.web_interface is not None and ask_confirmation:
                 get_success_confirmation = self.web_interface.get_successful_food_acquisition_confirmation()
                 if get_success_confirmation:

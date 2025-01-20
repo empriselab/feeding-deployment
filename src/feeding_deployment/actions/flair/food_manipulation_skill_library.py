@@ -58,12 +58,12 @@ class FoodManipulationSkillLibrary:
 
     def move_to_joint_positions(self, joint_positions):
 
-        plan = self.sim.plan_to_joint_positions(joint_positions)
-        print("Plan has length", len(plan))
         if self.robot_interface is None:
+            plan = self.sim.plan_to_joint_positions(joint_positions)
+            print("Plan has length", len(plan))
             self.sim.visualize_plan(plan)
         else:
-            self.robot_interface.execute_command(JointCommand(pos=self.sim.scene_description.retract_pos[:7]))
+            self.robot_interface.execute_command(JointCommand(pos=joint_positions))
 
     def move_to_ee_pose(self, pose, plan_override=False):
 
@@ -82,6 +82,7 @@ class FoodManipulationSkillLibrary:
 
     def reset(self):
 
+        print("Moving to above plate position: ", self.sim.scene_description.above_plate_pos)
         self.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
         self.set_wrist_state(0, 0)
 
@@ -140,7 +141,7 @@ class FoodManipulationSkillLibrary:
         # breakpoint()
         if not validity:
             print("Invalid point")
-            return
+            return False
 
         print("Getting transformation from base_link to camera_color_optical_frame")
         base_to_camera_transform = self.get_transform('base_link', 'camera_color_optical_frame')
@@ -185,6 +186,66 @@ class FoodManipulationSkillLibrary:
             # Rajat ToDo: Implement scooping pick up for simulation
             self.move_utensil_to_pose(waypoint_1_tip, tip_to_wrist)
 
+        return True
+
+    def dipping_skill(self, color_image, depth_image, camera_info, keypoint=None):
+
+        if keypoint is not None:
+            (center_x, center_y) = keypoint
+        else:
+            clicks = self.pixel_selector.run(color_image)
+            (center_x, center_y) = clicks[0]
+            major_axis = -np.pi/2
+
+        # get 3D point from depth image
+        validity, point = pixel2World(camera_info, center_x, center_y, depth_image)
+        # breakpoint()
+        if not validity:
+            print("Invalid point")
+            return False
+        
+        print("Getting transformation from base_link to camera_color_optical_frame")
+        base_to_camera_transform = self.get_transform('base_link', 'camera_color_optical_frame')
+        print("Base to camera transform: ", base_to_camera_transform)
+
+        food_base = np.eye(4)
+        food_base[:3,3] = point.reshape(1,3)
+        food_base = base_to_camera_transform @ food_base
+        food_base[2,3] = max(food_base[2,3] - 0.015, self.plate_height) 
+        # magic number for skewering offset
+        # food_base[0,3] += 0.012 # positive moves away from the robot
+        # keep the orientation of the food base fixed
+        food_base[:3,:3] = Rotation.from_quat([-0.7071068, 0.7071068, 0, 0]).as_matrix()
+
+        if self.robot_interface is not None:
+            self.tf_utils.publishTransformationToTF('base_link', 'food_frame', food_base)
+            self.rviz_interface.visualize_food(food_base)
+
+        if major_axis < np.pi/2:
+            major_axis = major_axis + np.pi/2
+
+        # caching this so that the robot doesn't rotate the wrist again
+        tip_to_wrist = self.get_transform('fork_tip', 'tool_frame')
+        print("Tip to wrist: ", tip_to_wrist)
+        
+        # action 0: Rotate scooping DoF to dip angle
+        # self.wrist_interface.set_to_dip_pos()
+
+        # Action 1: Move above food
+        waypoint_1_tip = np.copy(food_base)
+        waypoint_1_tip[2,3] += 0.07
+        # waypoint_1_tip[0,3] += 0.13
+        self.move_utensil_to_pose(waypoint_1_tip, tip_to_wrist)
+
+        # Action 2: Dip
+        waypoint_2_tip = np.copy(food_base)
+        self.move_utensil_to_pose(waypoint_2_tip, tip_to_wrist)
+
+        # Action 3: Move above food
+        waypoint_3_tip = np.copy(food_base)
+        waypoint_3_tip[2,3] += 0.07
+        self.move_utensil_to_pose(waypoint_3_tip, tip_to_wrist)
+        
     def scooping_pickup(self, hack = True):
 
         forkpitch_to_tip = self.get_transform('forkpitch', 'fork_tip')

@@ -267,7 +267,7 @@ class WebInterface:
         # Get the user's next bite selection
         msg_dict = self.get_required_web_interface_message(
             lambda msg_dict: (
-                (msg_dict["status"] == "aquire_food" or msg_dict["status"] == 0)
+                (msg_dict["status"] == "aquire_food" or msg_dict["status"] == 0 or msg_dict["status"] == 2)
             )
         ) 
 
@@ -277,6 +277,8 @@ class WebInterface:
             return "manual_skewering", msg_dict["positions"]
         elif msg_dict["status"] == 1: # manual scooping
             return "manual_scooping", msg_dict["positions"]
+        elif msg_dict["status"] == 2: # manual diping
+            return "manual_diping", msg_dict["positions"]
         else:
             print("Unsupported message received from the web interface: ", msg_dict)
 
