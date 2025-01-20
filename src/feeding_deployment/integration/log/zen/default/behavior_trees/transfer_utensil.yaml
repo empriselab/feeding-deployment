@@ -57,7 +57,7 @@ children:
       - sense
       - auto_timeout
       - headshake_user_generated
-    value: sense
+    value: auto_timeout
   - name: OutsideMouthDistance
     description: Distance from the tool tip to the user's mouth.
     is_user_editable: true

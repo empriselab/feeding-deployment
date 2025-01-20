@@ -1,0 +1,2627 @@
+{"state": "explanation", "status": ""}
+{"state": "task_selection", "status": "jump"}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "adaptability", "status": "jump"}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "adaptability_response", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "adaptability_response", "status": "The robot-assisted feeding system has been updated to operate at a higher speed for all actions involving picking, transferring, and stowing tools like drinks, utensils, and wipes."}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "adaptability_response", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "adaptability_response", "status": "The robot-assisted feeding system has been adjusted to operate at a slower speed for all tasks involving utensils, drinks, and wipes. Additionally, the system will now pause longer before moving to the next step, allowing more time for user interaction."}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "adaptability_response", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "adaptability_response", "status": "The robot's feeding system has been updated to operate at the highest speed for all tasks, including picking, transferring, and stowing utensils, drinks, and wipes."}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "adaptability_response", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "adaptability_response", "status": "The robot feeding system has been updated to speed up its actions and remove confirmation prompts. The wait time before continuing has been reduced for some tasks, and confirmation steps have been eliminated for transferring utensils and drinks. However, there was an issue with changing the wait time for the wipe transfer."}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "adaptability_response", "status": ""}
+{"state": "task_selection", "status": "jump"}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "newmealpage", "status": "jump"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "newmealpage", "status": "jump"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "acquirebite", "status": "jump"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[119, 331, 84, 91], [507, 91, 61, 425], [422, 225, 91, 90], [139, 136, 85, 90]]}}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Please wait for the transfer to complete in 5 seconds"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Moving to retract position"}
+{"state": "explanation", "status": "Moving to retract position"}
+{"state": "explanation", "status": "Moving to retract position"}
+{"state": "explanation", "status": "Moving to retract position"}
+{"state": "afterbitetransfer", "status": "jump"}
+{"state": "auto_time", "status": "100.0"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "adaptability", "status": "jump"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "adaptability_response", "status": ""}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "adaptability_response", "status": "The system was updated to reduce the waiting time before automatically continuing with tasks like acquiring a bite with a utensil and transferring utensils and drinks. However, the change could not be applied to the task involving a wipe."}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "adaptability_response", "status": ""}
+{"state": "task_selection", "status": "jump"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "acquirebite", "status": "jump"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[104, 325, 82, 93], [133, 133, 84, 89], [105, 79, 428, 403], [283, 80, 62, 90], [409, 232, 93, 90], [160, 248, 99, 87], [347, 168, 99, 74]]}}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Please wait for the transfer to complete in 5 seconds"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "afterbitetransfer", "status": "jump"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Picking up the appropriate food item"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "acquirebite", "status": "jump"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[165, 250, 100, 87], [140, 135, 83, 89], [289, 81, 62, 91], [353, 170, 99, 74], [415, 234, 93, 90]]}}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Please wait for the transfer to complete in 5 seconds"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "afterbitetransfer", "status": "jump"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "acquirebite", "status": "jump"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[242, 334, 89, 79], [143, 131, 83, 89], [293, 78, 62, 90]]}}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Please wait for the transfer to complete in 5 seconds"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "afterbitetransfer", "status": "jump"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "acquirebite", "status": "jump"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[337, 303, 77, 93], [144, 135, 82, 89], [357, 170, 99, 74], [294, 81, 61, 91], [418, 234, 94, 89], [456, 340, 87, 88], [296, 225, 85, 82]]}}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Please wait for the transfer to complete in 5 seconds"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "afterbitetransfer", "status": "jump"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "acquirebite", "status": "jump"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[139, 134, 83, 90], [291, 225, 86, 82], [353, 170, 98, 74], [414, 234, 93, 90], [289, 82, 62, 90], [206, 112, 86, 82]]}}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Please wait for the transfer to complete in 5 seconds"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "afterbitetransfer", "status": "jump"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Placing the utensil"}
+{"state": "explanation", "status": "Placing the utensil"}
+{"state": "explanation", "status": "Placing the utensil"}
+{"state": "explanation", "status": "Placing the utensil"}
+{"state": "explanation", "status": "Placing the utensil"}
+{"state": "explanation", "status": "Placing the utensil"}
+{"state": "explanation", "status": "Placing the utensil"}
+{"state": "explanation", "status": "Placing the utensil"}
+{"state": "explanation", "status": "Placing the utensil"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Picking up the drink"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Please do a Headshake (user generated) to complete transfer"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "afterdrinktransfer", "status": "jump"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Finished transferring drink to user's mouth"}
+{"state": "explanation", "status": "Finished transferring drink to user's mouth"}
+{"state": "explanation", "status": "Finished transferring drink to user's mouth"}
+{"state": "explanation", "status": "Finished transferring drink to user's mouth"}
+{"state": "explanation", "status": "Finished transferring drink to user's mouth"}
+{"state": "explanation", "status": "Finished transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Please do a Headshake (user generated) to complete transfer"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "explanation", "status": "Transferring drink to user's mouth"}
+{"state": "afterdrinktransfer", "status": "jump"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Finished transferring drink to user's mouth"}
+{"state": "explanation", "status": "Finished transferring drink to user's mouth"}
+{"state": "explanation", "status": "Placing the drink"}
+{"state": "explanation", "status": "Placing the drink"}
+{"state": "explanation", "status": "Placing the drink"}
+{"state": "explanation", "status": "Placing the drink"}
+{"state": "explanation", "status": "Placing the drink"}
+{"state": "explanation", "status": "Placing the drink"}
+{"state": "explanation", "status": "Placing the drink"}
+{"state": "explanation", "status": "Placing the drink"}
+{"state": "explanation", "status": "Placing the drink"}
+{"state": "explanation", "status": "Placing the drink"}
+{"state": "explanation", "status": "Placing the drink"}
+{"state": "explanation", "status": "Placing the drink"}
+{"state": "explanation", "status": "Placing the drink"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Picking up the utensil"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "acquirebite", "status": "jump"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[290, 223, 85, 81], [413, 232, 92, 89], [351, 168, 99, 74], [288, 79, 61, 91], [204, 109, 86, 83], [450, 338, 87, 87], [374, 402, 90, 80]]}}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Please wait for the transfer to complete in 5 seconds"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished transferring utensil to user's mouth"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "afterbitetransfer", "status": "jump"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Finished moving to retract position"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Picking up the wipe"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Bringing wipe to user's mouth"}
+{"state": "explanation", "status": "Bringing wipe to user's mouth"}
+{"state": "explanation", "status": "Bringing wipe to user's mouth"}
+{"state": "explanation", "status": "Bringing wipe to user's mouth"}
+{"state": "explanation", "status": "Bringing wipe to user's mouth"}
+{"state": "explanation", "status": "Bringing wipe to user's mouth"}
+{"state": "explanation", "status": "Please do a head nod to complete transfer"}
+{"state": "explanation", "status": "Bringing wipe to user's mouth"}
+{"state": "explanation", "status": "Bringing wipe to user's mouth"}
+{"state": "explanation", "status": "Bringing wipe to user's mouth"}
+{"state": "explanation", "status": "Bringing wipe to user's mouth"}
+{"state": "explanation", "status": "Bringing wipe to user's mouth"}
+{"state": "task_selection", "status": "jump"}
+{"state": "explanation", "status": "Finished bringing wipe to user's mouth"}
+{"state": "explanation", "status": "Finished bringing wipe to user's mouth"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Placing the wipe"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "acquirebite", "status": "jump"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[351, 164, 98, 75], [411, 230, 92, 89], [286, 77, 61, 91], [202, 107, 87, 83], [448, 336, 87, 87]]}}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Please wait for the transfer to complete in 5 seconds"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": "Unexpected camera anomaly detected"}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "task_selection", "status": "jump"}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "acquirebite", "status": "jump"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[419, 272, 75, 96], [286, 77, 61, 91], [202, 107, 87, 83], [372, 400, 89, 80]]}}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Please wait for the transfer to complete in 5 seconds"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "afterbitetransfer", "status": "jump"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "acquirebite", "status": "jump"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[287, 82, 62, 90], [204, 112, 86, 82]]}}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Please wait for the transfer to complete in 5 seconds"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "afterbitetransfer", "status": "jump"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected chicken on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "acquirebite", "status": "jump"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[205, 122, 75, 93]]}}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Please wait for the transfer to complete in 5 seconds"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "afterbitetransfer", "status": "jump"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "acquirebite", "status": "jump"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[148, 183, 90, 95], [380, 217, 74, 88], [231, 276, 85, 89]]}}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Please wait for the transfer to complete in 5 seconds"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "afterbitetransfer", "status": "jump"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected three chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "acquirebite", "status": "jump"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[378, 219, 74, 88], [229, 278, 84, 89]]}}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Please wait for the transfer to complete in 5 seconds"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "afterbitetransfer", "status": "jump"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected two chicken portions on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "acquirebite", "status": "jump"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[233, 274, 84, 89]]}}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Please wait for the transfer to complete in 5 seconds"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "afterbitetransfer", "status": "jump"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Please do a Headshake (user generated) to complete transfer"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "afterdrinktransfer", "status": "jump"}
+{"state": "auto_time", "status": "5.0"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Please open your mouth to initiate transfer"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Please do a head nod to complete transfer"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "task_selection", "status": "jump"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "Detected one chicken portion on the plate"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": "User emergency stop activated"}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "task_selection", "status": "jump"}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "task_selection", "status": "jump"}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}
+{"state": "explanation", "status": ""}

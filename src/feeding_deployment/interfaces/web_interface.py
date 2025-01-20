@@ -98,7 +98,14 @@ class WebInterface:
         msg_dict = json.loads(msg.data)
 
         self.task_selection_jump = False
-        if msg_dict["state"] == "task_selection":
+        
+        if msg_dict["status"] == "finish_feeding":
+            task_selected = {
+                "task": "reset",
+                "type": "reset",
+            }
+            self.task_selection_queue.put(task_selected)
+        elif msg_dict["state"] == "task_selection":
             if msg_dict["status"] == "take_bite":
                 task_selected = {
                     "task": "meal_assistance",
