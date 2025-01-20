@@ -112,13 +112,18 @@ def detect_head_nod(perception_interface, termination_event, timeout, head_nod_t
 
 Using the In-Context Examples as reference, generate a detector for the following input. Generate output in the same format as the in-context examples - just the code with comments, and without any additional text explanations, as additional text will render the output unexecutable in python. Absolutely make sure that there are no time.sleep() calls in the function. If using a while loop, make sure that you have the code lines for breaking out if face_keypoints or head_pose is None.
 
-IMPORTANT: Have the following lines exactly as is in your code:
+IMPORTANT 1: Have the following lines exactly as is in your code:
 ```
     while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
         head_perception_data = perception_interface.get_head_perception_data()
         if head_perception_data is None:
             break
 ```
+
+IMPORTANT 2: For detecting head movement over some time frame, do not track absolute time using time.time(). Instead track number of frames processed assuming get_head_perception_data takes 10Hz. For example, for tracking over 3 seconds, run a counter for 30 processed frames.
+
+IMPORTANT 3: You have to detect the given gesture over time, so even if it is initially not true, keep running detection until it is detected or you run out of data. DO NOT BREAK OF A DETECTION LOOP ONLY BECAUSE A CERTAIN AMOUNT OF TIME HAS PASSED.
+
 Input:
 ##################
 Language Description: %s
