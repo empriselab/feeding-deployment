@@ -1,0 +1,56 @@
+{"state": "acquirebite", "status": "jump"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[233, 274, 84, 89]]}}
+{"n_ordering": 3, "data": ["Chocolate Sauce", "Ketchup", "No dip"]}
+{"state": "auto_time", "status": "20.0"}
+{"state": "acquirebite", "status": "jump"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[233, 274, 84, 89]]}}
+{"n_ordering": 3, "data": ["Chocolate Sauce", "Ketchup", "No dip"]}
+{"state": "auto_time", "status": "20.0"}
+{"state": "acquirebite", "status": "jump"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[233, 274, 84, 89]]}}
+{"n_ordering": 3, "data": ["Chocolate Sauce", "Ketchup", "No dip"]}
+{"state": "auto_time", "status": "20.0"}
+{"state": "acquirebite", "status": "jump"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[233, 274, 84, 89]]}}
+{"n_ordering": 3, "data": ["Chocolate Sauce", "Ketchup", "No dip"]}
+{"state": "auto_time", "status": "20.0"}
+{"state": "acquirebite", "status": "jump"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[233, 274, 84, 89]]}}
+{"n_ordering": 3, "data": ["Chocolate Sauce", "Ketchup", "No dip"]}
+{"state": "auto_time", "status": "20.0"}
+{"state": "acquirebite", "status": "jump"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[233, 274, 84, 89]]}}
+{"n_ordering": 3, "data": ["Chocolate Sauce", "Ketchup", "No dip"]}
+{"state": "auto_time", "status": "20.0"}
+{"state": "acquirebite", "status": "jump"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[233, 274, 84, 89]]}}
+{"n_ordering": 3, "data": ["Chocolate Sauce", "Ketchup", "No dip"]}
+{"state": "auto_time", "status": "20.0"}
+{"state": "acquirebite", "status": "jump"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[233, 274, 84, 89]]}}
+{"n_ordering": 3, "data": ["Chocolate Sauce", "Ketchup", "No dip"]}
+{"state": "auto_time", "status": "20.0"}
+{"state": "acquirebite", "status": "jump"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[233, 274, 84, 89]]}}
+{"n_ordering": 3, "data": ["Chocolate Sauce", "Ketchup", "No dip"]}
+{"state": "auto_time", "status": "20.0"}
+{"state": "acquirebite", "status": "jump"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[233, 274, 84, 89]]}}
+{"n_ordering": 3, "data": ["Chocolate Sauce", "Ketchup", "No dip"]}
+{"state": "auto_time", "status": "20.0"}
+{"state": "acquirebite", "status": "jump"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[233, 274, 84, 89]]}}
+{"n_ordering": 3, "data": ["Chocolate Sauce", "Ketchup", "No dip"]}
+{"state": "auto_time", "status": "20.0"}
+{"state": "acquirebite", "status": "jump"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[233, 274, 84, 89]]}}
+{"n_ordering": 3, "data": ["Chocolate Sauce", "Ketchup", "No dip"]}
+{"state": "auto_time", "status": "20.0"}
+{"state": "acquirebite", "status": "jump"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[233, 274, 84, 89]]}}
+{"n_ordering": 3, "data": ["Chocolate Sauce", "Ketchup", "No dip"]}
+{"state": "auto_time", "status": "20.0"}
+{"state": "acquirebite", "status": "jump"}
+{"n_food_types": 1, "data": [], "current_bite": {"chicken": [[233, 274, 84, 89]]}}
+{"n_ordering": 3, "data": ["Chocolate Sauce", "Ketchup", "No dip"]}
+{"state": "auto_time", "status": "20.0"}

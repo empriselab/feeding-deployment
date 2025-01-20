@@ -191,9 +191,13 @@ class WebInterface:
                 return None
             try:
                 msg_dict = self.received_web_interface_messages.get_nowait()
-                if condition(msg_dict):
-                    print("Received required message from the web interface")
-                    return msg_dict
+                try:
+                    if condition(msg_dict):
+                        print("Received required message from the web interface")
+                        return msg_dict
+                except Exception as e:
+                    print("Error in condition: ", e)
+                    print("continuing to wait for required message from the web interface ...")
             except queue.Empty:
                 if print_once:
                     print("Waiting for required message from the web interface ...")
@@ -247,7 +251,7 @@ class WebInterface:
         bite_ordering_preference = msg_dict["status"]
         return bite_ordering_preference
     
-    def get_next_bite_selection(self, plate_image, n_food_types, data, predicted_bite, autocontinue_timeout) -> None:
+    def get_next_bite_selection(self, plate_image, n_solid_food_types, bite_data, predicted_bite, n_dip_food_types, dip_data, autocontinue_timeout) -> None:
 
         self.current_page = "meal_assistance"
 
@@ -259,28 +263,47 @@ class WebInterface:
 
         self._send_image(plate_image)
         time.sleep(0.1)
-        self._send_message({"n_food_types": n_food_types, "data": data, "current_bite": predicted_bite})  
+        self._send_message({"n_food_types": n_solid_food_types, "data": bite_data, "current_bite": predicted_bite})  
+        time.sleep(0.1)
+        self._send_message({"n_ordering": n_dip_food_types, "data": dip_data})
         # set autocontinue timeout
         time.sleep(0.5)
         self._send_message({"state": "auto_time", "status": str(autocontinue_timeout)})
 
+        bite_msg_dict, dip_msg_dict = None, None
         # Get the user's next bite selection
-        msg_dict = self.get_required_web_interface_message(
+        msg_dict_1 = self.get_required_web_interface_message(
             lambda msg_dict: (
-                (msg_dict["status"] == "aquire_food" or msg_dict["status"] == 0 or msg_dict["status"] == 2)
+                ((msg_dict["status"] == "aquire_food" or msg_dict["status"] == 0 or msg_dict["status"] == 2) or msg_dict["state"] == "dip_selection")
             )
-        ) 
-
-        if msg_dict["status"] == "aquire_food": # autonomous bite acquisition
-            return "autonomous", msg_dict["data"]
-        elif msg_dict["status"] == 0: # manual skewering
-            return "manual_skewering", msg_dict["positions"]
-        elif msg_dict["status"] == 1: # manual scooping
-            return "manual_scooping", msg_dict["positions"]
-        elif msg_dict["status"] == 2: # manual diping
-            return "manual_diping", msg_dict["positions"]
+        )
+        if msg_dict_1["status"] == "aquire_food" or msg_dict_1["status"] == 0 or msg_dict_1["status"] == 2:
+            bite_msg_dict = msg_dict_1
+            # But if bite is manual, then we should not wait for dip selection
+            if bite_msg_dict["status"] == "aquire_food":
+                dip_msg_dict = self.get_required_web_interface_message(
+                    lambda msg_dict: (
+                        (msg_dict["state"] == "dip_selection")
+                    )
+                )
+                return "autonomous", bite_msg_dict["data"], dip_msg_dict["status"]
+            else:
+                if bite_msg_dict["status"] == 0:
+                    return "manual_skewering", bite_msg_dict["positions"], None
+                elif bite_msg_dict["status"] == 2:
+                    return "manual_diping", bite_msg_dict["positions"], None
+                else:
+                    print("Unsupported message received from the web interface: ", bite_msg_dict)
         else:
-            print("Unsupported message received from the web interface: ", msg_dict)
+            dip_msg_dict = msg_dict_1
+            # Dip recieved means bite has to be autonomous
+            bite_msg_dict = self.get_required_web_interface_message(
+                lambda msg_dict: (
+                    (msg_dict["status"] == "aquire_food" or msg_dict["status"] == 0 or msg_dict["status"] == 2)
+                )
+            )
+            return "autonomous", bite_msg_dict["data"], dip_msg_dict["status"]
+
 
     def get_successful_food_acquisition_confirmation(self) -> None:
 
@@ -555,3 +578,37 @@ class WebInterface:
                     current_explanation = response
                 self._send_message({"state": "explanation", "status": current_explanation})
             time.sleep(1.0)  # Provide explanations at a rate of 1 Hz
+
+if __name__ == "__main__":
+    rospy.init_node("web_interface")
+    log_dir = Path(__file__).parent.parent / "integration" / "log" / "web_interface_log"
+    task_selection_queue = queue.Queue()
+    web_interface = WebInterface(task_selection_queue, log_dir)
+    
+    with open(log_dir / "food_detection_data.pkl", "rb") as f:
+        food_detection_data = pickle.load(f)
+
+    camera_color_data = food_detection_data["camera_color_data"]
+    camera_info_data = food_detection_data["camera_info_data"]
+    camera_depth_data = food_detection_data["camera_depth_data"]
+    food_items = food_detection_data["food_items"]
+    bite_ordering_preference = food_detection_data["bite_ordering_preference"]
+    items_detection = food_detection_data["items_detection"]
+
+    # remove next_food_item from data
+    food_type_to_data = items_detection['food_type_to_bounding_boxes_plate']
+
+    next_food_item = list(food_type_to_data.keys())[0]
+
+    n_food_types = len(food_type_to_data)
+    data = [{k: v} for k, v in food_type_to_data.items() if k != next_food_item]
+    predicted_bite = {next_food_item: food_type_to_data[next_food_item]}     
+
+    dip_data = ["Chocolate Sauce", "Ketchup", "No dip"]     
+    n_dip_food_types = len(dip_data)
+    # load acquisition data
+    skill_type, skill_params, dip_type = web_interface.get_next_bite_selection(items_detection['plate_image'], n_food_types, data, predicted_bite, n_dip_food_types, dip_data, autocontinue_timeout=20.0)
+
+    print("Skill type: ", skill_type)
+    print("Skill params: ", skill_params)
+    print("Dip type: ", dip_type)
