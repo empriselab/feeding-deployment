@@ -33,36 +33,37 @@ def detect_mouth_open(perception_interface, termination_event, timeout):
 
 
 def detect_head_nod(perception_interface, termination_event, timeout):
-
-    head_nod_threshold = 3.0
-    max_pitch_data_size = 500
+    head_nod_threshold = 15.0
+    required_direction_changes = 3
 
     start_time = time.time()
-    pitch_data = []
-    direction_changes = 0  # Counts the number of up-down or down-up changes
+    direction_changes = 0
+    last_min_extreme = float("inf")
+    last_max_extreme = -float("inf")
 
-    while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
+    while (time.time() - start_time < timeout and 
+           (termination_event is None or not termination_event.is_set())):
+        
         head_perception_data = perception_interface.get_head_perception_data()
         if head_perception_data is None:
+            # No more data
             break
+        
         head_pose = head_perception_data["head_pose"]
+        (_, _, _, _, head_pitch, _) = head_pose
 
-        (head_x, head_y, head_z, head_roll, head_pitch, head_yaw) = head_pose
-        pitch_data.append(head_pitch)
+        if head_pitch - last_min_extreme > head_nod_threshold:
+            direction_changes += 1
+            last_min_extreme = float("inf")
 
-        # Check if there is enough data to detect direction change
-        if len(pitch_data) >= 3:
+        if last_max_extreme - head_pitch > head_nod_threshold:
+            direction_changes += 1
+            last_max_extreme = -float("inf")
 
-            if (pitch_data[-2] - pitch_data[-3] > head_nod_threshold and pitch_data[-2] - pitch_data[-1] > head_nod_threshold) or \
-            (pitch_data[-3] - pitch_data[-2] > head_nod_threshold and pitch_data[-1] - pitch_data[-2] > head_nod_threshold):
-                direction_changes += 1
+        last_min_extreme = min(head_pitch, last_min_extreme)
+        last_max_extreme = max(head_pitch, last_max_extreme)
 
-            if direction_changes >= 2:
-                return True
+        if direction_changes >= required_direction_changes:
+            return True
 
-        # To avoid excessive memory usage, keep the pitch_data size small
-        if len(pitch_data) > max_pitch_data_size:
-            pitch_data.pop(0)
-
-    # If timeout expires without detecting the gesture, return False
     return False
