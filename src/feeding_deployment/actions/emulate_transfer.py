@@ -61,6 +61,9 @@ class EmulateTransferHLA(HighLevelAction):
 
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
+        if self.web_interface is not None:
+            self.web_interface.fix_explanation("Moving to infront of mouth")
+
         self.perception_interface.set_head_perception_tool("fork")
         self.perception_interface.start_head_perception_thread()
         if self.robot_interface is not None:
@@ -76,6 +79,9 @@ class EmulateTransferHLA(HighLevelAction):
 
         self.transfer.set_tool("fork")
         self.transfer.move_to_transfer_state(outside_mouth_distance=0.15)
+
+        if self.web_interface is not None:
+            self.web_interface.fix_explanation("Ready for gestures")
 
         if self.robot_interface is not None:
             self.perception_interface.speak("Ready for gestures")
@@ -135,6 +141,7 @@ class EmulateTransferHLA(HighLevelAction):
 
                 # shutdown the head perception thread and move to before transfer state
                 self.perception_interface.stop_head_perception_thread()
+                self.web_interface.fix_explanation("Moving back to before transfer position")
                 self.transfer.move_to_before_transfer_state()  
 
             else:
@@ -165,7 +172,9 @@ class EmulateTransferHLA(HighLevelAction):
 
                 # shutdown the head perception thread and move to before transfer state
                 self.perception_interface.stop_head_perception_thread()
+                self.web_interface.fix_explanation("Moving back to before transfer position")
                 self.transfer.move_to_before_transfer_state()  
+                self.web_interface.fix_explanation("Synthesizing gesture detector, please wait ...")
 
                 video_segments_path = self.gesture_detectors_dir / "video_segments" / synthesized_gesture_function_name
                 if not video_segments_path.exists():
@@ -204,7 +213,10 @@ class EmulateTransferHLA(HighLevelAction):
                         }, f)
 
                     print("Synthesizing gesture detector ...")
-                    generated_function_txt = self.detector_synthesizer.generate_function(gesture_datapath)
+                    generated_function_txt, accuracy = self.detector_synthesizer.generate_function(gesture_datapath)
+
+                    self.web_interface.fix_explanation(f"Synthesized gesture detector for {self.gesture_label} with accuracy {accuracy*100:.2f}%")
+                    time.sleep(2.0)
                 
                     # Hack to test the synthesizer
                     # hack_datapath = Path(__file__).parent.parent / "perception" / "gestures_perception" / "gestures_examples" / "shake_my_head_from_left_to_right.pkl"
@@ -214,6 +226,7 @@ class EmulateTransferHLA(HighLevelAction):
                         self.register_gesture_detector(synthesized_gesture_function_name, generated_function_txt)
                     else:
                         print("Did not generate valid detector function")
+                    self.web_interface.clear_explanation()
                 else:
                     print("Gesture examples recording is not valid")
         else:
@@ -221,7 +234,9 @@ class EmulateTransferHLA(HighLevelAction):
 
             # shutdown the head perception thread and move to before transfer state
             self.perception_interface.stop_head_perception_thread()
+            self.web_interface.fix_explanation("Moving back to before transfer position")
             self.transfer.move_to_before_transfer_state()        
+            self.web_interface.clear_explanation()
 
     def get_name(self) -> str:
         return "EmulateTransfer"

@@ -34,6 +34,8 @@ class WebInterface:
 
         # Used for generating continuous explanations.
         self.transparency_continuous = TransparencyContinuous(log_dir)
+        self.webapp_sent_messages_log = log_dir / "webapp_sent_messages.txt"
+        self.webapp_received_messages_log = log_dir / "webapp_received_messages.txt"
 
         # Objects of task_selection_queue are dicts and can be of the following types:
         # {'task': 'meal_assistance', 'type': 'bite' / 'sip' / 'wipe'}
@@ -80,6 +82,8 @@ class WebInterface:
 
 
     def _send_message(self, msg_dict: dict[str, Any]) -> None:
+        with open(self.webapp_sent_messages_log, "a") as f:
+            f.write(json.dumps(msg_dict) + "\n")
         self.web_interface_publisher.publish(String(json.dumps(msg_dict)))
 
     def _send_image(self, image) -> None:
@@ -88,6 +92,8 @@ class WebInterface:
     def _message_callback(self, msg: "String") -> None:
         """Callback for the web interface."""
         print("Received message on WebAppComm: ", msg.data)
+        with open(self.webapp_received_messages_log, "a") as f:
+            f.write(msg.data + "\n")
         
         msg_dict = json.loads(msg.data)
 

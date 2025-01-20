@@ -5,6 +5,7 @@
 # *.mp4
 *.zip
 **/llm_cache_continuous/**
+**/llm_cache/**
 
 src/feeding_deployment/integration/saved_states/last_stage.p
 src/feeding_deployment/integration/log/behavior_trees

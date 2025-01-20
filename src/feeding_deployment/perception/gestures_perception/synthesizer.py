@@ -123,12 +123,12 @@ from gymnasium.spaces import Box
 """
             updated_function_code = function_code.replace(old_snippet.strip(), new_snippet.strip())
 
-            return updated_function_code
+            return updated_function_code, accuracy
         except Exception as e:
             print("Error: ", e)
             with open(Path(__file__).parent / "results" / f"{self.label}.txt", "a") as f:
                 f.write(f"\nError: {e}")
-            return None
+            return None, None
     
     def test_in_context_examples(self):
         self._load_from_data_path(Path(__file__).parent / "gestures_examples" / "open_mouth.pkl")
@@ -194,12 +194,12 @@ def main():
 
     synthesizer = PersonalizedGestureDetectorSynthesizer(log_dir=Path(__file__).parent / "log")
     gesture_data_path = Path(__file__).parent.parent.parent / "integration" / "log" / "gesture_examples" / "head_nod_user_generated.pkl"
-    generated_function_txt = synthesizer.generate_function(gesture_datapath=gesture_data_path)
+    generated_function_txt, accuracy = synthesizer.generate_function(gesture_datapath=gesture_data_path)
     synthesizer.test_in_context_examples()
 
     # gesture_to_test = "shake_my_head_from_left_to_right"
     # gesture_datapath = Path(__file__).parent / "gestures_examples" / f"{gesture_to_test}.pkl"
-    # generated_function = synthesizer.generate_function(gesture_datapath)
+    # generated_function, accuracy = synthesizer.generate_function(gesture_datapath)
     # if generated_function is not None:
     #     with open("synthesized_gesture_detectors.py", "a") as f:
     #         f.write(generated_function)
