@@ -74,19 +74,17 @@ class EmulateTransferHLA(HighLevelAction):
             time.sleep(1.0) # let sim head perception thread warmstart
 
         if self.robot_interface is not None:
-            self.perception_interface.speak("Please press transfer button when ready")
+            self.perception_interface.speak("Please press transfer button while looking towards the robot when ready")
             self.perception_interface.detect_button_press()
 
         self.transfer.set_tool("fork")
         self.transfer.move_to_transfer_state(outside_mouth_distance=0.15)
 
-        if self.web_interface is not None:
-            self.web_interface.fix_explanation("Ready for gestures")
-
         if self.robot_interface is not None:
             self.perception_interface.speak("Ready for gestures")
 
         if self.web_interface is not None:
+            self.web_interface.update_fixed_explanation("Ready for gestures")
             if self.test_mode:
                 # Start with the static, given gestures.
                 available_gestures = inspect.getmembers(static_gesture_detectors, inspect.isfunction)
@@ -141,7 +139,7 @@ class EmulateTransferHLA(HighLevelAction):
 
                 # shutdown the head perception thread and move to before transfer state
                 self.perception_interface.stop_head_perception_thread()
-                self.web_interface.fix_explanation("Moving back to before transfer position")
+                self.web_interface.update_fixed_explanation("Moving back to before transfer position")
                 self.transfer.move_to_before_transfer_state()  
 
             else:
@@ -172,9 +170,9 @@ class EmulateTransferHLA(HighLevelAction):
 
                 # shutdown the head perception thread and move to before transfer state
                 self.perception_interface.stop_head_perception_thread()
-                self.web_interface.fix_explanation("Moving back to before transfer position")
+                self.web_interface.update_fixed_explanation("Moving back to before transfer position")
                 self.transfer.move_to_before_transfer_state()  
-                self.web_interface.fix_explanation("Synthesizing gesture detector, please wait ...")
+                self.web_interface.update_fixed_explanation("Synthesizing gesture detector, please wait ...")
 
                 video_segments_path = self.gesture_detectors_dir / "video_segments" / synthesized_gesture_function_name
                 if not video_segments_path.exists():
@@ -215,7 +213,7 @@ class EmulateTransferHLA(HighLevelAction):
                     print("Synthesizing gesture detector ...")
                     generated_function_txt, accuracy = self.detector_synthesizer.generate_function(gesture_datapath)
 
-                    self.web_interface.fix_explanation(f"Synthesized gesture detector for {self.gesture_label} with accuracy {accuracy*100:.2f}%")
+                    self.web_interface.update_fixed_explanation(f"Synthesized gesture detector for {self.gesture_label} with accuracy {accuracy*100:.2f}%")
                     time.sleep(2.0)
                 
                     # Hack to test the synthesizer
@@ -226,17 +224,15 @@ class EmulateTransferHLA(HighLevelAction):
                         self.register_gesture_detector(synthesized_gesture_function_name, generated_function_txt)
                     else:
                         print("Did not generate valid detector function")
-                    self.web_interface.clear_explanation()
                 else:
                     print("Gesture examples recording is not valid")
+            self.web_interface.clear_explanation()
         else:
             print("Can record or test gestures only with real robot and web interface")
 
             # shutdown the head perception thread and move to before transfer state
             self.perception_interface.stop_head_perception_thread()
-            self.web_interface.fix_explanation("Moving back to before transfer position")
             self.transfer.move_to_before_transfer_state()        
-            self.web_interface.clear_explanation()
 
     def get_name(self) -> str:
         return "EmulateTransfer"
