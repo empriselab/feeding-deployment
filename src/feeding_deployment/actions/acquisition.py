@@ -59,7 +59,7 @@ class AcquireBiteHLA(HighLevelAction):
         assert tool.name == "utensil"
         return "acquire_bite.yaml"
     
-    def acquire_bite(self, speed: str, dipping_depth: float, autocontinue_timeout: float, ask_confirmation: bool) -> None:
+    def acquire_bite(self, speed: str, dipping_depth: float, skewering_depth: float, autocontinue_timeout: float, ask_confirmation: bool) -> None:
 
         assert self.sim.held_object_name == "utensil"
 
@@ -204,7 +204,7 @@ class AcquireBiteHLA(HighLevelAction):
 
                 if skill == "Skewer":
                     skewer_point, skewer_angle = self.flair.inference_server.get_skewer_action(mask)
-                    skill_success = self.food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_point, major_axis = skewer_angle)
+                    skill_success = self.food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_point, major_axis = skewer_angle, skewering_depth=skewering_depth)
                 elif skill == "Scoop":
                     raise NotImplementedError("Scoop skill not yet implemented")
                 
@@ -239,7 +239,7 @@ class AcquireBiteHLA(HighLevelAction):
                 skewer_center = (point_x, point_y)
                 skewer_angle = -np.pi/2
 
-                skill_success = self.food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_center, major_axis = skewer_angle)            
+                skill_success = self.food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_center, major_axis = skewer_angle, skewering_depth=skewering_depth)            
             elif skill_type == "manual_scooping":
                 raise NotImplementedError("Scoop skill not yet implemented")
             elif skill_type == "manual_dipping":
@@ -265,7 +265,7 @@ class AcquireBiteHLA(HighLevelAction):
 
                 dip_point = (point_x, point_y)
 
-                skill_success = self.food_manipulation_skill_library.dipping_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = dip_point)
+                skill_success = self.food_manipulation_skill_library.dipping_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = dip_point, dipping_depth=dipping_depth)
 
             self.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
 

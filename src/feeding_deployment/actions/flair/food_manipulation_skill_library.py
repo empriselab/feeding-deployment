@@ -126,7 +126,7 @@ class FoodManipulationSkillLibrary:
             pose_transform = self.sim.get_transform(from_frame, to_frame)
             return pose_transform.to_matrix()
 
-    def skewering_skill(self, color_image, depth_image, camera_info, keypoint=None, major_axis=None, action_index=0):
+    def skewering_skill(self, color_image, depth_image, camera_info, keypoint=None, major_axis=None, skewering_depth=0.015, action_index=0):
         if keypoint is not None:
             (center_x, center_y) = keypoint
         else:
@@ -150,7 +150,7 @@ class FoodManipulationSkillLibrary:
         food_base = np.eye(4)
         food_base[:3,3] = point.reshape(1,3)
         food_base = base_to_camera_transform @ food_base
-        food_base[2,3] = max(food_base[2,3] - 0.015, self.plate_height) 
+        food_base[2,3] = max(food_base[2,3] - skewering_depth, self.plate_height) 
         # magic number for skewering offset
         # food_base[0,3] += 0.012 # positive moves away from the robot
         # keep the orientation of the food base fixed
@@ -189,7 +189,7 @@ class FoodManipulationSkillLibrary:
         return True
 
     def dipping_skill(self, color_image, depth_image, camera_info, keypoint=None, dipping_depth=0.03):
-        """ Dipping amount must be between 0.02 and 0.04"""
+        """ Dipping amount must be between 0.02 and 0.05"""
 
         if keypoint is not None:
             (center_x, center_y) = keypoint
@@ -198,6 +198,14 @@ class FoodManipulationSkillLibrary:
             clicks = self.pixel_selector.run(color_image)
             (center_x, center_y) = clicks[0]
             major_axis = -np.pi/2
+
+        # visualize keypoint
+        import cv2
+        cv2.circle(color_image, (center_x, center_y), 5, (0, 0, 255), -1)
+        cv2.imshow("Color image", color_image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        input("Press enter to continue...")
 
         # get 3D point from depth image
         validity, point = pixel2World(camera_info, center_x, center_y, depth_image)

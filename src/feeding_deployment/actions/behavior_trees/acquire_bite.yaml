@@ -14,9 +14,17 @@ parameters:
     space:
       type: "Box"
       lower: 0.02
-      upper: 0.04
+      upper: 0.05
     is_user_editable: True
     value: 0.03
+  - name: "SkeweringDepth"
+    description: "The depth a food item is skewered."
+    space:
+      type: "Box"
+      lower: 0.01
+      upper: 0.05
+    is_user_editable: True
+    value: 0.015
   - name: "TimeToWaitBeforeAutocontinue"
     description: "Time to wait before auto-continuing pickup bite button on the webapp."
     space:

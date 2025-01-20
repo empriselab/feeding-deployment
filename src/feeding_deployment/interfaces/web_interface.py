@@ -229,32 +229,6 @@ class WebInterface:
 
         return msg_dict["state"], msg_dict["status"]
 
-    def get_bite_ordering_preference(self, plate_image, n_food_types, data, ordering_options) -> None:
-
-        self.current_page = "meal_assistance"
-
-        # Jump to bite ordering page
-        self._send_message({"state": "newmealpage", "status": "jump"})
-        
-        # Wait for the web interface to be ready for initial data
-        time.sleep(0.5)
-        
-        # Send required data for the bite ordering page
-        self._send_image(plate_image)
-        self._send_message({"n_food_types": n_food_types, "data": data})
-        self._send_message({"n_ordering": len(ordering_options), "data": ordering_options})
-
-        # Get the user's bite ordering preference
-        msg_dict = self.get_required_web_interface_message(
-            lambda msg_dict: (
-                (msg_dict["state"] == "order_selection" and msg_dict["status"] != "ready_for_initial_data")
-                or (msg_dict["state"] == "voice")
-            )
-        )
-
-        bite_ordering_preference = msg_dict["status"]
-        return bite_ordering_preference
-    
     def get_next_bite_selection(self, plate_image, n_solid_food_types, bite_data, predicted_bite, n_dip_food_types, dip_data, autocontinue_timeout) -> None:
 
         self.current_page = "meal_assistance"
@@ -295,7 +269,7 @@ class WebInterface:
                 if bite_msg_dict["status"] == 0:
                     return "manual_skewering", bite_msg_dict["positions"], None
                 elif bite_msg_dict["status"] == 2:
-                    return "manual_diping", bite_msg_dict["positions"], None
+                    return "manual_dipping", bite_msg_dict["positions"], None
                 else:
                     print("Unsupported message received from the web interface: ", bite_msg_dict)
         else:
