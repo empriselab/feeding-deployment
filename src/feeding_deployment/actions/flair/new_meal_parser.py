@@ -24,10 +24,12 @@ class NewMealParser:
 
         # Initialize results
         parsed_food_items = None
+        parsed_dips = []
         parsed_bite_ordering_preference = None
 
         # Extract potential matches
-        food_items_match = re.search(r"Parsed Food Items:\s*(\[.*?\]|.*)", response)
+        food_items_match = re.search(r"Parsed Solid Food Items:\s*(\[.*?\]|.*)", response)
+        dips_match = re.search(r"Parsed Dips:\s*(\[.*?\]|.*)", response)
         bite_preference_match = re.search(r"Parsed Bite Preference Ordering:\s*(.*)", response)
 
         # Parse food items
@@ -46,6 +48,22 @@ class NewMealParser:
                 if not parsed_food_items:  # If parsing fails, reset to None
                     print("Also failed to parse as a comma-separated string... setting to None.")
                     parsed_food_items = None
+        
+        # Parse dips
+            dips_str = dips_match.group(1).strip()
+            try:
+                # Attempt to evaluate as a Python list
+                parsed_dips = ast.literal_eval(dips_str)
+                if not isinstance(parsed_dips, list):
+                    raise ValueError
+            except Exception as e:
+                print("Failed to parse dips as a list:", e)
+                print("Attempting to parse as a comma-separated string...")
+                # Attempt to split a comma-separated string
+                parsed_dips = [item.strip() for item in dips_str.split(",") if item.strip()]
+                if not parsed_dips:
+                    print("Also failed to parse as a comma-separated string... setting to None.")
+                    parsed_dips = []
 
         # Parse bite ordering preference
         if bite_preference_match:
@@ -53,7 +71,7 @@ class NewMealParser:
             if not parsed_bite_ordering_preference:
                 parsed_bite_ordering_preference = None
 
-        return parsed_food_items, parsed_bite_ordering_preference
+        return parsed_food_items, parsed_dips, parsed_bite_ordering_preference
     
 if __name__ == '__main__':
     new_meal_parser = NewMealParser()

@@ -272,7 +272,7 @@ class WristInterface:
         wrist_joint_states = rospy.wait_for_message('/wrist_joint_states', JointState)
         current_pitch = -wrist_joint_states.position[0]
         current_roll = -wrist_joint_states.position[1]
-        self.set_wrist_state(0.4 * math.pi, current_roll)
+        self.set_wrist_state(0.48 * math.pi, current_roll)
     
     def cutting_tilt(self):
         wrist_joint_states = rospy.wait_for_message('/wrist_joint_states', JointState)

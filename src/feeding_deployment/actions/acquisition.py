@@ -59,7 +59,7 @@ class AcquireBiteHLA(HighLevelAction):
         assert tool.name == "utensil"
         return "acquire_bite.yaml"
     
-    def acquire_bite(self, speed: str, autocontinue_timeout: float, ask_confirmation: bool) -> None:
+    def acquire_bite(self, speed: str, dipping_depth: float, autocontinue_timeout: float, ask_confirmation: bool) -> None:
 
         assert self.sim.held_object_name == "utensil"
 
@@ -151,18 +151,42 @@ class AcquireBiteHLA(HighLevelAction):
             print(" --- Next Action Prediction:", next_action_prediction['action_type'])
 
             # remove next_food_item from data
-            food_type_to_data = items_detection['food_type_to_bounding_boxes_plate']
+            solid_food_type_to_data = {}
+            for id in range(0, len(items_detection['labels_list'])):
+                if items_detection['category_list'][id] == "solid":
+                    label = items_detection['labels_list'][id]
+                    solid_food_type_to_data[label] = items_detection['food_type_to_bounding_boxes_plate'][label]
 
-            n_food_types = len(food_type_to_data)
-            data = [{k: v} for k, v in food_type_to_data.items() if k != next_food_item]
-            predicted_bite = {next_food_item: food_type_to_data[next_food_item]}
+            n_food_types = len(solid_food_type_to_data)
+            data = [{k: v} for k, v in solid_food_type_to_data.items() if k != next_food_item]
+            predicted_bite = {next_food_item: solid_food_type_to_data[next_food_item]}
+
+            dip_food_type_to_data = {}
+            for id in range(0, len(items_detection['labels_list'])):
+                if items_detection['category_list'][id] == "dip":
+                    label = items_detection['labels_list'][id]
+                    dip_food_type_to_data[label] = items_detection['food_type_to_bounding_boxes_plate'][label]
+
+            if len(dip_food_type_to_data) == 0: # no dips detected
+                dip_data = ["No dip"]     
+            else:
+                if next_action_prediction['dip_id'] is None: 
+                    dip_data = ["No dip"]
+                    dip_data.extend(list(dip_food_type_to_data.keys()))
+                else: # some dip was predicted
+                    next_dip_item = next_action_prediction['labels_list'][next_action_prediction['dip_id']]
+                    dip_data = [next_dip_item]
+                    dip_data.append("No dip")
+                    dip_data.extend([k for k in dip_food_type_to_data.keys() if k != next_dip_item])
+            n_dip_food_types = len(dip_data)
 
             if self.web_interface is not None:
-                skill_type, skill_params = self.web_interface.get_next_bite_selection(items_detection['plate_image'], n_food_types, data, predicted_bite, autocontinue_timeout=autocontinue_timeout)         
+                skill_type, skill_params, dip_type = self.web_interface.get_next_bite_selection(items_detection['plate_image'], n_food_types, data, predicted_bite, n_dip_food_types, dip_data, autocontinue_timeout=autocontinue_timeout)   
             else:
                 # params must be set to the autonomously selected values
                 skill_type = "autonomous"
                 skill_params = [next_food_item, bite_mask_idx]
+                dip_type = "No dip"
 
             skill_success = False
             if skill_type == "autonomous":
@@ -172,6 +196,7 @@ class AcquireBiteHLA(HighLevelAction):
                 food_type = skill_params[0]
                 item_id = skill_params[1] - 1
 
+                # Rajat Imp ToDo: Update bite history after successful skill execution
                 self.flair.update_bite_history(food_type)
 
                 mask = food_type_to_masks[food_type][item_id]
@@ -182,9 +207,14 @@ class AcquireBiteHLA(HighLevelAction):
                     skill_success = self.food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_point, major_axis = skewer_angle)
                 elif skill == "Scoop":
                     raise NotImplementedError("Scoop skill not yet implemented")
-                elif skill == "Dip":
-                    dip_point = self.flair.inference_server.get_dip_action(mask)
-                    skill_success = self.food_manipulation_skill_library.dipping_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = dip_point)
+                
+                if dip_type != "No dip":
+                    self.flair.update_bite_history(dip_type)
+                    dip_mask = food_type_to_masks[dip_type][0]
+                    dip_point = self.flair.inference_server.get_dip_action(dip_mask)
+                    self.food_manipulation_skill_library.reset()
+                    skill_success = self.food_manipulation_skill_library.dipping_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = dip_point, dipping_depth=dipping_depth)
+            
             elif skill_type == "manual_skewering":
 
                 plate_bounds = items_detection["plate_bounds"]

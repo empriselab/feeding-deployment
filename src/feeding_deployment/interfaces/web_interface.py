@@ -221,7 +221,11 @@ class WebInterface:
         self._send_image(plate_image)
 
         # Get the user's new meal input (always true)
-        msg_dict = self.get_required_web_interface_message(lambda msg_dict: True)
+        while self.active:
+            msg_dict = self.get_required_web_interface_message(lambda msg_dict: True)
+            # data: "{\"state\":\"order_selection\",\"status\":\"ready_for_initial_data\"}"
+            if msg_dict["state"] != "order_selection":
+                break
 
         return msg_dict["state"], msg_dict["status"]
 

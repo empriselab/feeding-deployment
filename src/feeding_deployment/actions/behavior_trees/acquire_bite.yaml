@@ -9,6 +9,14 @@ parameters:
       elements: ["low", "medium", "high"]
     is_user_editable: True
     value: "medium"
+  - name: "FoodDippingDepth"
+    description: "The depth a food item is dipped into a dipping sauce."
+    space:
+      type: "Box"
+      lower: 0.02
+      upper: 0.04
+    is_user_editable: True
+    value: 0.03
   - name: "TimeToWaitBeforeAutocontinue"
     description: "Time to wait before auto-continuing pickup bite button on the webapp."
     space:

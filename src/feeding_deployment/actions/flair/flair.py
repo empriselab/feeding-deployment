@@ -24,6 +24,7 @@ class FLAIR:
         if not os.path.exists(self.history_path):
             self.bite_history = []
             self.inference_server.FOOD_CLASSES = None
+            self.inference_server.FOOD_CATEGORIES = None
             self.user_preference = None
         else:
             # read in json format
@@ -32,12 +33,14 @@ class FLAIR:
                     logged_history = ast.literal_eval(f.read())
                 self.bite_history = logged_history["bite_history"]
                 self.inference_server.FOOD_CLASSES = logged_history["food_labels"]
+                self.inference_server.FOOD_CATEGORIES = logged_history["food_categories"]
                 self.user_preference = logged_history["user_preference"]
             except Exception as e:
                 print("Error reading history file", e)
                 print("Creating new history file...")
                 self.bite_history = []
                 self.inference_server.FOOD_CLASSES = None
+                self.inference_server.FOOD_CATEGORIES = None
                 self.user_preference = None
 
             print("Logged Bite History", self.bite_history)
@@ -52,6 +55,7 @@ class FLAIR:
             f.write(str({
                 "bite_history": self.bite_history,
                 "food_labels": self.inference_server.FOOD_CLASSES, 
+                "food_categories": self.inference_server.FOOD_CATEGORIES,
                 "user_preference": self.user_preference
             }))
 
@@ -60,20 +64,46 @@ class FLAIR:
         self.log_history()
 
     def parse_new_meal(self, food_items, bite_ordering_preference):
-        return self.new_meal_parser.parse_user_message(food_items, bite_ordering_preference)
+        solid_items, dip_items, bite_ordering_preference = self.new_meal_parser.parse_user_message(food_items, bite_ordering_preference)
         
+        food_items = {
+            "solid": solid_items,
+            "dip": dip_items
+        }
+
+        return food_items, bite_ordering_preference
+
     # def identify_plate(self, camera_color_data):
 
     #     items = self.inference_server.recognize_items(camera_color_data)
     #     print("Food Items recognized:", items)
     #     return items
 
-    def set_food_items(self, items):
-        self.inference_server.FOOD_CLASSES = items
+    def set_food_items(self, food_items):
+        self.inference_server.FOOD_CLASSES = food_items["solid"] + food_items["dip"]
+        self.inference_server.FOOD_CATEGORIES = []
+        for solid_food_item in food_items["solid"]:
+            self.inference_server.FOOD_CATEGORIES.append('solid')
+        for dip in food_items["dip"]:
+            self.inference_server.FOOD_CATEGORIES.append('dip')
+
         self.log_history()
 
     def get_food_items(self):
-        return self.inference_server.FOOD_CLASSES
+
+        solid_items = []
+        dip_items = []
+
+        for i, category in enumerate(self.inference_server.FOOD_CATEGORIES):
+            if category == 'solid':
+                solid_items.append(self.inference_server.FOOD_CLASSES[i])
+            else:
+                dip_items.append(self.inference_server.FOOD_CLASSES[i])
+
+        return {
+            "solid": solid_items,
+            "dip": dip_items
+        }
 
     def set_preference(self, user_preference):
         self.user_preference = user_preference
@@ -154,7 +184,15 @@ class FLAIR:
 
         # categories = self.inference_server.categorize_items(item_labels, sim=False) 
         # set all items to solids
-        categories = ['solid' for _ in item_labels]
+        categories = []
+        for label in clean_item_labels:
+            if label in self.inference_server.FOOD_CLASSES:
+                idx = self.inference_server.FOOD_CLASSES.index(label)
+                categories.append(self.inference_server.FOOD_CATEGORIES[idx])
+            else:
+                print("Label not found in food classes:", label, self.inference_server.FOOD_CLASSES)
+                categories.append('solid')
+
 
         print("--------------------")
         print("Labels:", item_labels)
@@ -216,6 +254,8 @@ class FLAIR:
                 food_type_to_skill[labels_list[i]] = 'Twirl'
             elif categories[i] == 'semisolid':
                 food_type_to_skill[labels_list[i]] = 'Scoop'
+            elif categories[i] == 'dip':
+                food_type_to_skill[labels_list[i]] = 'Dip'
             else:
                 food_type_to_skill[labels_list[i]] = 'Skewer'
 
@@ -245,7 +285,7 @@ class FLAIR:
         labels_list = items_detection['labels_list']
         per_food_portions = items_detection['per_food_portions']
         
-        food, dip, bite_mask_idx = self.inference_server.get_autonomous_action(annotated_image, camera_color_data, per_food_masks, category_list, labels_list, per_food_portions, self.user_preference, self.bite_history, self.continue_food_label, self.continue_dip_label, log_path)
+        food, dip, bite_mask_idx = self.inference_server.get_autonomous_action(annotated_image, per_food_masks, category_list, labels_list, per_food_portions, self.user_preference, self.bite_history)
         if food is None:
             return None
         

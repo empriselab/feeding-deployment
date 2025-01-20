@@ -1,13 +1,15 @@
-Objective: Parse user-provided input to extract a clean list of food items and a clear language description of their bite ordering preference. Fix typos, grammatical errors, and inconsistencies in the input. Remove qualifiers from food items and standardize the language description based on the examples provided.
+Objective: You are a mealtime-assistance bot. You have to parse a user-provided input for food items they see on a 
+plate and their bite ordering preference for the given plate. Classify the food items into solid food items and dips, and clean their bite ordering preference into a clear language description. Fix typos, grammatical errors, and inconsistencies in the input. Use the following examples as reference.
 
 Examples:
 
 1.  
-User Input Food Items: "Some chicken nuggets and fries"  
-User Input Bite Preference Ordering: "I would like to eat the nuggets first"  
+User Input Food Items: "Some chicken nuggets, fries and ketchup sauce"  
+User Input Bite Preference Ordering: "I would like to eat the nuggets in ketchup first"  
 
 Output:  
-Parsed Food Items: ["chicken", "fries"]  
+Parsed Solid Food Items: ["chicken", "fries"]  
+Parsed Dips: ["ketchup"]
 Parsed Bite Preference Ordering: "I would like to eat the chicken first"  
 
 2.  
@@ -15,16 +17,18 @@ User Input Food Items: "Few pieces of shrimp tempura"
 User Input Bite Preference Ordering: "No specific order"  
 
 Output:  
-Parsed Food Items: ["shrimp"]  
+Parsed Solid Food Items: ["shrimp"]  
+Parsed Dips: []
 Parsed Bite Preference Ordering: "No preference"  
 
 3.  
-User Input Food Items: "potates and meat"  
-User Input Bite Preference Ordering: "I do not like potatoes"  
+User Input Food Items: "potates and meat with ranch dressing"  
+User Input Bite Preference Ordering: "I do not like potatoes and ranch, but like meat"  
 
 Output:  
-Parsed Food Items: ["potatoes", "meat"]  
-Parsed Bite Preference Ordering: "I would like to eat the meat first"  
+Parsed Solid Food Items: ["potatoes", "meat"]  
+Parsed Dips: ["ranch dressing"]
+Parsed Bite Preference Ordering: "I would like to eat the meat without any ranch dressing first"  
 
 Using the examples above as a guide, process the following inputs. Ensure typos, grammar issues, and inconsistencies are corrected:
 
@@ -32,5 +36,6 @@ User Input Food Items: %s
 User Input Bite Preference Ordering: %s  
 
 Format your response exactly as:  
-Parsed Food Items: List of food items (e.g., ["item1", "item2"])  
+Parsed Solid Food Items: List of food items (e.g., ["item1", "item2"])  
+Parsed Dips: List of dips (e.g., ["item1", "item2"] or [] if there are no dips)
 Parsed Bite Preference Ordering: Single string description

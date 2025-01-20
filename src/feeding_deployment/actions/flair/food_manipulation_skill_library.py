@@ -188,10 +188,12 @@ class FoodManipulationSkillLibrary:
 
         return True
 
-    def dipping_skill(self, color_image, depth_image, camera_info, keypoint=None):
+    def dipping_skill(self, color_image, depth_image, camera_info, keypoint=None, dipping_depth=0.03):
+        """ Dipping amount must be between 0.02 and 0.04"""
 
         if keypoint is not None:
             (center_x, center_y) = keypoint
+            major_axis = -np.pi/2
         else:
             clicks = self.pixel_selector.run(color_image)
             (center_x, center_y) = clicks[0]
@@ -211,7 +213,9 @@ class FoodManipulationSkillLibrary:
         food_base = np.eye(4)
         food_base[:3,3] = point.reshape(1,3)
         food_base = base_to_camera_transform @ food_base
-        food_base[2,3] = max(food_base[2,3] - 0.015, self.plate_height) 
+        print("Food height detected: ", food_base[2,3])
+        print("Plate height: ", self.plate_height)
+        food_base[2,3] = max(food_base[2,3] - dipping_depth, self.plate_height) 
         # magic number for skewering offset
         # food_base[0,3] += 0.012 # positive moves away from the robot
         # keep the orientation of the food base fixed
@@ -245,6 +249,11 @@ class FoodManipulationSkillLibrary:
         waypoint_3_tip = np.copy(food_base)
         waypoint_3_tip[2,3] += 0.07
         self.move_utensil_to_pose(waypoint_3_tip, tip_to_wrist)
+
+        # Action 4: Set scooping state
+        self.wrist_interface.scoop_wrist()
+
+        return True
         
     def scooping_pickup(self, hack = True):
 

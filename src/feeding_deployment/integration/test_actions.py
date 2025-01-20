@@ -44,11 +44,12 @@ from feeding_deployment.actions.flair.flair import FLAIR
 from feeding_deployment.actions.flair.food_manipulation_skill_library import FoodManipulationSkillLibrary
 
 def test_FoodManipulationSkillLibrary(sim, robot_interface, wrist_interface, perception_interface, rviz_interface, no_waits):
-    
+
+    wrist_interface.set_velocity_mode()    
     food_manipulation_skill_library = FoodManipulationSkillLibrary(sim, robot_interface, wrist_interface, perception_interface, rviz_interface, no_waits)
     food_manipulation_skill_library.reset()
     camera_color_data, camera_info_data, camera_depth_data = perception_interface.get_camera_data()
-    food_manipulation_skill_library.dipping_skill(camera_color_data, camera_depth_data, camera_info_data)
+    food_manipulation_skill_library.dipping_skill(camera_color_data, camera_depth_data, camera_info_data, dipping_depth=0.04)
 
 def test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, run_behavior_tree_dir, no_waits, log_path=None):
 
