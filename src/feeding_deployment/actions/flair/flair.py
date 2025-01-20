@@ -79,6 +79,9 @@ class FLAIR:
         self.user_preference = user_preference
         self.log_history()
 
+    def get_preference(self):
+        return self.user_preference
+
     def clear_preference(self):
         self.user_preference = None
 

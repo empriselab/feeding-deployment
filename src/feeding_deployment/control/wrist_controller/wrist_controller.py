@@ -82,10 +82,12 @@ class WristInterface:
             print("Service call failed: %s"%e)
 
     def reset(self):
+        print("Waiting for wrist joint states")
         wrist_joint_states = rospy.wait_for_message('/wrist_joint_states', JointState)
         current_pitch = -wrist_joint_states.position[0]
         current_roll = -wrist_joint_states.position[1]
 
+        print("Reseting the wrist state")
         self.set_wrist_state(0, 0)
 
     def set_wrist_state(self, pitch, roll, vel=4, use_offset=True):

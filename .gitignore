@@ -4,12 +4,12 @@
 .python-version
 # *.mp4
 *.zip
+**/llm_cache_continuous/**
 
 src/feeding_deployment/integration/saved_states/last_stage.p
 src/feeding_deployment/integration/log/behavior_trees
 src/feeding_deployment/integration/log/execution_log.txt
 src/feeding_deployment/integration/log/nuc_execution_log.txt
-src/feeding_deployment/integration/log/llm_cache
 src/feeding_deployment/perception/gestures_perception/gesture_data
 src/feeding_deployment/perception/head_perception/DECA
 src/feeding_deployment/actions/flair/spaghetti_checkpoints

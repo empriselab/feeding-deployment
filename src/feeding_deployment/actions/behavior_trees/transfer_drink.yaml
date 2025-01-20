@@ -36,7 +36,7 @@ parameters:
       type: "Enum"
       elements: ["button", "sense", "auto_timeout"]
     is_user_editable: True
-    value: "button"
+    value: "sense"
   - name: "OutsideMouthDistance"
     description: "Distance from the tool tip to the user's mouth."
     space:

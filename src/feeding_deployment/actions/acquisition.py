@@ -112,8 +112,8 @@ class AcquireBiteHLA(HighLevelAction):
                     "camera_color_data": camera_color_data,
                     "camera_info_data": camera_info_data,
                     "camera_depth_data": camera_depth_data,
-                    "food_items": food_items,
-                    "bite_ordering_preference": bite_ordering_preference,
+                    "food_items": self.flair.get_food_items(),
+                    "bite_ordering_preference": self.flair.get_preference(),
                     "items_detection": items_detection,
                 }
                 with open(self.log_dir / "food_detection_data.pkl", "wb") as f:

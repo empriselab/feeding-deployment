@@ -432,8 +432,9 @@ class PerceptionInterface:
     
     def extract_from_logged_head_perception_data(self, timestamp):
 
-        start_time = timestamp[0]
-        end_time = timestamp[1]
+        # add five second to timestamp[0]
+        start_time = timestamp[0] + 5
+        end_time = timestamp[1] - 5
         
         data_segment = {
             "head_pose": [],
@@ -445,6 +446,8 @@ class PerceptionInterface:
 
         for (timestamp, head_perception_data) in self.log_head_perception_data:
             if timestamp >= start_time and timestamp <= end_time:
+                if head_perception_data is None:
+                    continue
                 data_segment["head_pose"].append(head_perception_data["head_pose"])
                 data_segment["face_keypoints"].append(head_perception_data["face_keypoints"])
                 data_segment["tool_tip_target_pose"].append(head_perception_data["tool_tip_target_pose"])

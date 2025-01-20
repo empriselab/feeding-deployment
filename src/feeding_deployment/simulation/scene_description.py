@@ -243,8 +243,12 @@ class SceneDescription:
     
     @property
     def drink_pose(self):
-        with open(Path(__file__).parent.parent / 'integration' / 'log' / 'drink_pickup_pos.pkl', 'rb') as f:
-            drink_poses = pickle.load(f)
+        try:
+            with open(Path(__file__).parent.parent / 'integration' / 'log' / 'drink_pickup_pos.pkl', 'rb') as f:
+                drink_poses = pickle.load(f)
+        except FileNotFoundError:
+            with open(Path(__file__).parent.parent / 'integration' / 'log' / 'study_drink_pickup_pos.pkl', 'rb') as f:
+                drink_poses = pickle.load(f)
         inside_drink_pose = drink_poses["last_drink_poses"]["inside_top_pose"]
         return inside_drink_pose.multiply(self.tool_frame_to_finger_tip)
 
