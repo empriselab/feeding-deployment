@@ -12,6 +12,22 @@ parameters:
     - medium
     - high
   value: medium
+- name: FoodDippingDepth
+  description: The depth a food item is dipped into a dipping sauce.
+  is_user_editable: true
+  space:
+    type: Box
+    lower: 0.02
+    upper: 0.05
+  value: 0.03
+- name: SkeweringDepth
+  description: The depth a food item is skewered.
+  is_user_editable: true
+  space:
+    type: Box
+    lower: 0.01
+    upper: 0.05
+  value: 0.05
 - name: TimeToWaitBeforeAutocontinue
   description: Time to wait before auto-continuing pickup bite button on the webapp.
   is_user_editable: true
@@ -19,7 +35,7 @@ parameters:
     type: Box
     lower: 5.0
     upper: 100.0
-  value: 5.0
+  value: 10.0
 - name: TransferAskForConfirmation
   description: Ask for confirmation on the web app before initiating the transfer
     sequence for a bite.
@@ -29,5 +45,5 @@ parameters:
     elements:
     - 0
     - 1
-  value: 0
+  value: 1
 fn: !hla acquire_bite

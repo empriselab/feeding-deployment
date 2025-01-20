@@ -541,6 +541,10 @@ class WebInterface:
         self.explanation_lock.acquire()  # This will block until the lock is available
         self._send_message({"state": "explanation", "status": explanation})
 
+    def update_fixed_explanation(self, explanation: str) -> None:
+        # lock is already acquired, so just update the explanation
+        self._send_message({"state": "explanation", "status": explanation})
+
     def clear_explanation(self) -> None:
         # Release the lock to allow continuous explanations to proceed
         if self.explanation_lock.locked():

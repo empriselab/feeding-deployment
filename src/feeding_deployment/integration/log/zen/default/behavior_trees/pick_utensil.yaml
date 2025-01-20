@@ -11,5 +11,5 @@ parameters:
     - low
     - medium
     - high
-  value: high
+  value: medium
 fn: !hla pick_utensil

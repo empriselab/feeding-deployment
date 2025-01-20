@@ -11,7 +11,7 @@ parameters:
     - low
     - medium
     - high
-  value: high
+  value: medium
 - name: ReadyToInitiateTransferInteraction
   description: Interaction mode for ready to initiate transfer.
   is_user_editable: true
@@ -41,7 +41,6 @@ parameters:
     - button
     - open_mouth
     - auto_timeout
-    - headshake_user_generated
   value: open_mouth
 - name: TransferCompleteInteraction
   description: Interaction mode for transfer completion.
@@ -52,8 +51,7 @@ parameters:
     - button
     - sense
     - auto_timeout
-    - headshake_user_generated
-  value: headshake_user_generated
+  value: sense
 - name: OutsideMouthDistance
   description: Distance from the tool tip to the user's mouth.
   is_user_editable: true
@@ -71,7 +69,7 @@ parameters:
     elements:
     - 0
     - 1
-  value: 0
+  value: 1
 - name: TimeToWaitBeforeAutocontinue
   description: Autocontinue duration for re-selecting drinking transfer after a sip.
   is_user_editable: true
@@ -79,5 +77,5 @@ parameters:
     type: Box
     lower: 5.0
     upper: 100.0
-  value: 5.0
+  value: 10.0
 fn: !hla transfer_drink
