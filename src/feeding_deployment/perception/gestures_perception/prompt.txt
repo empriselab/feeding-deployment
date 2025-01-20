@@ -6,7 +6,7 @@ def get_head_perception_data():
     Execution time: 0.1 sec.
     Returns:
         dict: {
-            "head_pose": (x, y, z, roll, pitch, yaw),  # Tuple of ints
+            "head_pose": (x, y, z, roll, pitch, yaw),  # tuple of ints
             "face_keypoints": list[tuple[int, int]]   # 68 face keypoints (x, y) in dlib format
         }
     """
@@ -35,8 +35,10 @@ def detect_mouth_open(perception_interface, termination_event, timeout, mouth_op
         """Calculate Euclidean distance between two points."""
         return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5
 
-    start_time = time.time()
-    while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
+    sampling_rate = 0.1
+    num_frames = 0
+    while num_frames * sampling_rate < timeout and (termination_event is None or not termination_event.is_set()):
+        num_frames += 1
         head_perception_data = perception_interface.get_head_perception_data()
         if head_perception_data is None:
             break
@@ -73,18 +75,19 @@ Output:
 # Maps gesture_detector argument index to Box parameter space.
 ADJUSTABLE_PARAMETERS = [
     3 : Box(0, 90, shape=tuple()),  # head_nod_threshold
-    4 : Box(0, 10, shape=tuple()),  # max_pitch_data_size
+    4 : Box(0, 10, shape=tuple()),  # required_direction_changes
 ]
 
 def detect_head_nod(perception_interface, termination_event, timeout, head_nod_threshold, required_direction_changes):
-    start_time = time.time()
     direction_changes = 0
-    last_min_extreme = float("inf")
-    last_max_extreme = -float("inf")
+    min_head_pitch = float("inf")
+    max_head_pitch = -float("inf")
 
-    while (time.time() - start_time < timeout and 
+    sampling_rate = 0.1
+    num_frames = 0
+    while (sampling_rate * num_frames < timeout and 
            (termination_event is None or not termination_event.is_set())):
-        
+        num_frames += 1
         head_perception_data = perception_interface.get_head_perception_data()
         if head_perception_data is None:
             # No more data
@@ -93,16 +96,16 @@ def detect_head_nod(perception_interface, termination_event, timeout, head_nod_t
         head_pose = head_perception_data["head_pose"]
         (_, _, _, _, head_pitch, _) = head_pose
 
-        if head_pitch - last_min_extreme > head_nod_threshold:
+        if head_pitch - min_head_pitch > head_nod_threshold:
             direction_changes += 1
-            last_min_extreme = float("inf")
+            min_head_pitch = float("inf")
 
-        if last_max_extreme - head_pitch > head_nod_threshold:
+        if max_head_pitch - head_pitch > head_nod_threshold:
             direction_changes += 1
             last_max_extreme = -float("inf")
 
-        last_min_extreme = min(head_pitch, last_min_extreme)
-        last_max_extreme = max(head_pitch, last_max_extreme)
+        min_head_pitch = min(head_pitch, min_head_pitch)
+        max_head_pitch = max(head_pitch, max_head_pitch)
 
         if direction_changes >= required_direction_changes:
             return True
@@ -110,19 +113,19 @@ def detect_head_nod(perception_interface, termination_event, timeout, head_nod_t
     return False
 ##################
 
-Using the In-Context Examples as reference, generate a detector for the following input. Generate output in the same format as the in-context examples - just the code with comments, and without any additional text explanations, as additional text will render the output unexecutable in python. Absolutely make sure that there are no time.sleep() calls in the function. If using a while loop, make sure that you have the code lines for breaking out if face_keypoints or head_pose is None.
+Using the In-Context Examples as reference, generate a detector for the following input. Generate output in the same format as the in-context examples - just the code with comments, and without any additional text explanations, as additional text will render the output unexecutable in python. DO NOT IMPORT time. If using a while loop, make sure that you have the code lines for breaking out if face_keypoints or head_pose is None.
 
 IMPORTANT 1: Have the following lines exactly as is in your code:
 ```
-    while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
+    sampling_rate = 0.1
+    num_frames = 0
+    while num_frames * sampling_rate < timeout and (termination_event is None or not termination_event.is_set()):
+        num_frames += 1
         head_perception_data = perception_interface.get_head_perception_data()
         if head_perception_data is None:
+            # No more data
             break
 ```
-
-IMPORTANT 2: For detecting head movement over some time frame, do not track absolute time using time.time(). Instead track number of frames processed assuming get_head_perception_data takes 10Hz. For example, for tracking over 3 seconds, run a counter for 30 processed frames.
-
-IMPORTANT 3: You have to detect the given gesture over time, so even if it is initially not true, keep running detection until it is detected or you run out of data. DO NOT BREAK OF A DETECTION LOOP ONLY BECAUSE A CERTAIN AMOUNT OF TIME HAS PASSED.
 
 Input:
 ##################

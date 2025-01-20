@@ -73,8 +73,7 @@ class PersonalizedGestureDetectorSynthesizer:
         self._load_from_data_path(gesture_datapath)
         prompt = self.prompt_skeleton % (self.language_description, self.function_label)
 
-        code_prefix = """import time
-import numpy as np
+        code_prefix = """import numpy as np
 from gymnasium.spaces import Box
 
 """

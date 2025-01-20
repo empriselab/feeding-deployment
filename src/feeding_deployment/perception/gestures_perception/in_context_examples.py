@@ -1,5 +1,3 @@
-import time
-
 def detect_mouth_open(perception_interface, termination_event, timeout):
 
     mouth_open_threshold = 0.45
@@ -8,10 +6,14 @@ def detect_mouth_open(perception_interface, termination_event, timeout):
         """Calculate Euclidean distance between two points."""
         return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5
 
-    start_time = time.time()
-    while time.time() - start_time < timeout and (termination_event is None or not termination_event.is_set()):
+    sampling_rate = 0.1
+    num_frames = 0
+    while (sampling_rate * num_frames < timeout and 
+           (termination_event is None or not termination_event.is_set())):
+        num_frames += 1
         head_perception_data = perception_interface.get_head_perception_data()
         if head_perception_data is None:
+            # No more data
             break
         face_keypoints = head_perception_data["face_keypoints"]
         
@@ -36,14 +38,15 @@ def detect_head_nod(perception_interface, termination_event, timeout):
     head_nod_threshold = 15.0
     required_direction_changes = 3
 
-    start_time = time.time()
     direction_changes = 0
     last_min_extreme = float("inf")
     last_max_extreme = -float("inf")
 
-    while (time.time() - start_time < timeout and 
+    sampling_rate = 0.1
+    num_frames = 0
+    while (sampling_rate * num_frames < timeout and 
            (termination_event is None or not termination_event.is_set())):
-        
+        num_frames += 1
         head_perception_data = perception_interface.get_head_perception_data()
         if head_perception_data is None:
             # No more data
