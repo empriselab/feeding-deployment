@@ -283,26 +283,27 @@ class WristInterface:
 
 if __name__ == '__main__':
     rospy.init_node('wrist_controller', anonymous=True)
-    wrist_controller = WristController(offset_pitch=0.0, offset_roll=0.0)
+    wrist_controller = WristInterface()
     wrist_controller.set_velocity_mode()
     wrist_controller.reset()
-    wrist_controller.set_to_scoop_pos()
+    wrist_controller.twirl_wrist(vel=8)
+    # wrist_controller.set_to_scoop_pos()
 
-    input("Press Enter to start horizontal spoon thread")
-    wrist_controller.start_horizontal_spoon_thread()
+    # input("Press Enter to start horizontal spoon thread")
+    # wrist_controller.start_horizontal_spoon_thread()
     
-    input("Press Enter to stop horizontal spoon thread")
-    wrist_controller.stop_horizontal_spoon_thread()
+    # input("Press Enter to stop horizontal spoon thread")
+    # wrist_controller.stop_horizontal_spoon_thread()
 
-    input("Press Enter to set to scoop pos")
-    wrist_controller.set_velocity_mode()
-    wrist_controller.set_to_scoop_pos()
+    # input("Press Enter to set to scoop pos")
+    # wrist_controller.set_velocity_mode()
+    # wrist_controller.set_to_scoop_pos()
 
-    input("Press Enter to start horizontal spoon thread")
-    wrist_controller.start_horizontal_spoon_thread()
+    # input("Press Enter to start horizontal spoon thread")
+    # wrist_controller.start_horizontal_spoon_thread()
     
-    input("Press Enter to stop horizontal spoon thread")
-    wrist_controller.stop_horizontal_spoon_thread()
+    # input("Press Enter to stop horizontal spoon thread")
+    # wrist_controller.stop_horizontal_spoon_thread()
     # wrist_controller.reset()
     # wrist_controller.set_to_cut_pos()
     # wrist_controller.reset()

@@ -49,7 +49,7 @@ def _main(
     else:
         raise RuntimeError("ROS not imported. Please run this script in a ROS environment and with the real robot.")
 
-    # logs are saved in user/scenario directory
+    # logs are saved in log/transfer_calibration
     log_dir = Path(__file__).parent / "log" / "transfer_calibration"
     if log_dir.exists():
         shutil.rmtree(log_dir)

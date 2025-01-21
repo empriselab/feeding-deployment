@@ -1,10 +1,11 @@
-"""The main entry point for running the integrated system."""
+"""Testing individual actions of the integrated system."""
 
 from pathlib import Path
 from typing import Any
 import shutil
 import json
 import sys
+import queue
 
 try:
     import rospy
@@ -86,14 +87,9 @@ def test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_
 
     high_level_action.execute_action(objects=[utensil], params={})
 
-def test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, run_on_robot, wrist_interface, flair, no_waits):
+def test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, no_waits, log_dir, run_behavior_tree_dir, execution_log, gesture_detectors_dir):
 
-    print("WAITING FOR MESSAGE on /WebAppComm")
-    msg = rospy.wait_for_message("/WebAppComm", String)
-    msg_dict = json.loads(msg.data)   
-    print(f"Received message: {msg_dict}")
-
-    high_level_action = AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, no_waits, log_path=None)
+    high_level_action = AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, no_waits, log_dir, run_behavior_tree_dir, execution_log, gesture_detectors_dir)
     utensil = Object("utensil", tool_type)
 
     sim.held_object_name = "utensil"
@@ -110,7 +106,7 @@ def test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interfa
     if robot_interface is not None:
         rviz_interface.tool_update(True, sim.held_object_name, Pose((0, 0, 0), (0, 0, 0, 1))) # pickup the tool in rviz
 
-    high_level_action.execute_action(objects=[utensil], params=msg_dict)
+    high_level_action.execute_action(objects=[utensil], params={})
     
 def _main(
     scene_config: str, transfer_type: str, run_on_robot: bool, use_interface: bool, simulate_head_perception: bool, use_gui: bool, make_videos: bool, max_motion_planning_time: float = 10, tool: str = "fork", no_waits: bool = False
@@ -123,9 +119,9 @@ def _main(
         assert not args.run_on_robot, "Need ROS to run on robot"
 
     # logs are saved in user/scenario directory
-    log_dir = Path(__file__).parent / "log" / "test_actions_log"
-    if log_dir.exists():
-        shutil.rmtree(log_dir)
+    log_dir = Path(__file__).parent / "log" / "transfer_calibration"
+    # if log_dir.exists():
+    #     shutil.rmtree(log_dir)
     log_dir.mkdir(exist_ok=True)
 
     execution_log = Path(__file__).parent / "log" / "execution_log.txt" # in root log directory
@@ -147,10 +143,6 @@ def _main(
     assert original_gesture_detection_filepath.exists()
     shutil.copy(original_gesture_detection_filepath, gesture_detectors_dir)
 
-
-    log_dir = Path(__file__).parent / "log" / "test_actions_log"
-    log_dir.mkdir(exist_ok=True)
-
     # Initialize the interface to the robot.
     if run_on_robot:
         robot_interface = ArmInterfaceClient()  # type: ignore  # pylint: disable=no-member
@@ -162,7 +154,8 @@ def _main(
     flair = FLAIR(log_dir)
 
     if use_interface:
-        web_interface = WebInterface()
+        task_selection_queue = queue.Queue()
+        web_interface = WebInterface(task_selection_queue=task_selection_queue, log_dir=log_dir)
     else:
         web_interface = None
 
@@ -179,8 +172,8 @@ def _main(
     else:
         rviz_interface = None
 
-    # # Create skills for high-level planning.
-    # hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
+    # Create skills for high-level planning.
+    hla_hyperparams = {"max_motion_planning_time": max_motion_planning_time}
 
     # # Copy the initial behavior trees into a directory for this run, where
     # # they will be modified based on user feedback.
@@ -191,8 +184,8 @@ def _main(
     # for original_bt_filename in original_behavior_tree_dir.glob("*.yaml"):
     #     shutil.copy(original_bt_filename, run_behavior_tree_dir)
 
-    test_FoodManipulationSkillLibrary(sim, robot_interface, wrist_interface, perception_interface, rviz_interface, no_waits)
-    # test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, tool, no_waits)
+    # test_FoodManipulationSkillLibrary(sim, robot_interface, wrist_interface, perception_interface, rviz_interface, no_waits)
+    test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, no_waits, log_dir, run_behavior_tree_dir, execution_log, gesture_detectors_dir)
     # for i in range(25):
     # test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, run_behavior_tree_dir, no_waits, log_path=None)
 
@@ -201,7 +194,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--scene_config", type=str, default="vention")
-    parser.add_argument("--transfer_type", type=str, default="inside")
+    parser.add_argument("--transfer_type", type=str, default="outside")
     parser.add_argument("--run_on_robot", action="store_true")
     parser.add_argument("--use_interface", action="store_true")
     parser.add_argument("--simulate_head_perception", action="store_true")

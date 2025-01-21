@@ -45,7 +45,8 @@ class FoodManipulationSkillLibrary:
         if self.sim.scene_description.scene_label == "wheelchair":
             self.plate_height = 0.12
         elif self.sim.scene_description.scene_label == "vention":
-            self.plate_height = 0.155
+            # self.plate_height = 0.155 # for silicone fork
+            self.plate_height = 0.158 # for metal fork
             # self.plate_height = 0.185
         else:
             raise NotImplementedError("Scene label not recognized; plate height required for bite acquisition")
