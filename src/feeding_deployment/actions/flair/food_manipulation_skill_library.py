@@ -259,20 +259,20 @@ class FoodManipulationSkillLibrary:
         waypoint_1_tip = np.copy(food_base)
         waypoint_1_tip[2,3] -= 0.07
         waypoint_1_tip[2,3] += 0.13
-        waypoint_1_tip[0,3] += 0.1
+        waypoint_1_tip[0,3] += 0.12
         self.move_utensil_to_pose(waypoint_1_tip, self.cached_reset_tip_to_wrist)
 
         # Action 2: Dip
         waypoint_2_tip = np.copy(food_base)
         waypoint_2_tip[2,3] -= 0.07
-        waypoint_2_tip[0,3] += 0.1
+        waypoint_2_tip[0,3] += 0.12
         self.move_utensil_to_pose(waypoint_2_tip, self.cached_reset_tip_to_wrist)
 
         # Action 3: Move above food
         waypoint_3_tip = np.copy(food_base)
         waypoint_3_tip[2,3] -= 0.07
         waypoint_3_tip[2,3] += 0.13
-        waypoint_3_tip[0,3] += 0.1
+        waypoint_3_tip[0,3] += 0.12
         self.move_utensil_to_pose(waypoint_3_tip, self.cached_reset_tip_to_wrist)
 
         # Action 4: Set scooping state

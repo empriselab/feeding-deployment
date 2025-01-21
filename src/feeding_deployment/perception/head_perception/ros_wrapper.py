@@ -186,7 +186,7 @@ class HeadPerceptionROSWrapper:
 
             if self.filter_noisy_readings: # do not shutdown robot if warm starting / kill_on_noisy_reading is False
                 if head_perception_data["noisy_reading"]:
-                    print("Noisy reading detected from DECA")
+                    # print("Noisy reading detected from DECA")
                     self.noisy_reading_publisher.publish(Bool(data=True))
                     return None
 

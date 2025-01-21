@@ -5,6 +5,7 @@ from typing import Any
 import numpy as np
 from scipy.spatial.transform import Rotation
 import shutil
+import queue
 
 try:
     import rospy
@@ -48,9 +49,35 @@ def _main(
     else:
         raise RuntimeError("ROS not imported. Please run this script in a ROS environment and with the real robot.")
 
+    # logs are saved in user/scenario directory
+    log_dir = Path(__file__).parent / "log" / "transfer_calibration"
+    if log_dir.exists():
+        shutil.rmtree(log_dir)
+    log_dir.mkdir(exist_ok=True)
+
+    execution_log = Path(__file__).parent / "log" / "execution_log.txt" # in root log directory
+    run_behavior_tree_dir = log_dir / "behavior_trees"
+    gesture_detectors_dir = log_dir / "gesture_detectors"
+            
+    # Copy the initial behavior trees into a directory for this run, where
+    # they will be modified based on user feedback.
+    run_behavior_tree_dir.mkdir(exist_ok=True)
+    original_behavior_tree_dir = Path(__file__).parents[1] / "actions" / "behavior_trees"
+    assert original_behavior_tree_dir.exists()
+    for original_bt_filename in original_behavior_tree_dir.glob("*.yaml"):
+        shutil.copy(original_bt_filename, run_behavior_tree_dir)
+
+    # Copy the initial gesture detection file into a directory for this run,
+    # where it will be updated from LLM-based few-shot learning.
+    gesture_detectors_dir.mkdir(exist_ok=True)
+    original_gesture_detection_filepath = Path(__file__).parents[1] / "perception" / "gestures_perception" / "synthesized_gesture_detectors.py"
+    assert original_gesture_detection_filepath.exists()
+    shutil.copy(original_gesture_detection_filepath, gesture_detectors_dir)
+
     # Initialize the interface to the robot.
     robot_interface = ArmInterfaceClient()  # type: ignore  # pylint: disable=no-member
-    web_interface = WebInterface()
+    task_selection_queue = queue.Queue()
+    web_interface = WebInterface(task_selection_queue=task_selection_queue, log_dir=log_dir)
 
     # Initialize the perceiver (e.g., get joint states or human head poses).
     if record_rom:
@@ -116,7 +143,7 @@ def _main(
         for original_bt_filename in original_behavior_tree_dir.glob("*.yaml"):
             shutil.copy(original_bt_filename, run_behavior_tree_dir)
 
-        high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_controller, flair=None, behavior_tree_dir=run_behavior_tree_dir , no_waits=False, log_path=None)
+        high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_controller, None, False, log_dir, run_behavior_tree_dir, execution_log, gesture_detectors_dir)
 
         if tool == "fork":
             object = Object("utensil", tool_type)

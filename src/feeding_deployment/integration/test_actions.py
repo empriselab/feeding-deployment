@@ -122,6 +122,32 @@ def _main(
     else:
         assert not args.run_on_robot, "Need ROS to run on robot"
 
+    # logs are saved in user/scenario directory
+    log_dir = Path(__file__).parent / "log" / "test_actions_log"
+    if log_dir.exists():
+        shutil.rmtree(log_dir)
+    log_dir.mkdir(exist_ok=True)
+
+    execution_log = Path(__file__).parent / "log" / "execution_log.txt" # in root log directory
+    run_behavior_tree_dir = log_dir / "behavior_trees"
+    gesture_detectors_dir = log_dir / "gesture_detectors"
+            
+    # Copy the initial behavior trees into a directory for this run, where
+    # they will be modified based on user feedback.
+    run_behavior_tree_dir.mkdir(exist_ok=True)
+    original_behavior_tree_dir = Path(__file__).parents[1] / "actions" / "behavior_trees"
+    assert original_behavior_tree_dir.exists()
+    for original_bt_filename in original_behavior_tree_dir.glob("*.yaml"):
+        shutil.copy(original_bt_filename, run_behavior_tree_dir)
+
+    # Copy the initial gesture detection file into a directory for this run,
+    # where it will be updated from LLM-based few-shot learning.
+    gesture_detectors_dir.mkdir(exist_ok=True)
+    original_gesture_detection_filepath = Path(__file__).parents[1] / "perception" / "gestures_perception" / "synthesized_gesture_detectors.py"
+    assert original_gesture_detection_filepath.exists()
+    shutil.copy(original_gesture_detection_filepath, gesture_detectors_dir)
+
+
     log_dir = Path(__file__).parent / "log" / "test_actions_log"
     log_dir.mkdir(exist_ok=True)
 

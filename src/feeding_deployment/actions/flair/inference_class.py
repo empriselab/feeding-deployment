@@ -605,9 +605,12 @@ class BiteAcquisitionInference:
                 elif "potato wedge" in self.FOOD_CLASSES[i]:
                     replacement_dict[self.FOOD_CLASSES[i]] = "yellow potato wedge piece"
                     food_classes_being_detected.append("yellow potato wedge piece")
+                elif "chicken nugget" in self.FOOD_CLASSES[i]:
+                    replacement_dict[self.FOOD_CLASSES[i]] = "small fried chicken nugget piece"
+                    food_classes_being_detected.append("small fried chicken nugget piece")
                 else:
-                    replacement_dict[self.FOOD_CLASSES[i]] = self.FOOD_CLASSES[i] + " piece"
-                    food_classes_being_detected.append(self.FOOD_CLASSES[i] + " piece")
+                    replacement_dict[self.FOOD_CLASSES[i]] = self.FOOD_CLASSES[i] + " individual piece"
+                    food_classes_being_detected.append(self.FOOD_CLASSES[i] + " individual piece")
             else: # append "dip" to dip items
                 replacement_dict[self.FOOD_CLASSES[i]] = self.FOOD_CLASSES[i] + " dip"
                 food_classes_being_detected.append(self.FOOD_CLASSES[i] + " dip")
@@ -772,93 +775,8 @@ class BiteAcquisitionInference:
             label = labels[i]
 
             clean_mask = cleanup_mask(mask)
-            # clean_mask = cv2.bitwise_and(clean_mask, plate_mask)
-            
-            if 'noodle' in label or 'mashed' in label or 'oatmeal' in label:
-                if 'noodle' in label:
-                    img_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                    inp = self.seg_net_transform(img_rgb).to(device=self.DEVICE)
-                    logits = self.seg_net(inp)
-                    pr_mask = logits.sigmoid().detach().cpu().numpy().reshape(H,W,1)
-                    noodle_vapors_mask = cv2.normalize(pr_mask, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
-                    clean_mask = cv2.bitwise_and(clean_mask, noodle_vapors_mask)
-                    clean_mask = outpaint_masks(clean_mask.copy(), individual_masks[:i] + individual_masks[i+1:])
-                    mask_vis = (clean_mask.copy() > 0).astype(np.uint8) * 255
-                
-                if 'mashed' in label or 'oatmeal' in label:
-                    clean_mask = outpaint_masks(clean_mask.copy(), individual_masks[:i] + individual_masks[i+1:])
-                    mask_vis = (clean_mask.copy() > 0).astype(np.uint8) * 255
-
-                    # use depth to clean up mask; crop image to just plate before running depth anything
-                    print('-------------- RUNNING DEPTH ANYTHING')
-
-                    ys,xs = np.where(plate_mask > 0)
-                    min_y, max_y, min_x, max_x = min(ys), max(ys), min(xs), max(xs)
-                    depth_src_image = image[min_y:max_y, min_x:max_x]
-
-                    da_image = cv2.cvtColor(depth_src_image, cv2.COLOR_BGR2RGB) / 255.0
-                    h, w = da_image.shape[:2]
-                    da_image = self.depth_anything_transform({'image': da_image})['image']
-                    da_image = torch.from_numpy(da_image).unsqueeze(0).cuda()
-                    
-                    with torch.no_grad():
-                        depth = self.depth_anything(da_image)
-                    
-                    depth = F.interpolate(depth[None], (h, w), mode='bilinear', align_corners=False)[0, 0]
-                    depth = (depth - depth.min()) / (depth.max() - depth.min()) * 255.0
-                    
-                    depth = depth.cpu().numpy().astype(np.uint8)
-                    # bring depth back to original image size, with 0s outside the plate
-                    depth_orig = np.zeros_like(image[:,:,0])
-                    depth_orig[min_y:max_y, min_x:max_x] = depth
-
-                    depth_color = cv2.applyColorMap(depth, cv2.COLORMAP_INFERNO)
-
-                    print('-------------- RAN DEPTH ANYTHING')
-
-                    median_intensity = np.median(depth_orig[clean_mask > 0])
-                    clean_mask[depth_orig < median_intensity - 15] = 0
-                    
-                    clean_mask_vis = (clean_mask > 0).astype(np.uint8) * 255
-                    depth_orig = depth_orig.astype(np.uint8)
-
-                    if log_path is not None and ('noodle' in label or 'mashed' in label or 'oatmeal' in label):
-                        
-                        vis = np.hstack((mask_vis, depth_orig, clean_mask_vis))
-                        cv2.imwrite(log_path + f"_depth_mask_filtering_{i}.png", vis)
-
             refined_masks.append(clean_mask)
-
-            if False: # Ignoring banana cutting for deployment
-            # if 'banana' in label:
-                cut_length = 80 # pixels, depends on height of the camera with respect to the plate, less than the actual length used due to offset existing in the cut action
-
-                bbox = detect_angular_bbox(mask)
-
-                print("Length of sides: ", np.linalg.norm(np.array(bbox[0]) - np.array(bbox[1])), np.linalg.norm(np.array(bbox[1]) - np.array(bbox[2])))
-
-                major_axis_length = max(np.linalg.norm(np.array(bbox[0]) - np.array(bbox[1])), np.linalg.norm(np.array(bbox[1]) - np.array(bbox[2])))
-                print("---- Major axis length: ", major_axis_length)
-                bites_left = major_axis_length / cut_length
-                print("---- Bites left: ", bites_left)
-                bites_left = math.ceil(bites_left)
-                portion_weights.append(bites_left)
-            else:
-                food_enclosing_mask = clean_mask.copy()
-
-                if 'mashed' in label or 'oatmeal' in label:
-                    # if filling lies within the mask, then it is a part of the food
-                    for j in range(len(individual_masks)):
-                        # check if there is any intersection between mask and individual mask
-                        if i != j and np.any(cv2.bitwise_and(mask, individual_masks[j])):
-                            food_enclosing_mask = cv2.bitwise_or(food_enclosing_mask, individual_masks[j])
-
-                    # visualize food enclosing mask
-                    # food_enclosing_mask_vis = (food_enclosing_mask > 0).astype(np.uint8) * 255
-                    # cv2.imshow('food_enclosing_img', food_enclosing_mask_vis)
-
-                MIN_WEIGHT = 0.008
-                portion_weights.append(max(1, mask_weight(food_enclosing_mask)/MIN_WEIGHT))
+            portion_weights.append(1) # each mask is a single portion for bites and dips
 
         print('Labels before replacement: ', labels)
         for key, value in replacement_dict.items():
