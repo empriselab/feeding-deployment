@@ -66,32 +66,42 @@ class PersonalizedGestureDetectorSynthesizer:
             ((MockPerceptionInterface(head_perception_data=example), None, timeout), False)
             for example in self.negative_examples 
         ]
+
+    def _delete_data_memory(self):
+        try:
+            del self.language_description
+            del self.function_label
+            del self.positive_examples
+            del self.negative_examples
+            del self.input_output_examples
+        except Exception as e:
+            print("Synthesizer: could not delete data memory: ", e)
     
     def generate_function(self, gesture_datapath: Path):
         # label, language_description, examples_data_path
         # label is the name of the datapath (last part of the datapath.pkl
         self._load_from_data_path(gesture_datapath)
-        prompt = self.prompt_skeleton % (self.language_description, self.function_label)
+        try:
+            prompt = self.prompt_skeleton % (self.language_description, self.function_label)
 
-        code_prefix = """import numpy as np
+            code_prefix = """import numpy as np
 from gymnasium.spaces import Box
 
 """
-        arg_optimizer = GridSearchSynthesizedProgramArgumentOptimizer()
-        synthesized_program, synthesized_info = synthesize_python_function_with_llm(
-            self.llm, self.function_label, self.input_output_examples, prompt,
-            code_prefix=code_prefix,
-            argument_optimizer=arg_optimizer,
-            arg_index_to_space_var_name=self.adjustable_parameters_name,
-        )
+            arg_optimizer = GridSearchSynthesizedProgramArgumentOptimizer()
+            synthesized_program, synthesized_info = synthesize_python_function_with_llm(
+                self.llm, self.function_label, self.input_output_examples, prompt,
+                code_prefix=code_prefix,
+                argument_optimizer=arg_optimizer,
+                arg_index_to_space_var_name=self.adjustable_parameters_name,
+            )
 
-        # Replace parameters!
-        function_code = synthesized_program.create_code_str_from_arg_values(synthesized_info.optimized_args)
+            # Replace parameters!
+            function_code = synthesized_program.create_code_str_from_arg_values(synthesized_info.optimized_args)
 
-        print("Best Optimized Arguments: ", synthesized_info.optimized_args)
+            print("Best Optimized Arguments: ", synthesized_info.optimized_args)
 
-        print("Generated Function Code: ", function_code)
-        try:
+            print("Generated Function Code: ", function_code)
             workspace = locals().copy()
             exec(function_code, workspace)
             assert self.function_label in workspace
@@ -122,8 +132,10 @@ from gymnasium.spaces import Box
 """
             updated_function_code = function_code.replace(old_snippet.strip(), new_snippet.strip())
 
+            self._delete_data_memory()
             return updated_function_code, accuracy
         except Exception as e:
+            self._delete_data_memory()
             print("Error: ", e)
             with open(Path(__file__).parent / "results" / f"{self.label}.txt", "a") as f:
                 f.write(f"\nError: {e}")

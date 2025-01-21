@@ -429,10 +429,18 @@ class PerceptionInterface:
     def stop_logging_head_perception(self):
         assert self.head_perception_running, "Head perception thread should be running to stop logging"
         self.log_head_perception = False
+
+    def delete_logged_head_perception_data(self):
+        import gc
+        self.log_head_perception_data = []
+        self.log_head_perception_start_time = None
+        gc.collect()
     
     def extract_from_logged_head_perception_data(self, timestamp):
 
         # add five second to timestamp[0]
+        print("data segment true start time: ", timestamp[0])
+        print("data segment true end time: ", timestamp[1])
         start_time = timestamp[0] + 5
         end_time = timestamp[1] - 5
         

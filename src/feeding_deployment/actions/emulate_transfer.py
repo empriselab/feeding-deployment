@@ -196,15 +196,20 @@ class EmulateTransferHLA(HighLevelAction):
                 if len(positive_examples_timestamps) > 0 and len(negative_examples_timestamps) > 0:
                     positive_examples = []
                     for timestamp in positive_examples_timestamps:
+                        print("Extracting positive example")
                         positive_example, positive_video = self.perception_interface.extract_from_logged_head_perception_data(timestamp)
                         positive_examples.append(positive_example)
                         save_video(positive_video, video_segments_path / f"positive_{len(positive_examples)}.mp4")
 
                     negative_examples = []
                     for timestamp in negative_examples_timestamps:
+                        print("Extracting negative example")
                         negative_example, negative_video = self.perception_interface.extract_from_logged_head_perception_data(timestamp)
                         negative_examples.append(negative_example)
                         save_video(negative_video, video_segments_path / f"negative_{len(negative_examples)}.mp4")
+
+                    # delete the logged data
+                    self.perception_interface.delete_logged_head_perception_data()
 
                     # save the examples
                     gesture_datapath = self.gesture_examples_path / f"{synthesized_gesture_function_name}.pkl"
