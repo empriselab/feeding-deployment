@@ -241,6 +241,12 @@ class FLAIR:
 
         plate_image = camera_color_data.copy()[plate_bounds[1]:plate_bounds[1]+plate_bounds[3], plate_bounds[0]:plate_bounds[0]+plate_bounds[2]]
 
+        # # visualize plate_image
+        # cv2.imshow('vis', plate_image)
+        # cv2.waitKey(0)
+        # input("Visualzing the plate image. Press Enter to continue.")
+        # cv2.destroyAllWindows()
+
         food_type_to_bounding_boxes = {label: [] for label in labels_list}
         food_type_to_bounding_boxes_plate = {label: [] for label in labels_list}
         food_type_to_masks = {label: [] for label in labels_list}

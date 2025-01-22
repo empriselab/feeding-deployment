@@ -599,18 +599,24 @@ class BiteAcquisitionInference:
         replacement_dict = {}
         for i, category in enumerate(self.FOOD_CATEGORIES):
             if category == 'solid': # append "piece to solid items"
-                if "steak" in self.FOOD_CLASSES[i]:
-                    replacement_dict[self.FOOD_CLASSES[i]] = "small cut brown steak piece"
-                    food_classes_being_detected.append("small cut brown steak piece")
-                elif "potato wedge" in self.FOOD_CLASSES[i]:
-                    replacement_dict[self.FOOD_CLASSES[i]] = "yellow potato wedge piece"
-                    food_classes_being_detected.append("yellow potato wedge piece")
-                elif "chicken nugget" in self.FOOD_CLASSES[i]:
-                    replacement_dict[self.FOOD_CLASSES[i]] = "small fried chicken nugget piece"
-                    food_classes_being_detected.append("small fried chicken nugget piece")
-                else:
-                    replacement_dict[self.FOOD_CLASSES[i]] = self.FOOD_CLASSES[i] + " individual piece"
-                    food_classes_being_detected.append(self.FOOD_CLASSES[i] + " individual piece")
+                # if "steak" in self.FOOD_CLASSES[i]:
+                #     replacement_dict[self.FOOD_CLASSES[i]] = "small cut brown steak piece"
+                #     food_classes_being_detected.append("small cut brown steak piece")
+                # elif "potato" in self.FOOD_CLASSES[i]:
+                #     replacement_dict[self.FOOD_CLASSES[i]] = "yellow potato wedge piece"
+                #     food_classes_being_detected.append("yellow potato wedge piece")
+                # elif "chicken" in self.FOOD_CLASSES[i]:
+                #     replacement_dict[self.FOOD_CLASSES[i]] = "small fried chicken nugget piece"
+                #     food_classes_being_detected.append("small fried chicken nugget piece")
+                # elif "strawberry" in self.FOOD_CLASSES[i]:
+                #     replacement_dict[self.FOOD_CLASSES[i]] = "red strawberry individual piece"
+                #     food_classes_being_detected.append("red strawberry individual piece")
+                # elif "cantaloupe" in self.FOOD_CLASSES[i]:
+                #     replacement_dict[self.FOOD_CLASSES[i]] = "cut square orange cantaloupe individual piece"
+                #     food_classes_being_detected.append("cut square orange cantaloupe individual piece")
+                # else:
+                replacement_dict[self.FOOD_CLASSES[i]] = "small cut up " + self.FOOD_CLASSES[i] + " piece"
+                food_classes_being_detected.append("small cut up " + self.FOOD_CLASSES[i] + " piece")
             else: # append "dip" to dip items
                 replacement_dict[self.FOOD_CLASSES[i]] = self.FOOD_CLASSES[i] + " dip"
                 food_classes_being_detected.append(self.FOOD_CLASSES[i] + " dip")
@@ -713,9 +719,6 @@ class BiteAcquisitionInference:
         annotated_image = mask_annotator.annotate(scene=image.copy(), detections=detections)
         annotated_image = box_annotator.annotate(scene=annotated_image, detections=detections, labels=labels)
 
-        individual_masks = []
-        refined_labels = []
-
         # Clean up to merge multiple detected noodle/semisolid masks
         max_prob = 0
         max_prob_idx = None
@@ -735,6 +738,13 @@ class BiteAcquisitionInference:
             idxs = list(range(len(detections)))
         
         noodle_semisolid_idx = None
+
+        # Calculate the maximum area threshold dynamically
+        H, W, C = image.shape
+        MAX_AREA_THRESHOLD = (H * W) / 5
+
+        individual_masks = []
+        refined_labels = []
         for i in range(len(detections)):
 
             if 'blue plate' in labels[i]:
@@ -754,9 +764,15 @@ class BiteAcquisitionInference:
                     binary_mask = individual_masks[noodle_semisolid_idx]
             ys,xs,_ = np.where(mask > (0,0,0))
             binary_mask[ys,xs] = 255
-            if i in idxs:
-                individual_masks.append(binary_mask)
-                refined_labels.append(labels[i])
+
+            # Calculate the area of the binary mask
+            area = np.sum(binary_mask > 0)
+            
+            # Only add the mask if its area is below the threshold
+            if area <= MAX_AREA_THRESHOLD:
+                if i in idxs:
+                    individual_masks.append(binary_mask)
+                    refined_labels.append(labels[i])
 
         labels = refined_labels
 

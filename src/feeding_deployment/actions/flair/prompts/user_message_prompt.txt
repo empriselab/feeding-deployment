@@ -1,23 +1,22 @@
-Objective: You are a mealtime-assistance bot. You have to parse a user-provided input for food items they see on a 
-plate and their bite ordering preference for the given plate. First convert the food items into their singular forms (as you would refer a single piece), then classify the food items into solid food items and dips, and clean their bite ordering preference into a clear language description. Fix typos, grammatical errors, and inconsistencies in the input. Use the following examples as reference.
+Objective: You are a mealtime-assistance bot. You have to parse a user-provided input for food items they see on a plate and their bite ordering preference for the given plate. First convert the food items into their singular forms (as you would refer a single piece), then classify the food items into solid food items and dips, and clean their bite ordering preference into a clear language description. Fix typos, grammatical errors, and inconsistencies in the input. Use the following examples as reference.
 
 Examples:
 
 1.  
-User Input Food Items: "Some chicken nuggets, fries and ketchup sauce"  
+User Input Food Items: "Some chicken nuggets, potato fries and ketchup sauce"  
 User Input Bite Preference Ordering: "I would like to eat the nuggets in ketchup first"  
 
 Output:  
-Parsed Solid Food Items: ["chicken", "fries"]  
+Parsed Solid Food Items: ["chicken nugget", "potato fry"]  
 Parsed Dips: ["ketchup"]
-Parsed Bite Preference Ordering: "I would like to eat the chicken dipped in ketchup first"  
+Parsed Bite Preference Ordering: "I would like to eat the chicken nuggets dipped in ketchup first"  
 
 2.  
 User Input Food Items: "Few pieces of shrimp tempura"  
 User Input Bite Preference Ordering: "No specific order"  
 
 Output:  
-Parsed Solid Food Items: ["shrimp"]  
+Parsed Solid Food Items: ["shrimp tempura"]  
 Parsed Dips: []
 Parsed Bite Preference Ordering: "No preference"  
 

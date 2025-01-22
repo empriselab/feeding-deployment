@@ -127,7 +127,7 @@ class _Runner:
             elif not (self.log_dir).exists(): # new scenario
                 assert (Path(__file__).parent / "log" / user / "default").exists(), "Do not have default scenario for this user."
                 os.makedirs(self.log_dir, exist_ok=True)
-                shutil.copytree(Path(__file__).parent / "log" / user / "default", self.log_dir)
+                shutil.copytree(Path(__file__).parent / "log" / user / "default", self.log_dir, dirs_exist_ok=True)
 
         if resume_from_state == "":
             # clear behavior tree execution log

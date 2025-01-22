@@ -79,8 +79,13 @@ class WatchDog:
 
         self.execution_log_path = Path(__file__).parent.parent / "integration" / "log" / "execution_log.txt"
 
+        self.disable_collision_sensor_pub = rospy.Publisher("/disable_collision_sensor", Bool, queue_size=1)
+
         self.second_counter = 0
         time.sleep(5.0) # Wait for all queues to fill up / collision monitor to start
+        
+        # make sure collision is enabled
+        self.disable_collision_sensor_pub.publish(Bool(data=False))
         print("Initialized.")
 
     def cameraCallback(self, msg):
