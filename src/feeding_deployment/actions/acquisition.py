@@ -36,6 +36,9 @@ class AcquireBiteHLA(HighLevelAction):
         self.food_manipulation_skill_library = FoodManipulationSkillLibrary(self.sim, self.robot_interface, self.wrist_interface, self.perception_interface, self.rviz_interface, self.no_waits)
         self.params = None
 
+        self.food_detection_log_dir = self.log_dir / "food_detection_log"
+        self.food_detection_log_dir.mkdir(exist_ok=True)
+
     def get_name(self) -> str:
         return "AcquireBiteWithTool"
     
@@ -126,7 +129,7 @@ class AcquireBiteHLA(HighLevelAction):
                     id = 0
                     while (self.food_detection_log_dir / f"{file_name}_{id}.pkl").exists():
                         id += 1
-                    with open(self.log_dir / f"{file_name}_{id}.pkl", "wb") as f:
+                    with open(self.food_detection_log_dir / f"{file_name}_{id}.pkl", "wb") as f:
                         pickle.dump(food_detection_data, f)
                         
                 else:
