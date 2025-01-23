@@ -117,17 +117,18 @@ class AcquireBiteHLA(HighLevelAction):
                         "bite_ordering_preference": self.flair.get_preference(),
                         "items_detection": items_detection,
                     }
-                    # check if "food_detection_data.pkl" exists
-                    # file_name = "food_detection_data"
-                    # id = 0
-                    # while (self.log_dir / f"{file_name}_{id}.pkl").exists():
-                    #     id += 1
-                    # with open(self.log_dir / f"{file_name}_{id}.pkl", "wb") as f:
-                    #     pickle.dump(food_detection_data, f)
 
                     with open(self.log_dir / "food_detection_data.pkl", "wb") as f:
                         pickle.dump(food_detection_data, f)
 
+                    # food detection continuous log
+                    file_name = "food_detection_data"
+                    id = 0
+                    while (self.food_detection_log_dir / f"{file_name}_{id}.pkl").exists():
+                        id += 1
+                    with open(self.log_dir / f"{file_name}_{id}.pkl", "wb") as f:
+                        pickle.dump(food_detection_data, f)
+                        
                 else:
                     # read last logged data
                     try:
