@@ -82,7 +82,7 @@ class WebInterface:
             print("Error stopping gesture listener thread: ", e)
 
 
-    def _send_message(self, msg_dict: dict[str, Any], explanation=True) -> None:
+    def _send_message(self, msg_dict: dict[str, Any], explanation=False) -> None:
         self.web_interface_publisher.publish(String(json.dumps(msg_dict)))
         if explanation:
             with open(self.webapp_explanation_messages_log, "a") as f:
@@ -245,9 +245,9 @@ class WebInterface:
         time.sleep(0.5) # simulate delay, needed for web interface
 
         self._send_image(plate_image)
-        time.sleep(0.1)
+        time.sleep(0.2)
         self._send_message({"n_food_types": n_solid_food_types, "data": bite_data, "current_bite": predicted_bite})  
-        time.sleep(0.1)
+        time.sleep(0.2)
         self._send_message({"n_ordering": n_dip_food_types, "data": dip_data})
         # set autocontinue timeout
         time.sleep(0.5)
@@ -544,11 +544,11 @@ class WebInterface:
     def fix_explanation(self, explanation: str) -> None:
         # Wait until the lock becomes available and then fix the explanation
         self.explanation_lock.acquire()  # This will block until the lock is available
-        self._send_message({"state": "explanation", "status": explanation})
+        self._send_message({"state": "explanation", "status": explanation}, explanation=True)
 
     def update_fixed_explanation(self, explanation: str) -> None:
         # lock is already acquired, so just update the explanation
-        self._send_message({"state": "explanation", "status": explanation})
+        self._send_message({"state": "explanation", "status": explanation}, explanation=True)
 
     def clear_explanation(self) -> None:
         # Release the lock to allow continuous explanations to proceed
@@ -563,7 +563,7 @@ class WebInterface:
                 response = self.transparency_continuous.get_explanation()
                 if response != "No new explanation to provide" and response != current_explanation:
                     current_explanation = response
-                self._send_message({"state": "explanation", "status": current_explanation})
+                self._send_message({"state": "explanation", "status": current_explanation}, explanation=True)
             time.sleep(1.0)  # Provide explanations at a rate of 1 Hz
 
 if __name__ == "__main__":

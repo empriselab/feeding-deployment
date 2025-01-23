@@ -3,6 +3,7 @@
 import numpy as np
 from scipy.spatial.transform import Rotation, Slerp
 import time
+import pickle
 
 try:
     import rospy
@@ -34,11 +35,12 @@ from feeding_deployment.actions.feel_the_bite.base import Transfer
 from pybullet_helpers.geometry import Pose
 
 class InsideMouthTransfer(Transfer):
-    def __init__(self, sim : FeedingDeploymentPyBulletSimulator, robot_interface: ArmInterfaceClient, perception_interface: PerceptionInterface, rviz_interface: RVizInterface, no_waits=False):
+    def __init__(self, sim : FeedingDeploymentPyBulletSimulator, robot_interface: ArmInterfaceClient, perception_interface: PerceptionInterface, rviz_interface: RVizInterface, no_waits=False, log_dir=None):
             
         super().__init__(sim, robot_interface, perception_interface, rviz_interface, no_waits)
 
         self.control_time = 0.01
+        self.log_dir = log_dir
 
     def getAngularDistance(self, rotation_a, rotation_b):
         return np.linalg.norm(Rotation.from_matrix(np.dot(rotation_a, rotation_b.T)).as_rotvec())
@@ -76,6 +78,14 @@ class InsideMouthTransfer(Transfer):
         head_perception_data = self.perception_interface.get_head_perception_data()
         forque_target_base = head_perception_data["tool_tip_target_pose"]
         head_pose = head_perception_data["head_pose"]
+
+        file_name = "head_perception_data"
+        id = 0
+        while (self.log_dir / f"{file_name}_{id}.pkl").exists():
+            id += 1
+        with open(self.log_dir / f"{file_name}_{id}.pkl", "wb") as f:
+            pickle.dump(head_perception_data, f)
+
         self.sim.set_head_pose(Pose(position=head_pose[:3], orientation=Rotation.from_euler('yxz', head_pose[3:], degrees=True).as_quat()))
 
         servo_point_forque_target = np.identity(4)

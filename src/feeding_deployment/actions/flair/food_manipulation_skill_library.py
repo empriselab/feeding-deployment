@@ -45,8 +45,9 @@ class FoodManipulationSkillLibrary:
         if self.sim.scene_description.scene_label == "wheelchair":
             self.plate_height = 0.12
         elif self.sim.scene_description.scene_label == "vention":
-            self.plate_height = 0.155 # for silicone fork
+            # self.plate_height = 0.155 # for silicone fork
             # self.plate_height = 0.158 # for metal fork
+            self.plate_height = 0.16 # for metal fork
             # self.plate_height = 0.185
         else:
             raise NotImplementedError("Scene label not recognized; plate height required for bite acquisition")
@@ -161,6 +162,8 @@ class FoodManipulationSkillLibrary:
         food_base = np.eye(4)
         food_base[:3,3] = point.reshape(1,3)
         food_base = base_to_camera_transform @ food_base
+        print("Depth to skewer: ", food_base[2,3] - skewering_depth)
+        print("Plate height: ", self.plate_height)
         food_base[2,3] = max(food_base[2,3] - skewering_depth, self.plate_height) 
         # magic number for skewering offset
         # food_base[0,3] += 0.012 # positive moves away from the robot

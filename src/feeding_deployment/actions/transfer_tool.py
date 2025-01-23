@@ -45,11 +45,13 @@ class TransferToolHLA(HighLevelAction):
         super().__init__(*args, **kwargs)
 
         self.tool = None
+        self.head_perception_log_dir = self.log_dir / "head_perception_log"
+        self.head_perception_log_dir.mkdir(exist_ok=True)
 
         if self.sim.scene_description.transfer_type == "inside":
-            self.transfer = InsideMouthTransfer(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.no_waits)
+            self.transfer = InsideMouthTransfer(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.no_waits, self.head_perception_log_dir)
         elif self.sim.scene_description.transfer_type == "outside":
-            self.transfer = OutsideMouthTransfer(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.no_waits)
+            self.transfer = OutsideMouthTransfer(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.no_waits, self.head_perception_log_dir)
         else:
             raise ValueError("Bite transfer type not recognized")
 

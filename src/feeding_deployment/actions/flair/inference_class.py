@@ -602,21 +602,21 @@ class BiteAcquisitionInference:
                 # if "steak" in self.FOOD_CLASSES[i]:
                 #     replacement_dict[self.FOOD_CLASSES[i]] = "small cut brown steak piece"
                 #     food_classes_being_detected.append("small cut brown steak piece")
-                # elif "potato" in self.FOOD_CLASSES[i]:
-                #     replacement_dict[self.FOOD_CLASSES[i]] = "yellow potato wedge piece"
-                #     food_classes_being_detected.append("yellow potato wedge piece")
-                # elif "chicken" in self.FOOD_CLASSES[i]:
-                #     replacement_dict[self.FOOD_CLASSES[i]] = "small fried chicken nugget piece"
-                #     food_classes_being_detected.append("small fried chicken nugget piece")
+                if "potato" in self.FOOD_CLASSES[i]:
+                    replacement_dict[self.FOOD_CLASSES[i]] = "yellow potato wedge piece"
+                    food_classes_being_detected.append("yellow potato wedge piece")
+                elif "chicken" in self.FOOD_CLASSES[i]:
+                    replacement_dict[self.FOOD_CLASSES[i]] = "small fried chicken nugget piece"
+                    food_classes_being_detected.append("small fried chicken nugget piece")
                 # elif "strawberry" in self.FOOD_CLASSES[i]:
                 #     replacement_dict[self.FOOD_CLASSES[i]] = "red strawberry individual piece"
                 #     food_classes_being_detected.append("red strawberry individual piece")
                 # elif "cantaloupe" in self.FOOD_CLASSES[i]:
                 #     replacement_dict[self.FOOD_CLASSES[i]] = "cut square orange cantaloupe individual piece"
                 #     food_classes_being_detected.append("cut square orange cantaloupe individual piece")
-                # else:
-                replacement_dict[self.FOOD_CLASSES[i]] = "small cut up " + self.FOOD_CLASSES[i] + " piece"
-                food_classes_being_detected.append("small cut up " + self.FOOD_CLASSES[i] + " piece")
+                else:
+                    replacement_dict[self.FOOD_CLASSES[i]] = "small cut up " + self.FOOD_CLASSES[i] + " piece"
+                    food_classes_being_detected.append("small cut up " + self.FOOD_CLASSES[i] + " piece")
             else: # append "dip" to dip items
                 replacement_dict[self.FOOD_CLASSES[i]] = self.FOOD_CLASSES[i] + " dip"
                 food_classes_being_detected.append(self.FOOD_CLASSES[i] + " dip")

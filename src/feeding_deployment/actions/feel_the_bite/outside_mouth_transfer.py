@@ -1,6 +1,7 @@
 
 import numpy as np
 from scipy.spatial.transform import Rotation
+import pickle
 
 try:
     import rospy
@@ -21,6 +22,12 @@ DISTANCE_INFRONT_MOUTH = 0.10
 
 class OutsideMouthTransfer(Transfer):
 
+    def __init__(self, sim : FeedingDeploymentPyBulletSimulator, robot_interface: ArmInterfaceClient, perception_interface: PerceptionInterface, rviz_interface: RVizInterface, no_waits=False, log_dir=None):
+            
+        super().__init__(sim, robot_interface, perception_interface, rviz_interface, no_waits)
+
+        self.log_dir = log_dir
+
     def move_to_transfer_state(self, outside_mouth_distance, maintain_position_at_goal = False):
 
         if self.robot_interface is not None:
@@ -30,6 +37,13 @@ class OutsideMouthTransfer(Transfer):
         head_perception_data = self.perception_interface.get_head_perception_data()
         forque_target_base = head_perception_data["tool_tip_target_pose"]
         head_pose = head_perception_data["head_pose"]
+
+        file_name = "head_perception_data"
+        id = 0
+        while (self.log_dir / f"{file_name}_{id}.pkl").exists():
+            id += 1
+        with open(self.log_dir / f"{file_name}_{id}.pkl", "wb") as f:
+            pickle.dump(head_perception_data, f)
         self.sim.set_head_pose(Pose(position=head_pose[:3], orientation=Rotation.from_euler('yxz', head_pose[3:], degrees=True).as_quat()))
 
         # set mouth pose to be facing away from the wheelchair
