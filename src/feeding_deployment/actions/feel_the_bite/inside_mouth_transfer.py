@@ -79,12 +79,13 @@ class InsideMouthTransfer(Transfer):
         forque_target_base = head_perception_data["tool_tip_target_pose"]
         head_pose = head_perception_data["head_pose"]
 
-        file_name = "head_perception_data"
-        id = 0
-        while (self.log_dir / f"{file_name}_{id}.pkl").exists():
-            id += 1
-        with open(self.log_dir / f"{file_name}_{id}.pkl", "wb") as f:
-            pickle.dump(head_perception_data, f)
+        if self.log_dir is not None:
+            file_name = "head_perception_data"
+            id = 0
+            while (self.log_dir / f"{file_name}_{id}.pkl").exists():
+                id += 1
+            with open(self.log_dir / f"{file_name}_{id}.pkl", "wb") as f:
+                pickle.dump(head_perception_data, f)
 
         self.sim.set_head_pose(Pose(position=head_pose[:3], orientation=Rotation.from_euler('yxz', head_pose[3:], degrees=True).as_quat()))
 

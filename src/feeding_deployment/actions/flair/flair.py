@@ -134,11 +134,11 @@ class FLAIR:
             item_bounding_boxes.append([x, y, w, h]) # original image coordinates
             item_bounding_boxes_plate.append([x-plate_bounds[0], y-plate_bounds[1], w, h]) # plate image coordinates
 
-        # cv2.imshow('vis', annotated_image)
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
+        cv2.imshow('vis', annotated_image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
-        # input("Visualzing the detected items. Press Enter to continue.")
+        input("Visualzing the detected items. Press Enter to continue.")
 
         # k = input('Are detected items correct?')
         # while k not in ['y', 'n']:
