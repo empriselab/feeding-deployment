@@ -305,7 +305,7 @@ class PerceptionInterface:
 
         else:
             # Rajat Hack: Wait one second for the aruco mean to be correct, does this actually help though?
-            time.sleep(1)
+            time.sleep(3)
 
             aruco_pose_msg = rospy.wait_for_message("/aruco_pose", PoseMsg)
             position = (aruco_pose_msg.position.x, aruco_pose_msg.position.y, aruco_pose_msg.position.z)
