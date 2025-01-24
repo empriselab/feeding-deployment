@@ -531,8 +531,8 @@ if __name__ == "__main__":
     parser.add_argument("--scene_config", type=str, default="vention") # name of the scene config (rough head-plate-robot setup)
     parser.add_argument("--user", type=str, default="") # name of the user
     parser.add_argument("--scenario", type=str, default="default") # name of the scenario
-    # parser.add_argument("--transfer_type", type=str, default="inside")
-    parser.add_argument("--transfer_type", type=str, default="outside")
+    parser.add_argument("--transfer_type", type=str, default="inside")
+    # parser.add_argument("--transfer_type", type=str, default="outside")
     parser.add_argument("--run_on_robot", action="store_true")
     parser.add_argument("--use_interface", action="store_true")
     parser.add_argument("--use_gui", action="store_true")
@@ -638,8 +638,9 @@ if __name__ == "__main__":
 
 
         input("Press Enter to continue...")
-        for i in range(10):
-            runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
+        # for i in range(10):
+        #     runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
 
         # Run some commands.
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
@@ -649,7 +650,6 @@ if __name__ == "__main__":
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
         # for i in range(5):
         #     runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
-        #     runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
     else:
         runner.run()
