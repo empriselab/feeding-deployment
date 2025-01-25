@@ -322,6 +322,8 @@ class _Runner:
                 else:
                     print(f"Invalid task selection: {task_selection_command}")
                     last_task_type = None
+                # self.web_interface.clear_received_messages() # So that only the latest message is processed
+                # time.sleep(1.0)
                 self.web_interface.ready_for_task_selection(last_task_type=last_task_type)
                 print("Ready for next user command.")
                 print("Current web interface page:", self.web_interface.current_page)
