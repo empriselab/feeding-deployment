@@ -605,9 +605,9 @@ class BiteAcquisitionInference:
                 if "potato" in self.FOOD_CLASSES[i]:
                     replacement_dict[self.FOOD_CLASSES[i]] = "yellow potato wedge piece"
                     food_classes_being_detected.append("yellow potato wedge piece")
-                # elif "chicken" in self.FOOD_CLASSES[i]:
-                    # replacement_dict[self.FOOD_CLASSES[i]] = "small fried chicken nugget piece"
-                    # food_classes_being_detected.append("small fried chicken nugget piece")
+                elif "broccoli" in self.FOOD_CLASSES[i]:
+                    replacement_dict[self.FOOD_CLASSES[i]] = "green broccoli floret piece"
+                    food_classes_being_detected.append("green broccoli floret piece")
                 elif "apple" in self.FOOD_CLASSES[i]:
                     replacement_dict[self.FOOD_CLASSES[i]] = "cut white apple slice piece"
                     food_classes_being_detected.append("cut white apple slice piece")
@@ -744,7 +744,7 @@ class BiteAcquisitionInference:
 
         # Calculate the maximum area threshold dynamically
         H, W, C = image.shape
-        MAX_AREA_THRESHOLD = (H * W) / 5
+        MAX_AREA_THRESHOLD = (H * W) / 25
 
         individual_masks = []
         refined_labels = []
@@ -772,10 +772,19 @@ class BiteAcquisitionInference:
             area = np.sum(binary_mask > 0)
             
             # Only add the mask if its area is below the threshold
+            # print(f"Area of {labels[i]}: {area}, Max Area Threshold: {MAX_AREA_THRESHOLD}")
+
+            # visualize the mask
+            # cv2.imshow('mask', binary_mask)
+            # cv2.waitKey(0)
+            # input("Visualizing mask, press enter to continue")
+
             if area <= MAX_AREA_THRESHOLD:
                 if i in idxs:
                     individual_masks.append(binary_mask)
                     refined_labels.append(labels[i])
+            else:
+                print(f"Ignoring {labels[i]} due to large area: {area} with max area threshold: {MAX_AREA_THRESHOLD}")
 
         labels = refined_labels
 

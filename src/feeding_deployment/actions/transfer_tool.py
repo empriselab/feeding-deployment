@@ -203,6 +203,7 @@ class TransferToolHLA(HighLevelAction):
             if not self.no_waits:
                 input("Press enter to switch to task compliant mode")
             self.robot_interface.switch_to_task_compliant_mode()
+            time.sleep(2.0) # let the robot stabilize
 
         if self.robot_interface is not None:
             self.relay_ready_to_initiate_transfer(ready_to_initiate_mode, initiate_transfer_mode)
@@ -223,6 +224,7 @@ class TransferToolHLA(HighLevelAction):
         if self.sim.scene_description.transfer_type == "inside" and self.robot_interface is not None:                
             if not self.no_waits:
                 input("Press enter to switch out of compliant mode")
+            time.sleep(2.0) # let the robot stabilize
             self.robot_interface.switch_out_of_compliant_mode()
             self.disable_collision_sensor_pub.publish(Bool(data=False))
             print("Sent message to turn on collision sensor")

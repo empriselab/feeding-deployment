@@ -139,7 +139,7 @@ class HeadPerceptionROSWrapper:
 
     def run_head_perception(self, visualize=False):
 
-        print("Running Head Perception")
+        # print("Running Head Perception")
         transform = None
         while transform is None:
             camera_color_data, camera_info_data, camera_depth_data, _ = (
