@@ -48,9 +48,12 @@ def test_FoodManipulationSkillLibrary(sim, robot_interface, wrist_interface, per
 
     wrist_interface.set_velocity_mode()    
     food_manipulation_skill_library = FoodManipulationSkillLibrary(sim, robot_interface, wrist_interface, perception_interface, rviz_interface, no_waits)
-    food_manipulation_skill_library.reset()
-    camera_color_data, camera_info_data, camera_depth_data = perception_interface.get_camera_data()
-    food_manipulation_skill_library.dipping_skill(camera_color_data, camera_depth_data, camera_info_data)
+
+    for i in range(10):
+        food_manipulation_skill_library.reset()
+        camera_color_data, camera_info_data, camera_depth_data = perception_interface.get_camera_data()
+        # food_manipulation_skill_library.dipping_skill(camera_color_data, camera_depth_data, camera_info_data)
+        food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data)
 
 def test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, no_waits, log_dir, run_behavior_tree_dir, execution_log, gesture_detectors_dir):
 
@@ -184,11 +187,11 @@ def _main(
     # for original_bt_filename in original_behavior_tree_dir.glob("*.yaml"):
     #     shutil.copy(original_bt_filename, run_behavior_tree_dir)
 
-    # test_FoodManipulationSkillLibrary(sim, robot_interface, wrist_interface, perception_interface, rviz_interface, no_waits)
+    test_FoodManipulationSkillLibrary(sim, robot_interface, wrist_interface, perception_interface, rviz_interface, no_waits)
     
     # test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, no_waits, log_dir, run_behavior_tree_dir, execution_log, gesture_detectors_dir)
-    for i in range(25):
-        test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, no_waits, log_dir, run_behavior_tree_dir, execution_log, gesture_detectors_dir)
+    # for i in range(25):
+        # test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, no_waits, log_dir, run_behavior_tree_dir, execution_log, gesture_detectors_dir)
 
 if __name__ == "__main__":
     import argparse
