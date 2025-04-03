@@ -84,7 +84,7 @@ class WebInterface:
 
     def _send_message(self, msg_dict: dict[str, Any], explanation=False) -> None:
         self.web_interface_publisher.publish(String(json.dumps(msg_dict)))
-        if explanation:
+        if explanation and msg_dict["status"] != "":
             with open(self.webapp_explanation_messages_log, "a") as f:
                 f.write(json.dumps(msg_dict) + "\n")
         else:

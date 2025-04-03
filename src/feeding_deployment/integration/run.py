@@ -638,6 +638,11 @@ if __name__ == "__main__":
         # NOTE: this is not working perfectly -- it updates "silent for ReadyForTransferInteraction" instead of the web app confirmations.
         # runner.process_user_update_request("On the iPad, don't ask me to confirm when I'm ready.")
 
+        # Change skewering axis for FLAIR.
+        # runner.process_user_update_request("Can you please skewer food up-down instead?")
+
+        # Use a beep to signal ready for transfer.
+        # runner.process_user_update_request("Just use a beep to signal when you want my attention")
 
         input("Press Enter to continue...")
         for i in range(5):
