@@ -1,0 +1,464 @@
+Parameter name being checked for validity: Speed
+Node name: StowWipe
+Behavior tree prompt: 
+Here are all behavior trees:
+Behavior Tree Nodes Related to Bite (synonyms: Feeding, Utensil, Food Item):
+name: PickUtensil
+description: Pick up the feeding (bite) utensil from the tool mount.
+type: Behavior
+parameters:
+- name: Speed
+  description: Speed of the robot during picking up the feeding (bite) utensil.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - low
+    - medium
+    - high
+  value: medium
+fn: !hla pick_utensil
+---
+name: AcquireBite
+description: Pick up the appropriate food item from the plate. The robot predicts
+  a food item to pickup from the plate and waits TimeToWaitBeforeAutocontinue on the
+  web application (web interface) before auto-continuing the pickup bite button. Within
+  this duration, the user can confirm or change the prediction. The robot then attempts
+  to pick up the food item from the plate and dip it if required. The robot then asks
+  for confirmation on the web application (web interface) before initiating the transfer
+  sequence for a bite, which is controlled by the TransferAskForConfirmation parameter.
+type: Behavior
+parameters:
+- name: Speed
+  description: Speed of the robot during bite acquisition (bite pickup).
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - low
+    - medium
+    - high
+  value: medium
+- name: FoodDippingDepth
+  description: The depth a food item is dipped into a dipping sauce.
+  is_user_editable: true
+  space:
+    type: Box
+    lower: 0.01
+    upper: 0.03
+  value: 0.02
+- name: SkeweringDepth
+  description: The depth a food item is skewered.
+  is_user_editable: true
+  space:
+    type: Box
+    lower: 0.01
+    upper: 0.05
+  value: 0.015
+- name: SkeweringOrientation
+  description: The orientation for skewering food (with respect to major axis of food).
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - horizontal
+    - vertical
+  value: horizontal
+- name: TimeToWaitBeforeAutocontinue
+  description: Time to wait before auto-continuing pickup bite button on the web app
+    (web interface).
+  is_user_editable: true
+  space:
+    type: Box
+    lower: 5.0
+    upper: 100.0
+  value: 10.0
+- name: TransferAskForConfirmation
+  description: Ask for confirmation on the web app (web interface) before initiating
+    the transfer sequence for a bite.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - 0
+    - 1
+  value: 1
+fn: !hla acquire_bite
+---
+name: TransferUtensil
+description: Bring the feeding (bite) utensil to the user's mouth for a bite. A bite
+  transfer starts with an ReadyToInitiateTransferInteraction (robot to human) where
+  the robot conveys to the user that it is ready to initiate the bite transfer, then
+  an InitiateTransferInteraction (human to robot) where the human conveys to the robot
+  that it is ready for a bite transfer. After this, the robot moves the feeding utensil
+  (and thus the food item) either near the user's mouth (OutsideMouthDistance defines
+  how near) or inside the user's mouth. Then commences the ReadyForTransferInteraction
+  (robot to human) where the robot conveys to the user that they can take a bite now.
+  After the users is done taking a bite, they use the TransferCompleteInteraction
+  (human to robot) to convey to the robot that they are done. The robot then moves
+  the feeding utensil away from the user's mouth. Once a bite transfer is complete,
+  the robot waits for TimeToWaitBeforeAutocontinue on the web app (web interface)
+  before re-selecting bite transfer again.
+type: Behavior
+parameters:
+- name: Speed
+  description: Speed of the robot during bringing the feeding utensil (bite) to the
+    user's mouth.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - low
+    - medium
+    - high
+  value: medium
+- name: ReadyToInitiateTransferInteraction
+  description: Interaction mode for how the robot conveys to the user that it is ready
+    to initiate the feeding utensil (bite) transfer.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - silent
+    - voice
+    - led
+    - beep
+  value: voice
+- name: InitiateTransferInteraction
+  description: Interaction mode for how the user conveys to the robot that they are
+    ready for a feeding utensil (bite) transfer.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - button
+    - open_mouth
+    - auto_timeout
+  value: open_mouth
+- name: ReadyForTransferInteraction
+  description: Interaction mode for how the robot conveys to the user that they can
+    take a bite now.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - silent
+    - voice
+    - led
+    - beep
+  value: voice
+- name: TransferCompleteInteraction
+  description: Interaction mode for how the user conveys to the robot that they are
+    done taking a bite. Sense corresponds to the robot waiting for the user to bite
+    down on the fork (the robot is detecting downward forces on the fork tip).
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - button
+    - sense
+    - auto_timeout
+  value: sense
+- name: OutsideMouthDistance
+  description: Distance from the feeding utensil tip to the user's mouth for the bite
+    transfer.
+  is_user_editable: true
+  space:
+    type: Box
+    lower: 0.1
+    upper: 0.2
+  value: 0.15
+- name: TimeToWaitBeforeAutocontinue
+  description: Autocontinue duration for re-selecting feeding utensil (bite) transfer
+    after a bite on the web app (web interface).
+  is_user_editable: true
+  space:
+    type: Box
+    lower: 5.0
+    upper: 100.0
+  value: 10.0
+fn: !hla transfer_utensil
+---
+name: StowUtensil
+description: Place the feeding (bite) utensil in the tool mount.
+type: Behavior
+parameters:
+- name: Speed
+  description: Speed of the robot during placing the feeding (bite) utensil.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - low
+    - medium
+    - high
+  value: medium
+fn: !hla stow_utensil
+---
+Behavior Tree Nodes Related to Drink (synonyms: Mug, Sip, Liquid):
+name: PickDrink
+description: Detect where the mug is and pick it up.
+type: Behavior
+parameters:
+- name: Speed
+  description: Speed of the robot during picking up the mug.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - low
+    - medium
+    - high
+  value: medium
+fn: !hla pick_drink
+---
+name: TransferDrink
+description: Bring the mug (drink) to the user's mouth for a sip. Before initiating
+  the transfer sequence for drink, the robot can confirm with the user on the web
+  app (web interface) once using AskForConfirmationInitiatingTransferSequence. A drink
+  transfer starts with an ReadyToInitiateTransferInteraction (robot to human) where
+  the robot conveys to the user that it is ready to initiate the drink transfer, then
+  an InitiateTransferInteraction (human to robot) where the human conveys to the robot
+  that it is ready for a drink transfer. After this, the robot moves the mug either
+  near the user's mouth (OutsideMouthDistance defines how near) or inside the user's
+  mouth. Then commences the ReadyForTransferInteraction (robot to human) where the
+  robot conveys to the user that they can take a sip now. After the users is done
+  taking a sip, they use the TransferCompleteInteraction (human to robot) to convey
+  to the robot that they are done. The robot then moves the mug away from the user's
+  mouth. Once a drink transfer is complete, the robot waits for TimeToWaitBeforeAutocontinue
+  on the web app (web interface) before re-selecting drink transfer again.
+type: Behavior
+parameters:
+- name: Speed
+  description: Speed of the robot during bringing the mug to the user's mouth.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - low
+    - medium
+    - high
+  value: medium
+- name: ReadyToInitiateTransferInteraction
+  description: Interaction mode for how the robot conveys to the user that it is ready
+    to initiate the drink transfer.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - silent
+    - voice
+    - led
+    - beep
+  value: voice
+- name: InitiateTransferInteraction
+  description: Interaction mode for how the user conveys to the robot that they are
+    ready for a drink transfer.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - button
+    - open_mouth
+    - auto_timeout
+  value: open_mouth
+- name: ReadyForTransferInteraction
+  description: Interaction mode for how the robot conveys to the user that they can
+    take a sip now.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - silent
+    - voice
+    - led
+    - beep
+  value: voice
+- name: TransferCompleteInteraction
+  description: Interaction mode for how the user conveys to the robot that they are
+    done taking a sip. Sense corresponds to the robot waiting for a head nod from
+    the user.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - button
+    - sense
+    - auto_timeout
+  value: sense
+- name: OutsideMouthDistance
+  description: Distance from the straw tip to the user's mouth for the drink transfer.
+  is_user_editable: true
+  space:
+    type: Box
+    lower: 0.1
+    upper: 0.2
+  value: 0.15
+- name: AskForConfirmationInitiatingTransferSequence
+  description: Ask for confirmation on the web app (web interface) before initiating
+    the transfer sequence for drink. True is 1 and False is 0.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - 0
+    - 1
+  value: 1
+- name: TimeToWaitBeforeAutocontinue
+  description: Autocontinue duration for re-selecting drink transfer after a sip on
+    the web app (web interface).
+  is_user_editable: true
+  space:
+    type: Box
+    lower: 5.0
+    upper: 100.0
+  value: 10.0
+fn: !hla transfer_drink
+---
+name: StowDrink
+description: Place the mug on the table.
+type: Behavior
+parameters:
+- name: Speed
+  description: Speed of the robot during placing the mug.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - low
+    - medium
+    - high
+  value: medium
+fn: !hla stow_drink
+---
+Behavior Tree Nodes Related to Wipe (synonyms: Clean, Cloth):
+name: PickWipe
+description: Pick up the wipe from the tool mount.
+type: Behavior
+parameters:
+- name: Speed
+  description: Speed of the robot during picking up the wipe.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - low
+    - medium
+    - high
+  value: medium
+fn: !hla pick_wipe
+---
+name: TransferWipe
+description: Bring the wipe to the user's mouth for a cleaning. Before initiating
+  the transfer sequence for wipe, the robot can confirm with the user on the web app
+  (web interface) once using AskForConfirmationInitiatingTransferSequence. A wipe
+  transfer starts with an ReadyToInitiateTransferInteraction (robot to human) where
+  the robot conveys to the user that it is ready to initiate the wipe transfer, then
+  an InitiateTransferInteraction (human to robot) where the human conveys to the robot
+  that it is ready for a wipe transfer. After this, the robot moves the wipe either
+  near the user's mouth (OutsideMouthDistance defines how near) or to touching distance
+  of the user's mouth. Then commences the ReadyForTransferInteraction (robot to human)
+  where the robot conveys to the user that they can start cleaning their mouth now.
+  After the users is done cleaning their mouth, they use the TransferCompleteInteraction
+  (human to robot) to convey to the robot that they are done. The robot then moves
+  the wipe away from the user's mouth. The robot does not autocontinue wipe transfer
+  again, and wait's for the user's to specify the next task.
+type: Behavior
+parameters:
+- name: Speed
+  description: Speed of the robot during bringing the wipe to the user's mouth.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - low
+    - medium
+    - high
+  value: medium
+- name: ReadyToInitiateTransferInteraction
+  description: Interaction mode for how the robot conveys to the user that it is ready
+    to initiate the wipe transfer.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - silent
+    - voice
+    - led
+    - beep
+  value: voice
+- name: InitiateTransferInteraction
+  description: Interaction mode for how the user conveys to the robot that they are
+    ready for a wipe transfer.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - button
+    - open_mouth
+    - auto_timeout
+  value: open_mouth
+- name: ReadyForTransferInteraction
+  description: Interaction mode for how the robot conveys to the user that they can
+    take start cleaning now.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - silent
+    - voice
+    - led
+    - beep
+  value: voice
+- name: TransferCompleteInteraction
+  description: Interaction mode for how the user conveys to the robot that they are
+    done cleaning their mouth. Sense corresponds to the robot waiting for a head nod
+    from the user.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - button
+    - sense
+    - auto_timeout
+  value: sense
+- name: OutsideMouthDistance
+  description: Distance from the wipe tip to the user's mouth for the wipe transfer.
+  is_user_editable: true
+  space:
+    type: Box
+    lower: 0.1
+    upper: 0.2
+  value: 0.15
+- name: AskForConfirmationInitiatingTransferSequence
+  description: Ask for confirmation on the web app (web interface) before initiating
+    the transfer sequence for wiping. True is 1 and False is 0.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - 0
+    - 1
+  value: 1
+fn: !hla transfer_wipe
+---
+name: StowWipe
+description: Place the wipe in the tool mount.
+type: Behavior
+parameters:
+- name: Speed
+  description: Speed of the robot during placing the wipe.
+  is_user_editable: true
+  space:
+    type: Enum
+    elements:
+    - low
+    - medium
+    - high
+  value: medium
+fn: !hla stow_wipe
+---
+
+
+Node name substring: name: StowWipe
+Parameter name is valid
