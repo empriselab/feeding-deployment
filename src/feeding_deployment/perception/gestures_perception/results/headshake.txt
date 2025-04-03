@@ -8,3 +8,5 @@ nBest Accuracy: 0.5
 nBest Accuracy: 0.6
 nBest Accuracy: 0.9
 nBest Accuracy: 0.6666666666666666
+nBest Accuracy: 0.8
+nBest Accuracy: 0.9

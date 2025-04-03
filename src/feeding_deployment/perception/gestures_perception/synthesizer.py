@@ -40,7 +40,7 @@ class PersonalizedGestureDetectorSynthesizer:
     def __init__(self, log_dir):
 
         self.llm = OpenAILLM(
-            model_name="gpt-4o",
+            model_name="gpt-4.5-preview-2025-02-27",
             cache_dir=log_dir / "llm_cache",
             max_tokens=2500,
         )
