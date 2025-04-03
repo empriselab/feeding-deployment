@@ -44,7 +44,7 @@ class PickToolHLA(HighLevelAction):
         assert len(objects) == 1
         tool = objects[0]
         assert self.sim.scene_description.scene_label == "vention"
-        assert tool.name in ["utensil", "drink", "wipe"]
+        assert tool.name in ["utensil", "drink", "wipe", "plate"]
         return f"pick_{tool.name}.yaml"
     
     def pick_utensil(self, speed: str) -> None:
@@ -120,3 +120,24 @@ class PickToolHLA(HighLevelAction):
             self.move_to_joint_positions(self.sim.scene_description.wipe_neutral_pos)
         self.move_to_joint_positions(self.sim.scene_description.retract_pos)
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
+
+    def pick_plate(self, speed: str) -> None:
+        assert self.sim.held_object_name is None
+
+        if self.robot_interface is not None:    
+            self.robot_interface.set_speed(speed)
+
+        self.move_to_joint_positions(self.sim.scene_description.retract_pos)
+        self.close_gripper()
+        self.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
+
+        plate_poses = self.perception_interface.perceive_plate_pickup_poses()
+
+        self.move_to_joint_positions(self.sim.scene_description.plate_staging_pos)
+        self.move_to_ee_pose(plate_poses['pre_grasp_pose'])
+        self.move_to_ee_pose(plate_poses['inside_bottom_pose'])
+        self.move_to_ee_pose(plate_poses['inside_top_pose'])
+        self.grasp_tool("plate")
+        self.move_to_ee_pose(plate_poses['post_grasp_pose'])
+
+        self.perception_interface.record_plate_pickup_joint_pos()

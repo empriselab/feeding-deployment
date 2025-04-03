@@ -43,7 +43,7 @@ class StowToolHLA(HighLevelAction):
         del params  # not used right now
         assert len(objects) == 1
         tool = objects[0]
-        assert tool.name in ["utensil", "drink", "wipe"]
+        assert tool.name in ["utensil", "drink", "wipe", "plate"]
         return f"stow_{tool.name}.yaml"
 
     def stow_utensil(self, speed: str) -> None:
@@ -104,4 +104,31 @@ class StowToolHLA(HighLevelAction):
         if self.sim.scene_description.scene_label == "vention":
             self.move_to_ee_pose(self.sim.scene_description.wipe_infront_mount)
 
+        self.move_to_joint_positions(self.sim.scene_description.retract_pos)
+
+    def stow_plate(self, speed: str) -> None:
+        print("Object name: ", self.sim.held_object_name)
+        assert self.sim.held_object_name == "plate"
+
+        if self.robot_interface is not None:
+            self.robot_interface.set_speed(speed)
+
+        last_plate_poses, last_plate_pickup_joint_pos = self.perception_interface.get_last_plate_pickup_configs(study_poses=False)
+
+        x_movement = input("Input the amount of x movement (to your right) for the plate: ")
+        x_movement = float(x_movement)
+
+        y_movement = input("Input the amount of y movement (away from you) for the plate: ")
+        y_movement = float(y_movement)
+
+        for value in ['inside_top_pose', 'place_inside_bottom_pose', 'place_pre_grasp_pose']:
+            last_plate_poses[value].position[0] += y_movement
+            last_plate_poses[value].position[1] -= x_movement
+
+        self.move_to_joint_positions(last_plate_pickup_joint_pos)
+        self.move_to_ee_pose(last_plate_poses['inside_top_pose'])
+        self.ungrasp_tool("plate")
+        self.move_to_ee_pose(last_plate_poses['place_inside_bottom_pose'])
+        self.move_to_ee_pose(last_plate_poses['place_pre_grasp_pose'])
+        self.move_to_joint_positions(self.sim.scene_description.plate_staging_pos)
         self.move_to_joint_positions(self.sim.scene_description.retract_pos)

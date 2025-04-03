@@ -41,6 +41,9 @@ def _plan_to_sim_state_trajectory(
     utensil_pose: Pose | None = None
     if sim.held_object_name != "utensil":
         utensil_pose = get_pose(sim.utensil_id, sim.physics_client_id)
+    plate_pose: Pose | None = None
+    if sim.held_object_name != "plate":
+        plate_pose = get_pose(sim.plate_id, sim.physics_client_id)
 
     sim_states: list[FeedingDeploymentWorldState] = []
     for joints in plan:
@@ -49,6 +52,7 @@ def _plan_to_sim_state_trajectory(
             drink_pose=drink_pose,
             wipe_pose=wipe_pose,
             utensil_pose=utensil_pose,
+            plate_pose=plate_pose,
             held_object=sim.held_object_name,
             held_object_tf=sim.held_object_tf,
         )
@@ -74,6 +78,8 @@ def _get_plan_to_execute_grasp(
         sim.held_object_id = sim.wipe_id
     elif object_name == "utensil":
         sim.held_object_id = sim.utensil_id
+    elif object_name == "plate":
+        sim.held_object_id = sim.plate_id
     else:
         raise NotImplementedError("TODO")
 
@@ -150,6 +156,7 @@ def remap_trajectory_to_constant_distance(
             drink_pose=s0.drink_pose,
             wipe_pose=s0.wipe_pose,
             utensil_pose=s0.utensil_pose,
+            plate_pose=s0.plate_pose,
             held_object=s0.held_object,
             held_object_tf=s0.held_object_tf,
         )

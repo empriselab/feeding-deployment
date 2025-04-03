@@ -95,6 +95,9 @@ class SceneDescription:
     wipe_above_mount: Pose
     wipe_above_mount_pos: JointPositions
 
+    # Plate constants
+    plate_staging_pos: JointPositions
+
     # Specific env arguments can be set to None
     utensil_outside_above_mount: Pose = None
     utensil_outside_above_mount_pos: JointPositions = None
@@ -176,11 +179,6 @@ class SceneDescription:
     table_urdf_path: Path = Path(__file__).parent.parent / "assets" / "table" / "table.urdf"
     table_mesh_path: Path = Path(__file__).parent.parent / "assets" / "table" / "table.obj"
 
-    # Plate
-    plate_pose: Pose = Pose((0.3, 0.25, 0.16))
-    plate_urdf_path: Path = Path(__file__).parent.parent / "assets" / "plate" / "plate.urdf"
-    plate_mesh_path: Path = Path(__file__).parent.parent / "assets" / "plate" / "plate.obj"
-
     # Floor
     floor_position: tuple[float, float, float] = (0, 0, -0.66)
     floor_urdf: Path = Path(__file__).parent.parent / "assets" / "floor" / "floor.urdf"
@@ -237,6 +235,11 @@ class SceneDescription:
         (0.000, 0.707, 0.000, 0.707),
     )
 
+    # Plate
+    plate_pose: Pose = Pose((0.3, 0.25, 0.16))
+    plate_urdf_path: Path = Path(__file__).parent.parent / "assets" / "plate" / "plate.urdf"
+    plate_mesh_path: Path = Path(__file__).parent.parent / "assets" / "plate" / "plate.obj"
+
     @property
     def utensil_pose(self):
         return self.utensil_inside_mount.multiply(self.tool_frame_to_finger_tip)
@@ -255,6 +258,17 @@ class SceneDescription:
     @property
     def wipe_pose(self):
         return self.wipe_inside_mount.multiply(self.tool_frame_to_finger_tip)
+    
+    # @property
+    # def plate_pose(self):
+    #     try:
+    #         with open(Path(__file__).parent.parent / 'integration' / 'log' / 'plate_pickup_pos.pkl', 'rb') as f:
+    #             plate_poses = pickle.load(f)
+    #     except FileNotFoundError:
+    #         with open(Path(__file__).parent.parent / 'integration' / 'log' / 'study_plate_pickup_pos.pkl', 'rb') as f:
+    #             plate_poses = pickle.load(f)
+    #     inside_plate_pose = plate_poses["last_plate_poses"]["inside_top_pose"]
+    #     return inside_plate_pose.multiply(self.tool_frame_to_finger_tip)
 
     @property
     def wheelchair_head_pose(self) -> Pose:
