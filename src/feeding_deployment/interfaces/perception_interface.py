@@ -474,6 +474,14 @@ class PerceptionInterface:
     
     def perceive_plate_pickup_poses(self):
 
+        def get_plate_transform():
+            # TODO need to update...
+            tf = np.zeros((4, 4))
+            tf[:3, :3] = R.from_euler("xyz", [0, 0, 0]).as_matrix()
+            tf[:3, 3] = np.array([0.0, 0.0, 0.0]) 
+            tf[3, 3] = 1
+            return tf
+
         def get_pre_grasp_transform():
             tf = np.zeros((4, 4))
             tf[:3, :3] = R.from_euler("xyz", [np.pi, 0, np.pi]).as_matrix()
@@ -526,6 +534,7 @@ class PerceptionInterface:
             self.aruco_pose = (position, orientation)
 
             plate_poses  = {}
+            plate_poses['plate_pose'] = self.get_aruco_relative_pose(get_plate_transform(), "plate")
             plate_poses['pre_grasp_pose'] = self.get_aruco_relative_pose(get_pre_grasp_transform(), "plate")
             plate_poses['inside_bottom_pose'] = self.get_aruco_relative_pose(get_inside_bottom_transform(), "plate")
             plate_poses['inside_top_pose'] = self.get_aruco_relative_pose(get_inside_top_transform(), "plate")
@@ -556,16 +565,8 @@ class PerceptionInterface:
             with open(Path(__file__).parent.parent / 'integration' / 'log' / 'study_pickup_pickup_pos.pkl', 'rb') as f:
                 plate_pickup_pos = pickle.load(f)
             last_plate_poses = plate_pickup_pos["last_plate_poses"]
-            plate_pickup_joint_pos = plate_pickup_pos["plate_pickup_joint_pos"]
+            # plate_pickup_joint_pos = plate_pickup_pos["plate_pickup_joint_pos"]
         else:
-            try:
-                last_plate_poses = self.last_plate_poses
-                plate_pickup_joint_pos = self.plate_pickup_joint_pos
-            except Exception as e:
-                print("Error loading plate pickup poses from script, using values from file instead")
-                with open(self.log_dir / 'plate_pickup_pos.pkl', 'rb') as f:
-                    plate_pickup_pos = pickle.load(f)
-                last_plate_poses = plate_pickup_pos["last_plate_poses"]
-                plate_pickup_joint_pos = plate_pickup_pos["plate_pickup_joint_pos"]
+            last_plate_poses = self.last_plate_poses
         
-        return last_plate_poses, plate_pickup_joint_pos
+        return last_plate_poses

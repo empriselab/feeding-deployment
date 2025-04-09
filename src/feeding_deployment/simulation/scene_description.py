@@ -59,7 +59,7 @@ def create_scene_description_from_config(config_file_path: str, transfer_type: s
     return SceneDescription(**processed_config)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=False)
 class SceneDescription:
     """Scene description."""
 

@@ -531,6 +531,31 @@ Write a VERY BRIEF summary of all the changes for a non-technical end user. Make
         synthesized_gesture_module = types.ModuleType('synthesized_gestures')
         exec(gesture_file_text, synthesized_gesture_module.__dict__)
         return inspect.getmembers(synthesized_gesture_module, inspect.isfunction)
+    
+    def get_multitask_personalization_state(self) -> dict[str, Any]:
+        """Get a sufficient state for multitask personalization."""
+        mp_state = {}
+
+        # TODO only do this when necessary...
+        skill = self.hla_name_to_hla["PickTool"]
+        skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
+        skill.close_gripper()
+        skill.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
+        self.perception_interface.perceive_plate_pickup_poses()
+        last_plate_poses = self.perception_interface.get_last_plate_pickup_configs()
+        mp_state["plate_pose"] = last_plate_poses["plate_pose"]
+        mp_state["robot_joints"] = self.perception_interface.get_robot_joints()
+
+        return mp_state
+    
+    def update_scene_spec(self, scene_spec_updates: dict[str, Any]) -> None:
+        """Update the scene spec with the given updates."""
+        for key, value in scene_spec_updates.items():
+            if hasattr(self.scene_description, key):
+                setattr(self.scene_description, key, value)
+            else:
+                raise ValueError(f"Invalid scene spec update: {key}")
+        print("Updated scene spec:", scene_spec_updates)
 
 
 if __name__ == "__main__":
@@ -662,34 +687,37 @@ if __name__ == "__main__":
 
         # Get the initial state to pass to multitask_personalization.
         mp_state = runner.get_multitask_personalization_state()
+        import ipdb; ipdb.set_trace()
         # Run multitask personalization code to produce an update to scene spec.
         scene_spec_updates = mp_feast_interface.run(mp_state)
         # Update the scene spec.
         runner.update_scene_spec(scene_spec_updates)
         # Run the first bite sequence (no plate movement).
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-        # Get the new state, which should include user feedback about occlusion.
-        mp_state = runner.get_multitask_personalization_state()
-        # Run multitask personalization code again.
-        scene_spec_updates = mp_feast_interface.run(mp_state)
-        # Update the scene spec.
-        runner.update_scene_spec(scene_spec_updates)
-        # Run the second bite sequence (with plate movement).
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.plate,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.plate,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-        # Prompt the operator to add the drink to the table.
-        input("Put the drink on the table, then press enter.")
-        # Get the new state, which should include the drink pose now.
-        mp_state = runner.get_multitask_personalization_state()
-        # Run multitask personalization code again.
-        scene_spec_updates = mp_feast_interface.run(mp_state)
-        # Update the scene spec.
-        runner.update_scene_spec(scene_spec_updates)
-        # Run drink repositioning and then drink assistance.
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
+        
+        # TODO
+        # # Get the new state, which should include user feedback about occlusion.
+        # mp_state = runner.get_multitask_personalization_state()
+        # # Run multitask personalization code again.
+        # scene_spec_updates = mp_feast_interface.run(mp_state)
+        # # Update the scene spec.
+        # runner.update_scene_spec(scene_spec_updates)
+        # # Run the second bite sequence (with plate movement).
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.plate,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.plate,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+        # # Prompt the operator to add the drink to the table.
+        # input("Put the drink on the table, then press enter.")
+        # # Get the new state, which should include the drink pose now.
+        # mp_state = runner.get_multitask_personalization_state()
+        # # Run multitask personalization code again.
+        # scene_spec_updates = mp_feast_interface.run(mp_state)
+        # # Update the scene spec.
+        # runner.update_scene_spec(scene_spec_updates)
+        # # Run drink repositioning and then drink assistance.
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
 
         #####################################################################################################
         #                                </ MULTITASK PERSONALIZATION DEMO >                                #
