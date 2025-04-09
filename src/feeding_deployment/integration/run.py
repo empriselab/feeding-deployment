@@ -714,7 +714,6 @@ if __name__ == "__main__":
         # Get the initial state to pass to multitask_personalization.
         mp_state = runner.get_multitask_personalization_state(look_topdown=True)
         _publish_mp_state(mp_state)
-
         input("Press enter after the scene has been updated.")
         
         # Run the first bite sequence (no plate movement).
@@ -740,15 +739,10 @@ if __name__ == "__main__":
         # Send the feedback and sync the environment.
         mp_state = runner.get_multitask_personalization_state(occluded=occluded)
         _publish_mp_state(mp_state)
+        input("Press enter after the scene has been updated.")
 
-        # TODO
-        # # Get the new state, which should include user feedback about occlusion.
-        # mp_state = runner.get_multitask_personalization_state()
-        # # Run multitask personalization code again.
-        # scene_spec_updates = mp_feast_interface.run(mp_state)
-        # # Update the scene spec.
-        # runner.update_scene_spec(scene_spec_updates)
-        # # Run the second bite sequence (with plate movement).
+        # TODO next: plate movement
+        # Run the second bite sequence (with plate movement).
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.plate,)))
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.plate,)))
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
