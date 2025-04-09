@@ -537,10 +537,10 @@ Write a VERY BRIEF summary of all the changes for a non-technical end user. Make
         mp_state = {}
 
         # TODO only do this when necessary...
-        skill = self.hla_name_to_hla["PickTool"]
-        skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
-        skill.close_gripper()
-        skill.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
+        # skill = self.hla_name_to_hla["PickTool"]
+        # skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
+        # skill.close_gripper()
+        # skill.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
         self.perception_interface.perceive_plate_pickup_poses()
         last_plate_poses = self.perception_interface.get_last_plate_pickup_configs()
         mp_state["plate_pose"] = last_plate_poses["plate_pose"]
@@ -685,8 +685,20 @@ if __name__ == "__main__":
         #                                < MULTITASK PERSONALIZATION DEMO >                                 #
         #####################################################################################################
 
+        import base64
+        mp_state_pub = rospy.Publisher('/mp_state', String, queue_size=1)
+
+        def _publish_mp_state(mp_state):
+            msg = String()
+            ps = pickle.dumps(mp_state)
+            s = base64.b64encode(ps).decode('ascii')
+            msg.data = s
+            mp_state_pub.publish(msg)
+
         # Get the initial state to pass to multitask_personalization.
         mp_state = runner.get_multitask_personalization_state()
+        _publish_mp_state(mp_state)
+        
         import ipdb; ipdb.set_trace()
         # Run multitask personalization code to produce an update to scene spec.
         scene_spec_updates = mp_feast_interface.run(mp_state)
