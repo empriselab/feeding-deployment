@@ -532,19 +532,20 @@ Write a VERY BRIEF summary of all the changes for a non-technical end user. Make
         exec(gesture_file_text, synthesized_gesture_module.__dict__)
         return inspect.getmembers(synthesized_gesture_module, inspect.isfunction)
     
-    def get_multitask_personalization_state(self, occluded: bool = False) -> dict[str, Any]:
+    def get_multitask_personalization_state(self, occluded: bool = False,
+                                            look_topdown: bool = False) -> dict[str, Any]:
         """Get a sufficient state for multitask personalization."""
         mp_state = {}
 
-        # TODO only do this when necessary...
-        skill = self.hla_name_to_hla["PickTool"]
-        skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
-        skill.close_gripper()
-        skill.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
-        self.perception_interface.perceive_plate_pickup_poses()
+        if look_topdown:
+            skill = self.hla_name_to_hla["PickTool"]
+            skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
+            skill.close_gripper()
+            skill.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
+            self.perception_interface.perceive_plate_pickup_poses()
+        
         last_plate_poses = self.perception_interface.get_last_plate_pickup_configs()
         mp_state["plate_pose"] = last_plate_poses["plate_pose"]
-
         skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
         mp_state["robot_joints"] = self.perception_interface.get_robot_joints()
 
@@ -711,7 +712,7 @@ if __name__ == "__main__":
         mp_state_sub = rospy.Subscriber('/mp_state_out', String, _update_scene_spec)
 
         # Get the initial state to pass to multitask_personalization.
-        mp_state = runner.get_multitask_personalization_state()
+        mp_state = runner.get_multitask_personalization_state(look_topdown=True)
         _publish_mp_state(mp_state)
 
         input("Press enter after the scene has been updated.")
