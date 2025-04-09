@@ -688,7 +688,13 @@ if __name__ == "__main__":
         #####################################################################################################
 
         import base64
-        mp_state_pub = rospy.Publisher('/mp_state', String, queue_size=1)
+        
+        def _update_scene_spec(mp_state_out):
+            # Decode the message.
+            s = base64.b64decode(mp_state_out.data.encode('ascii'))
+            ps = pickle.loads(s)
+            # Update the scene spec.
+            runner.update_scene_spec(ps)
 
         def _publish_mp_state(mp_state):
             msg = String()
@@ -697,15 +703,13 @@ if __name__ == "__main__":
             msg.data = s
             mp_state_pub.publish(msg)
 
+        mp_state_pub = rospy.Publisher('/mp_state', String, queue_size=1)
+        mp_state_sub = rospy.Subscriber('/mp_state_out', String, _update_scene_spec)
+
         # Get the initial state to pass to multitask_personalization.
         mp_state = runner.get_multitask_personalization_state()
         _publish_mp_state(mp_state)
         
-        import ipdb; ipdb.set_trace()
-        # Run multitask personalization code to produce an update to scene spec.
-        scene_spec_updates = mp_feast_interface.run(mp_state)
-        # Update the scene spec.
-        runner.update_scene_spec(scene_spec_updates)
         # Run the first bite sequence (no plate movement).
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
         
