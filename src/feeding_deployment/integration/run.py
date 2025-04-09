@@ -543,10 +543,10 @@ Write a VERY BRIEF summary of all the changes for a non-technical end user. Make
             skill.close_gripper()
             skill.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
             self.perception_interface.perceive_plate_pickup_poses()
+            skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
         
         last_plate_poses = self.perception_interface.get_last_plate_pickup_configs()
         mp_state["plate_pose"] = last_plate_poses["plate_pose"]
-        skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
         mp_state["robot_joints"] = self.perception_interface.get_robot_joints()
 
         if occluded:
@@ -719,7 +719,8 @@ if __name__ == "__main__":
         
         # Run the first bite sequence (no plate movement).
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.utensil,)))
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+        skill = runner.hla_name_to_hla["PickTool"]
+        skill.move_to_joint_positions(runner.sim.scene_description.above_plate_pos)
         
         # Ask for feedback.
         occluded = False
