@@ -532,7 +532,7 @@ Write a VERY BRIEF summary of all the changes for a non-technical end user. Make
         exec(gesture_file_text, synthesized_gesture_module.__dict__)
         return inspect.getmembers(synthesized_gesture_module, inspect.isfunction)
     
-    def get_multitask_personalization_state(self) -> dict[str, Any]:
+    def get_multitask_personalization_state(self, occluded: bool = False) -> dict[str, Any]:
         """Get a sufficient state for multitask personalization."""
         mp_state = {}
 
@@ -547,6 +547,9 @@ Write a VERY BRIEF summary of all the changes for a non-technical end user. Make
 
         skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
         mp_state["robot_joints"] = self.perception_interface.get_robot_joints()
+
+        if occluded:
+            mp_state["occluded"] = True
 
         return mp_state
     
@@ -714,8 +717,28 @@ if __name__ == "__main__":
         input("Press enter after the scene has been updated.")
         
         # Run the first bite sequence (no plate movement).
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.utensil,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
         
+        # Ask for feedback.
+        occluded = False
+        while True:
+            response = input("Was there occlusion? y/n")
+            if response.lower() in ["y", "yes"]:
+                print("User feedback: occlusion")
+                occluded = True
+                break
+            elif response.lower() in ["n", "no"]:
+                print("User feedback: no occlusion")
+                occluded = False
+                break
+            else:
+                print("Invalid input. Please enter 'y' or 'n'.")
+        
+        # Send the feedback and sync the environment.
+        mp_state = runner.get_multitask_personalization_state(occluded=occluded)
+        _publish_mp_state(mp_state)
+
         # TODO
         # # Get the new state, which should include user feedback about occlusion.
         # mp_state = runner.get_multitask_personalization_state()
