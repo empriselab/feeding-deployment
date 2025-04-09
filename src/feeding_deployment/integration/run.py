@@ -676,6 +676,7 @@ if __name__ == "__main__":
         # Use a beep to signal ready for transfer.
         # runner.process_user_update_request("Just use a beep to signal when you want my attention")
 
+        input("Press Enter to continue...")
         # for i in range(5):
         #     runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
         # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
@@ -695,10 +696,8 @@ if __name__ == "__main__":
             mp_state_pub.publish(msg)
 
         # Get the initial state to pass to multitask_personalization.
-        while True:
-            input("Press Enter to continue...")
-            mp_state = runner.get_multitask_personalization_state()
-            _publish_mp_state(mp_state)
+        mp_state = runner.get_multitask_personalization_state()
+        _publish_mp_state(mp_state)
         
         import ipdb; ipdb.set_trace()
         # Run multitask personalization code to produce an update to scene spec.

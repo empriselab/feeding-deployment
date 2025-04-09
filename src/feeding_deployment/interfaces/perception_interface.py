@@ -475,7 +475,6 @@ class PerceptionInterface:
     def perceive_plate_pickup_poses(self):
 
         def get_plate_transform():
-            # TODO need to update...
             tf = np.zeros((4, 4))
             tf[:3, :3] = R.from_euler("xyz", [0, 0, 0]).as_matrix()
             tf[:3, 3] = np.array([0.08, 0.17, 0.0]) 
