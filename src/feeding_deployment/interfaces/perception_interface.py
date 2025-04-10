@@ -341,7 +341,7 @@ class PerceptionInterface:
             # Rajat Hack: Wait one second for the aruco mean to be correct, does this actually help though?
             time.sleep(3)
 
-            aruco_pose_msg = rospy.wait_for_message("/aruco_pose", PoseMsg)
+            aruco_pose_msg = rospy.wait_for_message("/aruco_pose_0", PoseMsg)
             position = (aruco_pose_msg.position.x, aruco_pose_msg.position.y, aruco_pose_msg.position.z)
             orientation = (aruco_pose_msg.orientation.x, aruco_pose_msg.orientation.y, aruco_pose_msg.orientation.z, aruco_pose_msg.orientation.w)
             self.aruco_pose = (position, orientation)
@@ -525,7 +525,7 @@ class PerceptionInterface:
             # Rajat Hack: Wait one second for the aruco mean to be correct, does this actually help though?
             time.sleep(3)
 
-            aruco_pose_msg = rospy.wait_for_message("/aruco_pose", PoseMsg)
+            aruco_pose_msg = rospy.wait_for_message("/aruco_pose_1", PoseMsg)
             # save in pickle file
             with open(self.log_dir / 'aruco_pose.pkl', 'wb') as f:
                 pickle.dump(aruco_pose_msg, f)
