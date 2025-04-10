@@ -126,7 +126,7 @@ class StowToolHLA(HighLevelAction):
             last_plate_poses[value].position[0] += y_movement
             last_plate_poses[value].position[1] -= x_movement
 
-        input("Preparing to move plate by: x_movement: {}, y_movement: {}. Press Enter to continue...".format(x_movement, y_movement))
+        # input("Preparing to move plate by: x_movement: {}, y_movement: {}. Press Enter to continue...".format(x_movement, y_movement))
 
         self.move_to_ee_pose(last_plate_poses['inside_top_pose'])
         self.ungrasp_tool("plate")
