@@ -81,6 +81,8 @@ class PerceptionInterface:
         self.log_head_perception_start_time = None
         self.log_head_perception = False
 
+        self.last_plate_poses = None
+
         # set led brightness
         self.set_led_brightness()
 

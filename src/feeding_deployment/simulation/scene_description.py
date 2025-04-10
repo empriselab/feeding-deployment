@@ -73,6 +73,7 @@ class SceneDescription:
     # Feeding task constants
     above_plate_pos: JointPositions
     before_transfer_pos: JointPositions
+    absolute_before_transfer_pos: JointPositions
     before_transfer_pose: Pose
 
     # Utensil mount constants

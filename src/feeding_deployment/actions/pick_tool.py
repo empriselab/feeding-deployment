@@ -73,6 +73,7 @@ class PickToolHLA(HighLevelAction):
             self.move_to_joint_positions(self.sim.scene_description.retract_pos)
         # Pre-emptively move to the before_transfer_pos because moving to above_plate_pos from retract_pos is unsafe.
         self.move_to_joint_positions(self.sim.scene_description.absolute_before_transfer_pos)
+        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
         
     def pick_drink(self, speed: str) -> None:
         assert self.sim.held_object_name is None
@@ -127,11 +128,13 @@ class PickToolHLA(HighLevelAction):
         if self.robot_interface is not None:    
             self.robot_interface.set_speed(speed)
 
-        self.move_to_joint_positions(self.sim.scene_description.retract_pos)
-        self.close_gripper()
-        self.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
-
-        plate_poses = self.perception_interface.perceive_plate_pickup_poses()
+        if self.perception_interface.last_plate_poses is None:
+            self.move_to_joint_positions(self.sim.scene_description.retract_pos)
+            self.close_gripper()
+            self.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
+            plate_poses = self.perception_interface.perceive_plate_pickup_poses()
+        else:
+            plate_poses = self.perception_interface.last_plate_poses
 
         self.move_to_joint_positions(self.sim.scene_description.plate_staging_pos)
         self.move_to_ee_pose(plate_poses['pre_grasp_pose'])
