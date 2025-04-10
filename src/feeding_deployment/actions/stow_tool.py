@@ -113,19 +113,21 @@ class StowToolHLA(HighLevelAction):
         if self.robot_interface is not None:
             self.robot_interface.set_speed(speed)
 
-        last_plate_poses, last_plate_pickup_joint_pos = self.perception_interface.get_last_plate_pickup_configs(study_poses=False)
+        last_plate_poses = self.perception_interface.get_last_plate_pickup_configs(study_poses=False)
 
-        x_movement = input("Input the amount of x movement (to your right) for the plate: ")
-        x_movement = float(x_movement)
+        # x_movement = input("Input the amount of x movement (to your right) for the plate: ")
+        # x_movement = float(x_movement)
+        x_movement, y_movement = self.sim.scene_description.plate_delta_xy
 
-        y_movement = input("Input the amount of y movement (away from you) for the plate: ")
-        y_movement = float(y_movement)
+        # y_movement = input("Input the amount of y movement (away from you) for the plate: ")
+        # y_movement = float(y_movement)
 
         for value in ['inside_top_pose', 'place_inside_bottom_pose', 'place_pre_grasp_pose']:
             last_plate_poses[value].position[0] += y_movement
             last_plate_poses[value].position[1] -= x_movement
 
-        self.move_to_joint_positions(last_plate_pickup_joint_pos)
+        input("Preparing to move plate by: x_movement: {}, y_movement: {}. Press Enter to continue...".format(x_movement, y_movement))
+
         self.move_to_ee_pose(last_plate_poses['inside_top_pose'])
         self.ungrasp_tool("plate")
         self.move_to_ee_pose(last_plate_poses['place_inside_bottom_pose'])

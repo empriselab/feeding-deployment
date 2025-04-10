@@ -724,7 +724,7 @@ if __name__ == "__main__":
         # Ask for feedback.
         occluded = False
         while True:
-            response = input("Was there occlusion? y/n")
+            response = input("Was there occlusion? y/n ")
             if response.lower() in ["y", "yes"]:
                 print("User feedback: occlusion")
                 occluded = True
@@ -740,6 +740,13 @@ if __name__ == "__main__":
         mp_state = runner.get_multitask_personalization_state(occluded=occluded)
         _publish_mp_state(mp_state)
         input("Press enter after the scene has been updated.")
+
+        # Move the plate.
+        pick_tool = runner.hla_name_to_hla["PickTool"]
+        stow_tool = runner.hla_name_to_hla["StowTool"]
+        runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.plate,)))
+        runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.plate,)))
+
 
         # TODO next: plate movement
         # Run the second bite sequence (with plate movement).

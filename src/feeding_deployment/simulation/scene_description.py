@@ -97,6 +97,7 @@ class SceneDescription:
 
     # Plate constants
     plate_staging_pos: JointPositions
+    plate_delta_xy: tuple[float, float] = (0.0, 0.0)
 
     # Specific env arguments can be set to None
     utensil_outside_above_mount: Pose = None
