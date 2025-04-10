@@ -541,7 +541,7 @@ Write a VERY BRIEF summary of all the changes for a non-technical end user. Make
             skill = self.hla_name_to_hla["PickTool"]
             skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
             skill.close_gripper()
-            skill.move_to_joint_positions(self.sim.scene_description.above_plate_pos)
+            skill.move_to_joint_positions(self.sim.scene_description.plate_gaze_pos)
             self.perception_interface.perceive_plate_pickup_poses()
             skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
         
@@ -735,7 +735,9 @@ if __name__ == "__main__":
                 break
             else:
                 print("Invalid input. Please enter 'y' or 'n'.")
-        
+
+        skill.move_to_joint_positions(runner.sim.scene_description.absolute_before_transfer_pos)
+       
         # Send the feedback and sync the environment.
         mp_state = runner.get_multitask_personalization_state(occluded=occluded)
         _publish_mp_state(mp_state)

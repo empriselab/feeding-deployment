@@ -11,8 +11,12 @@ initial_joints:
   values: [0.0, -0.34903602299465675, -3.141591055693139, -2.5482592711638783, 0.0, -0.872688061814757, 1.57075917569769, 0.8, 0.8, 0.8, 0.8, -0.8, -0.8]
 
 # Feeding task constants
+plate_gaze_pos:
+  description: "Gaze configuration, the plate should be visible from this configuration"
+  type: "joint_positions"
+  values: [0.3055459366033905, 0.6053777947719071, 1.1660526995921257, -1.0548844993670023, 0.5442964308267175, -0.5540525552955726, -3.042111868966537]
 above_plate_pos: 
-  description: "Above plate configuration, the plate should be visible from this configuration"
+  description: "Above plate configuration"
   type: "joint_positions"
   values: [-2.86495014, -1.61460533, -2.6115943, -1.37673391, 1.11842806, -1.17904586, -2.6957422]
 before_transfer_pos: 

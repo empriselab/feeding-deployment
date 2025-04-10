@@ -71,6 +71,7 @@ class SceneDescription:
     retract_pos: JointPositions
 
     # Feeding task constants
+    plate_gaze_pos: JointPositions
     above_plate_pos: JointPositions
     before_transfer_pos: JointPositions
     absolute_before_transfer_pos: JointPositions
