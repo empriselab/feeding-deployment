@@ -1,14 +1,11 @@
-# Description: This script is used to detect ArUco markers and estimate their pose in the camera frame.
-
-# python imports
-import os, sys
+import os
+import sys
 import cv2
 import numpy as np
 import time
 import math
 from scipy.spatial.transform import Rotation
 
-# ros imports
 import rospy
 import message_filters
 from sensor_msgs.msg import Image, CameraInfo
@@ -18,13 +15,17 @@ from geometry_msgs.msg import Point, Pose
 from visualization_msgs.msg import MarkerArray, Marker
 
 from feeding_deployment.control.robot_controller.arm_client import ArmInterfaceClient
-from feeding_deployment.control.robot_controller.command_interface import CartesianCommand, JointCommand, CloseGripperCommand, OpenGripperCommand
+from feeding_deployment.control.robot_controller.command_interface import (
+    CartesianCommand,
+    JointCommand,
+    CloseGripperCommand,
+    OpenGripperCommand,
+)
 from geometry_msgs.msg import TransformStamped
 from collections import deque
 
-# from feeding_deployment.head_perception.ros_wrapper import HeadPerceptionROSWrapper
-
 from geometry_msgs.msg import Pose as pose_msg
+
 
 class TFInterface:
     def __init__(self):
@@ -34,9 +35,7 @@ class TFInterface:
         time.sleep(1.0)
 
     def updateTF(self, source_frame, target_frame, pose):
-
         t = TransformStamped()
-
         t.header.stamp = rospy.Time.now()
         t.header.frame_id = source_frame
         t.child_frame_id = target_frame
@@ -53,7 +52,9 @@ class TFInterface:
 
         self.broadcaster.sendTransform(t)
 
-    def get_frame_to_frame_transform(self, camera_info_data, frame_A = "base_link", target_frame = "camera_color_optical_frame"):
+    def get_frame_to_frame_transform(
+        self, camera_info_data, frame_A="base_link", target_frame="camera_color_optical_frame"
+    ):
         stamp = camera_info_data.header.stamp
         try:
             transform = self.tfBuffer.lookup_transform(
@@ -67,7 +68,6 @@ class TFInterface:
             tf2_ros.ConnectivityException,
             tf2_ros.ExtrapolationException,
         ):
-            # print("Exexption finding transform between base_link and", target_frame)
             return None
 
     def make_homogeneous_transform(self, transform):
@@ -88,7 +88,6 @@ class TFInterface:
             ]
         ).reshape(1, 3)
         A_to_B[3, 3] = 1
-
         return A_to_B
 
     def pose_to_matrix(self, pose):
@@ -99,7 +98,7 @@ class TFInterface:
         pose_matrix[:3, :3] = Rotation.from_quat(orientation).as_matrix()
         pose_matrix[3, 3] = 1
         return pose_matrix
-    
+
     def matrix_to_pose(self, mat):
         position = mat[:3, 3]
         orientation = Rotation.from_matrix(mat[:3, :3]).as_quat()
@@ -108,105 +107,157 @@ class TFInterface:
 
 class ArUcoPerception(TFInterface):
     def __init__(self, num_perception_samples=25):
-        # rospy.init_node('ArUcoPerception')
-
+        """
+        We track separate queues for each marker ID we care about.
+        Also set up multiple publishers:
+         - A single "generic" publisher: /aruco_pose
+         - One publisher per marker ID: /aruco_pose_0, /aruco_pose_1
+        """
         self.num_perception_samples = num_perception_samples
-        self.bridge = CvBridge()
-        self.aruco_pose_queue = deque(maxlen=num_perception_samples)
-        self.aruco_pose_publisher =  rospy.Publisher("/aruco_pose", Pose, queue_size=10)
+        self.pose_queues = {
+            0: deque(maxlen=num_perception_samples),
+            1: deque(maxlen=num_perception_samples),
+        }
 
-        self.color_image_sub = message_filters.Subscriber('/camera/color/image_raw', Image)
-        self.camera_info_sub = message_filters.Subscriber('/camera/color/camera_info', CameraInfo)
-        self.depth_image_sub = message_filters.Subscriber('/camera/aligned_depth_to_color/image_raw', Image)
-        ts = message_filters.TimeSynchronizer([self.color_image_sub, self.camera_info_sub, self.depth_image_sub], 1)
+        self.bridge = CvBridge()
+
+        # Existing (generic) publisher
+        self.aruco_pose_publisher = rospy.Publisher("/aruco_pose", Pose, queue_size=10)
+
+        # New, marker-specific publishers
+        self.aruco_pose_publisher_0 = rospy.Publisher("/aruco_pose_0", Pose, queue_size=10)
+        self.aruco_pose_publisher_1 = rospy.Publisher("/aruco_pose_1", Pose, queue_size=10)
+
+        # Subscribe to color and depth + camera info
+        self.color_image_sub = message_filters.Subscriber("/camera/color/image_raw", Image)
+        self.camera_info_sub = message_filters.Subscriber("/camera/color/camera_info", CameraInfo)
+        self.depth_image_sub = message_filters.Subscriber(
+            "/camera/aligned_depth_to_color/image_raw", Image
+        )
+        ts = message_filters.TimeSynchronizer(
+            [self.color_image_sub, self.camera_info_sub, self.depth_image_sub], 1
+        )
         ts.registerCallback(self.rgbdCallback)
 
         super().__init__()
 
     def rgbdCallback(self, rgb_image_msg, camera_info_msg, depth_image_msg):
-
         try:
-            # Convert your ROS Image message to OpenCV2
             rgb_image = self.bridge.imgmsg_to_cv2(rgb_image_msg, "bgr8")
             depth_image = self.bridge.imgmsg_to_cv2(depth_image_msg, "32FC1")
         except CvBridgeError as e:
             print(e)
-
-        dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
-        parameters =  cv2.aruco.DetectorParameters()
-        detector = cv2.aruco.ArucoDetector(dictionary, parameters)
-        (corners, ids, rejected) = detector.detectMarkers(rgb_image)
-
-        if len(corners) > 0:
-            ids = ids.flatten()
-            for (markerCorner, markerID) in zip(corners, ids):
-                corners = markerCorner.reshape((4, 2))
-        else:
-            return None  
-
-        landmarks = corners
-        landmarks_model = np.array([[-0.04,0.04,0],[0.04,0.04,0],[0.04,-0.04,0],[-0.04,-0.04,0]])
-
-        # convert  2d landmarks to 3d world points 
-        valid_landmarks_model = []
-        valid_landmarks_world = []
-        for i in range(landmarks.shape[0]):
-            validity, point = self.pixel2World(camera_info_msg, landmarks[i,0].astype(int), landmarks[i,1].astype(int), depth_image)
-            if validity:
-                valid_landmarks_model.append(landmarks_model[i])
-                valid_landmarks_world.append(point)
-
-        if len(valid_landmarks_world) < 4:
-            # print("Not enough landmarks to fit model.")
             return
 
-        valid_landmarks_model = np.array(valid_landmarks_model)
-        valid_landmarks_world = np.array(valid_landmarks_world)
+        # Detect ArUco markers
+        dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
+        parameters = cv2.aruco.DetectorParameters()
+        detector = cv2.aruco.ArucoDetector(dictionary, parameters)
+        corners, ids, rejected = detector.detectMarkers(rgb_image)
 
-        scale_fixed = 1.0
-        s, ret_R, ret_t = self.kabschUmeyama(valid_landmarks_world, valid_landmarks_model, scale_fixed)
+        if len(corners) == 0:
+            return
+        
+        ids = ids.flatten()
+        transform_camera_to_base = self.get_frame_to_frame_transform(camera_info_msg)
+        if transform_camera_to_base is None:
+            return
 
-        # print("landmarks_selected_model[:,:,np.newaxis].shape: ",landmarks_model[:,:,np.newaxis].shape)
-        # print("ret_R.shape: ",ret_R.shape)
-        landmarks_model_camera_frame = ret_t.reshape(3,1) + s * (ret_R @ landmarks_model[:,:,np.newaxis])
-        landmarks_model_camera_frame = np.squeeze(landmarks_model_camera_frame)
+        base_to_camera = self.make_homogeneous_transform(transform_camera_to_base)
 
-        # get things into world frame
+        # For each marker detected, check its ID and compute pose
+        for (markerCorner, markerID) in zip(corners, ids):
+            # Only handle certain IDs
+            if markerID not in [0, 1]:
+                continue
 
-        tag_pos = np.append(np.mean(valid_landmarks_world, axis=0), 1) # pad with 1 for homogeneous coordinate
+            # Each markerCorner is shape (1,4,2); reshape to (4,2)
+            marker_corners = markerCorner.reshape((4, 2))
 
-        transform = self.get_frame_to_frame_transform(camera_info_msg)
+            # Our known 3D layout of the corners in marker coords
+            # (assuming 8cm side length, each corner is +/- 0.04 along x,y)
+            landmarks_model = np.array(
+                [
+                    [-0.04,  0.04, 0],
+                    [ 0.04,  0.04, 0],
+                    [ 0.04, -0.04, 0],
+                    [-0.04, -0.04, 0],
+                ]
+            )
 
-        if transform is not None:   
-            base_to_camera = self.make_homogeneous_transform(transform)
+            # Convert corners from pixel to 3D (camera frame)
+            valid_landmarks_model = []
+            valid_landmarks_world = []
+            for i in range(marker_corners.shape[0]):
+                u, v = marker_corners[i, 0], marker_corners[i, 1]
+                valid, pt_world = self.pixel2World(
+                    camera_info_msg, int(u), int(v), depth_image
+                )
+                if valid:
+                    valid_landmarks_model.append(landmarks_model[i])
+                    valid_landmarks_world.append(pt_world)
 
-            # cam to tag homogeneous transform
-            camera_to_tag = np.zeros((4, 4))
-            camera_to_tag[:3, :3] = ret_R
-            camera_to_tag[:3, 3] = np.array([ tag_pos[0], tag_pos[1], tag_pos[2] ]).reshape(1, 3)
-            camera_to_tag[3, 3] = 1 
+            if len(valid_landmarks_world) < 4:
+                # Not enough corners to fit the model for this marker
+                continue
 
-            # base to tag homogeneous transform and update tf
-            base_to_tag = np.dot(base_to_camera, camera_to_tag)
-            self.updateTF("base_link", "AR_tag", base_to_tag)
-            self.update_aruco_pose(base_to_tag)
+            valid_landmarks_model = np.array(valid_landmarks_model)
+            valid_landmarks_world = np.array(valid_landmarks_world)
 
-    def update_aruco_pose(self, aruco_pose_mat):
-        aruco_pose = self.matrix_to_pose(aruco_pose_mat)
-        self.aruco_pose_queue.append(aruco_pose)
-        # Wait to update until we have at least num_perception_samples samples.
-        if len(self.aruco_pose_queue) >= self.num_perception_samples:
-            running_average_position = np.mean([pose[0] for pose in self.aruco_pose_queue], axis=0)
-            running_average_orientation = np.mean([pose[1] for pose in self.aruco_pose_queue], axis=0)
-            p = Pose()
-            p.position.x = running_average_position[0]
-            p.position.y = running_average_position[1]
-            p.position.z = running_average_position[2]
-            p.orientation.x = running_average_orientation[0]
-            p.orientation.y = running_average_orientation[1]
-            p.orientation.z = running_average_orientation[2]
-            p.orientation.w = running_average_orientation[3]
-            self.aruco_pose_publisher.publish(p)
+            # We do a Kabsch-Umeyama to find rotation + translation
+            scale_fixed = 1.0
+            s, R_est, t_est = self.kabschUmeyama(
+                valid_landmarks_world, valid_landmarks_model, scale_fixed
+            )
+
+            # The average of the 3D corners in camera coords
+            tag_pos_camframe = np.mean(valid_landmarks_world, axis=0)
+            camera_to_tag = np.eye(4)
+            camera_to_tag[:3, :3] = R_est
+            camera_to_tag[:3, 3] = tag_pos_camframe
+
+            # Then transform that to the base frame
+            base_to_tag = base_to_camera @ camera_to_tag
+
+            # Broadcast a TF named AR_tag_<markerID>
+            self.updateTF("base_link", f"AR_tag_{markerID}", base_to_tag)
+
+            # Update the running average pose for this marker, then publish
+            self.update_aruco_pose(base_to_tag, markerID)
+
+    def update_aruco_pose(self, aruco_pose_mat, markerID):
+        """Store and publish the running-averaged pose for each marker."""
+        pose_tuple = self.matrix_to_pose(aruco_pose_mat)
+        self.pose_queues[markerID].append(pose_tuple)
+
+        # Wait until we have at least num_perception_samples for that marker
+        if len(self.pose_queues[markerID]) < self.num_perception_samples:
+            return
+
+        # Compute running-average position/orientation
+        positions = [p[0] for p in self.pose_queues[markerID]]
+        orientations = [p[1] for p in self.pose_queues[markerID]]
+
+        avg_pos = np.mean(positions, axis=0)
+        avg_ori = np.mean(orientations, axis=0)
+
+        p = Pose()
+        p.position.x = avg_pos[0]
+        p.position.y = avg_pos[1]
+        p.position.z = avg_pos[2]
+        p.orientation.x = avg_ori[0]
+        p.orientation.y = avg_ori[1]
+        p.orientation.z = avg_ori[2]
+        p.orientation.w = avg_ori[3]
+
+        # 1) Publish to the existing (generic) publisher
+        self.aruco_pose_publisher.publish(p)
+
+        # 2) Publish to the marker‑ID‑specific publisher
+        if markerID == 0:
+            self.aruco_pose_publisher_0.publish(p)
+        elif markerID == 1:
+            self.aruco_pose_publisher_1.publish(p)
 
     def pixel2World(self, camera_info, image_x, image_y, depth_image):
 
@@ -272,15 +323,9 @@ class ArUcoPerception(TFInterface):
         t = np.mean(A, axis=0) - R.as_matrix()@np.mean(scaled_B, axis=0)
 
         return scale, R.as_matrix(), t
-    
-if __name__ == '__main__':
 
-    # target_position = (0.61, -0.12, 0.6)
-    # target_orientation = (0.56, 0.37, 0.49, 0.55)
-    # cmd = CartesianCommand(target_position, target_orientation)
-    # robot_interface = ArmInterfaceClient()
-    # robot_interface.execute_command(cmd)
 
-    rospy.init_node('ArUcoPerception')
+if __name__ == "__main__":
+    rospy.init_node("ArUcoPerception")
     aruco_perception = ArUcoPerception()
     rospy.spin()
