@@ -737,6 +737,7 @@ if __name__ == "__main__":
         # Get the initial state to pass to multitask_personalization.
         mp_state = runner.get_multitask_personalization_state(user_request="food", actively_detect_plate=True)
         _publish_mp_state(mp_state)
+        assert np.allclose(runner.scene_description.plate_delta_xy, (0, 0)), "The CSP solver thinks that the plate is not reachable by the robot."
 
         # Run the first bite sequence (no plate movement).
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.utensil,)))
