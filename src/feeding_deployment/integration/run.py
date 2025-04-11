@@ -759,19 +759,20 @@ if __name__ == "__main__":
 
         pick_tool.move_to_joint_positions(runner.sim.scene_description.absolute_before_transfer_pos)
        
-        # # Send the feedback and sync the environment.
+        # Send the feedback and sync the environment.
         mp_state = runner.get_multitask_personalization_state(user_request="food", occluded=occluded)
         _publish_mp_state(mp_state)
 
-        # # Move the plate.
+        # Move the plate.
         stow_tool = runner.hla_name_to_hla["StowTool"]
         runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.plate,)))
         runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.plate,)))
 
         # Run the second bite sequence.
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.utensil,)))
+        runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.utensil,)))
         pick_tool.move_to_joint_positions(runner.sim.scene_description.above_plate_pos)
         pick_tool.move_to_joint_positions(runner.sim.scene_description.absolute_before_transfer_pos)
+        runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.utensil,)))
 
         # Ask the experimenter to put the drink on the table.
         input("Put the drink on the table, then press enter")

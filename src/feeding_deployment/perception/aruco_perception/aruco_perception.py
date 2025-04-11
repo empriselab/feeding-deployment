@@ -146,6 +146,8 @@ class ArUcoPerception(TFInterface):
 
         assert len(markerID) == 1
         markerID = markerID[0]
+        if markerID not in [0, 1]:
+            return
         markerCorner = markerCorner.reshape((4, 2))
 
         landmarks = markerCorner
