@@ -702,6 +702,7 @@ if __name__ == "__main__":
         #                                < MULTITASK PERSONALIZATION DEMO >                                 #
         #####################################################################################################
 
+
         import base64
         
         num_scene_spec_updates = 0
@@ -736,7 +737,7 @@ if __name__ == "__main__":
         # Get the initial state to pass to multitask_personalization.
         mp_state = runner.get_multitask_personalization_state(user_request="food", actively_detect_plate=True)
         _publish_mp_state(mp_state)
-        
+
         # Run the first bite sequence (no plate movement).
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.utensil,)))
         pick_tool = runner.hla_name_to_hla["PickTool"]
