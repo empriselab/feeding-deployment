@@ -546,8 +546,9 @@ Write a VERY BRIEF summary of all the changes for a non-technical end user. Make
             skill.move_to_joint_positions(self.sim.scene_description.plate_gaze_pos)
             self.perception_interface.perceive_plate_pickup_poses()
             skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
-            last_plate_poses = self.perception_interface.get_last_plate_pickup_configs()
-            mp_state["plate_pose"] = last_plate_poses["plate_pose"]
+
+        if self.perception_interface.last_plate_poses:
+            mp_state["plate_pose"] = self.perception_interface.last_plate_poses
 
         if actively_detect_drink:
             skill = self.hla_name_to_hla["PickTool"]
@@ -556,8 +557,9 @@ Write a VERY BRIEF summary of all the changes for a non-technical end user. Make
             skill.move_to_joint_positions(self.sim.scene_description.drink_gaze_pos)
             self.perception_interface.perceive_drink_pickup_poses()
             skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
-            last_drink_poses, _ = self.perception_interface.get_last_drink_pickup_configs()
-            mp_state["drink_pose"] = last_drink_poses["drink_pose"]
+
+        if self.perception_interface.last_drink_poses:
+            mp_state["drink_pose"] =self.perception_interface.last_drink_poses
 
         mp_state["robot_joints"] = self.perception_interface.get_robot_joints()
 
@@ -814,12 +816,17 @@ if __name__ == "__main__":
         input("Put the drink on the table, then press enter")
 
         # Detect the drink and plan to move it and the plate.
-        mp_state = runner.get_multitask_personalization_state(user_request="prepare",
-                                                              actively_detect_plate=True,
+        enable_plate_repositioning = False  # TODO change this for video
+        if enable_plate_repositioning:
+            user_request = "prepare"
+        else:
+            user_request = "prepare-drink-only"
+        mp_state = runner.get_multitask_personalization_state(user_request=user_request,
+                                                              actively_detect_plate=enable_plate_repositioning,
                                                               actively_detect_drink=True)
         _publish_mp_state(mp_state)
 
-        if not np.allclose(runner.scene_description.plate_delta_xy, (0, 0), atol=1e-3):
+        if enable_plate_repositioning and not np.allclose(runner.scene_description.plate_delta_xy, (0, 0), atol=1e-3):
             # Make room for the drink by moving the plate again.
             runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.plate,)))
             runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.plate,)))

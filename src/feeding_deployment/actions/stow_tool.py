@@ -75,7 +75,7 @@ class StowToolHLA(HighLevelAction):
         x_movement, y_movement = self.sim.scene_description.drink_delta_xy
         self.sim.scene_description.drink_delta_xy = (0, 0)
 
-        for value in ['inside_top_pose', 'place_inside_bottom_pose', 'place_pre_grasp_pose']:
+        for value in ['drink_pose', 'inside_top_pose', 'place_inside_bottom_pose', 'place_pre_grasp_pose']:
             last_drink_poses[value].position[0] += y_movement
             last_drink_poses[value].position[1] -= x_movement
 
@@ -127,7 +127,7 @@ class StowToolHLA(HighLevelAction):
         # y_movement = input("Input the amount of y movement (away from you) for the plate: ")
         # y_movement = float(y_movement)
 
-        for value in ['inside_top_pose', 'place_inside_bottom_pose', 'place_pre_grasp_pose']:
+        for value in ['plate_pose', 'inside_top_pose', 'place_inside_bottom_pose', 'place_pre_grasp_pose']:
             last_plate_poses[value].position[0] += y_movement
             last_plate_poses[value].position[1] -= x_movement
 
