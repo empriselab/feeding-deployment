@@ -819,9 +819,6 @@ if __name__ == "__main__":
                                                               actively_detect_drink=True)
         _publish_mp_state(mp_state)
 
-        # The plate pre-grasp pose is going to be wrong now for some reason...
-        import ipdb; ipdb.set_trace()
-
         if not np.allclose(runner.scene_description.plate_delta_xy, (0, 0), atol=1e-3):
             # Make room for the drink by moving the plate again.
             runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.plate,)))
