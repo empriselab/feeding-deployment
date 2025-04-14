@@ -405,7 +405,7 @@ class PerceptionInterface:
             goal_pose = Pose(goal_pose[0], new_rot.as_quat())
         elif override_angles == "plate":
             rot = R.from_quat(goal_pose[1])
-            roll = np.pi
+            roll = 0
             pitch = 0
             _, _, yaw = rot.as_euler("xyz")
             new_rot = R.from_euler("xyz", [roll, pitch, yaw])
@@ -534,7 +534,7 @@ class PerceptionInterface:
             self.aruco_pose = (position, orientation)
 
             plate_poses  = {}
-            plate_poses['plate_pose'] = self.get_aruco_relative_pose(get_plate_transform(), override_angles=None)
+            plate_poses['plate_pose'] = self.get_aruco_relative_pose(get_plate_transform(), override_angles="plate")
             plate_poses['pre_grasp_pose'] = self.get_aruco_relative_pose(get_pre_grasp_transform(), "plate")
             plate_poses['inside_bottom_pose'] = self.get_aruco_relative_pose(get_inside_bottom_transform(), "plate")
             plate_poses['inside_top_pose'] = self.get_aruco_relative_pose(get_inside_top_transform(), "plate")

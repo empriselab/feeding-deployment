@@ -739,6 +739,8 @@ if __name__ == "__main__":
         _publish_mp_state(mp_state)
         assert np.allclose(runner.scene_description.plate_delta_xy, (0, 0)), "The CSP solver thinks that the plate is not reachable by the robot."
 
+        import ipdb; ipdb.set_trace()
+
         pick_tool = runner.hla_name_to_hla["PickTool"]
         stow_tool = runner.hla_name_to_hla["StowTool"]
 
