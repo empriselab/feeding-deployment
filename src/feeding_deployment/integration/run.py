@@ -548,7 +548,7 @@ Write a VERY BRIEF summary of all the changes for a non-technical end user. Make
             skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
 
         if self.perception_interface.last_plate_poses:
-            mp_state["plate_pose"] = self.perception_interface.last_plate_poses
+            mp_state["plate_pose"] = self.perception_interface.last_plate_poses["plate_pose"]
 
         if actively_detect_drink:
             skill = self.hla_name_to_hla["PickTool"]
@@ -559,7 +559,7 @@ Write a VERY BRIEF summary of all the changes for a non-technical end user. Make
             skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
 
         if self.perception_interface.last_drink_poses:
-            mp_state["drink_pose"] =self.perception_interface.last_drink_poses
+            mp_state["drink_pose"] =self.perception_interface.last_drink_poses["drink_pose"]
 
         mp_state["robot_joints"] = self.perception_interface.get_robot_joints()
 
