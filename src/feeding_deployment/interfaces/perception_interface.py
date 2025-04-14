@@ -405,6 +405,13 @@ class PerceptionInterface:
             goal_pose = Pose(goal_pose[0], new_rot.as_quat())
         elif override_angles == "plate":
             rot = R.from_quat(goal_pose[1])
+            roll = np.pi
+            pitch = 0
+            _, _, yaw = rot.as_euler("xyz")
+            new_rot = R.from_euler("xyz", [roll, pitch, yaw])
+            goal_pose = Pose(goal_pose[0], new_rot.as_quat())
+        elif override_angles == "plate-pose":
+            rot = R.from_quat(goal_pose[1])
             roll = 0
             pitch = 0
             _, _, yaw = rot.as_euler("xyz")
@@ -534,7 +541,7 @@ class PerceptionInterface:
             self.aruco_pose = (position, orientation)
 
             plate_poses  = {}
-            plate_poses['plate_pose'] = self.get_aruco_relative_pose(get_plate_transform(), override_angles="plate")
+            plate_poses['plate_pose'] = self.get_aruco_relative_pose(get_plate_transform(), override_angles="plate-pose")
             plate_poses['pre_grasp_pose'] = self.get_aruco_relative_pose(get_pre_grasp_transform(), "plate")
             plate_poses['inside_bottom_pose'] = self.get_aruco_relative_pose(get_inside_bottom_transform(), "plate")
             plate_poses['inside_top_pose'] = self.get_aruco_relative_pose(get_inside_top_transform(), "plate")
@@ -543,7 +550,7 @@ class PerceptionInterface:
             plate_poses['place_pre_grasp_pose'] = self.get_aruco_relative_pose(get_place_pre_grasp_transform(), "plate")
 
             self._aruco_perception.updateTF("base_link", "plate", self.pose_to_matrix(plate_poses['plate_pose']))
-
+            self._aruco_perception.updateTF("base_link", "pre_grasp_pose", self.pose_to_matrix(plate_poses['pre_grasp_pose']))
 
         self.last_plate_poses = plate_poses
 
