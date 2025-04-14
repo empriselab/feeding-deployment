@@ -302,7 +302,7 @@ class PerceptionInterface:
         def get_drink_transform():
             tf = np.zeros((4, 4))
             tf[:3, :3] = R.from_euler("xyz", [0, 0, np.pi / 2]).as_matrix()
-            tf[:3, 3] = np.array([0.0, -0.1, 0.02]) 
+            tf[:3, 3] = np.array([0.0, 0.0, 0.0]) 
             tf[3, 3] = 1
             return tf
 
@@ -361,6 +361,9 @@ class PerceptionInterface:
             drink_poses['post_grasp_pose'] = self.get_aruco_relative_pose(get_post_grasp_pose(), "drink")
             drink_poses['place_inside_bottom_pose'] = self.get_aruco_relative_pose(get_place_inside_bottom_transform(), "drink")
             drink_poses['place_pre_grasp_pose'] = self.get_aruco_relative_pose(get_place_pre_grasp_transform(), "drink")
+
+            self._aruco_perception.updateTF("base_link", "drink_pose", self.pose_to_matrix(drink_poses['drink_pose']))
+            self._aruco_perception.updateTF("base_link", "pre_grasp_pose", self.pose_to_matrix(drink_poses['pre_grasp_pose']))
 
         self.last_drink_poses = drink_poses
 

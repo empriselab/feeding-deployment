@@ -743,20 +743,34 @@ if __name__ == "__main__":
         stow_tool = runner.hla_name_to_hla["StowTool"]
 
         # TEST TWO PLATE MOVES IN A ROW
-        runner.scene_description.plate_delta_xy = (0.2, 0.0)
-        runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.plate,)))
-        runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.plate,)))
+        # runner.scene_description.plate_delta_xy = (0.2, 0.0)
+        # runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.plate,)))
+        # runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.plate,)))
 
-        mp_state = runner.get_multitask_personalization_state(user_request="food", actively_detect_plate=True)
-        _publish_mp_state(mp_state)
-        assert np.allclose(runner.scene_description.plate_delta_xy, (0, 0)), "The CSP solver thinks that the plate is not reachable by the robot."
+        # mp_state = runner.get_multitask_personalization_state(user_request="food", actively_detect_plate=True)
+        # _publish_mp_state(mp_state)
+        # assert np.allclose(runner.scene_description.plate_delta_xy, (0, 0)), "The CSP solver thinks that the plate is not reachable by the robot."
 
-        runner.scene_description.plate_delta_xy = (-0.2, 0.0)
-        runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.plate,)))
-        runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.plate,)))
+        # runner.scene_description.plate_delta_xy = (-0.2, 0.0)
+        # runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.plate,)))
+        # runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.plate,)))
 
-        import ipdb; ipdb.set_trace()
+        # import ipdb; ipdb.set_trace()
         # END TEST
+
+        # TEST DRINK MOVE
+        # mp_state = runner.get_multitask_personalization_state(user_request="drink", actively_detect_drink=True)
+        # _publish_mp_state(mp_state)
+        # import ipdb; ipdb.set_trace()
+        # assert np.allclose(runner.scene_description.drink_delta_xy, (0, 0)), "The CSP solver thinks that the drink is not reachable by the robot."
+
+        # runner.scene_description.drink_delta_xy = (0.0, 0.1)
+        # runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.drink,)))
+        # runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.drink,)))
+
+        # import ipdb; ipdb.set_trace()
+         # END TEST
+
 
         # Run the first bite sequence (no plate movement).
         runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.utensil,)))
