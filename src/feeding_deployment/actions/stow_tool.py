@@ -79,7 +79,7 @@ class StowToolHLA(HighLevelAction):
             last_drink_poses[value].position[0] += y_movement
             last_drink_poses[value].position[1] -= x_movement
 
-        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
+        self.move_to_joint_positions(self.sim.scene_description.drink_before_transfer_pos)
         self.move_to_ee_pose(last_drink_poses['inside_top_pose'])
         self.ungrasp_tool("drink")
         self.move_to_ee_pose(last_drink_poses['place_inside_bottom_pose'])

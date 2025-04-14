@@ -96,7 +96,7 @@ class PickToolHLA(HighLevelAction):
 
         self.perception_interface.record_drink_pickup_joint_pos()
 
-        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
+        self.move_to_joint_positions(self.sim.scene_description.drink_before_transfer_pos)
 
     def pick_wipe(self, speed: str) -> None:
         assert self.sim.held_object_name is None

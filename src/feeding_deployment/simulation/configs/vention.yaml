@@ -32,6 +32,14 @@ before_transfer_pose:
   description: ""
   type: "ee_pose"
   values: [0.504, 0.303, 0.529, 0.0, 0.707, 0.707, 0]
+drink_before_transfer_pos: 
+  description: "Ready to transfer configuration, the user's face should be visible from this configuration"
+  type: "joint_positions"
+  values: [-2.86554642, -1.61951779, -2.60986085, -1.37302839, 1.11779249, -1.18028264, 2.05515862]
+drink_before_transfer_pose:
+  description: ""
+  type: "ee_pose"
+  values: [0.504, 0.303, 0.529, 0.0, 0.707, 0.707, 0]
 
 # Utensil mount constants
 utensil_inside_mount: 

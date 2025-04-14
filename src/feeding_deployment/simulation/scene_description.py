@@ -74,8 +74,10 @@ class SceneDescription:
     plate_gaze_pos: JointPositions
     above_plate_pos: JointPositions
     before_transfer_pos: JointPositions
+    drink_before_transfer_pos: JointPositions
     absolute_before_transfer_pos: JointPositions
     before_transfer_pose: Pose
+    drink_before_transfer_pose: Pose
 
     # Utensil mount constants
     utensil_inside_mount: Pose
