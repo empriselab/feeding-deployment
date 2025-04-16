@@ -417,7 +417,7 @@ class PerceptionInterface:
             roll = 0
             pitch = 0
             _, _, yaw = rot.as_euler("xyz")
-            new_rot = R.from_euler("xyz", [roll, pitch, yaw])
+            new_rot = R.from_euler("xyz", [roll, pitch, yaw + np.pi])
             goal_pose = Pose(goal_pose[0], new_rot.as_quat())
         
         return goal_pose
