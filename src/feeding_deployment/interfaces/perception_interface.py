@@ -364,6 +364,7 @@ class PerceptionInterface:
             drink_poses['place_pre_grasp_pose'] = self.get_aruco_relative_pose(get_place_pre_grasp_transform(), "drink")
 
         self.last_drink_poses = drink_poses
+        self.sync_rviz()
 
         return drink_poses
     
@@ -551,6 +552,7 @@ class PerceptionInterface:
             plate_poses['place_pre_grasp_pose'] = self.get_aruco_relative_pose(get_place_pre_grasp_transform(), "plate")
 
         self.last_plate_poses = plate_poses
+        self.sync_rviz()
 
         return plate_poses
     

@@ -112,7 +112,7 @@ class ArUcoPerception(TFInterface):
 
         self.num_perception_samples = num_perception_samples
         self.bridge = CvBridge()
-        self.aruco_pose_queue = deque(maxlen=num_perception_samples)
+        self.aruco_pose_queues = {0: deque(maxlen=num_perception_samples), 1: deque(maxlen=num_perception_samples)}
         self.aruco_pose_publisher =  rospy.Publisher("/aruco_pose", Pose, queue_size=10)
         self.aruco_pose_publisher_0 = rospy.Publisher("/aruco_pose_0", Pose, queue_size=10)
         self.aruco_pose_publisher_1 = rospy.Publisher("/aruco_pose_1", Pose, queue_size=10)
@@ -195,20 +195,20 @@ class ArUcoPerception(TFInterface):
             # base to tag homogeneous transform and update tf
             base_to_tag = np.dot(base_to_camera, camera_to_tag)
             self.updateTF("base_link", f"AR_tag_{markerID}", base_to_tag)
-            marker_pub = {
-                0: self.aruco_pose_publisher_0,
-                1: self.aruco_pose_publisher_1,
-            }[markerID]
-            for publisher in [self.aruco_pose_publisher, marker_pub]:
-                self.update_aruco_pose(base_to_tag, publisher)
+            self.update_aruco_pose(base_to_tag, markerID)
 
-    def update_aruco_pose(self, aruco_pose_mat, publisher):
+    def update_aruco_pose(self, aruco_pose_mat, markerID):
         aruco_pose = self.matrix_to_pose(aruco_pose_mat)
-        self.aruco_pose_queue.append(aruco_pose)
+        marker_pub = {
+            0: self.aruco_pose_publisher_0,
+            1: self.aruco_pose_publisher_1,
+        }[markerID]
+        aruco_pose_queue = self.aruco_pose_queues[markerID]
+        aruco_pose_queue.append(aruco_pose)
         # Wait to update until we have at least num_perception_samples samples.
-        if len(self.aruco_pose_queue) >= self.num_perception_samples:
-            running_average_position = np.mean([pose[0] for pose in self.aruco_pose_queue], axis=0)
-            running_average_orientation = np.mean([pose[1] for pose in self.aruco_pose_queue], axis=0)
+        if len(aruco_pose_queue) >= self.num_perception_samples:
+            running_average_position = np.mean([pose[0] for pose in aruco_pose_queue], axis=0)
+            running_average_orientation = np.mean([pose[1] for pose in aruco_pose_queue], axis=0)
             p = Pose()
             p.position.x = running_average_position[0]
             p.position.y = running_average_position[1]
@@ -217,7 +217,8 @@ class ArUcoPerception(TFInterface):
             p.orientation.y = running_average_orientation[1]
             p.orientation.z = running_average_orientation[2]
             p.orientation.w = running_average_orientation[3]
-            publisher.publish(p)
+            for publisher in [self.aruco_pose_publisher, marker_pub]:
+                publisher.publish(p)
 
     def pixel2World(self, camera_info, image_x, image_y, depth_image):
 
