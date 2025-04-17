@@ -336,6 +336,7 @@ class PerceptionInterface:
 
         def get_place_pre_grasp_transform():
             tf = get_pre_grasp_transform()
+            tf[2, 3] = 0.25
             # tf[1, 3] = 0.0
             return tf
                 
