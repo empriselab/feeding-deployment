@@ -97,7 +97,7 @@ class PickToolHLA(HighLevelAction):
             self.move_to_ee_pose(self.sim.scene_description.wipe_outside_above_mount)
         elif self.sim.scene_description.scene_label == "vention":
             self.move_to_joint_positions(self.sim.scene_description.wipe_neutral_pos)
-        self.move_to_joint_positions(self.sim.scene_description.retract_pos)
+        self.move_to_joint_positions(self.sim.scene_description.retract_utensil_forward_pos)
         self.move_to_joint_positions(self.sim.scene_description.absolute_before_transfer_pos)
         self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
         

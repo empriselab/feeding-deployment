@@ -69,6 +69,7 @@ class SceneDescription:
     # Robot constants
     initial_joints: JointPositions
     retract_pos: JointPositions
+    retract_utensil_forward_pos: JointPositions
 
     # Feeding task constants
     plate_gaze_pos: JointPositions
