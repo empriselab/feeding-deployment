@@ -812,9 +812,8 @@ if __name__ == "__main__":
             runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.drink,)))
 
         # Do a drink transfer.
-        # mp_state = runner.get_multitask_personalization_state(user_request="drink")
-        # _publish_mp_state(mp_state)
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
+        runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.drink,)))
+        runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.drink,)))
         
 
 
