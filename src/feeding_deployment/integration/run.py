@@ -825,47 +825,58 @@ if __name__ == "__main__":
             before_transfer_pose = mp_response["before_transfer_pose"]
             before_transfer_pos = mp_response["before_transfer_pos"]
             above_plate_pos = mp_response["above_plate_pos"]
+            occlusion_poi_relevance = mp_response["occlusion_poi_relevance"]
+
+            runner.update_scene_spec({"plate_delta_xy": plate_delta_xy})
+            runner.update_scene_spec({"before_transfer_pose": before_transfer_pose})
+            runner.update_scene_spec({"before_transfer_pos": before_transfer_pos})
+            runner.update_scene_spec({"above_plate_pos": above_plate_pos})
+            runner.update_scene_spec({"drink_delta_xy": drink_delta_xy})
 
             if not np.allclose(plate_delta_xy, [0, 0], atol=1e-3):
-                runner.update_scene_spec({"plate_delta_xy": plate_delta_xy})
-                runner.update_scene_spec({"before_transfer_pose": before_transfer_pose})
-                runner.update_scene_spec({"before_transfer_pos": before_transfer_pos})
-                runner.update_scene_spec({"above_plate_pos": above_plate_pos})
                 # pick and stow the plate
+                input("Press Enter to move the plate...")
                 runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.plate,)))
                 runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.plate,)))
 
             runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.utensil,)))
             pick_tool.move_to_joint_positions(runner.sim.scene_description.above_plate_pos)
+            pick_tool.move_to_joint_positions(runner.sim.scene_description.before_transfer_pos)
             pick_tool.move_to_joint_positions(runner.sim.scene_description.absolute_before_transfer_pos)
-
-            # ask user about plate occlusion
-            plate_occluded = input("Is the plate occluded? (y/n): ")
-            while plate_occluded not in ["y", "n"]:
-                plate_occluded = input("Please enter 'y' or 'n': ")
-
             runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.utensil,)))
 
             if not np.allclose(drink_delta_xy, [0, 0], atol=1e-3):
-                runner.update_scene_spec({"drink_delta_xy": drink_delta_xy})
                 # pick and stow the drink
+                input("Press Enter to move the drink...")
                 runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.drink,)))
                 runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.drink,)))
 
             runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.drink,)))
-
-            # ask user about drink occlusion
-            drink_occluded = input("Is the drink occluded? (y/n): ")
-            while drink_occluded not in ["y", "n"]:
-                drink_occluded = input("Please enter 'y' or 'n': ")
-
             runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.drink,)))
 
-            mp_response = _send_mp_request({"request_type": "occlusion_dataset",
-                                "plate_pose": plate_pose,
-                                "drink_pose": drink_pose,
-                                "plate_occluded": plate_occluded,
-                                "drink_occluded": drink_occluded}) 
+            occlusion_dataset_dict = {
+                "request_type": "occlusion_dataset",
+                "plate_pose": plate_pose,
+                "drink_pose": drink_pose,
+                "occlusion": {}
+            }
+            for poi, prediction in occlusion_poi_relevance.items():
+                print(f"Verifying the RELEVANCE of POI={poi} for this meal")
+                relevance = verify_predictions(prediction, [True, False])
+                if relevance:
+                    print(f"Verifying whether view was occluded for POI={poi} during FEEDING")
+                    plate_occlusion = verify_predictions(False, [True, False])
+                    print(f"Verifying whether view was occluded for POI={poi} during DRINKING")
+                    drink_occlusion = verify_predictions(False, [True, False])
+                else:
+                    plate_occlusion = False
+                    drink_occlusion = False
+                occlusion_dataset_dict["occlusion"][poi] = {
+                    "relevance": relevance,
+                    "plate_occlusion": plate_occlusion,
+                    "drink_occlusion": drink_occlusion,
+                }
+            mp_response = _send_mp_request(occlusion_dataset_dict)
             assert mp_response["response_type"] == "occlusion_dataset" 
         
         # start meal
