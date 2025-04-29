@@ -240,7 +240,7 @@ class FoodManipulationSkillLibrary:
         food_base = base_to_camera_transform @ food_base
         print("Food height detected: ", food_base[2,3])
         print("Plate height: ", self.plate_height)
-        food_base[2,3] = self.plate_height + 0.06 - dipping_depth
+        food_base[2,3] = self.plate_height + 0.08 - dipping_depth
         print("Food height after plate update: ", food_base[2,3])
         # food_base[2,3] = max(food_base[2,3] - dipping_depth, self.plate_height) 
         # magic number for skewering offset

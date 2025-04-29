@@ -158,7 +158,7 @@ parameters:
     - button
     - sense
     - auto_timeout
-  value: sense
+  value: auto_timeout
 - name: OutsideMouthDistance
   description: Distance from the feeding utensil tip to the user's mouth for the bite
     transfer.
@@ -285,7 +285,7 @@ parameters:
     - button
     - sense
     - auto_timeout
-  value: sense
+  value: auto_timeout
 - name: OutsideMouthDistance
   description: Distance from the straw tip to the user's mouth for the drink transfer.
   is_user_editable: true
@@ -421,7 +421,7 @@ parameters:
     - button
     - sense
     - auto_timeout
-  value: sense
+  value: auto_timeout
 - name: OutsideMouthDistance
   description: Distance from the wipe tip to the user's mouth for the wipe transfer.
   is_user_editable: true

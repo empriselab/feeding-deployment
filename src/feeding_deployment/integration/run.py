@@ -765,6 +765,12 @@ if __name__ == "__main__":
 
             return orderings
         
+
+        # Make sure web interface is running:
+        assert runner.web_interface is not None, "Run takes user commands from the web interface which is None."
+        runner.web_interface.ready_for_task_selection()
+        time.sleep(2)
+        
         @dataclass
         class Meal:
             meal_id: int
@@ -778,7 +784,7 @@ if __name__ == "__main__":
             Meal(2, "social with friend on left", "circular table", ["raw vegetables"], ["ranch dressing", "hummus"]),
             Meal(3, "watching TV in front", "circular table", ["potato wedges"], ["ketchup", "BBQ sauce"]),
             Meal(4, "personal", "circular table", ["carrot sticks"], ["ranch dressing", "hummus"]),
-            Meal(5, "social TV-watching (with TV in front) and with friend on left side", "rectangular table", ["tater tots"], ["ketchup", "BBQ sauce"]),
+            Meal(5, "social TV-watching (with TV in front) and with friend on left side", "rectangular table", ["tater tot"], ["ketchup", "BBQ sauce"])
         ]
 
         current_meal = MEALS[args.meal_id-1]
@@ -833,109 +839,156 @@ if __name__ == "__main__":
             runner.flair.inference_server.FOOD_CLASSES.append(dip)
             runner.flair.inference_server.FOOD_CATEGORIES.append("dip")
         runner.flair.user_preference = bite_ordering
-        
+
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.utensil,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.utensil,)))
+
         pick_tool = runner.hla_name_to_hla["PickTool"]
         stow_tool = runner.hla_name_to_hla["StowTool"]
 
-        # make sure there is no occlusion at bite acquisition and drink acquisition poses
-        occlusion = True
-        while occlusion:
+        # # SEQUENCE 1: Feeding with only plate
 
+        plate_pose = runner.get_plate_pose()
+        while plate_pose is None:
+            print("No plate pose detected.")
+            input("Please adjust the plate and press Enter to continue...")
+            plate_pose = runner.get_plate_pose()
+        plate_pose = Pose((plate_pose.position[0], plate_pose.position[1], 0.17))
+
+        mp_response = _send_mp_request({"request_type": "occlusion_query",
+                              "plate_pose": plate_pose, 
+                              "drink_pose": None})
+        assert mp_response["response_type"] == "occlusion_query"
+        disoriented_plate_delta_xy = mp_response["plate_delta_xy"]
+        plate_delta_xy = (-1 * disoriented_plate_delta_xy[1], disoriented_plate_delta_xy[0])
+        before_transfer_pose = mp_response["before_transfer_pose"]
+        before_transfer_pos = mp_response["before_transfer_pos"]
+        above_plate_pos = mp_response["above_plate_pos"]
+        occlusion_poi_relevance = mp_response["occlusion_poi_relevance"]
+        bite_occlusion_image = mp_response["bite_occlusion_image"]
+
+        Image.fromarray(bite_occlusion_image).show()
+        print("Visualizing bite occlusion image.")
+        input("Press Enter to continue...")
+
+        runner.update_scene_spec({"plate_delta_xy": plate_delta_xy})
+        runner.update_scene_spec({"before_transfer_pose": before_transfer_pose})
+        runner.update_scene_spec({"before_transfer_pos": before_transfer_pos})
+        runner.update_scene_spec({"above_plate_pos": above_plate_pos})
+
+        if not np.allclose(plate_delta_xy, [0, 0], atol=1e-3):
+            # pick and stow the plate
+            input("Press Enter to move the plate...")
+            runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.plate,)))
+            runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.plate,)))
+
+        runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.utensil,)))
+        # pick_tool.move_to_joint_positions(runner.sim.scene_description.above_plate_pos)
+        # pick_tool.move_to_joint_positions(runner.sim.scene_description.before_transfer_pos)
+        # pick_tool.move_to_joint_positions(runner.sim.scene_description.absolute_before_transfer_pos)
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+        runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.utensil,)))
+
+        # # SEQUENCE 2: Feeding with plate and drink
+
+        plate_pose = runner.get_plate_pose()
+        drink_pose = runner.get_drink_pose()
+        
+        while plate_pose is None or drink_pose is None:
+            print("No plate or drink pose detected.")
+            input("Please adjust the plate and drink and press Enter to continue...")
             plate_pose = runner.get_plate_pose()
             drink_pose = runner.get_drink_pose()
-            
-            while plate_pose is None or drink_pose is None:
-                print("No plate or drink pose detected.")
-                input("Please adjust the plate and drink and press Enter to continue...")
-                plate_pose = runner.get_plate_pose()
-                drink_pose = runner.get_drink_pose()
 
-            # adjust poses because table height is different in simulation
-            plate_pose = Pose((plate_pose.position[0], plate_pose.position[1], 0.17)) 
-            drink_pose = Pose((drink_pose.position[0], drink_pose.position[1], 0.35), (0, np.sqrt(2) / 2, np.sqrt(2) / 2, 0)) 
+        # adjust poses because table height is different in simulation
+        plate_pose = Pose((plate_pose.position[0], plate_pose.position[1], 0.17)) 
+        drink_pose = Pose((drink_pose.position[0], drink_pose.position[1], 0.35), (0, np.sqrt(2) / 2, np.sqrt(2) / 2, 0)) 
 
-            print("Plate pose:", plate_pose)
-            print("Drink pose:", drink_pose)
-            input("Press Enter to continue...")
+        print("Plate pose:", plate_pose)
+        print("Drink pose:", drink_pose)
+        input("Press Enter to continue...")
 
-            # send plate_pose and drink_pose to multitask personalization
-            mp_response = _send_mp_request({"request_type": "occlusion_query",
-                              "plate_pose": plate_pose, 
-                              "drink_pose": drink_pose})
-            assert mp_response["response_type"] == "occlusion_query"
-            disoriented_plate_delta_xy = mp_response["plate_delta_xy"]
-            disoriented_drink_delta_xy = mp_response["drink_delta_xy"]
-            plate_delta_xy = (-1 * disoriented_plate_delta_xy[1], disoriented_plate_delta_xy[0])
-            drink_delta_xy = (-1 * disoriented_drink_delta_xy[1], disoriented_drink_delta_xy[0])
-            before_transfer_pose = mp_response["before_transfer_pose"]
-            before_transfer_pos = mp_response["before_transfer_pos"]
-            above_plate_pos = mp_response["above_plate_pos"]
-            occlusion_poi_relevance = mp_response["occlusion_poi_relevance"]
-            bite_occlusion_image = mp_response["bite_occlusion_image"]
-            drink_occlusion_image = mp_response["drink_occlusion_image"]
+        # send plate_pose and drink_pose to multitask personalization
+        mp_response = _send_mp_request({"request_type": "occlusion_query",
+                            "plate_pose": plate_pose, 
+                            "drink_pose": drink_pose})
+        assert mp_response["response_type"] == "occlusion_query"
+        disoriented_plate_delta_xy = mp_response["plate_delta_xy"]
+        disoriented_drink_delta_xy = mp_response["drink_delta_xy"]
+        plate_delta_xy = (-1 * disoriented_plate_delta_xy[1], disoriented_plate_delta_xy[0])
+        drink_delta_xy = (-1 * disoriented_drink_delta_xy[1], disoriented_drink_delta_xy[0])
+        before_transfer_pose = mp_response["before_transfer_pose"]
+        before_transfer_pos = mp_response["before_transfer_pos"]
+        above_plate_pos = mp_response["above_plate_pos"]
+        occlusion_poi_relevance = mp_response["occlusion_poi_relevance"]
+        bite_occlusion_image = mp_response["bite_occlusion_image"]
+        drink_occlusion_image = mp_response["drink_occlusion_image"]
 
-            Image.fromarray(bite_occlusion_image).show()
-            print("Visualizing bite occlusion image.")
-            input("Press Enter to continue...")
+        Image.fromarray(bite_occlusion_image).show()
+        print("Visualizing bite occlusion image.")
+        input("Press Enter to continue...")
 
-            Image.fromarray(drink_occlusion_image).show()
-            print("Visualizing drink occlusion image.")
-            input("Press Enter to continue...")
+        Image.fromarray(drink_occlusion_image).show()
+        print("Visualizing drink occlusion image.")
+        input("Press Enter to continue...")
 
-            runner.update_scene_spec({"plate_delta_xy": plate_delta_xy})
-            runner.update_scene_spec({"before_transfer_pose": before_transfer_pose})
-            runner.update_scene_spec({"before_transfer_pos": before_transfer_pos})
-            runner.update_scene_spec({"above_plate_pos": above_plate_pos})
-            runner.update_scene_spec({"drink_delta_xy": drink_delta_xy})
+        runner.update_scene_spec({"plate_delta_xy": plate_delta_xy})
+        runner.update_scene_spec({"before_transfer_pose": before_transfer_pose})
+        runner.update_scene_spec({"before_transfer_pos": before_transfer_pos})
+        runner.update_scene_spec({"above_plate_pos": above_plate_pos})
+        runner.update_scene_spec({"drink_delta_xy": drink_delta_xy})
 
-            if not np.allclose(drink_delta_xy, [0, 0], atol=1e-3):
-                # pick and stow the drink
-                input("Press Enter to move the drink...")
-                runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.drink,)))
-                runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.drink,)))
+        if not np.allclose(plate_delta_xy, [0, 0], atol=1e-3):
+            # pick and stow the plate
+            input("Press Enter to move the plate...")
+            runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.plate,)))
+            runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.plate,)))
 
+        if not np.allclose(drink_delta_xy, [0, 0], atol=1e-3):
+            # pick and stow the drink
+            input("Press Enter to move the drink...")
             runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.drink,)))
             runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.drink,)))
 
-            if not np.allclose(plate_delta_xy, [0, 0], atol=1e-3):
-                # pick and stow the plate
-                input("Press Enter to move the plate...")
-                runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.plate,)))
-                runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.plate,)))
+        runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.drink,)))
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
+        runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.drink,)))
 
-            runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.utensil,)))
-            pick_tool.move_to_joint_positions(runner.sim.scene_description.above_plate_pos)
-            pick_tool.move_to_joint_positions(runner.sim.scene_description.before_transfer_pos)
-            pick_tool.move_to_joint_positions(runner.sim.scene_description.absolute_before_transfer_pos)
-            runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.utensil,)))
+        runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.utensil,)))
+        # pick_tool.move_to_joint_positions(runner.sim.scene_description.above_plate_pos)
+        # pick_tool.move_to_joint_positions(runner.sim.scene_description.before_transfer_pos)
+        # pick_tool.move_to_joint_positions(runner.sim.scene_description.absolute_before_transfer_pos)
+        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+        runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.utensil,)))
 
-            occlusion_dataset_dict = {
-                "request_type": "occlusion_dataset",
-                "plate_pose": plate_pose,
-                "drink_pose": drink_pose,
-                "occlusion": {}
+        occlusion_dataset_dict = {
+            "request_type": "occlusion_dataset",
+            "plate_pose": plate_pose,
+            "drink_pose": drink_pose,
+            "occlusion": {}
+        }
+        for poi, prediction in occlusion_poi_relevance.items():
+            print(f"Verifying the RELEVANCE of POI={poi} for this meal")
+            relevance = verify_predictions(prediction, [True, False])
+            if relevance:
+                print(f"Verifying whether view was occluded for POI={poi} during FEEDING")
+                plate_occlusion = verify_predictions(False, [True, False])
+                print(f"Verifying whether view was occluded for POI={poi} during DRINKING")
+                drink_occlusion = verify_predictions(False, [True, False])
+            else:
+                plate_occlusion = False
+                drink_occlusion = False
+            occlusion_dataset_dict["occlusion"][poi] = {
+                "relevance": relevance,
+                "plate_occlusion": plate_occlusion,
+                "drink_occlusion": drink_occlusion,
             }
-            for poi, prediction in occlusion_poi_relevance.items():
-                print(f"Verifying the RELEVANCE of POI={poi} for this meal")
-                relevance = verify_predictions(prediction, [True, False])
-                if relevance:
-                    print(f"Verifying whether view was occluded for POI={poi} during FEEDING")
-                    plate_occlusion = verify_predictions(False, [True, False])
-                    print(f"Verifying whether view was occluded for POI={poi} during DRINKING")
-                    drink_occlusion = verify_predictions(False, [True, False])
-                else:
-                    plate_occlusion = False
-                    drink_occlusion = False
-                occlusion_dataset_dict["occlusion"][poi] = {
-                    "relevance": relevance,
-                    "plate_occlusion": plate_occlusion,
-                    "drink_occlusion": drink_occlusion,
-                }
 
-                if plate_occlusion or drink_occlusion:
-                    occlusion = True
-            mp_response = _send_mp_request(occlusion_dataset_dict)
-            assert mp_response["response_type"] == "occlusion_dataset" 
+            if plate_occlusion or drink_occlusion:
+                occlusion = True
+        mp_response = _send_mp_request(occlusion_dataset_dict)
+        assert mp_response["response_type"] == "occlusion_dataset" 
         
         # start meal
         if not args.use_interface:
@@ -946,11 +999,45 @@ if __name__ == "__main__":
 
     else:
         if not args.use_interface:
+
             for i in range(3):
+                input("Press Enter to pick up the drink...")
                 runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
                 runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
+
+            # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
+            # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
+            # for i in range(3):
+                # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
+                # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
         else:
-            runner.run()
+            runner.web_interface.ready_for_task_selection()
+            time.sleep(2)
+
+            @dataclass
+            class Meal:
+                meal_id: int
+                context: str
+                table_type: str
+                food_items: List[str]
+                dips: List[str]
+
+            current_meal = Meal(5, "social TV-watching (with TV in front) and with friend on left side", "rectangular table", ["tater tot"], ["ketchup", "BBQ sauce"])
+
+            runner.flair.inference_server.FOOD_CLASSES = []
+            runner.flair.inference_server.FOOD_CATEGORIES = []
+            for food_item in current_meal.food_items:
+                runner.flair.inference_server.FOOD_CLASSES.append(food_item)
+                runner.flair.inference_server.FOOD_CATEGORIES.append("solid")
+            for dip in current_meal.dips:
+                runner.flair.inference_server.FOOD_CLASSES.append(dip)
+                runner.flair.inference_server.FOOD_CATEGORIES.append("dip")
+            runner.flair.user_preference = "tater tot dipped in ketchup"
+
+
+            runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+            runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.utensil,)))
+            # runner.run()
 
     if args.make_videos:
         output_path = Path(__file__).parent / "videos" / "full.mp4"

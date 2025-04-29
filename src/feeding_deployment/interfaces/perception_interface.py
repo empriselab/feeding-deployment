@@ -89,6 +89,7 @@ class PerceptionInterface:
 
     def zero_ft_sensor(self):
         print("Zeroing FT sensor")
+        return # not using FT for now
         if self.simulation:
             return
         bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
