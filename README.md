@@ -64,7 +64,8 @@
         - `source devel/setup.bash`
         - `cd src/feeding-deployment/src/feeding_deployment/integration`
         - `python run.py --user tests --run_on_robot --use_interface --no_waits`
-   - _Important Note:_ If you want to resume from some state (state names: after_utensil_pickup, after_bite_pickup, last_state), use: `python run.py --user tests --run_on_robot --use_interface --no_waits --resume_from_state after_utensil_pickup` (replace after_utensil_pickup with appropriate state name).
+   - _Important Note 1:_ If you want to resume from some state (state names: after_utensil_pickup, after_bite_pickup, last_state), use: `python run.py --user tests --run_on_robot --use_interface --no_waits --resume_from_state after_utensil_pickup` (replace after_utensil_pickup with appropriate state name).
+   - _Important Note 2:_ The preset food item for `tests` user is bananas. If you want to try some other food item, just change the user name to a new one. For example, `python run.py --user tests_new --run_on_robot --use_interface --no_waits`
 
 ### Moving the robot to preset configurations
 
