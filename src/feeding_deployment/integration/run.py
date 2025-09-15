@@ -1011,33 +1011,7 @@ if __name__ == "__main__":
                 # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
                 # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
         else:
-            runner.web_interface.ready_for_task_selection()
-            time.sleep(2)
-
-            @dataclass
-            class Meal:
-                meal_id: int
-                context: str
-                table_type: str
-                food_items: List[str]
-                dips: List[str]
-
-            current_meal = Meal(5, "social TV-watching (with TV in front) and with friend on left side", "rectangular table", ["tater tot"], ["ketchup", "BBQ sauce"])
-
-            runner.flair.inference_server.FOOD_CLASSES = []
-            runner.flair.inference_server.FOOD_CATEGORIES = []
-            for food_item in current_meal.food_items:
-                runner.flair.inference_server.FOOD_CLASSES.append(food_item)
-                runner.flair.inference_server.FOOD_CATEGORIES.append("solid")
-            for dip in current_meal.dips:
-                runner.flair.inference_server.FOOD_CLASSES.append(dip)
-                runner.flair.inference_server.FOOD_CATEGORIES.append("dip")
-            runner.flair.user_preference = "tater tot dipped in ketchup"
-
-
-            runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-            runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.utensil,)))
-            # runner.run()
+            runner.run()
 
     if args.make_videos:
         output_path = Path(__file__).parent / "videos" / "full.mp4"

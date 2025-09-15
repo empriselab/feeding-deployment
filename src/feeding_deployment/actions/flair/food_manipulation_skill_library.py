@@ -51,7 +51,7 @@ class FoodManipulationSkillLibrary:
             # self.plate_height = 0.185
             # self.plate_height = 0.197 # green table
             # self.plate_height = 0.221
-            self.plate_height = 0.166
+            self.plate_height = 0.17
         else:
             raise NotImplementedError("Scene label not recognized; plate height required for bite acquisition")
 

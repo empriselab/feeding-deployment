@@ -34,7 +34,7 @@ from feeding_deployment.control.robot_controller.arm_interface import ArmInterfa
 
 
 CAMERA_FREQUENCY_THRESHOLD = 10 # expected is 30 Hz
-FT_FREQUENCY_THRESHOLD = 0 # expected is 1000 Hz
+FT_FREQUENCY_THRESHOLD = 300 # expected is 1000 Hz
 FT_THRESHOLD = [40.0, 40.0, 40.0, 2.0, 2.0, 2.0]
 COLLISION_FREE_FREQUENCY_THRESHOLD = 100 # expected is 350 Hz (empirical)
 
@@ -56,9 +56,9 @@ class WatchDog:
         self._arm_interface = self.manager.ArmInterface()
 
         # bias FT sensor
-        # bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
-        # bias('bias')
-        # time.sleep(2.0) # wait for bias to complete
+        bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
+        bias('bias')
+        time.sleep(2.0) # wait for bias to complete
 
         queue_size = 1000
         self.camera_info_sub = rospy.Subscriber("/camera/color/camera_info", CameraInfo, self.cameraCallback, queue_size = queue_size, buff_size = 65536*queue_size)
@@ -137,7 +137,7 @@ class WatchDog:
 
         for _unexpected, _anomaly in [
                                     (self.camera_unexpected, AnomalyStatus.CAMERA_UNEXPECTED),
-                                    # (self.ft_unexpected, AnomalyStatus.FT_UNEXPECTED),
+                                    (self.ft_unexpected, AnomalyStatus.FT_UNEXPECTED),
                                     (self.collision_free_unexpected, AnomalyStatus.COLLISION_FREE_UNEXPECTED)]:
             if _unexpected:
                 print(f"Unexpected: {_anomaly}")

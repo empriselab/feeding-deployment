@@ -85,11 +85,11 @@ class PerceptionInterface:
         self.last_drink_poses = None
 
         # set led brightness
-        self.set_led_brightness()
+        # self.set_led_brightness()
 
     def zero_ft_sensor(self):
         print("Zeroing FT sensor")
-        return # not using FT for now
+        # return # not using FT for now
         if self.simulation:
             return
         bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
