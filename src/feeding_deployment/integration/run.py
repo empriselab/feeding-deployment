@@ -603,8 +603,8 @@ if __name__ == "__main__":
     parser.add_argument("--scene_config", type=str, default="vention") # name of the scene config (rough head-plate-robot setup)
     parser.add_argument("--user", type=str, default="") # name of the user
     parser.add_argument("--scenario", type=str, default="default") # name of the scenario
-    parser.add_argument("--transfer_type", type=str, default="inside")
-    # parser.add_argument("--transfer_type", type=str, default="outside")
+    # parser.add_argument("--transfer_type", type=str, default="inside")
+    parser.add_argument("--transfer_type", type=str, default="outside")
     parser.add_argument("--run_on_robot", action="store_true")
     parser.add_argument("--use_interface", action="store_true")
     parser.add_argument("--use_gui", action="store_true")
@@ -1023,6 +1023,18 @@ if __name__ == "__main__":
             runner.run()
 
     else:
+
+        plate_delta_xy = (0.0, 0.0)
+        before_transfer_pose = Pose((0.43629148602485657, 0.5221561789512634, 0.5431587100028992), 
+                                    (-0.03718446899872125, 0.705653494730171, 0.7073595770431803, -0.01768868015632298))
+        before_transfer_pos = (-3.1390543947548384, -1.4689991246554897, -2.284652129616783, -1.4035934861797976, 1.247671130152002, -0.7409223079286891, 1.863516879062629)
+        above_plate_pos = (3.0760043222633215, -1.532676904215938, -2.4219980049348946, -1.397861298249511, 1.3906581132911193, -0.8611986522399375, -2.943499541174756)
+
+        runner.update_scene_spec({"plate_delta_xy": plate_delta_xy})
+        runner.update_scene_spec({"before_transfer_pose": before_transfer_pose})    
+        runner.update_scene_spec({"before_transfer_pos": before_transfer_pos})
+        runner.update_scene_spec({"above_plate_pos": above_plate_pos})
+
         if not args.use_interface:
 
             for i in range(3):
