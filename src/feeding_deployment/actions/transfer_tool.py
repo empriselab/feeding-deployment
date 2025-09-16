@@ -201,6 +201,8 @@ class TransferToolHLA(HighLevelAction):
             time.sleep(1.0) # let sim head perception thread warmstart
 
         if self.sim.scene_description.transfer_type == "inside" and self.robot_interface is not None:
+            # only for CBTL: move to absolute transfer pos before switching to compliant mode
+            self.move_to_joint_positions(self.sim.scene_description.absolute_before_transfer_pos)
             self.disable_collision_sensor_pub.publish(Bool(data=True))
             print("Sent message to turn off collision sensor")
             time.sleep(0.5) # let collision sensor turn off
@@ -232,6 +234,8 @@ class TransferToolHLA(HighLevelAction):
             self.robot_interface.switch_out_of_compliant_mode()
             self.disable_collision_sensor_pub.publish(Bool(data=False))
             print("Sent message to turn on collision sensor")
+            # only for CBTL: move to before transfer pos after switching out of compliant mode
+            self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
     def get_name(self) -> str:
         return "TransferTool"
