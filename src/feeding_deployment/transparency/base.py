@@ -12,7 +12,7 @@ class TransparencyBase(abc.ABC):
     def __init__(self, log_dir, cache_name = "llm_cache"):
 
         self.llm = OpenAILLM(
-            model_name="gpt-4.5-preview-2025-02-27",
+            model_name="gpt-4.1-2025-04-14",
             cache_dir = log_dir / cache_name,
         )
 

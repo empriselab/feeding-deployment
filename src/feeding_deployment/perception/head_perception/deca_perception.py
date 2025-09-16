@@ -90,14 +90,14 @@ class HeadPerception:
 
         self.FLAME_neck_index = 2151
 
-        roll_threshold = np.pi / 5
-        pitch_threshold = np.pi / 5
-        yaw_threshold = np.pi / 5
+        roll_threshold = 2*np.pi # / 5
+        pitch_threshold = 2*np.pi # / 5
+        yaw_threshold = 2*np.pi # / 5
 
         self.max_rotation_threshold = np.array(
             [roll_threshold, pitch_threshold, yaw_threshold]
         )
-        self.max_distance_threshold = np.array([0.5, 0.5, 0.5])  # m
+        self.max_distance_threshold = np.array([3.0, 3.0, 3.0])  # np.array([0.5, 0.5, 0.5])
 
         self.current_filepath = os.path.dirname(os.path.abspath(__file__))
 
@@ -451,7 +451,7 @@ class HeadPerception:
             if self.last_trans is not None:
                 if filter_noisy_readings and (np.any(np.abs(translation_from_reference) > self.max_distance_threshold)
                      or np.any( np.abs(rotation_from_reference) > self.max_rotation_threshold)):
-                    # print("Noisy reading!")
+                    print("Noisy reading!")
 
                     return {
                         "head_pose": self.get_head_pose_from_neck_frame(self.last_neck_frame),
