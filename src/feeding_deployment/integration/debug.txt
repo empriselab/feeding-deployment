@@ -1,4 +1,4 @@
-Parameter name being checked for validity: ReadyForTransferInteraction
+Parameter name being checked for validity: InitiateTransferInteraction
 Node name: TransferWipe
 Behavior tree prompt: 
 Here are all behavior trees:
