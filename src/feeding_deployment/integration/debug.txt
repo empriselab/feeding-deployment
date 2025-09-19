@@ -1,4 +1,4 @@
-Parameter name being checked for validity: InitiateTransferInteraction
+Parameter name being checked for validity: ReadyForTransferInteraction
 Node name: TransferWipe
 Behavior tree prompt: 
 Here are all behavior trees:
@@ -134,7 +134,7 @@ parameters:
     - button
     - open_mouth
     - auto_timeout
-  value: button
+  value: open_mouth
 - name: ReadyForTransferInteraction
   description: Interaction mode for how the robot conveys to the user that they can
     take a bite now.
@@ -261,7 +261,7 @@ parameters:
     - button
     - open_mouth
     - auto_timeout
-  value: button
+  value: open_mouth
 - name: ReadyForTransferInteraction
   description: Interaction mode for how the robot conveys to the user that they can
     take a sip now.
@@ -397,7 +397,7 @@ parameters:
     - button
     - open_mouth
     - auto_timeout
-  value: button
+  value: open_mouth
 - name: ReadyForTransferInteraction
   description: Interaction mode for how the robot conveys to the user that they can
     take start cleaning now.

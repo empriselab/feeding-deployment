@@ -603,8 +603,8 @@ if __name__ == "__main__":
     parser.add_argument("--scene_config", type=str, default="vention") # name of the scene config (rough head-plate-robot setup)
     parser.add_argument("--user", type=str, default="") # name of the user
     parser.add_argument("--scenario", type=str, default="default") # name of the scenario
-    parser.add_argument("--transfer_type", type=str, default="inside")
-    # parser.add_argument("--transfer_type", type=str, default="outside")
+    # parser.add_argument("--transfer_type", type=str, default="inside")
+    parser.add_argument("--transfer_type", type=str, default="outside")
     parser.add_argument("--run_on_robot", action="store_true")
     parser.add_argument("--use_interface", action="store_true")
     parser.add_argument("--use_gui", action="store_true")
@@ -614,7 +614,6 @@ if __name__ == "__main__":
     parser.add_argument("--resume_from_state", type=str, default="")
     parser.add_argument("--no_waits", action="store_true")
     parser.add_argument("--cbtl", action="store_true")
-    parser.add_argument("--cbtl_resume", action="store_true")
     parser.add_argument("--meal_id", type=int, default=1)
     parser.add_argument("--results_dir", type=Path, default=Path("feast_default_user"), help="Directory for saving and loading results and user responses. Make one of these directories per user.")
     parser.add_argument("--load", action="store_true")
