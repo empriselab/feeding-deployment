@@ -320,6 +320,7 @@ class _Runner:
                                     user_input = input("Please enter 'y' or 'n': ")
                                 if user_input == "y":
                                     update_summary = input("Please enter the update summary to show on the web interface: ")
+                                    self.web_interface.update_adaptability_response(update_summary)
                                 else:
                                     try:
                                         print("Processing user update request:", adaptation_request)
@@ -615,8 +616,8 @@ if __name__ == "__main__":
     parser.add_argument("--scene_config", type=str, default="vention") # name of the scene config (rough head-plate-robot setup)
     parser.add_argument("--user", type=str, default="") # name of the user
     parser.add_argument("--scenario", type=str, default="default") # name of the scenario
-    # parser.add_argument("--transfer_type", type=str, default="inside")
-    parser.add_argument("--transfer_type", type=str, default="outside")
+    parser.add_argument("--transfer_type", type=str, default="inside")
+    # parser.add_argument("--transfer_type", type=str, default="outside")
     parser.add_argument("--run_on_robot", action="store_true")
     parser.add_argument("--use_interface", action="store_true")
     parser.add_argument("--use_gui", action="store_true")
@@ -738,11 +739,28 @@ if __name__ == "__main__":
         _mp_response = data
 
     # Helper function to verify predictions with the user.
-    def verify_predictions(field_name, prediction, options):
+    def verify_predictions(args, field_name, prediction, options):
+        field_to_choice = {}
+        results = {}  # field name -> {"options": ..., "prediction": ..., "choice": ...}
+        results_dir: Path = args.results_dir
+        results_dir.mkdir(exist_ok=True)
+        field_to_choice_file = results_dir / f"field_to_choice_meal{args.meal_id}.json"
+        results_file = results_dir / f"results_meal{args.meal_id}.json"
+        load = False
+        if load and field_to_choice_file.exists():
+            with open(field_to_choice_file, "r") as f:
+                field_to_choice = json.load(f)
+        user_description_file = results_dir / "user_description.txt"
+        if not user_description_file.exists():
+            user_description = input("Write any kind of description for this user that will be helpful for us to refer back to later: ")
+            with open(user_description_file, "w") as f:
+                f.write(user_description)
+        field_to_choice = {}
+        results = {}  
         print("Field name:", field_name)
         if prediction not in options:
             raise ValueError(f"Invalid prediction: {prediction}. Expected one of {options}.")
-        if args.load and field_name in field_to_choice:
+        if load and field_name in field_to_choice:
             choice = field_to_choice[field_name]
             print(f"Loaded choice {choice} for {field_name}")
             results[field_name] = {"options": options, "prediction": prediction, "choice": choice}
@@ -811,20 +829,6 @@ if __name__ == "__main__":
         be_verbal = True
         if args.cbtl:
             # sends encoded messages to multitask personalization on ROS topic /mp_request, and expects to receive a response on /mp_response
-            field_to_choice = {}
-            results = {}  # field name -> {"options": ..., "prediction": ..., "choice": ...}
-            results_dir: Path = args.results_dir
-            results_dir.mkdir(exist_ok=True)
-            field_to_choice_file = results_dir / f"field_to_choice_meal{args.meal_id}.json"
-            results_file = results_dir / f"results_meal{args.meal_id}.json"
-            if args.load and field_to_choice_file.exists():
-                with open(field_to_choice_file, "r") as f:
-                    field_to_choice = json.load(f)
-            user_description_file = results_dir / "user_description.txt"
-            if not user_description_file.exists():
-                user_description = input("Write any kind of description for this user that will be helpful for us to refer back to later: ")
-                with open(user_description_file, "w") as f:
-                    f.write(user_description)
 
             mp_response_sub = rospy.Subscriber("/mp_response", String, mp_response_callback)
             mp_request_pub = rospy.Publisher("/mp_request", String, queue_size=10)
@@ -878,6 +882,8 @@ if __name__ == "__main__":
         else:
             explanation_text += " speak aloud: no."
         print('Explanation text:', explanation_text)
+        runner.web_interface.switch_to_explanation_page()
+        input("Press Enter to see the explanation on the web interface...")
         runner.web_interface.fix_explanation(explanation_text)
 
         input("Showing explanation. Press Enter to continue...")
@@ -888,10 +894,10 @@ if __name__ == "__main__":
 
         if args.cbtl:
             # Rajat manually inputs preferences
-            feeding_side = verify_predictions("feeding_side", feeding_side, ["left", "right"])
-            bite_ordering = verify_predictions("bite_ordering", bite_ordering, bite_ordering_options)
-            ready_signal = verify_predictions("ready_signal", ready_signal, ["mouth_open", "button", "auto_continue"])
-            be_verbal = verify_predictions("be_verbal", be_verbal, [True, False])
+            feeding_side = verify_predictions(args, "feeding_side", feeding_side, ["left", "right"])
+            bite_ordering = verify_predictions(args, "bite_ordering", bite_ordering, bite_ordering_options)
+            ready_signal = verify_predictions(args, "ready_signal", ready_signal, ["mouth_open", "button", "auto_continue"])
+            be_verbal = verify_predictions(args, "be_verbal", be_verbal, [True, False])
 
             # send the verified predictions to multitask personalization
             mp_response = _send_mp_request({"request_type": "initialization_dataset",
@@ -936,11 +942,11 @@ if __name__ == "__main__":
                     }
                     for poi, prediction in occlusion_poi_relevance.items():
                         print(f"Verifying the RELEVANCE of POI={poi} for this meal")
-                        relevance = verify_predictions(f"occlusion-poi-{poi}-relevance-iter{occlusion_iter}", prediction, [True, False])
+                        relevance = verify_predictions(args, f"occlusion-poi-{poi}-relevance-iter{occlusion_iter}", prediction, [True, False])
                         if relevance:
                             print(f"Verifying whether view was occluded for POI={poi} during FEEDING")
                             Image.fromarray(bite_occlusion_image).show()
-                            plate_occlusion = verify_predictions(f"occlusion-poi-{poi}-feeding-iter{occlusion_iter}", False, [True, False])
+                            plate_occlusion = verify_predictions(args, f"occlusion-poi-{poi}-feeding-iter{occlusion_iter}", False, [True, False])
                         else:
                             plate_occlusion = False
                         occlusion_dataset_dict["occlusion"][poi] = {
@@ -1022,7 +1028,7 @@ if __name__ == "__main__":
 
         else:
             if current_meal.meal_id == 5:
-                bite_ordering = verify_predictions("bite_ordering", bite_ordering, bite_ordering_options)
+                bite_ordering = verify_predictions(args, "bite_ordering", bite_ordering, bite_ordering_options)
                 runner.flair.user_preference = bite_ordering
 
                 plate_delta_xy = (0.0, 0.0)

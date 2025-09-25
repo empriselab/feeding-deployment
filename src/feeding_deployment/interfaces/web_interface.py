@@ -81,6 +81,9 @@ class WebInterface:
         except Exception as e:
             print("Error stopping gesture listener thread: ", e)
 
+    def switch_to_explanation_page(self) -> None:
+        # rostopic pub -1 /ServerComm std_msgs/String "data: '{\"state\":\"preparepickup2\",\"status\":\"jump\"}'"
+        self.web_interface_publisher.publish(String(json.dumps({"state": "preparepickup2", "status": "jump"})))
 
     def _send_message(self, msg_dict: dict[str, Any], explanation=False) -> None:
         self.web_interface_publisher.publish(String(json.dumps(msg_dict)))
