@@ -1,5 +1,5 @@
-Parameter name being checked for validity: ReadyForTransferInteraction
-Node name: TransferWipe
+Parameter name being checked for validity: InitiateTransferInteraction
+Node name: TransferUtensil
 Behavior tree prompt: 
 Here are all behavior trees:
 Behavior Tree Nodes Related to Bite (synonyms: Feeding, Utensil, Food Item):
@@ -165,9 +165,9 @@ parameters:
   is_user_editable: true
   space:
     type: Box
-    lower: 0.1
-    upper: 0.2
-  value: 0.15
+    lower: 0.05
+    upper: 0.1
+  value: 0.06
 - name: TimeToWaitBeforeAutocontinue
   description: Autocontinue duration for re-selecting feeding utensil (bite) transfer
     after a bite on the web app (web interface).
@@ -460,5 +460,5 @@ fn: !hla stow_wipe
 ---
 
 
-Node name substring: name: TransferWipe
+Node name substring: name: TransferUtensil
 Parameter name is valid

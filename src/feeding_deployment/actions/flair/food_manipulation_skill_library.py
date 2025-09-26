@@ -170,7 +170,7 @@ class FoodManipulationSkillLibrary:
         food_base[2,3] = max(food_base[2,3] - skewering_depth, self.plate_height) 
         # magic number for skewering offset
         # food_base[0,3] = 0.005 # positive moves away from the robot
-        # food_base[1,3] -= 0.02 # positive moves left from the robot
+        food_base[1,3] -= 0.01 # positive moves left from the robot
         # keep the orientation of the food base fixed
         food_base[:3,:3] = Rotation.from_quat([-0.7071068, 0.7071068, 0, 0]).as_matrix()
 

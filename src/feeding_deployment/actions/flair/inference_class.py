@@ -753,7 +753,7 @@ class BiteAcquisitionInference:
 
         # Calculate the maximum area threshold dynamically
         H, W, C = image.shape
-        MAX_AREA_THRESHOLD = (H * W) / 25
+        MAX_AREA_THRESHOLD = (H * W) / 15
 
         individual_masks = []
         refined_labels = []
