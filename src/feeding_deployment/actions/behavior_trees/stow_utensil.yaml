@@ -1,9 +1,9 @@
 name: "StowUtensil"
-description: "Place the utensil in the tool mount."
+description: "Place the feeding (bite) utensil in the tool mount."
 type: "Behavior"
 parameters:
   - name: "Speed"
-    description: "Speed of the robot during placing the utensil."
+    description: "Speed of the robot during placing the feeding (bite) utensil."
     space:
       type: Enum
       elements: ["low", "medium", "high"]

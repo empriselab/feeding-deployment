@@ -45,9 +45,13 @@ class FoodManipulationSkillLibrary:
         if self.sim.scene_description.scene_label == "wheelchair":
             self.plate_height = 0.12
         elif self.sim.scene_description.scene_label == "vention":
-            self.plate_height = 0.155 # for silicone fork
+            # self.plate_height = 0.155 # for silicone fork
             # self.plate_height = 0.158 # for metal fork
+            # self.plate_height = 0.16 # for metal fork
             # self.plate_height = 0.185
+            # self.plate_height = 0.197 # green table
+            # self.plate_height = 0.221
+            self.plate_height = 0.17
         else:
             raise NotImplementedError("Scene label not recognized; plate height required for bite acquisition")
 
@@ -161,9 +165,12 @@ class FoodManipulationSkillLibrary:
         food_base = np.eye(4)
         food_base[:3,3] = point.reshape(1,3)
         food_base = base_to_camera_transform @ food_base
+        print("Depth to skewer: ", food_base[2,3] - skewering_depth)
+        print("Plate height: ", self.plate_height)
         food_base[2,3] = max(food_base[2,3] - skewering_depth, self.plate_height) 
         # magic number for skewering offset
-        # food_base[0,3] += 0.012 # positive moves away from the robot
+        # food_base[0,3] = 0.005 # positive moves away from the robot
+        food_base[1,3] -= 0.01 # positive moves left from the robot
         # keep the orientation of the food base fixed
         food_base[:3,:3] = Rotation.from_quat([-0.7071068, 0.7071068, 0, 0]).as_matrix()
 
@@ -234,7 +241,7 @@ class FoodManipulationSkillLibrary:
         food_base = base_to_camera_transform @ food_base
         print("Food height detected: ", food_base[2,3])
         print("Plate height: ", self.plate_height)
-        food_base[2,3] = self.plate_height + 0.06 - dipping_depth
+        food_base[2,3] = self.plate_height + 0.08 - dipping_depth
         print("Food height after plate update: ", food_base[2,3])
         # food_base[2,3] = max(food_base[2,3] - dipping_depth, self.plate_height) 
         # magic number for skewering offset

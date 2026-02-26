@@ -59,7 +59,7 @@ def create_scene_description_from_config(config_file_path: str, transfer_type: s
     return SceneDescription(**processed_config)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=False)
 class SceneDescription:
     """Scene description."""
 
@@ -69,11 +69,16 @@ class SceneDescription:
     # Robot constants
     initial_joints: JointPositions
     retract_pos: JointPositions
+    retract_utensil_forward_pos: JointPositions
 
     # Feeding task constants
+    plate_gaze_pos: JointPositions
     above_plate_pos: JointPositions
     before_transfer_pos: JointPositions
+    drink_before_transfer_pos: JointPositions
+    absolute_before_transfer_pos: JointPositions
     before_transfer_pose: Pose
+    drink_before_transfer_pose: Pose
 
     # Utensil mount constants
     utensil_inside_mount: Pose
@@ -94,6 +99,11 @@ class SceneDescription:
     wipe_outside_mount_pos: JointPositions
     wipe_above_mount: Pose
     wipe_above_mount_pos: JointPositions
+
+    # Plate constants
+    plate_staging_pos: JointPositions
+    plate_delta_xy: tuple[float, float] = (0.0, 0.0)
+    drink_delta_xy: tuple[float, float] = (0.0, 0.0)
 
     # Specific env arguments can be set to None
     utensil_outside_above_mount: Pose = None
@@ -172,14 +182,9 @@ class SceneDescription:
     conservative_bb_half_extents: tuple[float, float, float] = (0.4, 0.4, 1.0)
 
     # Table.
-    table_pose: Pose = Pose((0.35, 0.45, 0.15))
+    table_pose: Pose = Pose((0.35, 0.45, 0.2))
     table_urdf_path: Path = Path(__file__).parent.parent / "assets" / "table" / "table.urdf"
     table_mesh_path: Path = Path(__file__).parent.parent / "assets" / "table" / "table.obj"
-
-    # Plate
-    plate_pose: Pose = Pose((0.3, 0.25, 0.16))
-    plate_urdf_path: Path = Path(__file__).parent.parent / "assets" / "plate" / "plate.urdf"
-    plate_mesh_path: Path = Path(__file__).parent.parent / "assets" / "plate" / "plate.obj"
 
     # Floor
     floor_position: tuple[float, float, float] = (0, 0, -0.66)
@@ -237,6 +242,11 @@ class SceneDescription:
         (0.000, 0.707, 0.000, 0.707),
     )
 
+    # Plate
+    plate_pose: Pose = Pose((0.3, 0.25, 0.16))
+    plate_urdf_path: Path = Path(__file__).parent.parent / "assets" / "plate" / "plate.urdf"
+    plate_mesh_path: Path = Path(__file__).parent.parent / "assets" / "plate" / "plate.obj"
+
     @property
     def utensil_pose(self):
         return self.utensil_inside_mount.multiply(self.tool_frame_to_finger_tip)
@@ -255,6 +265,17 @@ class SceneDescription:
     @property
     def wipe_pose(self):
         return self.wipe_inside_mount.multiply(self.tool_frame_to_finger_tip)
+    
+    # @property
+    # def plate_pose(self):
+    #     try:
+    #         with open(Path(__file__).parent.parent / 'integration' / 'log' / 'plate_pickup_pos.pkl', 'rb') as f:
+    #             plate_poses = pickle.load(f)
+    #     except FileNotFoundError:
+    #         with open(Path(__file__).parent.parent / 'integration' / 'log' / 'study_plate_pickup_pos.pkl', 'rb') as f:
+    #             plate_poses = pickle.load(f)
+    #     inside_plate_pose = plate_poses["last_plate_poses"]["inside_top_pose"]
+    #     return inside_plate_pose.multiply(self.tool_frame_to_finger_tip)
 
     @property
     def wheelchair_head_pose(self) -> Pose:

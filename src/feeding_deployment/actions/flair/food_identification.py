@@ -35,7 +35,7 @@ class GPT4VFoodIdentification:
         base64_image = self.encode_image(image)
 
         payload = {
-        "model": "gpt-4o",
+        "model": "gpt-4.1-2025-04-14",
         "messages": [
             {
             "role": "user",
@@ -66,7 +66,7 @@ class GPT4VFoodIdentification:
         base64_image = self.encode_image(image)
 
         payload = {
-        "model": "gpt-4o",
+        "model": "gpt-4.1-2025-04-14",
         "messages": [
             {
             "role": "user",

@@ -81,11 +81,15 @@ class PerceptionInterface:
         self.log_head_perception_start_time = None
         self.log_head_perception = False
 
+        self.last_plate_poses = None
+        self.last_drink_poses = None
+
         # set led brightness
-        self.set_led_brightness()
+        # self.set_led_brightness()
 
     def zero_ft_sensor(self):
         print("Zeroing FT sensor")
+        # return # not using FT for now
         if self.simulation:
             return
         bias = rospy.ServiceProxy('/forque/bias_cmd', String_cmd)
@@ -296,7 +300,47 @@ class PerceptionInterface:
         return T
 
     def perceive_drink_pickup_poses(self):
+
+        def get_drink_transform():
+            tf = np.zeros((4, 4))
+            tf[:3, :3] = R.from_euler("xyz", [0, 0, np.pi / 2]).as_matrix()
+            tf[:3, 3] = np.array([0.0, 0.0, 0.0]) 
+            tf[3, 3] = 1
+            return tf
+
+        def get_pre_grasp_transform():
+            tf = np.zeros((4, 4))
+            tf[:3, :3] = R.from_euler("xyz", [np.pi, 0, np.pi / 2]).as_matrix()
+            tf[:3, 3] = np.array([0.09, -0.02, 0.1]) 
+            tf[3, 3] = 1
+            return tf
+
+        def get_inside_bottom_transform():
+            tf = get_pre_grasp_transform()
+            tf[2, 3] = 0.017
+            return tf
+
+        def get_inside_top_transform():
+            tf = get_inside_bottom_transform()
+            tf[0, 3] = 0.14
+            return tf
         
+        def get_post_grasp_pose():
+            tf = get_inside_top_transform()
+            tf[0, 3] = 0.32
+            return tf
+        
+        def get_place_inside_bottom_transform():
+            tf = get_inside_bottom_transform()
+            # tf[1, 3] = 0.0
+            return tf
+
+        def get_place_pre_grasp_transform():
+            tf = get_pre_grasp_transform()
+            # tf[2, 3] = 0.25
+            # tf[1, 3] = 0.0
+            return tf
+                
         if self.simulation:
             # load them from a pickle file
             with open(self.log_dir / 'drink_pickup_pos.pkl', 'rb') as f:
@@ -305,22 +349,24 @@ class PerceptionInterface:
 
         else:
             # Rajat Hack: Wait one second for the aruco mean to be correct, does this actually help though?
-            time.sleep(1)
+            time.sleep(3)
 
-            aruco_pose_msg = rospy.wait_for_message("/aruco_pose", PoseMsg)
+            aruco_pose_msg = rospy.wait_for_message("/aruco_pose_0", PoseMsg)
             position = (aruco_pose_msg.position.x, aruco_pose_msg.position.y, aruco_pose_msg.position.z)
             orientation = (aruco_pose_msg.orientation.x, aruco_pose_msg.orientation.y, aruco_pose_msg.orientation.z, aruco_pose_msg.orientation.w)
             self.aruco_pose = (position, orientation)
 
             drink_poses  = {}
-            drink_poses['pre_grasp_pose'] = self.get_aruco_relative_pose(self.get_pre_grasp_transform())
-            drink_poses['inside_bottom_pose'] = self.get_aruco_relative_pose(self.get_inside_bottom_transform())
-            drink_poses['inside_top_pose'] = self.get_aruco_relative_pose(self.get_inside_top_transform())
-            drink_poses['post_grasp_pose'] = self.get_aruco_relative_pose(self.get_post_grasp_pose())
-            drink_poses['place_inside_bottom_pose'] = self.get_aruco_relative_pose(self.get_place_inside_bottom_transform())
-            drink_poses['place_pre_grasp_pose'] = self.get_aruco_relative_pose(self.get_place_pre_grasp_transform())
+            drink_poses['drink_pose'] = self.get_aruco_relative_pose(get_drink_transform(), "drink")
+            drink_poses['pre_grasp_pose'] = self.get_aruco_relative_pose(get_pre_grasp_transform(), "drink")
+            drink_poses['inside_bottom_pose'] = self.get_aruco_relative_pose(get_inside_bottom_transform(), "drink")
+            drink_poses['inside_top_pose'] = self.get_aruco_relative_pose(get_inside_top_transform(), "drink")
+            drink_poses['post_grasp_pose'] = self.get_aruco_relative_pose(get_post_grasp_pose(), "drink")
+            drink_poses['place_inside_bottom_pose'] = self.get_aruco_relative_pose(get_place_inside_bottom_transform(), "drink")
+            drink_poses['place_pre_grasp_pose'] = self.get_aruco_relative_pose(get_place_pre_grasp_transform(), "drink")
 
         self.last_drink_poses = drink_poses
+        self.sync_rviz()
 
         return drink_poses
     
@@ -339,71 +385,44 @@ class PerceptionInterface:
         print("Drink pickup poses recorded")
 
     def get_last_drink_pickup_configs(self, study_poses = False):
-        if study_poses:
-            with open(Path(__file__).parent.parent / 'integration' / 'log' / 'study_drink_pickup_pos.pkl', 'rb') as f:
-                drink_pickup_pos = pickle.load(f)
-            last_drink_poses = drink_pickup_pos["last_drink_poses"]
-            drink_pickup_joint_pos = drink_pickup_pos["drink_pickup_joint_pos"]
-        else:
-            try:
-                last_drink_poses = self.last_drink_poses
-                drink_pickup_joint_pos = self.drink_pickup_joint_pos
-            except Exception as e:
-                print("Error loading drink pickup poses from script, using values from file instead")
-                with open(self.log_dir / 'drink_pickup_pos.pkl', 'rb') as f:
-                    drink_pickup_pos = pickle.load(f)
-                last_drink_poses = drink_pickup_pos["last_drink_poses"]
-                drink_pickup_joint_pos = drink_pickup_pos["drink_pickup_joint_pos"]
+        assert not study_poses
+        last_drink_poses = self.last_drink_poses
+        try:
+            drink_pickup_joint_pos = self.drink_pickup_joint_pos
+        except Exception as e:
+            drink_pickup_joint_pos = None
         
         return last_drink_poses, drink_pickup_joint_pos
 
-    def get_aruco_relative_pose(self, transform, override_angles = True):
+    def get_aruco_relative_pose(self, transform, override_angles = ""):
         aruco_pos_mat = self.pose_to_matrix(self.aruco_pose)
         goal_frame = np.dot(aruco_pos_mat, transform)
         goal_pose = self.matrix_to_pose(goal_frame)
 
         # If true, use 2 hardcoded angle values.
-        if override_angles:
+        if override_angles == "drink":
             rot = R.from_quat(goal_pose[1])
             roll = np.pi / 2
             pitch = 0
             _, _, yaw = rot.as_euler("xyz")
             new_rot = R.from_euler("xyz", [roll, pitch, yaw])
             goal_pose = Pose(goal_pose[0], new_rot.as_quat())
-
+        elif override_angles == "plate":
+            rot = R.from_quat(goal_pose[1])
+            roll = np.pi
+            pitch = 0
+            _, _, yaw = rot.as_euler("xyz")
+            new_rot = R.from_euler("xyz", [roll, pitch, yaw])
+            goal_pose = Pose(goal_pose[0], new_rot.as_quat())
+        elif override_angles == "plate-pose":
+            rot = R.from_quat(goal_pose[1])
+            roll = 0
+            pitch = 0
+            _, _, yaw = rot.as_euler("xyz")
+            new_rot = R.from_euler("xyz", [roll, pitch, yaw + np.pi])
+            goal_pose = Pose(goal_pose[0], new_rot.as_quat())
+        
         return goal_pose
-
-    def get_pre_grasp_transform(self):
-        tf = np.zeros((4, 4))
-        tf[:3, :3] = R.from_euler("xyz", [np.pi, 0, np.pi / 2]).as_matrix()
-        tf[:3, 3] = np.array([0.09, -0.02, 0.1]) 
-        tf[3, 3] = 1
-        return tf
-
-    def get_inside_bottom_transform(self):
-        tf = self.get_pre_grasp_transform()
-        tf[2, 3] = 0.017
-        return tf
-
-    def get_inside_top_transform(self):
-        tf = self.get_inside_bottom_transform()
-        tf[0, 3] = 0.14
-        return tf
-    
-    def get_post_grasp_pose(self):
-        tf = self.get_inside_top_transform()
-        tf[0, 3] = 0.25
-        return tf
-    
-    def get_place_inside_bottom_transform(self):
-        tf = self.get_inside_bottom_transform()
-        # tf[1, 3] = 0.0
-        return tf
-
-    def get_place_pre_grasp_transform(self):
-        tf = self.get_pre_grasp_transform()
-        # tf[1, 3] = 0.0
-        return tf
 
     def pose_to_matrix(self, pose):
         position = pose[0]
@@ -438,11 +457,11 @@ class PerceptionInterface:
     
     def extract_from_logged_head_perception_data(self, timestamp):
 
-        # add five second to timestamp[0]
+        # add three second to timestamp[0]
         print("data segment true start time: ", timestamp[0])
         print("data segment true end time: ", timestamp[1])
-        start_time = timestamp[0] + 5
-        end_time = timestamp[1] - 5
+        start_time = timestamp[0] + 3
+        end_time = timestamp[1] - 3
         
         data_segment = {
             "head_pose": [],
@@ -464,3 +483,112 @@ class PerceptionInterface:
                 video_segment.append(head_perception_data["camera_color_data"])
 
         return data_segment, video_segment
+    
+    def perceive_plate_pickup_poses(self):
+
+        def get_plate_transform():
+            tf = np.zeros((4, 4))
+            tf[:3, :3] = R.from_euler("xyz", [0, 0, np.pi]).as_matrix()
+            tf[:3, 3] = np.array([0.05, 0.15, 0.0]) 
+            tf[3, 3] = 1
+            return tf
+
+        def get_pre_grasp_transform():
+            tf = np.zeros((4, 4))
+            tf[:3, :3] = R.from_euler("xyz", [np.pi, 0, np.pi]).as_matrix()
+            tf[:3, 3] = np.array([0.07, -0.01, 0.1]) 
+            tf[3, 3] = 1
+            return tf
+
+        def get_inside_bottom_transform():
+            tf = get_pre_grasp_transform()
+            tf[2, 3] = 0.025
+            return tf
+
+        def get_inside_top_transform():
+            tf = get_inside_bottom_transform()
+            tf[1, 3] = -0.025
+            return tf
+        
+        def get_post_grasp_pose():
+            tf = get_inside_top_transform()
+            tf[2, 3] = 0.05
+            return tf
+        
+        def get_place_inside_bottom_transform():
+            tf = get_inside_bottom_transform()
+            # tf[1, 3] = 0.0
+            return tf
+
+        def get_place_pre_grasp_transform():
+            tf = get_pre_grasp_transform()
+            # tf[1, 3] = 0.0
+            return tf
+        
+        if self.simulation:
+            # load them from a pickle file
+            with open(self.log_dir / 'plate_pickup_pos.pkl', 'rb') as f:
+                plate_pickup_pos = pickle.load(f)
+            plate_poses = plate_pickup_pos["last_plate_poses"]
+
+        else:
+            # Rajat Hack: Wait one second for the aruco mean to be correct, does this actually help though?
+            time.sleep(3)
+
+            aruco_pose_msg = rospy.wait_for_message("/aruco_pose_1", PoseMsg)
+            # save in pickle file
+            with open(self.log_dir / 'aruco_pose.pkl', 'wb') as f:
+                pickle.dump(aruco_pose_msg, f)
+            
+            position = (aruco_pose_msg.position.x, aruco_pose_msg.position.y, aruco_pose_msg.position.z)
+            orientation = (aruco_pose_msg.orientation.x, aruco_pose_msg.orientation.y, aruco_pose_msg.orientation.z, aruco_pose_msg.orientation.w)
+            self.aruco_pose = (position, orientation)
+
+            plate_poses  = {}
+            plate_poses['plate_pose'] = self.get_aruco_relative_pose(get_plate_transform(), override_angles="plate-pose")
+            plate_poses['pre_grasp_pose'] = self.get_aruco_relative_pose(get_pre_grasp_transform(), "plate")
+            plate_poses['inside_bottom_pose'] = self.get_aruco_relative_pose(get_inside_bottom_transform(), "plate")
+            plate_poses['inside_top_pose'] = self.get_aruco_relative_pose(get_inside_top_transform(), "plate")
+            plate_poses['post_grasp_pose'] = self.get_aruco_relative_pose(get_post_grasp_pose(), "plate")
+            plate_poses['place_inside_bottom_pose'] = self.get_aruco_relative_pose(get_place_inside_bottom_transform(), "plate")
+            plate_poses['place_pre_grasp_pose'] = self.get_aruco_relative_pose(get_place_pre_grasp_transform(), "plate")
+
+        self.last_plate_poses = plate_poses
+        self.sync_rviz()
+
+        return plate_poses
+    
+    def record_plate_pickup_joint_pos(self):
+        if self.simulation:
+            return
+        
+        self.plate_pickup_joint_pos = self.get_robot_joints()[:7]
+        # save them in a pickle file
+        plate_pickup_pos = {
+            "last_plate_poses": self.last_plate_poses,
+            "plate_pickup_joint_pos": self.plate_pickup_joint_pos
+        }
+        with open(self.log_dir / 'plate_pickup_pos.pkl', 'wb') as f:
+            pickle.dump(plate_pickup_pos, f)
+        print("Plate pickup poses recorded")
+
+    def get_last_plate_pickup_configs(self, study_poses = False):
+        if study_poses:
+            with open(Path(__file__).parent.parent / 'integration' / 'log' / 'study_pickup_pickup_pos.pkl', 'rb') as f:
+                plate_pickup_pos = pickle.load(f)
+            last_plate_poses = plate_pickup_pos["last_plate_poses"]
+            # plate_pickup_joint_pos = plate_pickup_pos["plate_pickup_joint_pos"]
+        else:
+            last_plate_poses = self.last_plate_poses
+        
+        return last_plate_poses
+
+    def sync_rviz(self):
+        if self.last_plate_poses:
+            plate_poses = self.last_plate_poses
+            self._aruco_perception.updateTF("base_link", "plate", self.pose_to_matrix(plate_poses['plate_pose']))
+            self._aruco_perception.updateTF("base_link", "plate_pre", self.pose_to_matrix(plate_poses['pre_grasp_pose']))
+        if self.last_drink_poses:
+            drink_poses = self.last_drink_poses
+            self._aruco_perception.updateTF("base_link", "drink", self.pose_to_matrix(drink_poses['drink_pose']))
+            self._aruco_perception.updateTF("base_link", "drink_pre", self.pose_to_matrix(drink_poses['pre_grasp_pose']))

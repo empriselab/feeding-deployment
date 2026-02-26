@@ -1,44 +1,44 @@
 name: "TransferUtensil"
-description: "Bring the utensil to the user's mouth for a bite."
+description: "Bring the feeding (bite) utensil to the user's mouth for a bite. A bite transfer starts with an ReadyToInitiateTransferInteraction (robot to human) where the robot conveys to the user that it is ready to initiate the bite transfer, then an InitiateTransferInteraction (human to robot) where the human conveys to the robot that it is ready for a bite transfer. After this, the robot moves the feeding utensil (and thus the food item) either near the user's mouth (OutsideMouthDistance defines how near) or inside the user's mouth. Then commences the ReadyForTransferInteraction (robot to human) where the robot conveys to the user that they can take a bite now. After the users is done taking a bite, they use the TransferCompleteInteraction (human to robot) to convey to the robot that they are done. The robot then moves the feeding utensil away from the user's mouth. Once a bite transfer is complete, the robot waits for TimeToWaitBeforeAutocontinue on the web app (web interface) before re-selecting bite transfer again."
 type: "Behavior"
 parameters:
   - name: "Speed"
-    description: "Speed of the robot during bringing the utensil to the user's mouth."
+    description: "Speed of the robot during bringing the feeding utensil (bite) to the user's mouth."
     space:
       type: "Enum"
       elements: ["low", "medium", "high"]
     is_user_editable: True
     value: "medium"
   - name: "ReadyToInitiateTransferInteraction"
-    description: "Interaction mode for ready to initiate transfer."
+    description: "Interaction mode for how the robot conveys to the user that it is ready to initiate the feeding utensil (bite) transfer."
     space:
       type: "Enum"
-      elements: ["silent", "voice", "led"]
-    is_user_editable: True
-    value: "voice"
-  - name: "ReadyForTransferInteraction"
-    description: "Interaction mode for ready to transfer."
-    space:
-      type: "Enum"
-      elements: ["silent", "voice", "led"]
+      elements: ["silent", "voice", "led", "beep"]
     is_user_editable: True
     value: "voice"
   - name: "InitiateTransferInteraction"
-    description: "Interaction mode for transfer."
+    description: "Interaction mode for how the user conveys to the robot that they are ready for a feeding utensil (bite) transfer."
     space:
       type: "Enum"
       elements: ["button", "open_mouth", "auto_timeout"]
     is_user_editable: True
     value: "open_mouth"
+  - name: "ReadyForTransferInteraction"
+    description: "Interaction mode for how the robot conveys to the user that they can take a bite now."
+    space:
+      type: "Enum"
+      elements: ["silent", "voice", "led", "beep"]
+    is_user_editable: True
+    value: "voice"
   - name: "TransferCompleteInteraction"
-    description: "Interaction mode for transfer completion."
+    description: "Interaction mode for how the user conveys to the robot that they are done taking a bite. Sense corresponds to the robot waiting for the user to bite down on the fork (the robot is detecting downward forces on the fork tip)."
     space:
       type: "Enum"
       elements: ["button", "sense", "auto_timeout"]
     is_user_editable: True
     value: "sense"
   - name: "OutsideMouthDistance"
-    description: "Distance from the tool tip to the user's mouth."
+    description: "Distance from the feeding utensil tip to the user's mouth for the bite transfer."
     space:
       type: "Box"
       lower: 0.1
@@ -46,7 +46,7 @@ parameters:
     is_user_editable: True
     value: 0.15
   - name: "TimeToWaitBeforeAutocontinue"
-    description: "Autocontinue duration for re-selecting drinking transfer after a sip."
+    description: "Autocontinue duration for re-selecting feeding utensil (bite) transfer after a bite on the web app (web interface)."
     space:
       type: "Box"
       lower: 5.0

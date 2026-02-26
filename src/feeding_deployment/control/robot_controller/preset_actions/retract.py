@@ -44,5 +44,5 @@ if __name__ == "__main__":
     # This will now use the single, shared instance of ArmInterface
     arm_interface = manager.ArmInterface()
 
-    retract_pos = [0.0, -0.34903602299465675, -3.141591055693139, -2.5482592711638783, 0.0, -0.872688061814757, 1.57075917569769]
+    retract_pos = [0.0, -0.34903602299465675, -3.141591055693139, -2.0, 0.0, -0.872688061814757, 1.57075917569769]
     arm_interface.set_joint_position(retract_pos)

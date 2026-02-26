@@ -244,6 +244,7 @@ class FeedingDeploymentPyBulletWorld:
             (self.drink_id, "drink", state.drink_pose),
             (self.wipe_id, "wipe", state.wipe_pose),
             (self.utensil_id, "utensil", state.utensil_pose),
+            (self.plate_id, "plate", state.plate_pose),
         ]:
             if state.held_object == name:
                 assert not some_object_held

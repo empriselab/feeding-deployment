@@ -176,6 +176,7 @@ class FeedingDeploymentPyBulletSimulator(FeedingDeploymentPyBulletWorld):
             drink_pose=get_pose(self.drink_id, self.physics_client_id),
             wipe_pose=get_pose(self.wipe_id, self.physics_client_id),
             utensil_pose=get_pose(self.utensil_id, self.physics_client_id),
+            plate_pose=get_pose(self.plate_id, self.physics_client_id),
             held_object=self.held_object_name,
             held_object_tf=self.held_object_tf,
         )

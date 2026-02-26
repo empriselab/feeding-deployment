@@ -3,7 +3,7 @@
 import json
 from collections import namedtuple
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, List
 import pickle
 import queue
 import os
@@ -15,6 +15,10 @@ from tomsutils.llm import OpenAILLM
 import time
 import types
 import inspect
+import base64
+import itertools
+from dataclasses import dataclass
+from PIL import Image
 
 try:
     import rospy
@@ -147,7 +151,7 @@ class _Runner:
             self.wrist_interface = None
 
         self.llm = OpenAILLM(
-            model_name="gpt-4o",
+            model_name="gpt-4.1-2025-04-14",
             cache_dir=self.log_dir / "llm_cache",
         )
 
@@ -211,11 +215,13 @@ class _Runner:
         self.drink = Object("drink", tool_type)
         self.wipe = Object("wipe", tool_type)
         self.utensil = Object("utensil", tool_type)
-        self.all_objects = {self.drink, self.wipe, self.utensil}
+        self.plate = Object("plate", tool_type)
+        self.all_objects = {self.drink, self.wipe, self.utensil, self.plate}
         self.object_name_to_object = {
             "drink": self.drink,
             "wipe": self.wipe,
             "utensil": self.utensil,
+            "plate": self.plate,
         }
         # Create all ground HLAs that will be used.
         self._all_ground_hlas = []
@@ -232,6 +238,9 @@ class _Runner:
                 self._all_ground_hlas.append(ground_hla)
         # Rewrite the behavior trees to avoid any inconsistencies.
         for hla, objs in self._all_ground_hlas:
+            # Super Hack: skip the plate transfer behavior tree.
+            if hla == self.hla_name_to_hla["TransferTool"] and objs[0].name == "plate":
+                continue
             try:
                 bt_filepath = hla.behavior_tree_dir / hla.get_behavior_tree_filename(objs, {})
             except NotImplementedError:
@@ -244,6 +253,7 @@ class _Runner:
             LiftedAtom(GripperFree, []),
             ToolPrepared([self.wipe]),
             ToolPrepared([self.drink]),
+            ToolPrepared([self.plate]),
             IsUtensil([self.utensil]),
         }
 
@@ -264,13 +274,19 @@ class _Runner:
         print("Runner is ready.")
         self.active = True
 
-    def run(self) -> None:
+    def run(self, continuous = True) -> None:
 
         assert self.web_interface is not None, "Run takes user commands from the web interface which is None."
         
         self.web_interface.ready_for_task_selection()
         last_task_type = None
         while self.active:
+            if not continuous:
+                resp = input("Press 'y' to continue RUNNER, 'n' to stop: ")
+                while resp not in ["y", "n"]:
+                    resp = input("Press 'y' to continue RUNNER, 'n' to stop: ")
+                if resp == "n":
+                    break
             try:
                 task_selection_command = self.task_selection_queue.get(timeout=1)
                 self.web_interface.clear_received_messages() # So that only the latest message is processed
@@ -299,14 +315,21 @@ class _Runner:
                         while self.active:
                             adaptation_request = self.web_interface.get_adaptability_request()
                             if adaptation_request:
-                                try:
-                                    print("Processing user update request:", adaptation_request)
-                                    update_summary = self.process_user_update_request(adaptation_request)
-                                    print('Processed user update request.')
+                                user_input = input("Do you want to manually process this? (y/n): ")
+                                while user_input not in ["y", "n"]:
+                                    user_input = input("Please enter 'y' or 'n': ")
+                                if user_input == "y":
+                                    update_summary = input("Please enter the update summary to show on the web interface: ")
                                     self.web_interface.update_adaptability_response(update_summary)
-                                except Exception as e:
-                                    print(f"Update failed: {str(e)}")
-                                    self.web_interface.update_adaptability_response("Adaptation failed. Please try rephrasing the request.")
+                                else:
+                                    try:
+                                        print("Processing user update request:", adaptation_request)
+                                        update_summary = self.process_user_update_request(adaptation_request)
+                                        print('Processed user update request.')
+                                        self.web_interface.update_adaptability_response(update_summary)
+                                    except Exception as e:
+                                        print(f"Update failed: {str(e)}")
+                                        self.web_interface.update_adaptability_response("Adaptation failed. Please try rephrasing the request.")
                             else:
                                 break
                     elif task_type == "gesture":
@@ -322,6 +345,8 @@ class _Runner:
                 else:
                     print(f"Invalid task selection: {task_selection_command}")
                     last_task_type = None
+                # self.web_interface.clear_received_messages() # So that only the latest message is processed
+                # time.sleep(1.0)
                 self.web_interface.ready_for_task_selection(last_task_type=last_task_type)
                 print("Ready for next user command.")
                 print("Current web interface page:", self.web_interface.current_page)
@@ -388,9 +413,10 @@ class _Runner:
             self.current_atoms -= operator.delete_effects
             self.current_atoms |= operator.add_effects
 
-            # Super hack: the drink and wipe are always prepared.
+            # Super hack: the drink, wipe and plate are always prepared.
             self.current_atoms.add(ToolPrepared([self.wipe]))
             self.current_atoms.add(ToolPrepared([self.drink]))
+            self.current_atoms.add(ToolPrepared([self.plate]))
 
             # Save the latest state in case we want to resume execution
             # after a crash.
@@ -421,6 +447,7 @@ class _Runner:
 
     def process_user_update_request(self, request_text: str) -> str:
         """Validate and update behavior trees."""
+        self.perception_interface.sync_rviz()
         available_hla_object_names = []
         for hla, obj_combo in self._all_ground_hlas:
             hla_name = hla.get_name()
@@ -522,6 +549,64 @@ Write a VERY BRIEF summary of all the changes for a non-technical end user. Make
         synthesized_gesture_module = types.ModuleType('synthesized_gestures')
         exec(gesture_file_text, synthesized_gesture_module.__dict__)
         return inspect.getmembers(synthesized_gesture_module, inspect.isfunction)
+    
+    def get_plate_pose(self) -> Pose | None:
+        skill = self.hla_name_to_hla["PickTool"]
+        skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
+        skill.close_gripper()
+        skill.move_to_joint_positions(self.sim.scene_description.plate_gaze_pos)
+        self.perception_interface.perceive_plate_pickup_poses()
+        skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
+        if self.perception_interface.last_plate_poses:
+            plate_pose = self.perception_interface.last_plate_poses["plate_pose"]
+            return plate_pose
+        else:
+            print("No plate pose detected.")
+            return None
+        
+    def get_drink_pose(self) -> Pose | None:
+        skill = self.hla_name_to_hla["PickTool"]
+        skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
+        skill.close_gripper()
+        skill.move_to_joint_positions(self.sim.scene_description.drink_gaze_pos)
+        self.perception_interface.perceive_drink_pickup_poses()
+        skill.move_to_joint_positions(self.sim.scene_description.retract_pos)
+        if self.perception_interface.last_drink_poses:
+            drink_pose = self.perception_interface.last_drink_poses["drink_pose"]
+            return drink_pose
+        else:
+            print("No drink pose detected.")
+            return None
+    
+    def get_multitask_personalization_state(self, user_request: str, occluded: bool = False,
+                                            actively_detect_plate: bool = False,
+                                            actively_detect_drink: bool = False) -> dict[str, Any]:
+        """Get a sufficient state for multitask personalization."""
+        mp_state = {"user_request": user_request}
+
+        if actively_detect_plate:
+            mp_state["plate_pose"] = self.get_plate_pose()
+
+        if actively_detect_drink:
+            mp_state["drink_pose"] = self.get_drink_pose()
+
+        mp_state["robot_joints"] = self.perception_interface.get_robot_joints()
+
+        if occluded:
+            mp_state["occluded"] = True
+
+        self.perception_interface.sync_rviz()
+
+        return mp_state
+    
+    def update_scene_spec(self, scene_spec_updates: dict[str, Any]) -> None:
+        """Update the scene spec with the given updates."""
+        for key, value in scene_spec_updates.items():
+            if hasattr(self.scene_description, key):
+                setattr(self.scene_description, key, value)
+            else:
+                raise ValueError(f"Invalid scene spec update: {key}")
+        print("Updated scene spec:", scene_spec_updates)
 
 
 if __name__ == "__main__":
@@ -541,6 +626,10 @@ if __name__ == "__main__":
     parser.add_argument("--max_motion_planning_time", type=float, default=10.0)
     parser.add_argument("--resume_from_state", type=str, default="")
     parser.add_argument("--no_waits", action="store_true")
+    parser.add_argument("--cbtl", action="store_true")
+    parser.add_argument("--meal_id", type=int, default=1)
+    parser.add_argument("--results_dir", type=Path, default=Path("feast_default_user"), help="Directory for saving and loading results and user responses. Make one of these directories per user.")
+    parser.add_argument("--load", action="store_true")
     args = parser.parse_args()
 
     if args.user == "":
@@ -575,86 +664,390 @@ if __name__ == "__main__":
     # runner.hla_command_queue.put(drink_transfer_msg)
 
     if not args.use_interface:
+        raise NotImplementedError
 
-        # Test adding a new gesture.
-        # gesture_label = "detect_head_shake"
-        # gesture_description = "shaking head from left to right"
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["EmulateTransfer"], (), {"test_mode": False, "gesture_label":gesture_label, "gesture_description": gesture_description} ))        
+    @dataclass
+    class Meal:
+        meal_id: int
+        context: str
+        table_type: str
+        food_items: List[str]
+        dips: List[str]
+        plate_pose: Pose = None
 
-        # Test using the new gesture.
-        # runner.process_user_update_request("Let me shake my head to tell the robot that I'm done.")
+    MEALS = [
+        Meal(1, "personal", "rectangular table", ["french fries"], ["ketchup", "BBQ sauce"], Pose((0.3, 0.75, 0.17))),
+        Meal(2, "social with friend on left", "circular table", ["raw vegetables"], ["ranch dressing", "hummus"], Pose((0.3, 0.75, 0.17))),
+        Meal(3, "watching TV in front", "circular table", ["potato wedges"], ["ketchup", "BBQ sauce"], Pose((0.3, 0.75, 0.17))),
+        Meal(4, "personal", "circular table", ["carrot sticks"], ["ranch dressing", "hummus"], Pose((0.3, 0.75, 0.17))),
+        Meal(5, "social TV-watching (with TV in front) and with friend on left side", "rectangular table", ["tater tots"], ["ketchup", "BBQ sauce"], None),
+    ]
 
-        # Now try actually doing a transfer. The gesture should be used.
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
+    # Helper function to generate all possible bite orderings.
+    def generate_bite_orderings(food_items: List[str], dips: List[str]) -> List[str]:
+        orderings = []
 
-        ## Variations on modifying the speed of the robot.
+        # All permutations of food items with all dipping combinations
+        for food_perm in itertools.permutations(food_items):
+            food_dip_variants = []
+            for food in food_perm:
+                variants = [f"{food} without any dipping"]
+                variants += [f"{food} dipped in {dip}" for dip in dips]
+                food_dip_variants.append(variants)
 
-        # All fast.
-        # runner.process_user_update_request("Set the speed of the robot to high.") 
-        # runner.process_user_update_request("Make the robot move fast.") 
-        # runner.process_user_update_request("Can the robot move faster.") 
-        # runner.process_user_update_request("The robot is too slow right now.") 
-        # runner.process_user_update_request("Go faster.") 
+            for combo in itertools.product(*food_dip_variants):
+                orderings.append(" then ".join(combo))
 
-        # All slow.
-        # runner.process_user_update_request("Set the speed of the robot to low.") 
-        # runner.process_user_update_request("Make the robot move slow.") 
-        # runner.process_user_update_request("Can the robot move slower.") 
-        # runner.process_user_update_request("The robot is too fast right now.") 
-        # runner.process_user_update_request("Go slower.")
+        if len(food_items) > 1:
+            # One alternating pattern across all food items
+            alt_variants = []
+            for food in food_items:
+                if dips:
+                    alt_variants.append(f"{food} dipped in {dips[0]}")
+                else:
+                    alt_variants.append(food)
+            if len(alt_variants) == 1:
+                alt_pattern = f"alternating bites of {alt_variants[0]}"
+            else:
+                alt_pattern = "alternating bites of " + " and ".join(alt_variants)
+            orderings.append(alt_pattern)
 
-        # All medium.
-        # runner.process_user_update_request("Can the robot go not too fast but also not too slow?") 
+        return orderings
+    
+    # Helper function to send a request to the multitask personalization module.
+    def _send_mp_request(data):
+        # Encode the message.
+        global _mp_response
+        s = pickle.dumps(data)
+        s = base64.b64encode(s).decode('ascii')
+        msg = String()
+        msg.data = s
+        _mp_response = None
+        mp_request_pub.publish(msg)
+        print("Sent MP request: ", data)  
+        while _mp_response is None:
+            time.sleep(0.1)  # Wait for the response
+        print("Received MP response: ", _mp_response)
+        return _mp_response
 
-        # Selective speeds.
-        # runner.process_user_update_request("When the robot is coming close to my mouth can it go more slowly") 
-        # runner.process_user_update_request("When the robot is bringing food into my mouth can it not go so fast")  # currently updates all transfers, but that's okay
-        # runner.process_user_update_request("I only wanted to update the speed for the food, not for the drink or the wipe. Can you set the drink and wipe back to normal") 
-        # runner.process_user_update_request("When the robot is stabbing the food it is really slow right now") 
+    # Response callback function
+    def mp_response_callback(msg):
+        # Decode the message.
+        s = base64.b64decode(msg.data.encode('ascii'))
+        data = pickle.loads(s)
+        global _mp_response
+        _mp_response = data
 
-        # Autocontinue times for transfer.
-        # runner.process_user_update_request("Stop waiting so long in between things") 
-        # runner.process_user_update_request("Can you wait just a little longer to let me decide if I want to continue") 
-        # runner.process_user_update_request("I need some more time to think")
-        # runner.process_user_update_request("I need some more time to think after taking a bite")  # updates more times than it should
-        # runner.process_user_update_request("I don't need to wait so long after drinking")  # updates more times than it should
+    # Helper function to verify predictions with the user.
+    def verify_predictions(args, field_name, prediction, options):
+        field_to_choice = {}
+        results = {}  # field name -> {"options": ..., "prediction": ..., "choice": ...}
+        results_dir: Path = args.results_dir
+        results_dir.mkdir(exist_ok=True)
+        field_to_choice_file = results_dir / f"field_to_choice_meal{args.meal_id}.json"
+        results_file = results_dir / f"results_meal{args.meal_id}.json"
+        load = False
+        if load and field_to_choice_file.exists():
+            with open(field_to_choice_file, "r") as f:
+                field_to_choice = json.load(f)
+        user_description_file = results_dir / "user_description.txt"
+        if not user_description_file.exists():
+            user_description = input("Write any kind of description for this user that will be helpful for us to refer back to later: ")
+            with open(user_description_file, "w") as f:
+                f.write(user_description)
+        field_to_choice = {}
+        results = {}  
+        print("Field name:", field_name)
+        if prediction not in options:
+            raise ValueError(f"Invalid prediction: {prediction}. Expected one of {options}.")
+        if load and field_name in field_to_choice:
+            choice = field_to_choice[field_name]
+            print(f"Loaded choice {choice} for {field_name}")
+            results[field_name] = {"options": options, "prediction": prediction, "choice": choice}
+            with open(results_file, "w") as f:
+                json.dump(results, f)
+            return choice
+        print("From the following options:")
+        for i in range(len(options)):
+            print(f"{i+1}. {options[i]}")
+        print("The robot predicted the following preference: ", prediction)
+        user_input = input("Do you agree with the robot's prediction? (y/n): ")
+        while user_input not in ["y", "n"]:
+            user_input = input("Please enter 'y' or 'n': ")
+        if user_input == "y":
+            print("User agreed with the robot's prediction.")
+            choice = prediction
+        else:
+            # get user's preference
+            preferred_id = input("Please enter the number of your preferred option: ")
+            while not preferred_id.isdigit() or int(preferred_id) < 1 or int(preferred_id) > len(options):
+                preferred_id = input("Please enter a valid number: ")
+            preferred_id = int(preferred_id) - 1
+            print(f"User preferred option: {options[preferred_id]}")
+            choice = options[preferred_id]
+        field_to_choice[field_name] = choice
+        with open(field_to_choice_file, "w") as f:
+            json.dump(field_to_choice, f)
+        results[field_name] = {"options": options, "prediction": prediction, "choice": choice}
+        with open(results_file, "w") as f:
+            json.dump(results, f)
+        return choice
+    
+    if args.resume_from_state != "":
+        if args.cbtl:
+            # Resuming from a previous CBTL run 
+            with open(runner.log_dir / "scene_spec_updates.json", "r") as f:
+                update_specs = json.load(f)
 
-        # Outside mouth distance.
-        # runner.process_user_update_request("Set the outside mouth distance for transfer to 12 cms.")
-        # runner.process_user_update_request("Can you come closer to my mouth with the food?")
-        # runner.process_user_update_request("Please stay farther away from me")
-        # runner.process_user_update_request("Set the outside mouth distance for transfer to 0 cm.")  # should fail
-        # runner.process_user_update_request("Come just a tiny bit closer to my mouth.")
+            plate_delta_xy = update_specs["plate_delta_xy"]
+            before_transfer_pose = Pose(update_specs["before_transfer_pose"][0], update_specs["before_transfer_pose"][1])
+            before_transfer_pos = update_specs["before_transfer_pos"]
+            above_plate_pos = update_specs["above_plate_pos"]
 
-        # NOTE: this is not working perfectly -- it updates the transfer distance for all 3 transfer skills.
-        # runner.process_user_update_request("Stay just a little farther away from my mouth when you are bringing the drink.")
+        else:
+            plate_delta_xy = (0.0, 0.0)
+            before_transfer_pose = Pose((0.43629148602485657, 0.5221561789512634, 0.5431587100028992), 
+                                        (-0.03718446899872125, 0.705653494730171, 0.7073595770431803, -0.01768868015632298))
+            before_transfer_pos = (-3.1390543947548384, -1.4689991246554897, -2.284652129616783, -1.4035934861797976, 1.247671130152002, -0.7409223079286891, 1.863516879062629)
+            above_plate_pos = (3.0760043222633215, -1.532676904215938, -2.4219980049348946, -1.397861298249511, 1.3906581132911193, -0.8611986522399375, -2.943499541174756)
 
-        # Removing the "Confirm Ready for Transfer" page on the web app.
-        # runner.process_user_update_request("Remove all transfer confirmations from the web app.")
-        # runner.process_user_update_request("Remove all transfer confirmations.")
+        runner.update_scene_spec({"plate_delta_xy": plate_delta_xy})
+        runner.update_scene_spec({"before_transfer_pose": before_transfer_pose})    
+        runner.update_scene_spec({"before_transfer_pos": before_transfer_pos})
+        runner.update_scene_spec({"above_plate_pos": above_plate_pos})
 
-        # NOTE: this is not working perfectly -- it updates "silent for ReadyForTransferInteraction" instead of the web app confirmations.
-        # runner.process_user_update_request("On the iPad, don't ask me to confirm when I'm ready.")
-
-
-        input("Press Enter to continue...")
-
-        # Run some commands.
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.utensil,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.wipe,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["TransferTool"], (runner.drink,)))
-        runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.wipe,)))
-        # for i in range(5):
-        #     runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
-        #     runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["StowTool"], (runner.drink,)))
-        # runner.process_user_command(GroundHighLevelAction(runner.hla_name_to_hla["PickTool"], (runner.drink,)))
-    else:
         runner.run()
+
+    else:
+        current_meal = MEALS[args.meal_id-1]
+        assert current_meal.meal_id == args.meal_id
+        bite_ordering_options = generate_bite_orderings(current_meal.food_items, current_meal.dips)
+
+        feeding_side = "right"
+        bite_ordering = bite_ordering_options[0]
+        ready_signal = "mouth_open"
+        be_verbal = True
+        if args.cbtl:
+            # sends encoded messages to multitask personalization on ROS topic /mp_request, and expects to receive a response on /mp_response
+
+            mp_response_sub = rospy.Subscriber("/mp_response", String, mp_response_callback)
+            mp_request_pub = rospy.Publisher("/mp_request", String, queue_size=10)
+            time.sleep(1)  # Wait for the subscriber and publisher to be ready
+        
+            # send mealContext, table_type, food_items and bite_ordering_options to multitask personalization
+            mp_response = _send_mp_request({"request_type": "initialization_query",
+                        "meal_id": current_meal.meal_id,
+                        "context": current_meal.context, 
+                        "table_type": current_meal.table_type,
+                        "food_items": current_meal.food_items,
+                        "dips": current_meal.dips,
+                        "bite_ordering_options": bite_ordering_options})
+            assert mp_response["response_type"] == "initialization_query"
+            feeding_side = mp_response["feeding_side"]
+            bite_ordering = mp_response["bite_ordering"]
+            ready_signal = mp_response["ready_signal"]
+            be_verbal = mp_response["be_verbal"]
+
+        # ready signal
+        if ready_signal == "auto_continue":
+            ready_signal = "auto_timeout"
+        runner.process_user_update_request(f"For all transfer actions, set the initiate transfer interaction to {ready_signal}. Do not consider the plate tool.")
+        # be verbal
+        if not be_verbal:
+            runner.process_user_update_request("For all actions, be quiet.")
+        else:
+            runner.process_user_update_request("For all actions, speak aloud what you are doing.")
+        # set params for bite acquisition
+        runner.flair.inference_server.FOOD_CLASSES = []
+        runner.flair.inference_server.FOOD_CATEGORIES = []
+        for food_item in current_meal.food_items:
+            runner.flair.inference_server.FOOD_CLASSES.append(food_item)
+            runner.flair.inference_server.FOOD_CATEGORIES.append("solid")
+        for dip in current_meal.dips:
+            runner.flair.inference_server.FOOD_CLASSES.append(dip)
+            runner.flair.inference_server.FOOD_CATEGORIES.append("dip")
+        runner.flair.user_preference = bite_ordering
+
+        # show parameters to the user on the web interface
+        assert runner.web_interface is not None
+        explanation_text = f"The robot has made the following predictions for this meal -- bite ordering: {bite_ordering},"
+        if ready_signal == "auto_timeout":
+            explanation_text += " ready signal: auto-continue after a timeout,"
+        elif ready_signal == "mouth_open":
+            explanation_text += " ready signal: mouth open detection,"
+        else: # button
+            explanation_text += " ready signal: button press,"
+        if be_verbal:
+            explanation_text += " speak aloud: yes."
+        else:
+            explanation_text += " speak aloud: no."
+        print('Explanation text:', explanation_text)
+        runner.web_interface.switch_to_explanation_page()
+        input("Press Enter to see the explanation on the web interface...")
+        runner.web_interface.fix_explanation(explanation_text)
+
+        input("Showing explanation. Press Enter to continue...")
+        # have user make edits using the web interface (if needed) for adaptability
+        runner.web_interface.clear_explanation()
+        time.sleep(2)
+        runner.run(continuous=False)  # run once to process any adaptability requests
+
+        if args.cbtl:
+            # Rajat manually inputs preferences
+            feeding_side = verify_predictions(args, "feeding_side", feeding_side, ["left", "right"])
+            bite_ordering = verify_predictions(args, "bite_ordering", bite_ordering, bite_ordering_options)
+            ready_signal = verify_predictions(args, "ready_signal", ready_signal, ["mouth_open", "button", "auto_continue"])
+            be_verbal = verify_predictions(args, "be_verbal", be_verbal, [True, False])
+
+            # send the verified predictions to multitask personalization
+            mp_response = _send_mp_request({"request_type": "initialization_dataset",
+                            "feeding_side": feeding_side, 
+                            "bite_ordering": bite_ordering, 
+                            "ready_signal": ready_signal,
+                            "be_verbal": be_verbal})
+            assert mp_response["response_type"] == "initialization_dataset"
+            
+            if current_meal.meal_id != 5:
+                # occlusion
+                current_plate_pose = current_meal.plate_pose
+
+                occlusion = True
+                occlusion_iter = 0
+                while occlusion:
+                    occlusion = False
+                    mp_response = _send_mp_request({"request_type": "occlusion_query",
+                                                    "plate_pose": current_plate_pose,
+                                                    "drink_pose": None,
+                                                    })
+                    assert mp_response["response_type"] == "occlusion_query"
+                    plate_delta_xy = mp_response["plate_delta_xy"]
+                    drink_delta_xy = mp_response["drink_delta_xy"]
+                    before_transfer_pose = mp_response["before_transfer_pose"]
+                    before_transfer_pos = mp_response["before_transfer_pos"]
+                    above_plate_pos = mp_response["above_plate_pos"]
+                    occlusion_poi_relevance = mp_response["occlusion_poi_relevance"]
+                    bite_occlusion_image = mp_response["bite_occlusion_image"]
+                    drink_occlusion_image = mp_response["drink_occlusion_image"]
+
+                    # TODO visualize the potential occlusion points
+                    new_plate_pose = Pose((current_plate_pose.position[0] + plate_delta_xy[0],
+                                        current_plate_pose.position[1] + plate_delta_xy[1],
+                                        current_plate_pose.position[2]),
+                                        current_plate_pose.orientation)
+                    occlusion_dataset_dict = {
+                        "request_type": "occlusion_dataset",
+                        "plate_pose": new_plate_pose,
+                        "drink_pose": None,
+                        "occlusion": {}
+                    }
+                    for poi, prediction in occlusion_poi_relevance.items():
+                        print(f"Verifying the RELEVANCE of POI={poi} for this meal")
+                        relevance = verify_predictions(args, f"occlusion-poi-{poi}-relevance-iter{occlusion_iter}", prediction, [True, False])
+                        if relevance:
+                            print(f"Verifying whether view was occluded for POI={poi} during FEEDING")
+                            Image.fromarray(bite_occlusion_image).show()
+                            plate_occlusion = verify_predictions(args, f"occlusion-poi-{poi}-feeding-iter{occlusion_iter}", False, [True, False])
+                        else:
+                            plate_occlusion = False
+                        occlusion_dataset_dict["occlusion"][poi] = {
+                            "relevance": relevance,
+                            "plate_occlusion": plate_occlusion,
+                            "drink_occlusion": False,
+                        }
+                        if plate_occlusion:
+                            occlusion = True
+
+                    mp_response = _send_mp_request(occlusion_dataset_dict)
+                    current_plate_pose = new_plate_pose
+                    occlusion_iter += 1
+            else:
+                # ready signal
+                if ready_signal == "auto_continue":
+                    ready_signal = "auto_timeout"
+                runner.process_user_update_request(f"For all transfer actions, set the initiate transfer interaction to {ready_signal}. Do not consider the plate tool.")
+                # be verbal
+                if not be_verbal:
+                    runner.process_user_update_request("For all actions, be quiet.")
+                else:
+                    runner.process_user_update_request("For all actions, speak aloud what you are doing.")
+                # set params for bite acquisition
+                runner.flair.user_preference = bite_ordering
+
+                print("For meal 5, the plate pose needs to be detected.")
+               
+                pick_tool = runner.hla_name_to_hla["PickTool"]
+                stow_tool = runner.hla_name_to_hla["StowTool"]
+
+                # # SEQUENCE 1: Feeding with only plate
+
+                plate_pose = runner.get_plate_pose()
+                while plate_pose is None:
+                    print("No plate pose detected.")
+                    input("Please adjust the plate and press Enter to continue...")
+                    plate_pose = runner.get_plate_pose()
+                plate_pose = Pose((plate_pose.position[0], plate_pose.position[1], 0.17))
+
+                mp_response = _send_mp_request({"request_type": "occlusion_query",
+                                    "plate_pose": plate_pose, 
+                                    "drink_pose": None})
+                assert mp_response["response_type"] == "occlusion_query"
+                disoriented_plate_delta_xy = mp_response["plate_delta_xy"]
+                plate_delta_xy = (-1 * disoriented_plate_delta_xy[1], disoriented_plate_delta_xy[0])
+                before_transfer_pose = mp_response["before_transfer_pose"]
+                before_transfer_pos = mp_response["before_transfer_pos"]
+                above_plate_pos = mp_response["above_plate_pos"]
+                occlusion_poi_relevance = mp_response["occlusion_poi_relevance"]
+                bite_occlusion_image = mp_response["bite_occlusion_image"]
+
+                Image.fromarray(bite_occlusion_image).show()
+                print("Visualizing bite occlusion image.")
+                input("Press Enter to continue...")
+
+                runner.update_scene_spec({"plate_delta_xy": plate_delta_xy})
+                runner.update_scene_spec({"before_transfer_pose": before_transfer_pose})
+                runner.update_scene_spec({"before_transfer_pos": before_transfer_pos})
+                runner.update_scene_spec({"above_plate_pos": above_plate_pos})
+
+                update_specs = {
+                    "plate_delta_xy": plate_delta_xy,
+                    "before_transfer_pose": before_transfer_pose,
+                    "before_transfer_pos": before_transfer_pos,
+                    "above_plate_pos": above_plate_pos
+                }
+                # save them in log file
+                with open(runner.log_dir / "scene_spec_updates.json", "w") as f:
+                    json.dump(update_specs, f, indent=4)
+
+                if not np.allclose(plate_delta_xy, [0, 0], atol=1e-3):
+                    # pick and stow the plate
+                    input("Press Enter to move the plate...")
+                    runner.process_user_command(GroundHighLevelAction(pick_tool, (runner.plate,)))
+                    runner.process_user_command(GroundHighLevelAction(stow_tool, (runner.plate,)))
+
+                runner.run()
+
+        else:
+            if current_meal.meal_id == 5:
+                bite_ordering = verify_predictions(args, "bite_ordering", bite_ordering, bite_ordering_options)
+                runner.flair.user_preference = bite_ordering
+
+                plate_delta_xy = (0.0, 0.0)
+                before_transfer_pose = Pose((0.43629148602485657, 0.5221561789512634, 0.5431587100028992), 
+                                            (-0.03718446899872125, 0.705653494730171, 0.7073595770431803, -0.01768868015632298))
+                before_transfer_pos = (-3.1390543947548384, -1.4689991246554897, -2.284652129616783, -1.4035934861797976, 1.247671130152002, -0.7409223079286891, 1.863516879062629)
+                above_plate_pos = (3.0760043222633215, -1.532676904215938, -2.4219980049348946, -1.397861298249511, 1.3906581132911193, -0.8611986522399375, -2.943499541174756)
+
+                runner.update_scene_spec({"plate_delta_xy": plate_delta_xy})
+                runner.update_scene_spec({"before_transfer_pose": before_transfer_pose})    
+                runner.update_scene_spec({"before_transfer_pos": before_transfer_pos})
+                runner.update_scene_spec({"above_plate_pos": above_plate_pos})
+                runner.run()
+
+    print("Run complete.")
 
     if args.make_videos:
         output_path = Path(__file__).parent / "videos" / "full.mp4"
         runner.make_video(output_path)
 
-    if args.run_on_robot:
-        rospy.spin()
+    # if args.run_on_robot:
+    #     rospy.spin()

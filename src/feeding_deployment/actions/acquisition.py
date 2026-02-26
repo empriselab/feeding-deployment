@@ -36,6 +36,9 @@ class AcquireBiteHLA(HighLevelAction):
         self.food_manipulation_skill_library = FoodManipulationSkillLibrary(self.sim, self.robot_interface, self.wrist_interface, self.perception_interface, self.rviz_interface, self.no_waits)
         self.params = None
 
+        self.food_detection_log_dir = self.log_dir / "food_detection_log"
+        self.food_detection_log_dir.mkdir(exist_ok=True)
+
     def get_name(self) -> str:
         return "AcquireBiteWithTool"
     
@@ -59,7 +62,7 @@ class AcquireBiteHLA(HighLevelAction):
         assert tool.name == "utensil"
         return "acquire_bite.yaml"
     
-    def acquire_bite(self, speed: str, dipping_depth: float, skewering_depth: float, autocontinue_timeout: float, ask_confirmation: bool) -> None:
+    def acquire_bite(self, speed: str, dipping_depth: float, skewering_depth: float, skewering_orientation: str, autocontinue_timeout: float, ask_confirmation: bool) -> None:
 
         assert self.sim.held_object_name == "utensil"
 
@@ -117,17 +120,18 @@ class AcquireBiteHLA(HighLevelAction):
                         "bite_ordering_preference": self.flair.get_preference(),
                         "items_detection": items_detection,
                     }
-                    # check if "food_detection_data.pkl" exists
-                    # file_name = "food_detection_data"
-                    # id = 0
-                    # while (self.log_dir / f"{file_name}_{id}.pkl").exists():
-                    #     id += 1
-                    # with open(self.log_dir / f"{file_name}_{id}.pkl", "wb") as f:
-                    #     pickle.dump(food_detection_data, f)
 
                     with open(self.log_dir / "food_detection_data.pkl", "wb") as f:
                         pickle.dump(food_detection_data, f)
 
+                    # food detection continuous log
+                    file_name = "food_detection_data"
+                    id = 0
+                    while (self.food_detection_log_dir / f"{file_name}_{id}.pkl").exists():
+                        id += 1
+                    with open(self.food_detection_log_dir / f"{file_name}_{id}.pkl", "wb") as f:
+                        pickle.dump(food_detection_data, f)
+                        
                 else:
                     # read last logged data
                     try:
@@ -218,11 +222,13 @@ class AcquireBiteHLA(HighLevelAction):
 
                     if skill == "Skewer":
                         skewer_point, skewer_angle = self.flair.inference_server.get_skewer_action(mask)
+                        if skewering_orientation == "vertical":
+                            skewer_angle = skewer_angle + np.pi / 2
                         skill_success = self.food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data, keypoint = skewer_point, major_axis = skewer_angle, skewering_depth=skewering_depth)
                     elif skill == "Scoop":
                         raise NotImplementedError("Scoop skill not yet implemented")
                     
-                    if dip_type != "No dip":
+                    if dip_type != "No dip" and skill_success:
                         self.flair.update_bite_history(dip_type)
                         dip_mask = food_type_to_masks[dip_type][0]
                         dip_point = self.flair.inference_server.get_dip_action(dip_mask)

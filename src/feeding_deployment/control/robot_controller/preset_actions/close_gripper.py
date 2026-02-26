@@ -25,7 +25,13 @@ from feeding_deployment.control.robot_controller.command_interface import Kinova
 
 
 if __name__ == "__main__":
-
+    import argparse
+    parser = argparse.ArgumentParser()
+    # Add a time sleep argument.
+    parser.add_argument("--sleep", type=float, default=0.0, help="Time to sleep before closing gripper")
+    args = parser.parse_args()
+    time.sleep(args.sleep)
+    
     assert ROSPY_IMPORTED, "ROS is required to run on the real robot"
     rospy.init_node("close_gripper_action")
 

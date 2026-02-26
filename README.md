@@ -17,7 +17,7 @@
 ## Run Feeding Demo on Real Robot
 1. Run the arm controller server on the NUC:
    - ssh to the NUC: `sshnuc` with lab password
-   - zero the arm torque offsets:
+   - [only for inside-mouth bite transfer] zero the arm torque offsets:
         - Alias `set_zeros` on NUC
         - Otherwise, run the following commands:
              - `conda activate controller`
@@ -49,19 +49,30 @@
         - `rosrun wrist_driver_ros wrist_driver`  
    - _Important Note:_ To shutdown this node, press Ctrl + / (Signal handling is setup to shutdown cleanly)
 5. Start the web application:
+   - Make sure that the feeding laptop's WiFi is off (so that the webapp only launches on the router IP)
    - Alias `launch_app` on compute system
    - Otherwise, run the following commands from the root of your ROS workspace:
         - `conda activate feed`
         - `source devel/setup.bash`
         - `cd ~/deployment_ws/src/feedingpage/vue-ros-demo`
-        - `npm run serve` 
+        - `npm run serve`
+   - On a browser connected to FeedingDeployment-5G (on the laptop or the iPad), open the following webpage: `http://192.168.1.2:8080/#/task_selection`  
 6. Run the feeding demo:
+   - Make sure that the feeding laptop's WiFi is on and connected to the internet so that ChatGPT API works (use KortexWiFi if available)
    - Alias `run_demo` on compute system
    - Otherwise,run the following commands from the root of your ROS workspace:
         - `conda activate feed`
         - `source devel/setup.bash`
         - `cd src/feeding-deployment/src/feeding_deployment/integration`
-        - `python demo.py --run_on_robot --use_interface --no_waits`
+        - `python run.py --user tests --run_on_robot --use_interface --no_waits`
+   - _Important Note 1:_ If you want to resume from some state (state names: after_utensil_pickup, after_bite_pickup, last_state), use: `python run.py --user tests --run_on_robot --use_interface --no_waits --resume_from_state after_utensil_pickup` (replace after_utensil_pickup with appropriate state name).
+   - _Important Note 2:_ The preset food item for `tests` user is bananas. If you want to try some other food item, just change the user name to a new one. For example, `python run.py --user tests_new --run_on_robot --use_interface --no_waits`
+
+### Moving the robot to preset configurations
+
+You can move the robot to preset configurations by running:
+- Alias `cd_actions` on compute system
+- `python retract.py` (you can also send it to transfer.py and acquisition.py) 
 
 ### Calibrate tool offset for inside-mouth transfer
 
@@ -94,7 +105,7 @@
 
 - To check FT readings: `rostopic echo /forque/forqueSensor`
 - IP for robot: 192.168..10
-- IP for webapp:" http://192.168.1.2:8080/#/home
+- IP for webapp: `http://192.168.1.2:8080/#/task_selection`
 
 ## Check Installation
 

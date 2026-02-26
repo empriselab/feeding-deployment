@@ -127,6 +127,8 @@ IMPORTANT 1: Have the following lines exactly as is in your code:
             break
 ```
 
+IMPORTANT 2: The head poses are not guaranteed to be in any particular frame. So DO NOT use abs(roll), abs(pitch), abs(yaw) to check if there has been no change -- those are absolute values in an arbitrary frame.
+
 Input:
 ##################
 Language Description: %s

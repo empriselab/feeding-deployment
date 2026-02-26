@@ -117,49 +117,14 @@ if __name__ == "__main__":
     if run_commands != "y":
         exit()
 
-    # before_transfer_pos = [
-    #     -2.2918810140796944, 
-    #     -1.3007262259143966, 
-    #     -1.7207919509747756, 
-    #     -2.208494777188223, 
-    #     -0.4778078511832584, 
-    #     -0.16136412624120933, 
-    #     -2.998179564676263
-    # ]
-
-    before_transfer_pos = [
-        -2.86554642,
-        -1.61951779,
-        -2.60986085,
-        -1.37302839,
-        1.11779249,
-        -1.18028264,
-        2.05515862,
-    ]
-
-    arm_client_interface.execute_command(JointCommand(before_transfer_pos))
-
-    retract_pos = [0.0, -0.34903602299465675, -3.141591055693139, -2.5482592711638783, 0.0, -0.872688061814757, 1.57075917569769]
-
-    time.sleep(5.0)
+    retract_pos = [0.0, -0.34903602299465675, -3.141591055693139, -2.0, 0.0, -0.872688061814757, 1.57075917569769]
     arm_client_interface.execute_command(JointCommand(retract_pos))
 
-    time.sleep(5.0)
+    # midpoint_pos = [2.2912525080624357, 0.730991513381838, 2.0830126187361424, -2.1737367965371632, 0.28532185799581516, -0.4648462461578422, -0.29495787389950756]
+    # arm_client_interface.execute_command(JointCommand(midpoint_pos))
+
+    before_transfer_pos = [-2.86554642, -1.61951779, -2.60986085, -1.37302839, 1.11779249, -1.18028264, 2.05515862]
     arm_client_interface.execute_command(JointCommand(before_transfer_pos))
 
-    arm_client_interface.execute_command(JointCommand(retract_pos))
-
-    # input("Press enter to go to compliance mode...")
-    # arm_client_interface.switch_to_task_compliant_mode()
-
-    # arm_pos, ee_pose, gripper_pos = arm_client_interface.get_state()
-    # drop_test_pose = np.zeros(7)
-    # drop_test_pose[:3] = [0.45, 0.62, 0.6]
-    # drop_test_pose[3:] = [-0.03083443277876381, 0.7132803649800029, 0.7001853591905794, -0.00456305428030798]
-    # drop_test_task_command = CartesianCommand(pos=drop_test_pose[:3], quat=drop_test_pose[3:])
-    
-    # input("Press Enter to move to drop test pos")
-    # arm_client_interface.execute_command(drop_test_task_command)
-
-    # input('Press Enter to switch out of compliant mode')
-    # arm_client_interface.switch_out_of_compliant_mode()
+    # drink_gaze_pos = [-0.004187021865822871, 0.6034579885210962, -3.1259047705564633, -2.3538005746884725, 0.01149092320739253, 1.3411586039000891, 1.6825233913747728]
+    # arm_client_interface.execute_command(JointCommand(drink_gaze_pos))

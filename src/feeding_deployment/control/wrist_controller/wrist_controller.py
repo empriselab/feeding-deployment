@@ -285,9 +285,11 @@ if __name__ == '__main__':
     rospy.init_node('wrist_controller', anonymous=True)
     wrist_controller = WristInterface()
     wrist_controller.set_velocity_mode()
-    wrist_controller.reset()
-    wrist_controller.twirl_wrist(vel=8)
-    # wrist_controller.set_to_scoop_pos()
+
+    while not rospy.is_shutdown():
+        wrist_controller.reset()
+        wrist_controller.twirl_wrist(vel=8)
+        wrist_controller.set_to_scoop_pos()
 
     # input("Press Enter to start horizontal spoon thread")
     # wrist_controller.start_horizontal_spoon_thread()

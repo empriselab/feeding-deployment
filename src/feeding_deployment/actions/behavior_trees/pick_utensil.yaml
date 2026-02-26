@@ -1,9 +1,9 @@
 name: "PickUtensil"
-description: "Pick up the utensil from the tool mount."
+description: "Pick up the feeding (bite) utensil from the tool mount."
 type: "Behavior"
 parameters:
   - name: "Speed"
-    description: "Speed of the robot during picking up the utensil."
+    description: "Speed of the robot during picking up the feeding (bite) utensil."
     space:
       type: Enum
       elements: ["low", "medium", "high"]

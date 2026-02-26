@@ -48,13 +48,16 @@ def test_FoodManipulationSkillLibrary(sim, robot_interface, wrist_interface, per
 
     wrist_interface.set_velocity_mode()    
     food_manipulation_skill_library = FoodManipulationSkillLibrary(sim, robot_interface, wrist_interface, perception_interface, rviz_interface, no_waits)
-    food_manipulation_skill_library.reset()
-    camera_color_data, camera_info_data, camera_depth_data = perception_interface.get_camera_data()
-    food_manipulation_skill_library.dipping_skill(camera_color_data, camera_depth_data, camera_info_data)
 
-def test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, run_behavior_tree_dir, no_waits, log_path=None):
+    for i in range(10):
+        food_manipulation_skill_library.reset()
+        camera_color_data, camera_info_data, camera_depth_data = perception_interface.get_camera_data()
+        # food_manipulation_skill_library.dipping_skill(camera_color_data, camera_depth_data, camera_info_data)
+        food_manipulation_skill_library.skewering_skill(camera_color_data, camera_depth_data, camera_info_data)
 
-    high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair=None, behavior_tree_dir=run_behavior_tree_dir , no_waits=no_waits, log_path=None)    
+def test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, no_waits, log_dir, run_behavior_tree_dir, execution_log, gesture_detectors_dir):
+
+    high_level_action = TransferToolHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, no_waits, log_dir, run_behavior_tree_dir, execution_log, gesture_detectors_dir)    
 
     if tool == "fork":
         utensil = Object("utensil", tool_type)
@@ -184,17 +187,18 @@ def _main(
     # for original_bt_filename in original_behavior_tree_dir.glob("*.yaml"):
     #     shutil.copy(original_bt_filename, run_behavior_tree_dir)
 
-    # test_FoodManipulationSkillLibrary(sim, robot_interface, wrist_interface, perception_interface, rviz_interface, no_waits)
-    test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, no_waits, log_dir, run_behavior_tree_dir, execution_log, gesture_detectors_dir)
+    test_FoodManipulationSkillLibrary(sim, robot_interface, wrist_interface, perception_interface, rviz_interface, no_waits)
+    
+    # test_AcquireBiteHLA(sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, no_waits, log_dir, run_behavior_tree_dir, execution_log, gesture_detectors_dir)
     # for i in range(25):
-    # test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, run_behavior_tree_dir, no_waits, log_path=None)
+        # test_TransferToolHLA(tool, sim, robot_interface, perception_interface, rviz_interface, web_interface, hla_hyperparams, wrist_interface, flair, no_waits, log_dir, run_behavior_tree_dir, execution_log, gesture_detectors_dir)
 
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--scene_config", type=str, default="vention")
-    parser.add_argument("--transfer_type", type=str, default="outside")
+    parser.add_argument("--transfer_type", type=str, default="inside")
     parser.add_argument("--run_on_robot", action="store_true")
     parser.add_argument("--use_interface", action="store_true")
     parser.add_argument("--simulate_head_perception", action="store_true")

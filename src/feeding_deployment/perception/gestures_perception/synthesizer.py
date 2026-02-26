@@ -40,7 +40,7 @@ class PersonalizedGestureDetectorSynthesizer:
     def __init__(self, log_dir):
 
         self.llm = OpenAILLM(
-            model_name="gpt-4o",
+            model_name="gpt-4.1-2025-04-14",
             cache_dir=log_dir / "llm_cache",
             max_tokens=2500,
         )
@@ -205,8 +205,8 @@ def main():
     #         }, f)
         
 
-    synthesizer = PersonalizedGestureDetectorSynthesizer(log_dir=Path(__file__).parent / "log" / "testing_gestures")
-    gesture_data_path = Path(__file__).parent.parent.parent / "integration" / "log" / "gesture_examples_rajat" / "head_still.pkl"
+    synthesizer = PersonalizedGestureDetectorSynthesizer(log_dir=Path(__file__).parent / "log" / "testing_gestures_2")
+    gesture_data_path = Path(__file__).parent.parent.parent / "integration" / "log" / "benjamin" / "tv" / "gesture_detectors" / "gesture_examples" / "head_still.pkl"
     generated_function_txt, accuracy = synthesizer.generate_function(gesture_datapath=gesture_data_path)
     # synthesizer.test_in_context_examples()
 

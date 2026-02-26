@@ -1,9 +1,9 @@
 name: "AcquireBite"
-description: "Pick up the appropriate food item from the plate."
+description: "Pick up the appropriate food item from the plate. The robot predicts a food item to pickup from the plate and waits TimeToWaitBeforeAutocontinue on the web application (web interface) before auto-continuing the pickup bite button. Within this duration, the user can confirm or change the prediction. The robot then attempts to pick up the food item from the plate and dip it if required. The robot then asks for confirmation on the web application (web interface) before initiating the transfer sequence for a bite, which is controlled by the TransferAskForConfirmation parameter."
 type: "Behavior"
 parameters:
   - name: "Speed"
-    description: "Speed of the robot during bite acquisition."
+    description: "Speed of the robot during bite acquisition (bite pickup)."
     space:
       type: Enum
       elements: ["low", "medium", "high"]
@@ -25,8 +25,15 @@ parameters:
       upper: 0.05
     is_user_editable: True
     value: 0.015
+  - name: "SkeweringOrientation"
+    description: "The orientation for skewering food (with respect to major axis of food)."
+    space:
+      type: Enum
+      elements: ["horizontal", "vertical"]
+    is_user_editable: True
+    value: "horizontal"
   - name: "TimeToWaitBeforeAutocontinue"
-    description: "Time to wait before auto-continuing pickup bite button on the webapp."
+    description: "Time to wait before auto-continuing pickup bite button on the web app (web interface)."
     space:
       type: "Box"
       lower: 5.0
@@ -34,7 +41,7 @@ parameters:
     is_user_editable: True
     value: 10.0
   - name: "TransferAskForConfirmation"
-    description: "Ask for confirmation on the web app before initiating the transfer sequence for a bite."
+    description: "Ask for confirmation on the web app (web interface) before initiating the transfer sequence for a bite."
     space:
       type: "Enum"
       elements: [0, 1]

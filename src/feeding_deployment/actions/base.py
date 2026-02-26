@@ -911,7 +911,7 @@ Which of the following skills may be relevant to this request?
     all_nodes_description = ""
     
     # Load the behavior trees.
-    all_nodes_description += "Bite:\n"
+    all_nodes_description += "Behavior Tree Nodes Related to Bite (synonyms: Feeding, Utensil, Food Item):\n"
     for bite_node in bite:
         # if bite_node not in relevant_bts_response:
         #     continue
@@ -919,7 +919,7 @@ Which of the following skills may be relevant to this request?
             node_description = f.read()
         all_nodes_description += node_description + "\n---\n"
 
-    all_nodes_description += "Drink:\n"
+    all_nodes_description += "Behavior Tree Nodes Related to Drink (synonyms: Mug, Sip, Liquid):\n"
     for drink_node in drink:
         # if drink_node not in relevant_bts_response:
         #     continue
@@ -927,7 +927,7 @@ Which of the following skills may be relevant to this request?
             node_description = f.read()
         all_nodes_description += node_description + "\n---\n"
 
-    all_nodes_description += "Wipe:\n"
+    all_nodes_description += "Behavior Tree Nodes Related to Wipe (synonyms: Clean, Cloth):\n"
     for wipe_node in wipe:
         # if wipe_node not in relevant_bts_response:
         #     continue
@@ -979,7 +979,12 @@ Here are all behavior trees:
 Note that the units used for parameters are all speeds in degrees per second, all durations in seconds, and all distances in meters. Take this into account when user requests contain units and make sure to convert them to the appropriate units for the behavior tree.
 
 Based on the information given, convert the original command into a list of one or more structured outputs. 
-If the user does not specifically mention a certain tool, make the update for all tools.
+IMPORTANT: If the user does not specify a certain tool or their synonym between 
+1. bite (synonyms: feeding, utensil, food item), 
+2. drink (synonyms: mug, sip, liquid), and 
+3. wipe (synonyms: clean, cloth), 
+make the update for all tools. 
+However, if they specifically mention a tool or the tool is clear from the context, only make the update for that tool. For example, if they mention "increase the speed of the robot for bites", only make the update for actions involving the feeding utensil tool, i.e., PickUtensil, AcquireBite, TransferUtensil, and StowUtensil.
 
 Return your answer in a format where calling eval() in python will directly produce a list of UserUpdateRequest instances.
 """
@@ -1085,10 +1090,19 @@ def _strip_python_response(response: str) -> str:
 
 
 def _parameter_name_is_valid(parameter_name, node_name, behavior_tree_prompt):
-    node_name_substring = f'name: "{node_name}"'
+    node_name_substring = f'name: {node_name}'
+    with open("debug.txt", "w") as f:
+        f.write("Parameter name being checked for validity: %s\n" % parameter_name)
+        f.write("Node name: %s\n" % node_name)
+        f.write("Behavior tree prompt: %s\n" % behavior_tree_prompt)
+        f.write("Node name substring: %s\n" % node_name_substring)
     for match in re.finditer(node_name_substring, behavior_tree_prompt):
         idx = match.start()
         end = behavior_tree_prompt[idx:].find("---")
         if parameter_name in behavior_tree_prompt[idx:idx+end]:
+            with open("debug.txt", "a") as f:
+                f.write("Parameter name is valid\n")
             return True
+    with open("debug.txt", "a") as f:
+        f.write("Parameter name is invalid\n")
     return False

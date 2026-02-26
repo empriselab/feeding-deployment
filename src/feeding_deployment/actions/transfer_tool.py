@@ -45,11 +45,13 @@ class TransferToolHLA(HighLevelAction):
         super().__init__(*args, **kwargs)
 
         self.tool = None
+        self.head_perception_log_dir = self.log_dir / "head_perception_log"
+        self.head_perception_log_dir.mkdir(exist_ok=True)
 
         if self.sim.scene_description.transfer_type == "inside":
-            self.transfer = InsideMouthTransfer(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.no_waits)
+            self.transfer = InsideMouthTransfer(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.no_waits, self.head_perception_log_dir)
         elif self.sim.scene_description.transfer_type == "outside":
-            self.transfer = OutsideMouthTransfer(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.no_waits)
+            self.transfer = OutsideMouthTransfer(self.sim, self.robot_interface, self.perception_interface, self.rviz_interface, self.no_waits, self.head_perception_log_dir)
         else:
             raise ValueError("Bite transfer type not recognized")
 
@@ -166,6 +168,8 @@ class TransferToolHLA(HighLevelAction):
                     raise NotImplementedError
         elif ready_to_initiate_transfer_interaction == "led":
             self.perception_interface.turn_on_led()
+        elif ready_to_initiate_transfer_interaction == "beep":
+            self.perception_interface.speak("Beep")
         else:
             raise NotImplementedError
 
@@ -176,15 +180,18 @@ class TransferToolHLA(HighLevelAction):
             self.perception_interface.speak("Ready for transfer")
         elif ready_for_transfer_interaction == "led":
             self.perception_interface.turn_on_led()
+        elif ready_for_transfer_interaction == "beep":
+            self.perception_interface.speak("Beep")
         else:
             raise NotImplementedError
 
-    def execute_transfer(self, ready_to_initiate_mode: str, ready_to_transfer_mode: str,
-                         initiate_transfer_mode: str, transfer_complete_mode: str,
+    def execute_transfer(self, ready_to_initiate_mode: str, initiate_transfer_mode: str,
+                         ready_to_transfer_mode: str, transfer_complete_mode: str,
                          outside_mouth_distance: float = 0.0,
                          maintain_position_at_goal = False):
         
         self.perception_interface.set_head_perception_tool(self.tool)
+        print("--- Starting head perception thread ---")
         self.perception_interface.start_head_perception_thread()
         if self.robot_interface is not None:
             time.sleep(2.0) # let head perception thread warmstart / robot to stabilize
@@ -194,12 +201,15 @@ class TransferToolHLA(HighLevelAction):
             time.sleep(1.0) # let sim head perception thread warmstart
 
         if self.sim.scene_description.transfer_type == "inside" and self.robot_interface is not None:
+            # only for CBTL: move to absolute transfer pos before switching to compliant mode
+            self.move_to_joint_positions(self.sim.scene_description.absolute_before_transfer_pos)
             self.disable_collision_sensor_pub.publish(Bool(data=True))
             print("Sent message to turn off collision sensor")
             time.sleep(0.5) # let collision sensor turn off
             if not self.no_waits:
                 input("Press enter to switch to task compliant mode")
             self.robot_interface.switch_to_task_compliant_mode()
+            time.sleep(2.0) # let the robot stabilize
 
         if self.robot_interface is not None:
             self.relay_ready_to_initiate_transfer(ready_to_initiate_mode, initiate_transfer_mode)
@@ -220,9 +230,12 @@ class TransferToolHLA(HighLevelAction):
         if self.sim.scene_description.transfer_type == "inside" and self.robot_interface is not None:                
             if not self.no_waits:
                 input("Press enter to switch out of compliant mode")
+            time.sleep(2.0) # let the robot stabilize
             self.robot_interface.switch_out_of_compliant_mode()
             self.disable_collision_sensor_pub.publish(Bool(data=False))
             print("Sent message to turn on collision sensor")
+            # only for CBTL: move to before transfer pos after switching out of compliant mode
+            self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
 
     def get_name(self) -> str:
         return "TransferTool"

@@ -75,6 +75,7 @@ class RVizInterface:
         self.tool_update(False, "drink", self._scene_description.drink_pose)
         self.tool_update(False, "wipe", self._scene_description.wipe_pose)
         self.tool_update(False, "utensil", self._scene_description.utensil_pose)
+        # self.tool_update(False, "plate", self._scene_description.plate_pose)
     
     def joint_state_update(self, joints: JointPositions):
         self.sim_joint_publishers.publish(
@@ -96,6 +97,10 @@ class RVizInterface:
             tool_base = "drinkbase"
         elif held_object == "wipe":
             tool_base = "wipebase"
+        elif held_object == "plate":
+            tool_base = "platebase"
+        else:
+            raise ValueError(f"Unknown held object: {held_object}")
 
         if pick:
             self.publish_static_transform("sim/finger_tip", "sim/" + tool_base, object_pose)

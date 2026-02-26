@@ -223,18 +223,18 @@ class EmulateTransferHLA(HighLevelAction):
 
                     print("Synthesizing gesture detector ...")
                     generated_function_txt, accuracy = self.detector_synthesizer.generate_function(gesture_datapath)
-
-                    self.web_interface.update_fixed_explanation(f"Synthesized gesture detector for {self.gesture_label} with accuracy {accuracy*100:.2f}%")
-                    time.sleep(2.0)
                 
                     # Hack to test the synthesizer
                     # hack_datapath = Path(__file__).parent.parent / "perception" / "gestures_perception" / "gestures_examples" / "shake_my_head_from_left_to_right.pkl"
                     # generated_function_txt = self.detector_synthesizer.generate_function(hack_datapath)
                     
                     if generated_function_txt is not None:
+                        self.web_interface.update_fixed_explanation(f"Synthesized gesture detector for {self.gesture_label} with accuracy {accuracy*100:.2f}%")
                         self.register_gesture_detector(synthesized_gesture_function_name, generated_function_txt)
                     else:
+                        self.web_interface.update_fixed_explanation("Did not generate valid detector function")
                         print("Did not generate valid detector function")
+                    time.sleep(2.0) # let the user see the message
                 else:
                     print("Gesture examples recording is not valid")
             self.web_interface.clear_explanation()

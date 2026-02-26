@@ -1,5 +1,5 @@
 name: "TransferDrink"
-description: "Bring the mug to the user's mouth for a sip."
+description: "Bring the mug (drink) to the user's mouth for a sip. Before initiating the transfer sequence for drink, the robot can confirm with the user on the web app (web interface) once using AskForConfirmationInitiatingTransferSequence. A drink transfer starts with an ReadyToInitiateTransferInteraction (robot to human) where the robot conveys to the user that it is ready to initiate the drink transfer, then an InitiateTransferInteraction (human to robot) where the human conveys to the robot that it is ready for a drink transfer. After this, the robot moves the mug either near the user's mouth (OutsideMouthDistance defines how near) or inside the user's mouth. Then commences the ReadyForTransferInteraction (robot to human) where the robot conveys to the user that they can take a sip now. After the users is done taking a sip, they use the TransferCompleteInteraction (human to robot) to convey to the robot that they are done. The robot then moves the mug away from the user's mouth. Once a drink transfer is complete, the robot waits for TimeToWaitBeforeAutocontinue on the web app (web interface) before re-selecting drink transfer again."
 type: "Behavior"
 parameters:
   - name: "Speed"
@@ -10,35 +10,35 @@ parameters:
     is_user_editable: True
     value: "medium"
   - name: "ReadyToInitiateTransferInteraction"
-    description: "Interaction mode for ready to initiate transfer."
+    description: "Interaction mode for how the robot conveys to the user that it is ready to initiate the drink transfer."
     space:
       type: "Enum"
-      elements: ["silent", "voice", "led"]
-    is_user_editable: True
-    value: "voice"
-  - name: "ReadyForTransferInteraction"
-    description: "Interaction mode for ready to transfer."
-    space:
-      type: "Enum"
-      elements: ["silent", "voice", "led"]
+      elements: ["silent", "voice", "led", "beep"]
     is_user_editable: True
     value: "voice"
   - name: "InitiateTransferInteraction"
-    description: "Interaction mode for transfer."
+    description: "Interaction mode for how the user conveys to the robot that they are ready for a drink transfer."
     space:
       type: "Enum"
       elements: ["button", "open_mouth", "auto_timeout"]
     is_user_editable: True
     value: "open_mouth"
+  - name: "ReadyForTransferInteraction"
+    description: "Interaction mode for how the robot conveys to the user that they can take a sip now."
+    space:
+      type: "Enum"
+      elements: ["silent", "voice", "led", "beep"]
+    is_user_editable: True
+    value: "voice"
   - name: "TransferCompleteInteraction"
-    description: "Interaction mode for transfer completion."
+    description: "Interaction mode for how the user conveys to the robot that they are done taking a sip. Sense corresponds to the robot waiting for a head nod from the user."
     space:
       type: "Enum"
       elements: ["button", "sense", "auto_timeout"]
     is_user_editable: True
     value: "sense"
   - name: "OutsideMouthDistance"
-    description: "Distance from the tool tip to the user's mouth."
+    description: "Distance from the straw tip to the user's mouth for the drink transfer."
     space:
       type: "Box"
       lower: 0.1
@@ -46,14 +46,14 @@ parameters:
     is_user_editable: True
     value: 0.15
   - name: "AskForConfirmationInitiatingTransferSequence"
-    description: "Ask for confirmation on the web app before initiating the transfer sequence for drinking."
+    description: "Ask for confirmation on the web app (web interface) before initiating the transfer sequence for drink. True is 1 and False is 0."
     space:
       type: "Enum"
       elements: [0, 1]
     is_user_editable: True
     value: 1
   - name: "TimeToWaitBeforeAutocontinue"
-    description: "Autocontinue duration for re-selecting drinking transfer after a sip."
+    description: "Autocontinue duration for re-selecting drink transfer after a sip on the web app (web interface)."
     space:
       type: "Box"
       lower: 5.0
