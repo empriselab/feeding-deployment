@@ -1082,6 +1082,9 @@ because the parameter_name is not in the given behavior tree node. Make sure tha
 
 
 def _strip_python_response(response: str) -> str:
+    # print("Raw LLM response:", response)
+    if isinstance(response, list):
+        response = response[0]
     if response.startswith("```python"):
         response = response[len("```python"):]
     if response.endswith("```"):

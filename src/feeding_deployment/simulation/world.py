@@ -80,10 +80,10 @@ class FeedingDeploymentPyBulletWorld:
         self.robot = robot
 
         # Create a holder (vention stand).
-        self.robot_holder_id = create_pybullet_block(
-            scene_description.robot_holder_rgba,
-            half_extents=scene_description.robot_holder_half_extents,
-            physics_client_id=self.physics_client_id,
+        self.robot_holder_id = p.loadURDF(
+            str(scene_description.robot_holder_urdf_path),
+            useFixedBase=True,
+            physicsClientId=self.physics_client_id,
         )
         p.resetBasePositionAndOrientation(
             self.robot_holder_id,
@@ -102,6 +102,33 @@ class FeedingDeploymentPyBulletWorld:
             self._wheelchair_id,
             scene_description.wheelchair_pose.position,
             scene_description.wheelchair_pose.orientation,
+            physicsClientId=self.physics_client_id,
+        )
+        
+        # Create microwave
+        self._microwave_id = p.loadURDF(
+            str(scene_description.microwave_urdf_path),
+            useFixedBase=True,
+            physicsClientId=self.physics_client_id,
+            globalScaling=0.5,
+        )
+        p.resetBasePositionAndOrientation(
+            self._microwave_id,
+            scene_description.microwave_pose.position,
+            scene_description.microwave_pose.orientation,
+            physicsClientId=self.physics_client_id,
+        )
+        
+        # Create refrigerator
+        self._refridgerator_id = p.loadURDF(
+            str(scene_description.refridgerator_urdf_path),
+            useFixedBase=True,
+            physicsClientId=self.physics_client_id,
+        )
+        p.resetBasePositionAndOrientation(
+            self._refridgerator_id,
+            scene_description.refridgerator_pose.position,
+            scene_description.refridgerator_pose.orientation,
             physicsClientId=self.physics_client_id,
         )
 

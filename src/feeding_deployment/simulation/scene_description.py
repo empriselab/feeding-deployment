@@ -141,9 +141,10 @@ class SceneDescription:
 
     # Robot holder (vention stand).
     # robot_holder_pose: Pose = Pose((0.0, 0.0, -0.261))
-    robot_holder_pose: Pose = Pose((0.0, 0.0, -0.34))
-    robot_holder_rgba: tuple[float, float, float, float] = (0.5, 0.5, 0.5, 1.0)
-    robot_holder_half_extents: tuple[float, float, float] = (0.10, 0.10, 0.33)
+    robot_holder_urdf_path: Path = (Path(__file__).parent.parent / "assets" / "vention_base" / "vention_base.urdf")
+    robot_holder_pose: Pose = Pose((0.0, 0.0, -0.01))
+    # robot_holder_rgba: tuple[float, float, float, float] = (0.5, 0.5, 0.5, 1.0)
+    # robot_holder_half_extents: tuple[float, float, float] = (0.10, 0.10, 0.33)
 
     # Wheelchair.
     wheelchair_pose: Pose = Pose(
@@ -165,6 +166,28 @@ class SceneDescription:
         / "wheelchair.obj"
     )
     
+    # Microwave
+    microwave_pose: Pose = Pose(
+        (0.5, 0.0, -0.06), (0.0, 0.0, 0.0, 1.0)
+    )
+    microwave_urdf_path: Path = (
+        Path(__file__).parent.parent
+        / "assets"
+        / "microwave"
+        / "mobility.urdf"
+    )
+    
+    # Refridgerator
+    refridgerator_pose: Pose = Pose(
+        (1.0, 1.0, -0.06), (0.0, 0.0, 0.0, 1.0)
+    )
+    refridgerator_urdf_path: Path = (
+        Path(__file__).parent.parent
+        / "assets"
+        / "refridgerator"
+        / "mobility.urdf"
+    )
+     
     user_head_pose: Pose = Pose(
         (-0.4, 0.5, 0.67), (0.5, 0.5, 0.5, 0.5)
     )

@@ -14,6 +14,9 @@ src/feeding_deployment/integration/log/nuc_execution_log.txt
 src/feeding_deployment/perception/gestures_perception/gesture_data
 src/feeding_deployment/perception/head_perception/DECA
 src/feeding_deployment/actions/flair/spaghetti_checkpoints
+src/feeding_deployment/assets/vention_base/vention_base.STL
+src/feeding_deployment/assets/vention_base/vention_base.mtl
+src/feeding_deployment/assets/vention_base/vention_base.obj
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

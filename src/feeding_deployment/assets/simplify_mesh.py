@@ -43,6 +43,6 @@ def simplify_mesh_with_pybullet(input_mesh_path, output_mesh_path, vhacd_params=
     p.disconnect()
 
 # Example usage:
-input_mesh = "table/table.obj"
-output_mesh = "table/simplified_table.obj"
+input_mesh = "vention_base/vention_base.obj"
+output_mesh = "vention_base/vention_base_simplified.obj"
 simplify_mesh_with_pybullet(input_mesh, output_mesh)

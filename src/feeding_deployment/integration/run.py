@@ -793,6 +793,8 @@ if __name__ == "__main__":
             json.dump(results, f)
         return choice
     
+    input("Press Enter to continue with the meal assistance task...")
+    
     if args.resume_from_state != "":
         if args.cbtl:
             # Resuming from a previous CBTL run 
@@ -881,7 +883,7 @@ if __name__ == "__main__":
             explanation_text += " speak aloud: yes."
         else:
             explanation_text += " speak aloud: no."
-        print('Explanation text:', explanation_text)
+        
         runner.web_interface.switch_to_explanation_page()
         input("Press Enter to see the explanation on the web interface...")
         runner.web_interface.fix_explanation(explanation_text)
