@@ -117,11 +117,7 @@ class SceneDescription:
 
     # Robot.
     robot_name: str = "kinova-gen3"
-    robot_urdf_path: Path = (Path(__file__).parent.parent / "assets" / "robot" / "robot.urdf")
-    robot_base_pose: Pose = Pose(
-        (0.0, 0.0, 0.0),
-        (0.0, 0.0, 0.0, 1.0),
-    )
+    robot_urdf_path: Path = (Path(__file__).parent.parent / "assets" / "robot" / "robot.urdf")   
     tool_frame_to_finger_tip: Pose = Pose(
         (0.0, 0.0, 0.05955),
         (0.0, 0.0, 0.0, 1.0),
@@ -142,13 +138,13 @@ class SceneDescription:
     # Robot holder (vention stand).
     # robot_holder_pose: Pose = Pose((0.0, 0.0, -0.261))
     robot_holder_urdf_path: Path = (Path(__file__).parent.parent / "assets" / "vention_base" / "vention_base.urdf")
-    robot_holder_pose: Pose = Pose((0.0, 0.0, -0.01))
+    robot_holder_pose: Pose = Pose((1.0, 3.0, 0.53))
     # robot_holder_rgba: tuple[float, float, float, float] = (0.5, 0.5, 0.5, 1.0)
     # robot_holder_half_extents: tuple[float, float, float] = (0.10, 0.10, 0.33)
 
     # Wheelchair.
     wheelchair_pose: Pose = Pose(
-        (-0.3, 0.45, -0.06), (0.0, 0.0, 0.0, 1.0)
+        (1, 3.5, 0.6), (0.0, 0.0, 0.0, 1.0)
     )
     wheelchair_relative_head_pose: Pose = Pose(
         (0.0, -0.25, 0.75), (0.0, 0.0, 0.0, 1.0)
@@ -168,7 +164,7 @@ class SceneDescription:
     
     # Microwave
     microwave_pose: Pose = Pose(
-        (0.5, 0.0, -0.06), (0.0, 0.0, 0.0, 1.0)
+        (1.7, 0.5, 1.07), (0, 0, -0.7071068, 0.7071068)
     )
     microwave_urdf_path: Path = (
         Path(__file__).parent.parent
@@ -179,7 +175,7 @@ class SceneDescription:
     
     # Refridgerator
     refridgerator_pose: Pose = Pose(
-        (1.0, 1.0, -0.06), (0.0, 0.0, 0.0, 1.0)
+        (3.3, 0.5, 0.94), (0, 0, -0.7071068, 0.7071068)
     )
     refridgerator_urdf_path: Path = (
         Path(__file__).parent.parent
@@ -187,9 +183,20 @@ class SceneDescription:
         / "refridgerator"
         / "mobility.urdf"
     )
+    
+    # Sink 
+    sink_pose: Pose = Pose(
+        (2, 0.45, 0.0), (0.0, 0.0, 0.0, 1.0)
+    )
+    sink_urdf_path: Path = (
+        Path(__file__).parent.parent
+        / "assets"
+        / "sink"
+        / "sink.urdf"
+    )
      
     user_head_pose: Pose = Pose(
-        (-0.4, 0.5, 0.67), (0.5, 0.5, 0.5, 0.5)
+        (0.9, 3.5, 1.2), (0.5, 0.5, 0.5, 0.5)
     )
 
     user_head_urdf_path: Path = (
@@ -205,19 +212,19 @@ class SceneDescription:
     conservative_bb_half_extents: tuple[float, float, float] = (0.4, 0.4, 1.0)
 
     # Table.
-    table_pose: Pose = Pose((0.35, 0.45, 0.2))
+    table_pose: Pose = Pose((1.7, 3.45, 0.8))
     table_urdf_path: Path = Path(__file__).parent.parent / "assets" / "table" / "table.urdf"
     table_mesh_path: Path = Path(__file__).parent.parent / "assets" / "table" / "table.obj"
 
     # Floor
-    floor_position: tuple[float, float, float] = (0, 0, -0.66)
+    floor_position: tuple[float, float, float] = (0, 0, 0)
     floor_urdf: Path = Path(__file__).parent.parent / "assets" / "floor" / "floor.urdf"
     floor_mesh_path: Path = Path(__file__).parent.parent / "assets" / "floor" / "floor.obj"
 
     wall_poses: list[Pose] = field(
         default_factory=lambda: [
-            Pose.from_rpy((0.0, -1.25, 0.0), (np.pi / 2, 0.0, np.pi / 2)),
-            Pose.from_rpy((-1.25, 0.0, 0.0), (np.pi / 2, 0.0, 0.0)),
+            Pose.from_rpy((0.0, 0.0, 0.0), (np.pi / 2, 0.0, np.pi / 2)),
+            Pose.from_rpy((0.0, 0.0, 0.0), (np.pi / 2, 0.0, 0.0)),
             # Pose.from_rpy((4.25, 0.0, 0.0), (np.pi / 2, 0.0, np.pi)),
             # Pose.from_rpy((0.0, 0.0, 3.0), (0.0, np.pi / 2, 0.0)),
         ]
@@ -269,6 +276,11 @@ class SceneDescription:
     plate_pose: Pose = Pose((0.3, 0.25, 0.16))
     plate_urdf_path: Path = Path(__file__).parent.parent / "assets" / "plate" / "plate.urdf"
     plate_mesh_path: Path = Path(__file__).parent.parent / "assets" / "plate" / "plate.obj"
+    
+    @property
+    def robot_base_pose(self):
+        pose = Pose((self.robot_holder_pose.position[0], self.robot_holder_pose.position[1], self.robot_holder_pose.position[2] + 0.01), self.robot_holder_pose.orientation)
+        return pose
 
     @property
     def utensil_pose(self):

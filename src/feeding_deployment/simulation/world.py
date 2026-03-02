@@ -131,6 +131,19 @@ class FeedingDeploymentPyBulletWorld:
             scene_description.refridgerator_pose.orientation,
             physicsClientId=self.physics_client_id,
         )
+        
+        # Create sink
+        self._sink_id = p.loadURDF(
+            str(scene_description.sink_urdf_path),
+            useFixedBase=True,
+            physicsClientId=self.physics_client_id,
+        )
+        p.resetBasePositionAndOrientation(
+            self._sink_id,
+            scene_description.sink_pose.position,
+            scene_description.sink_pose.orientation,
+            physicsClientId=self.physics_client_id,
+        )
 
         if not ignore_user:
             # Create a conservative collision boundary around the wheelchair.
