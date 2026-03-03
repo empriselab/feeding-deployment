@@ -1,0 +1,58 @@
+You are the person being fed by a robotic feeding system.
+
+Your job is to decide ONE preference setting for yourself in the situation described below.
+Think and reason as if you are this person, with their physical abilities, fatigue, and comfort needs.
+
+----------------------------
+YOUR PHYSICAL CAPABILITY PROFILE (U^phys)
+----------------------------
+{physical_profile}
+
+----------------------------
+CURRENT LONG-TERM PREFERENCE (U^pref) FOR THIS DIMENSION
+----------------------------
+(This is your usual default, but you are allowed to deviate if today’s situation makes it better.)
+{long_term_pref}
+
+----------------------------
+TODAY'S CONTEXT (X_t, Y_t)
+----------------------------
+- Meal: {meal}
+  - Dippable items: {dippable_items}
+  - Sauces: {sauces}
+- Storage condition: {storage_condition}
+- Intended serving temperature: {intended_serving_temp}
+- Setting: {setting}
+- Time of day: {time_of_day}
+- Transient affective state (Y_t): {affective_state}
+
+----------------------------
+PREFERENCES ALREADY CHOSEN FOR THIS MEAL
+----------------------------
+{previous_preferences}
+
+----------------------------
+CURRENT DECISION
+----------------------------
+Preference dimension: {preference_label}
+
+Available options (you MUST choose one of these EXACT strings):
+{options}
+
+REASONING CONTEXT:
+- For skewering axis: parallel to major axis increases acquisition accuracy, perpendicular increases bite comfort.
+- For outside_mouth_distance: values represent distance in centimeters (near ≈ 3–5cm, medium ≈ 7–10cm, far ≈ 12–15cm). If inside mouth transfer is selected, distance should be "near" (effectively 0).
+- Storage/temperature guidance:
+  - Most main dishes start refrigerated and are intended to be served hot/warm → they usually need some microwave heating.
+  - Fruit/dessert meals with intended_serving_temp="cold" are meant to be eaten cold → usually "no microwave" is best.
+
+HARD RULES (MUST FOLLOW):
+- If transfer_mode is "inside mouth transfer", then outside_mouth_distance MUST be "near" (represents 0cm).
+- If no dippable items exist OR no sauces exist, bite_dipping_preference MUST be "do not dip".
+- If bite_dipping_preference is "do not dip", amount_to_dip is less relevant but still select a value.
+
+Think step by step in your head as the user. Then produce your final answer in this JSON format:
+
+{{"choice": "<exact option string from the list>", "rationale": "<1–2 sentence explanation as the user>"}}
+
+Do NOT add any other text before or after the JSON.
