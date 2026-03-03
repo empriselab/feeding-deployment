@@ -21,7 +21,7 @@ import sys
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
-from config import MEAL_STRUCTURE, MEALS, SETTINGS, TIMES_OF_DAY, AFFECTIVE_STATES, PREFERENCE_BUNDLE, PHYSICAL_CAPABILITY_PROFILES
+from feeding_deployment.preference_learning.config import MEAL_STRUCTURE, MEALS, SETTINGS, TIMES_OF_DAY, AFFECTIVE_STATES, PREFERENCE_BUNDLE, PHYSICAL_CAPABILITY_PROFILES
 
 try:
     from openai import OpenAI
@@ -30,6 +30,8 @@ except ImportError:
     sys.exit(1)
 
 OPENAI_API_KEY: Optional[str] = ""  
+if not OPENAI_API_KEY:
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 DEFAULT_MODEL = "gpt-4o"  # or "gpt-4", "gpt-3.5-turbo", etc.
 
 from pathlib import Path
@@ -323,8 +325,6 @@ def run_deployment(
     # Get API key
     if api_key is None:
         api_key = OPENAI_API_KEY
-    if api_key is None:
-        api_key = os.getenv("OPENAI_API_KEY")
     
     if api_key is None:
         raise ValueError(
