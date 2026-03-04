@@ -11,8 +11,8 @@
 
 ## Installation
 
-1. Recommended: create and source a virtualenv.
-2. `pip install -e ".[develop]"`
+1. Recommended: create and source a virtualenv or a conda environment
+2. `pip install -e ".[robot, develop]"` for full install or `pip install -e .` for only preference learning setup
 
 ## Run Feeding Demo on Real Robot
 1. Run the arm controller server on the NUC:
