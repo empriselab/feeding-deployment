@@ -1,7 +1,12 @@
-You are the person being fed by a robotic feeding system.
+You are the person being fed by a robotic mealtime-assistance system.
 
-Your job is to decide ONE preference setting for yourself in the situation described below.
-Think and reason as if you are this person, with their physical abilities, fatigue, and comfort needs.
+Your job is to choose a COMPLETE preference bundle P_t (all dimensions) for TODAY’s situation.
+Think and decide as this person, considering their physical abilities, comfort needs, interaction style, and current affective state.
+
+We want f(·) to be DETERMINISTIC:
+- Follow the decision procedure exactly.
+- Do NOT invent new options.
+- If multiple options could work, resolve using the tie-break rules (no randomness).
 
 ----------------------------
 YOUR PHYSICAL CAPABILITY PROFILE (U^phys)
@@ -9,10 +14,16 @@ YOUR PHYSICAL CAPABILITY PROFILE (U^phys)
 {physical_profile}
 
 ----------------------------
-CURRENT LONG-TERM PREFERENCE (U^pref) FOR THIS DIMENSION
+LONG-TERM PREFERENCE ENCODING (U^pref) ACROSS ALL DIMENSIONS
 ----------------------------
-(This is your usual default, but you are allowed to deviate if today’s situation makes it better.)
-{long_term_pref}
+This is your stable preference encoding across all dimensions. For each field it includes:
+- default: your usual setting in a quiet personal setting with neutral affect and foods without sauces
+- user_tendencies: conditional rules describing how your preference changes under combinations of (context × food × affect)
+
+You MUST use both default and user_tendencies to decide today’s full bundle.
+Deviate from defaults only when your tendencies (or hard rules / physical constraints) indicate a different option.
+
+{user_preference_encoding}
 
 ----------------------------
 TODAY'S CONTEXT (X_t, Y_t)
@@ -27,32 +38,65 @@ TODAY'S CONTEXT (X_t, Y_t)
 - Transient affective state (Y_t): {affective_state}
 
 ----------------------------
-PREFERENCES ALREADY CHOSEN FOR THIS MEAL
+ALLOWED OPTIONS (MUST CHOOSE EXACT STRINGS)
 ----------------------------
-{previous_preferences}
+You MUST select exactly one option for each field from the allowed options below:
+
+{options_by_field}
 
 ----------------------------
-CURRENT DECISION
+DECISION PROCEDURE (FOLLOW EXACTLY)
 ----------------------------
-Preference dimension: {preference_label}
+A) Start with the long-term defaults for ALL fields as an initial bundle.
 
-Available options (you MUST choose one of these EXACT strings):
-{options}
+B) Apply user_tendencies to update the bundle:
+   - For each field, identify which tendency rules apply given TODAY’s full combination of:
+     (setting/context, food type characteristics including sauces/dips, affective state).
+   - Apply the field’s applicable tendency rules to propose an updated choice.
 
-REASONING CONTEXT:
-- For skewering axis: parallel to major axis increases acquisition accuracy, perpendicular increases bite comfort.
-- For outside_mouth_distance: values represent distance in centimeters (near ≈ 3–5cm, medium ≈ 7–10cm, far ≈ 12–15cm). If inside mouth transfer is selected, distance should be "near" (effectively 0).
-- Storage/temperature guidance:
-  - Most main dishes start refrigerated and are intended to be served hot/warm → they usually need some microwave heating.
-  - Fruit/dessert meals with intended_serving_temp="cold" are meant to be eaten cold → usually "no microwave" is best.
+C) Resolve conflicts deterministically:
+   - If a field has multiple applicable rules that conflict, choose using this priority:
+     1) physical constraints / feasibility / comfort implied by U^phys
+     2) affective state (fatigued / in a hurry / energetic / relaxed / neutral)
+     3) environmental dining context (social / TV / working / alone)
+     4) food type (meat / dessert / fruit / sauces)
+     5) long-term default
 
-HARD RULES (MUST FOLLOW):
-- If transfer_mode is "inside mouth transfer", then outside_mouth_distance MUST be "near" (represents 0cm).
-- If no dippable items exist OR no sauces exist, bite_dipping_preference MUST be "do not dip".
-- If bite_dipping_preference is "do not dip", amount_to_dip is less relevant but still select a value.
+D) Enforce CROSS-DIMENSION CONSISTENCY:
+   - Preferences should form a coherent interaction style for today (e.g., more automation when fatigued).
+   - If two settings logically interact, pick a consistent pair using the same tie-break order.
 
-Think step by step in your head as the user. Then produce your final answer in this JSON format:
+E) HARD RULES (MUST FOLLOW, APPLY LAST EVEN IF IT OVERRIDES EARLIER STEPS):
+   1) If transfer_mode == "inside mouth transfer", then outside_mouth_distance MUST be "near".
+   2) If no dippable items exist OR no sauces exist, bite_dipping_preference MUST be "do not dip".
+   3) If bite_dipping_preference == "do not dip", amount_to_dip is less relevant but still choose one allowed option.
 
-{{"choice": "<exact option string from the list>", "rationale": "<1–2 sentence explanation as the user>"}}
+----------------------------
+DOMAIN NOTES (FOR INTERPRETATION ONLY)
+----------------------------
+- Skewering axis:
+  - parallel to major axis can produce narrower bites (may help limited mouth opening)
+  - perpendicular to major axis can increase acquisition success
+- Outside_mouth_distance:
+  - near ≈ 3–5 cm, medium ≈ 7–10 cm, far ≈ 12–15 cm
+  - if inside mouth transfer is used, outside_mouth_distance should be "near" (≈0 cm)
 
-Do NOT add any other text before or after the JSON.
+----------------------------
+OUTPUT FORMAT (JSON ONLY)
+----------------------------
+Return ONLY valid JSON (no markdown, no extra text).
+
+Format:
+{{
+  "preferences": {
+    "<field_name_1>": {"choice": "<exact allowed option>", "rationale": "<1–2 sentences>"},
+    ...
+    "<field_name_19>": {"choice": "<exact allowed option>", "rationale": "<1–2 sentences>"}
+  }
+}}
+
+Rules for output:
+- Include ALL fields exactly once.
+- No extra fields.
+- Each choice must exactly match one allowed option string for that field.
+- Rationales should briefly reference the applied tendency / tie-break / hard rule when relevant.

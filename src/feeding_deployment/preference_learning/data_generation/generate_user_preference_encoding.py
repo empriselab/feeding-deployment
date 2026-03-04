@@ -1,3 +1,31 @@
+"""
+Generate a structured “user preference encoding” for a robot-assisted mealtime system
+using an LLM, conditioned on a care recipient’s physical functioning profile.
+
+This script:
+- Loads a prompt template from `prompts/user_preference_encoding_prompt.txt` and fills
+  in `{physical_profile}`.
+- Calls the OpenAI Chat Completions API to produce a JSON object describing the user’s
+  default preferences and how those preferences vary across dining context, food type,
+  and affective state.
+- Enforces a STRICT output schema:
+    - The output must be valid JSON (no extra text/markdown).
+    - The JSON must contain exactly the expected preference fields (no missing/extra keys).
+    - Each field must be an object with exactly:
+        {"default": <string>, "user_tendencies": <non-empty string>}
+    - Each "default" must be one of the allowed options in `PREFERENCE_SCHEMA`.
+
+If the LLM output violates the schema (e.g., truncated JSON, wrong keys, invalid option),
+the script raises an error rather than silently falling back to defaults.
+
+Usage:
+  python generate_user_preference_encoding.py --physical-profile <profile_key> [--model <model_name>]
+
+Requirements:
+- `OPENAI_API_KEY` must be set in the environment (or add wiring to use --api-key).
+- `openai` Python package installed.
+"""
+
 import argparse
 import csv
 import json

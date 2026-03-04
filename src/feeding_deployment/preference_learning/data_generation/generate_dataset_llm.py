@@ -8,8 +8,9 @@ Generates 30-day datasets using LLM reasoning based on:
 - Context (X): meal, setting, time of day
 - Transient affective state (Y_t)
 
-For each day, makes 19 LLM calls (one per preference dimension) to reason about
-the preference bundle based on physical constraints, long-term preferences, context, and affect.
+For each day, makes ONE joint LLM call (all 19 preference dimensions at once) to
+generate the preference bundle based on physical constraints, long-term preferences,
+context, and affect.
 """
 
 import argparse
@@ -19,9 +20,20 @@ import os
 import random
 import sys
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 
-from feeding_deployment.preference_learning.config import MEAL_STRUCTURE, MEALS, SETTINGS, TIMES_OF_DAY, AFFECTIVE_STATES, PREFERENCE_BUNDLE, PHYSICAL_CAPABILITY_PROFILES
+from feeding_deployment.preference_learning.config import (
+    MEAL_STRUCTURE,
+    MEALS,
+    SETTINGS,
+    TIMES_OF_DAY,
+    AFFECTIVE_STATES,
+    PREFERENCE_BUNDLE,
+    PHYSICAL_CAPABILITY_PROFILES,
+)
+from feeding_deployment.preference_learning.data_generation.generate_user_preference_encoding import (
+    generate_user_preference_encoding_llm,
+)
 
 try:
     from openai import OpenAI
@@ -29,18 +41,22 @@ except ImportError:
     print("Error: openai package not installed. Install it with: pip install openai", file=sys.stderr)
     sys.exit(1)
 
-OPENAI_API_KEY: Optional[str] = ""  
+OPENAI_API_KEY: Optional[str] = ""
 if not OPENAI_API_KEY:
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-DEFAULT_MODEL = "gpt-4o"  # or "gpt-4", "gpt-3.5-turbo", etc.
+DEFAULT_MODEL = "gpt-4o"
 
 from pathlib import Path
 
+# NOTE: You said you'll edit the prompt later.
+# For now we keep a single template path; update it to your new joint prompt when ready.
 PROMPT_PATH = Path(__file__).parent / "prompts" / "preference_prompt.txt"
+
 
 def load_prompt_template() -> str:
     with open(PROMPT_PATH, "r", encoding="utf-8") as f:
         return f.read()
+
 
 PREFERENCE_PROMPT_TEMPLATE = load_prompt_template()
 
@@ -49,7 +65,7 @@ PREFERENCE_PROMPT_TEMPLATE = load_prompt_template()
 # HELPER FUNCTIONS
 # ============================================================================
 
-def get_meal_info(meal: str) -> Dict[str, any]:
+def get_meal_info(meal: str) -> Dict[str, Any]:
     """Extract meal structure information."""
     info = MEAL_STRUCTURE.get(
         meal,
@@ -75,64 +91,66 @@ def get_meal_info(meal: str) -> Dict[str, any]:
     }
 
 
-def generate_long_term_preference_variation(
-    base_prefs: Dict[str, str],
-    variation_level: float,
-    rng: random.Random,
-) -> Dict[str, str]:
-    """
-    Generate a variation of long-term preferences.
-    variation_level: 0.0 = no change, 1.0 = maximum change
-    """
-    new_prefs = {}
-    pref_fields = [f[0] for f in PREFERENCE_BUNDLE]
-    
-    for field in pref_fields:
-        if rng.random() < variation_level:
-            # Change this preference - randomly select from options
-            options = next((opt[2] for opt in PREFERENCE_BUNDLE if opt[0] == field), [])
-            if options:
-                new_prefs[field] = rng.choice(options)
-            else:
-                new_prefs[field] = base_prefs.get(field, "")
-        else:
-            # Keep the same
-            new_prefs[field] = base_prefs.get(field, "")
-    
-    return new_prefs
+def apply_hard_rules(preferences: Dict[str, str], meal_info: Dict[str, Any]) -> Dict[str, str]:
+    """Apply hard rules to preferences after LLM generation."""
+    prefs = preferences.copy()
+
+    # Rule 1: If inside mouth transfer, distance must be "near" (represents 0cm)
+    if prefs.get("transfer_mode") == "inside mouth transfer":
+        prefs["outside_mouth_distance"] = "near"
+
+    # Rule 2: If no dippable items or no sauces, must be "do not dip"
+    if not meal_info["has_dippable"] or not meal_info["has_sauce"]:
+        prefs["bite_dipping_preference"] = "do not dip"
+
+    return prefs
 
 
 # ============================================================================
-# LLM GENERATION
+# JOINT LLM GENERATION (ONE CALL PER DAY)
 # ============================================================================
 
-def create_preference_prompt(
-    preference_name: str,
-    preference_label: str,
-    options: List[str],
+def _strip_json_fences(raw: str) -> str:
+    raw = (raw or "").strip()
+    if "```json" in raw:
+        return raw.split("```json", 1)[1].split("```", 1)[0].strip()
+    if "```" in raw:
+        return raw.split("```", 1)[1].split("```", 1)[0].strip()
+    return raw
+
+
+def create_joint_preference_prompt(
     physical_profile: str,
-    long_term_pref: Optional[str],
+    long_term_prefs: Dict[str, Any],
     context: Dict[str, str],
-    meal_info: Dict[str, any],
+    meal_info: Dict[str, Any],
     affective_state: str,
-    previous_preferences: Dict[str, str],
-    idx: int,
-    total: int,
 ) -> str:
-    """Create a prompt for generating a single preference dimension."""
+    """
+    Create a prompt for generating ALL 19 preferences jointly.
 
+    NOTE: This currently reuses PREFERENCE_PROMPT_TEMPLATE. You said you'll edit the prompt later.
+    When you update the prompt, make sure it instructs the model to output a single JSON object
+    containing all 19 fields.
+    """
     meal = context["meal"]
     setting = context["setting"]
     time_of_day = context.get("time_of_day", "unknown")
 
-    previous_str = (
-        "\n".join(f"- {k}: {v}" for k, v in previous_preferences.items())
-        if previous_preferences else "None yet"
-    )
+    # Provide options for each dimension (so the joint call can pick valid strings)
+    # We'll embed a compact spec the prompt can reference.
+    bundle_spec_lines: List[str] = []
+    for field, label, options in PREFERENCE_BUNDLE:
+        bundle_spec_lines.append(f"- {field} ({label}): {options}")
+
+    bundle_spec = "\n".join(bundle_spec_lines)
+
+    # Put U^pref in the prompt as JSON so the model can reference default + user_tendencies per field.
+    long_term_pref_json = json.dumps(long_term_prefs, ensure_ascii=False, indent=2)
 
     prompt = PREFERENCE_PROMPT_TEMPLATE.format(
         physical_profile=physical_profile,
-        long_term_pref=long_term_pref if long_term_pref else "Not specified",
+        long_term_pref=long_term_pref_json,
         meal=meal,
         dippable_items=", ".join(meal_info["dippable_items"]) if meal_info["dippable_items"] else "None",
         sauces=", ".join(meal_info["sauces"]) if meal_info["sauces"] else "None",
@@ -141,98 +159,135 @@ def create_preference_prompt(
         setting=setting,
         time_of_day=time_of_day,
         affective_state=affective_state,
-        previous_preferences=previous_str,
-        preference_label=preference_label,
-        options=", ".join(options),
+        previous_preferences="N/A (joint generation)",
+        preference_label="ALL_DIMENSIONS_JOINT",
+        options=bundle_spec,
     )
-
     return prompt
 
-def generate_preference_with_llm(
-    client: OpenAI,
-    preference_name: str,
-    preference_label: str,
-    options: List[str],
-    physical_profile: str,
-    long_term_pref: Optional[str],
-    context: Dict[str, str],
-    meal_info: Dict[str, any],
-    affective_state: str,
-    previous_preferences: Dict[str, str],
-    idx: int,
-    total: int,
-    model: str = DEFAULT_MODEL,
-) -> Tuple[str, str]:
-    """Generate a single preference using LLM.
+
+def _validate_joint_output_strict(
+    data: Any,
+) -> Tuple[Dict[str, str], Dict[str, str]]:
+    """
+    Validate that the model returned all preference fields and each choice is one of the allowed options.
+
+    Expected JSON shape (strict):
+      {
+        "<field>": {"choice": "<exact option>", "rationale": "<string>"},
+        ...
+      }
 
     Returns:
-        (choice, rationale)
+      (choices, rationales)
+
+    Raises:
+      KeyError / TypeError / ValueError on any violation.
     """
-    
-    prompt = create_preference_prompt(
-        preference_name, preference_label, options,
-        physical_profile, long_term_pref, context, meal_info,
-        affective_state, previous_preferences, idx, total
+    if not isinstance(data, dict):
+        raise TypeError(f"Expected top-level JSON object (dict). Got {type(data).__name__}")
+
+    allowed_map: Dict[str, List[str]] = {field: options for field, _label, options in PREFERENCE_BUNDLE}
+    expected_fields = set(allowed_map.keys())
+    got_fields = set(data.keys())
+
+    missing = sorted(expected_fields - got_fields)
+    extra = sorted(got_fields - expected_fields)
+    if missing:
+        raise KeyError(f"Missing fields in joint LLM output: {missing}")
+    if extra:
+        raise KeyError(f"Unexpected extra fields in joint LLM output: {extra}")
+
+    choices: Dict[str, str] = {}
+    rationales: Dict[str, str] = {}
+
+    for field in sorted(expected_fields):
+        entry = data[field]
+        if not isinstance(entry, dict):
+            raise TypeError(f'Field "{field}" must be an object with keys ["choice","rationale"].')
+
+        if set(entry.keys()) != {"choice", "rationale"}:
+            raise KeyError(
+                f'Field "{field}" must have exactly keys ["choice","rationale"]. Got: {sorted(entry.keys())}'
+            )
+
+        choice = entry["choice"]
+        rationale = entry["rationale"]
+
+        if not isinstance(choice, str) or not choice.strip():
+            raise ValueError(f'Field "{field}.choice" must be a non-empty string.')
+        if not isinstance(rationale, str):
+            raise TypeError(f'Field "{field}.rationale" must be a string.')
+
+        # Strict exact matching (case-sensitive) against allowed options list
+        allowed = allowed_map[field]
+        if choice not in allowed:
+            raise ValueError(f'Invalid choice for "{field}": {choice!r}. Allowed: {allowed}')
+
+        choices[field] = choice
+        rationales[field] = rationale.strip()
+
+    return choices, rationales
+
+
+def generate_joint_preferences_with_llm(
+    client: OpenAI,
+    physical_profile: str,
+    long_term_prefs: Dict[str, Any],
+    context: Dict[str, str],
+    meal_info: Dict[str, Any],
+    affective_state: str,
+    model: str = DEFAULT_MODEL,
+) -> Tuple[Dict[str, str], Dict[str, str]]:
+    """
+    Generate ALL 19 preferences jointly using ONE LLM call.
+
+    Returns:
+      (pref_choices, pref_rationales)
+
+    Strict behavior:
+      - Requires valid JSON
+      - Requires exactly the 19 expected fields
+      - Requires each choice to exactly match an allowed option string
+      - Raises on any violation
+    """
+    prompt = create_joint_preference_prompt(
+        physical_profile=physical_profile,
+        long_term_prefs=long_term_prefs,
+        context=context,
+        meal_info=meal_info,
+        affective_state=affective_state,
     )
-    
-    try:
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": "You are an expert at reasoning about robotic feeding assistance preferences based on user capabilities, context, and affective state. Always follow hard rules strictly."},
-                {"role": "user", "content": prompt},
-            ],
-            temperature=0.3,  # Lower temperature for more consistent reasoning
-            max_tokens=100,
-        )
 
-        raw = response.choices[0].message.content.strip()
+    response = client.chat.completions.create(
+        model=model,
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are an expert at reasoning about robotic mealtime-assistance preferences based on "
+                    "user capabilities, long-term tendencies, context, and affective state. "
+                    "Return ONLY valid JSON (no markdown, no extra text). "
+                    "Output schema: {field: {\"choice\": <exact option string>, \"rationale\": <string>}} "
+                    "for all provided fields, with no missing or extra fields."
+                ),
+            },
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.3,
+        max_tokens=4000,
+        # If supported by your SDK/version, this helps enforce JSON-only outputs.
+        response_format={"type": "json_object"},
+    )
 
-        # Extract JSON if wrapped in ```json``` fences
-        if "```json" in raw:
-            raw = raw.split("```json", 1)[1].split("```", 1)[0].strip()
-        elif "```" in raw:
-            raw = raw.split("```", 1)[1].split("```", 1)[0].strip()
+    raw = response.choices[0].message.content
+    print("Raw LLM output:")
+    print(raw)
 
-        data = json.loads(raw)
-        choice_raw = str(data.get("choice", "")).strip()
-        rationale = str(data.get("rationale", "")).strip()
+    raw = _strip_json_fences(raw)
+    parsed = json.loads(raw)
 
-        # Validate choice against options (case-insensitive)
-        choice_lower = choice_raw.lower()
-        for opt in options:
-            if opt.lower() == choice_lower:
-                return opt, rationale
-
-        # Loose contains matching as fallback
-        for opt in options:
-            if opt.lower() in choice_lower or choice_lower in opt.lower():
-                return opt, rationale
-
-        print(
-            f"Warning: LLM returned invalid choice '{choice_raw}' for {preference_name}. Using '{options[0]}'",
-            file=sys.stderr,
-        )
-        return options[0], rationale
-
-    except Exception as e:
-        print(f"Error calling LLM for {preference_name}: {e}. Using first option.", file=sys.stderr)
-        return options[0], ""
-
-
-def apply_hard_rules(preferences: Dict[str, str], meal_info: Dict[str, any]) -> Dict[str, str]:
-    """Apply hard rules to preferences after LLM generation."""
-    prefs = preferences.copy()
-    
-    # Rule 1: If inside mouth transfer, distance must be "near" (represents 0cm)
-    if prefs.get("transfer_mode") == "inside mouth transfer":
-        prefs["outside_mouth_distance"] = "near"
-    
-    # Rule 2: If no dippable items or no sauces, must be "do not dip"
-    if not meal_info["has_dippable"] or not meal_info["has_sauce"]:
-        prefs["bite_dipping_preference"] = "do not dip"
-    
-    return prefs
+    return _validate_joint_output_strict(parsed)
 
 
 # ============================================================================
@@ -247,7 +302,7 @@ class DeploymentConfig:
     seed: Optional[int] = None
     days: int = 30
     u_update_days: Tuple[int, int] = (1, 16)
-    variation_level: float = 0.3  # How much U^pref changes between windows (0.0-1.0)
+    variation_level: float = 0.3  # (kept for config/logging)
 
 
 def run_deployment(
@@ -256,12 +311,11 @@ def run_deployment(
     model: str = DEFAULT_MODEL,
     output_dir: str = "out",
 ) -> str:
-    """Generate a 30-day deployment dataset using LLM and save as JSON."""
-    
-    # Get API key
+    """Generate a deployment dataset using LLM and save as JSON."""
+
     if api_key is None:
         api_key = OPENAI_API_KEY
-    
+
     if api_key is None:
         raise ValueError(
             "OpenAI API key not found. Please set it in one of these ways:\n"
@@ -269,39 +323,25 @@ def run_deployment(
             "2. Modify OPENAI_API_KEY in this script\n"
             "3. Pass --api-key argument"
         )
-    
+
     client = OpenAI(api_key=api_key)
     rng = random.Random(cfg.seed)
-    
+
     os.makedirs(output_dir, exist_ok=True)
     out_path = os.path.join(output_dir, f"{cfg.user_name}__{cfg.deployment_id}__30d.json")
-    
-    # Generate long-term preferences for window 1
-    print(f"Generating long-term preferences for days 1-15...")
-    u_pref_window1 = generate_long_term_preferences_llm(
-        client, cfg.physical_capability_profile, "days 1-15", model
-    )
-    
-    # Generate long-term preferences for window 2 with variation
-    print(f"Generating long-term preferences for days 16-30 (with variation level {cfg.variation_level})...")
-    u_pref_window2_base = generate_long_term_preferences_llm(
-        client, cfg.physical_capability_profile, "days 16-30", model
-    )
-    u_pref_window2 = generate_long_term_preference_variation(
-        u_pref_window1, cfg.variation_level, rng
-    )
-    # Merge: use window2_base but apply variation from window1
-    for k in u_pref_window2:
-        if rng.random() < 0.5:  # 50% chance to use window2_base instead
-            u_pref_window2[k] = u_pref_window2_base.get(k, u_pref_window2[k])
-    
-    # Collect all days into an in-memory structure, then dump to JSON.
+
+    # Long-term preferences (two windows)
+    print("Generating long-term preferences for days 1-15...")
+    u_pref_window1 = generate_user_preference_encoding_llm(client, cfg.physical_capability_profile, model)
+
+    print("Generating long-term preferences for days 16-30...")
+    u_pref_window2 = generate_user_preference_encoding_llm(client, cfg.physical_capability_profile, model)
+
     days: List[Dict[str, object]] = []
 
     for day in range(1, cfg.days + 1):
         print(f"\n=== Day {day}/{cfg.days} ===")
 
-        # Determine which window and U^pref is in effect
         if day < cfg.u_update_days[1]:
             u_current = u_pref_window1
             window_num = 1
@@ -325,41 +365,31 @@ def run_deployment(
 
         print(f"Context: {meal} | {setting} | {time_of_day} | {affective_state}")
 
-        # Generate preferences one by one using LLM (19 dimensions)
-        pref_choices: Dict[str, str] = {}
-        pref_rationales: Dict[str, str] = {}
-        total = len(PREFERENCE_BUNDLE)  # 19 preferences
-
-        for idx, (field, label, options) in enumerate(PREFERENCE_BUNDLE, 1):
-            print(f"  [{idx}/{total}] Generating {label}...", end=" ", flush=True)
-            long_term_val = u_current.get(field, "")
-
-            choice, rationale = generate_preference_with_llm(
-                client,
-                field,
-                label,
-                options,
-                cfg.physical_capability_profile,
-                long_term_val,
-                context,
-                meal_info,
-                affective_state,
-                pref_choices,
-                idx,
-                total,
-                model,
-            )
-            pref_choices[field] = choice
-            pref_rationales[field] = rationale
-            print(f"→ {choice}")
-
-        # Apply hard rules
-        pref_choices = apply_hard_rules(pref_choices, meal_info)
-
-        # Add bite_ordering_preference (not in user's 19-item list, generate randomly)
-        ordering_choice = rng.choice(
-            ["alternate X and Y", "start with X then Y", "start with Y then X"]
+        # ONE joint call for all 19 dimensions
+        pref_choices, pref_rationales = generate_joint_preferences_with_llm(
+            client=client,
+            physical_profile=cfg.physical_capability_profile,
+            long_term_prefs=u_current,
+            context=context,
+            meal_info=meal_info,
+            affective_state=affective_state,
+            model=model,
         )
+
+        # Apply hard rules (may override choices)
+        pref_choices_after = apply_hard_rules(pref_choices, meal_info)
+
+        # If hard rules changed anything, keep rationale but append a note for traceability.
+        for k, v_after in pref_choices_after.items():
+            v_before = pref_choices.get(k)
+            if v_before != v_after:
+                note = f" [HARD RULE OVERRIDE: {v_before!r} -> {v_after!r}]"
+                pref_rationales[k] = (pref_rationales.get(k, "") + note).strip()
+
+        pref_choices = pref_choices_after
+
+        # Add bite_ordering_preference (not in the 19-item list; keep random for now)
+        ordering_choice = rng.choice(["alternate X and Y", "start with X then Y", "start with Y then X"])
         pref_choices["bite_ordering_preference"] = ordering_choice
         pref_rationales.setdefault("bite_ordering_preference", "")
 
@@ -368,10 +398,7 @@ def run_deployment(
             "window": window_num,
             "context": context,
             "preferences": {
-                name: {
-                    "choice": pref_choices.get(name, ""),
-                    "rationale": pref_rationales.get(name, ""),
-                }
+                name: {"choice": pref_choices.get(name, ""), "rationale": pref_rationales.get(name, "")}
                 for name in pref_choices.keys()
             },
         }
@@ -379,7 +406,6 @@ def run_deployment(
 
         print(f"✓ Day {day} generated")
 
-    # Top-level JSON structure
     data = {
         "user": cfg.user_name,
         "deployment_id": cfg.deployment_id,
@@ -390,7 +416,6 @@ def run_deployment(
             "variation_level": cfg.variation_level,
             "model": model,
         },
-        # Slow latent preferences U^pref for each window
         "long_term_preferences": {
             "window_1_days_1_15": u_pref_window1,
             "window_2_days_16_30": u_pref_window2,
@@ -405,16 +430,14 @@ def run_deployment(
 
 
 def parse_args(argv: List[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="LLM-based dataset generator (30-day deployments)."
-    )
+    parser = argparse.ArgumentParser(description="LLM-based dataset generator (30-day deployments).")
     parser.add_argument("--user", required=True, help="User name (e.g., User1)")
     parser.add_argument("--deployment-id", default="dep1", help="Deployment identifier")
     parser.add_argument(
         "--physical-profile",
         required=True,
         choices=list(PHYSICAL_CAPABILITY_PROFILES.keys()),
-        help="Physical capability profile key"
+        help="Physical capability profile key",
     )
     parser.add_argument("--seed", type=int, default=None, help="Random seed")
     parser.add_argument("--days", type=int, default=30, help="Number of days (default: 30)")
@@ -422,7 +445,7 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
         "--variation-level",
         type=float,
         default=0.3,
-        help="U^pref variation level between windows (0.0-1.0, default: 0.3)"
+        help="U^pref variation level between windows (0.0-1.0, default: 0.3)",
     )
     parser.add_argument("--output-dir", default="out", help="Output directory (default: out)")
     parser.add_argument("--api-key", help="OpenAI API key (overrides env/config)")
@@ -432,9 +455,9 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
 
 def main(argv: List[str]) -> int:
     args = parse_args(argv)
-    
+
     physical_profile = PHYSICAL_CAPABILITY_PROFILES[args.physical_profile]
-    
+
     cfg = DeploymentConfig(
         user_name=args.user,
         deployment_id=args.deployment_id,
@@ -443,14 +466,9 @@ def main(argv: List[str]) -> int:
         days=args.days,
         variation_level=args.variation_level,
     )
-    
+
     try:
-        out_path = run_deployment(
-            cfg,
-            api_key=args.api_key,
-            model=args.model,
-            output_dir=args.output_dir,
-        )
+        out_path = run_deployment(cfg, api_key=args.api_key, model=args.model, output_dir=args.output_dir)
         print(f"\n✓ Done. Wrote: {out_path}")
         return 0
     except Exception as e:
