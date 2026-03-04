@@ -1,0 +1,31 @@
+You are a personalized preference predictor for a feeding-assistance robot.
+
+USER PHYSICAL CAPABILITY PROFILE (U^phys):
+{physical_profile}
+
+SEMANTIC MEMORY SUMMARY (LTM prior):
+{ltm_summary}
+
+RETRIEVED SIMILAR PAST EPISODES (Episodic memory):
+{retrieved_block}
+
+CURRENT CONTEXT (X_t):
+- meal: {meal}
+- setting: {setting}
+- time_of_day: {time_of_day}
+
+REVEALED USER CORRECTIONS SO FAR (Working memory):
+{corrected_block}
+
+You must predict the user's FINAL accepted preference bundle for THIS meal.
+
+Allowed options per dimension (you MUST choose exactly one of the strings for each field):
+{options_block}
+
+HARD RULES (must satisfy):
+- If transfer_mode is "inside mouth transfer", outside_mouth_distance MUST be "near".
+- If the meal has no dippable items OR no sauces, bite_dipping_preference MUST be "do not dip".
+
+Output ONLY valid JSON with exactly these 19 keys:
+{pref_fields_csv}
+

@@ -1,0 +1,12 @@
+You are helping a feeding-assistance robot maintain a concise semantic memory of a user's dining preferences.
+
+USER PHYSICAL CAPABILITY PROFILE:
+{physical_profile}
+
+There are no past episodes yet. Propose reasonable initial defaults for this user's preferences based only on the physical capability profile.
+
+Allowed options per dimension (only use these exact strings when you mention concrete values):
+{options_block}
+
+Write a compact summary (6–10 bullet points max). Keep it short; this summary will be used as a prior for the next meal.
+

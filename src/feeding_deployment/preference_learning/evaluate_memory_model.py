@@ -44,6 +44,18 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 import feeding_deployment.preference_learning.config as root_config  # type: ignore
+from feeding_deployment.preference_learning.config.preference_bundle import (
+    PREFERENCE_BUNDLE as _PREF_BUNDLE_DIMS,
+)
+from feeding_deployment.preference_learning.prompts.ltm_summary_cold_start import (
+    render_ltm_cold_start_prompt,
+)
+from feeding_deployment.preference_learning.prompts.ltm_summary_update import (
+    render_ltm_update_prompt,
+)
+from feeding_deployment.preference_learning.prompts.bundle_prediction_prompt import (
+    render_bundle_prediction_prompt,
+)
 
 try:
     from openai import OpenAI
@@ -81,6 +93,22 @@ def _retry_on_rate_limit(
 
 PREF_FIELDS: List[str] = [name for (name, _, _) in root_config.PREFERENCE_BUNDLE]  # 19 dims
 PREF_OPTIONS: Dict[str, List[str]] = {name: opts for (name, _, opts) in root_config.PREFERENCE_BUNDLE}
+PREF_DESCRIPTIONS: Dict[str, str] = {
+    dim.field: dim.description for dim in _PREF_BUNDLE_DIMS
+}
+
+
+def _build_options_block() -> str:
+    """Render preference options (and descriptions) for inclusion in LLM prompts."""
+    lines: List[str] = []
+    for field in PREF_FIELDS:
+        opts_str = ", ".join(PREF_OPTIONS[field])
+        desc = PREF_DESCRIPTIONS.get(field, "").strip()
+        if desc:
+            lines.append(f"- {field}: [{opts_str}] — {desc}")
+        else:
+            lines.append(f"- {field}: [{opts_str}]")
+    return "\n".join(lines)
 
 
 def _strip_code_fences(s: str) -> str:
@@ -221,16 +249,24 @@ def _summarize_ltm(
     previous_ltm_summary: str,
     past_episode_snippets: List[str],
 ) -> str:
-    opts_block = "\n".join(f"- {field}: [{', '.join(PREF_OPTIONS[field])}]" for field in PREF_FIELDS)
+    opts_block = _build_options_block()
 
     if not previous_ltm_summary.strip():
         # Cold start (boundary=0): generate initial defaults from physical_profile alone.
-        prompt = f"""You are helping a feeding-assistance robot maintain a concise semantic memory of a user's dining preferences.\n\nUSER PHYSICAL CAPABILITY PROFILE:\n{physical_profile}\n\nThere are no past episodes yet. Propose reasonable initial defaults for this user's preferences based only on the physical capability profile.\n\nAllowed options per dimension (only use these exact strings when you mention concrete values):\n{opts_block}\n\nWrite a compact summary (6-10 bullet points max). Keep it short; this summary will be used as a prior for the next meal.\n"""
+        prompt = render_ltm_cold_start_prompt(
+            physical_profile=physical_profile,
+            options_block=opts_block,
+        )
         max_tokens = 350
     else:
         # Update mode: incorporate new episodes into the previous summary.
         new_episodes_block = "\n\n".join(past_episode_snippets) if past_episode_snippets else "(no new episodes in this window)"
-        prompt = f"""You are helping a feeding-assistance robot maintain a concise semantic memory of a user's dining preferences.\n\nUSER PHYSICAL CAPABILITY PROFILE:\n{physical_profile}\n\nPREVIOUS SUMMARY:\n{previous_ltm_summary}\n\nNEW EPISODES SINCE THAT SUMMARY (context + final accepted preferences):\n{new_episodes_block}\n\nTask: Update the summary to incorporate the new evidence above. When the same context produced different preference bundles across episodes, preserve both patterns as context-conditional variation — do not average or discard either. Flag dimensions where the user shows variability, as these likely depend on unobserved internal states. Retain everything from the previous summary unless directly contradicted by new evidence.\n\nAllowed options per dimension (only use these exact strings when you mention concrete values):\n{opts_block}\n\nKeep the summary to 6-10 bullet points normally; you may use up to ~12 if there are genuine conditional branches to preserve. This summary will be used as a prior for the next meal.\n"""
+        prompt = render_ltm_update_prompt(
+            physical_profile=physical_profile,
+            previous_ltm_summary=previous_ltm_summary,
+            new_episodes_block=new_episodes_block,
+            options_block=opts_block,
+        )
         max_tokens = 500
 
     def _call() -> Any:
@@ -240,7 +276,7 @@ def _summarize_ltm(
                 {"role": "system", "content": "You write concise, faithful preference summaries."},
                 {"role": "user", "content": prompt},
             ],
-            temperature=0.2,
+            temperature=0,
             max_tokens=max_tokens,
         )
 
@@ -257,11 +293,18 @@ def _predict_bundle_llm(
     context: Dict[str, Any],
     corrected: Dict[str, str],
 ) -> Dict[str, str]:
-    opts_block = "\n".join(f"- {field}: [{', '.join(PREF_OPTIONS[field])}]" for field in PREF_FIELDS)
+    opts_block = _build_options_block()
     retrieved_block = "\n\n".join(retrieved_episodes) if retrieved_episodes else "(none)"
     corrected_block = "\n".join(f"- {k}: {v}" for k, v in corrected.items()) if corrected else "(none)"
 
-    prompt = f"""You are a personalized preference predictor for a feeding-assistance robot.\n\nUSER PHYSICAL CAPABILITY PROFILE (U^phys):\n{physical_profile}\n\nSEMANTIC MEMORY SUMMARY (LTM prior):\n{ltm_summary}\n\nRETRIEVED SIMILAR PAST EPISODES (Episodic memory):\n{retrieved_block}\n\nCURRENT CONTEXT (X_t):\n- meal: {context.get('meal')}\n- setting: {context.get('setting')}\n- time_of_day: {context.get('time_of_day')}\n\nREVEALED USER CORRECTIONS SO FAR (Working memory):\n{corrected_block}\n\nYou must predict the user's FINAL accepted preference bundle for THIS meal.\n\nAllowed options per dimension (you MUST choose exactly one of the strings for each field):\n{opts_block}\n\nHARD RULES (must satisfy):\n- If transfer_mode is \"inside mouth transfer\", outside_mouth_distance MUST be \"near\".\n- If the meal has no dippable items OR no sauces, bite_dipping_preference MUST be \"do not dip\".\n\nOutput ONLY valid JSON with exactly these 19 keys:\n{', '.join(PREF_FIELDS)}\n"""
+    prompt = render_bundle_prediction_prompt(
+        physical_profile=physical_profile,
+        ltm_summary=ltm_summary,
+        retrieved_block=retrieved_block,
+        context=context,
+        corrected_block=corrected_block,
+        options_block=opts_block,
+    )
 
     def _call() -> Any:
         return client.chat.completions.create(
@@ -552,6 +595,16 @@ def main() -> int:
     real_stdout = sys.stdout
     sys.stdout = _Tee(real_stdout, report_txt_file)
 
+    # Structured logs for inspection/debugging (per-run).
+    logs_dir = report_dir / "logs"
+    logs_dir.mkdir(parents=True, exist_ok=True)
+    retrieved_log_path = logs_dir / "retrieved_memory.jsonl"
+    ltm_log_path = logs_dir / "ltm_memory.jsonl"
+    wm_log_path = logs_dir / "working_memory.jsonl"
+    retrieved_log_file = open(retrieved_log_path, "a", encoding="utf-8")
+    ltm_log_file = open(ltm_log_path, "a", encoding="utf-8")
+    wm_log_file = open(wm_log_path, "a", encoding="utf-8")
+
     try:
         if args.num_rollouts < 1:
             print("--num-rollouts must be >= 1", file=sys.stderr)
@@ -664,6 +717,25 @@ def main() -> int:
                         ltm_cache[key] = ltm_summary
                     previous_ltm_summary = ltm_summary
 
+                    # Log long-term memory state for this meal/day.
+                    ltm_log_file.write(
+                        json.dumps(
+                            {
+                                "run_timestamp": run_ts,
+                                "dataset_file": path,
+                                "user": user,
+                                "rollout": rollout_idx,
+                                "day": day,
+                                "boundary": boundary,
+                                "delta": args.delta,
+                                "ltm_summary": ltm_summary,
+                                "new_episodes": new_episodes,
+                            },
+                            ensure_ascii=False,
+                        )
+                        + "\n"
+                    )
+
                     corrected: Dict[str, str] = {}
                     m = 0
                     affective_state = str(ctx.get("transient_affective_state") or "unknown").strip() or "unknown"
@@ -696,9 +768,46 @@ def main() -> int:
                                 k=args.k_retrieve,
                             )
 
+                        # Log episodic retrieval for this prediction step.
+                        retrieved_log_file.write(
+                            json.dumps(
+                                {
+                                    "run_timestamp": run_ts,
+                                    "dataset_file": path,
+                                    "user": user,
+                                    "rollout": rollout_idx,
+                                    "day": day,
+                                    "m": m,
+                                    "ablation": args.ablation,
+                                    "use_em": use_em,
+                                    "query": query,
+                                    "retrieved_episodes": retrieved,
+                                },
+                                ensure_ascii=False,
+                            )
+                            + "\n"
+                        )
+
                         # Ablation: optionally disable LTM and/or EM.
                         ltm_for_pred = ltm_summary if args.ablation not in ("em_only", "no_memory") else ""
                         retrieved_for_pred = retrieved if args.ablation not in ("ltm_only", "no_memory") else []
+
+                        # Log working memory state before prediction.
+                        wm_log_file.write(
+                            json.dumps(
+                                {
+                                    "run_timestamp": run_ts,
+                                    "dataset_file": path,
+                                    "user": user,
+                                    "rollout": rollout_idx,
+                                    "day": day,
+                                    "m": m,
+                                    "corrected": corrected,
+                                },
+                                ensure_ascii=False,
+                            )
+                            + "\n"
+                        )
 
                         print(
                             f"  [Predict] Calling OpenAI for bundle (day {day}, m={m}) ...",
@@ -914,6 +1023,9 @@ def main() -> int:
     finally:
         sys.stdout = real_stdout
         report_txt_file.close()
+        retrieved_log_file.close()
+        ltm_log_file.close()
+        wm_log_file.close()
 
 
 if __name__ == "__main__":
