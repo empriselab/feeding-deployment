@@ -1,0 +1,2700 @@
+{
+  "user": "user1",
+  "deployment_id": "dep1",
+  "physical_profile_label": "severe_paralysis_clear_speech",
+  "config": {
+    "days": 30,
+    "seed": null,
+    "model": "gpt-4o"
+  },
+  "user_preference_encoding": {
+    "microwave_time": {
+      "default": "2 min",
+      "user_tendencies": "IF eating alone AND in a hurry AND food is meat THEN 3 min BECAUSE hotter meat is preferred for quick meals. IF eating in a social setting AND relaxed AND food is dessert THEN no microwave BECAUSE desserts are preferred at room temperature in social settings. IF watching television AND neutral AND food is fruit THEN 1 min BECAUSE fruits are preferred closer to room temperature. IF working on a laptop AND energetic AND food is with sauces THEN 3 min BECAUSE warmer food is preferred to maintain focus. IF eating alone AND fatigued AND food is dessert THEN no microwave BECAUSE less effort is needed with room temperature desserts."
+    },
+    "occlusion_relevance": {
+      "default": "minimize front occlusion",
+      "user_tendencies": "IF eating in a social setting AND relaxed AND any food THEN minimize left occlusion BECAUSE it is important to maintain social interaction. IF watching television AND neutral AND any food THEN minimize front occlusion BECAUSE it is important to keep the TV visible. IF working on a laptop AND in a hurry AND any food THEN do not consider occlusion BECAUSE efficiency is prioritized. IF eating alone AND fatigued AND any food THEN minimize front occlusion BECAUSE it reduces distractions. IF eating alone AND energetic AND food is with sauces THEN do not consider occlusion BECAUSE focus is on the meal."
+    },
+    "robot_speed": {
+      "default": "medium",
+      "user_tendencies": "IF eating in a social setting AND in a hurry AND any food THEN fast BECAUSE quicker interactions are preferred. IF watching television AND relaxed AND any food THEN slow BECAUSE it allows for a more leisurely pace. IF working on a laptop AND energetic AND any food THEN fast BECAUSE it matches the user's energy level. IF eating alone AND fatigued AND food is meat THEN medium BECAUSE it balances speed and effort. IF eating alone AND neutral AND food is dessert THEN slow BECAUSE desserts are enjoyed at a leisurely pace."
+    },
+    "skewering_axis": {
+      "default": "parallel to major axis",
+      "user_tendencies": "IF eating in a social setting AND relaxed AND food is meat THEN perpendicular to major axis BECAUSE it increases bite acquisition success. IF watching television AND neutral AND food is fruit THEN parallel to major axis BECAUSE it produces easier-to-eat bites. IF working on a laptop AND energetic AND food is with sauces THEN perpendicular to major axis BECAUSE it ensures successful dipping. IF eating alone AND fatigued AND food is dessert THEN parallel to major axis BECAUSE it requires less effort. IF eating alone AND in a hurry AND food is meat THEN perpendicular to major axis BECAUSE it ensures quicker bite acquisition."
+    },
+    "web_interface_confirmation": {
+      "default": "no",
+      "user_tendencies": "IF eating in a social setting AND relaxed AND any food THEN yes BECAUSE it ensures precise control in social settings. IF watching television AND neutral AND any food THEN no BECAUSE it minimizes interruptions. IF working on a laptop AND energetic AND any food THEN yes BECAUSE it allows the user to multitask. IF eating alone AND fatigued AND any food THEN no BECAUSE it reduces effort. IF eating alone AND in a hurry AND food is with sauces THEN yes BECAUSE it ensures successful dipping."
+    },
+    "transfer_mode": {
+      "default": "inside mouth transfer",
+      "user_tendencies": "IF eating in a social setting AND relaxed AND any food THEN outside mouth transfer BECAUSE it is less intrusive. IF watching television AND neutral AND any food THEN inside mouth transfer BECAUSE it minimizes distractions. IF working on a laptop AND energetic AND any food THEN inside mouth transfer BECAUSE it allows for efficient eating. IF eating alone AND fatigued AND any food THEN inside mouth transfer BECAUSE it requires less effort. IF eating alone AND in a hurry AND food is with sauces THEN outside mouth transfer BECAUSE it reduces mess."
+    },
+    "outside_mouth_distance": {
+      "default": "near",
+      "user_tendencies": "IF eating in a social setting AND relaxed AND any food THEN medium BECAUSE it allows for comfortable interaction. IF watching television AND neutral AND any food THEN near BECAUSE it minimizes distractions. IF working on a laptop AND energetic AND any food THEN near BECAUSE it allows for efficient eating. IF eating alone AND fatigued AND any food THEN near BECAUSE it requires less effort. IF eating alone AND in a hurry AND food is with sauces THEN medium BECAUSE it reduces mess."
+    },
+    "robot_ready_cue": {
+      "default": "speech",
+      "user_tendencies": "IF eating in a social setting AND relaxed AND any food THEN speech + LED BECAUSE it ensures clear communication. IF watching television AND neutral AND any food THEN LED BECAUSE it is less disruptive. IF working on a laptop AND energetic AND any food THEN speech BECAUSE it provides clear acknowledgment. IF eating alone AND fatigued AND any food THEN speech BECAUSE it is easier to perceive. IF eating alone AND in a hurry AND food is with sauces THEN speech + LED BECAUSE it ensures clear communication."
+    },
+    "bite_initiation_feeding": {
+      "default": "open mouth",
+      "user_tendencies": "IF eating in a social setting AND relaxed AND any food THEN button BECAUSE it avoids confusion with talking. IF watching television AND neutral AND any food THEN autocontinue BECAUSE it minimizes distractions. IF working on a laptop AND energetic AND any food THEN open mouth BECAUSE it allows for efficient interaction. IF eating alone AND fatigued AND any food THEN open mouth BECAUSE it requires less effort. IF eating alone AND in a hurry AND food is with sauces THEN autocontinue BECAUSE it ensures quicker interactions."
+    },
+    "bite_initiation_drinking": {
+      "default": "open mouth",
+      "user_tendencies": "IF eating in a social setting AND relaxed AND any food THEN button BECAUSE it avoids confusion with talking. IF watching television AND neutral AND any food THEN autocontinue BECAUSE it minimizes distractions. IF working on a laptop AND energetic AND any food THEN open mouth BECAUSE it allows for efficient interaction. IF eating alone AND fatigued AND any food THEN open mouth BECAUSE it requires less effort. IF eating alone AND in a hurry AND food is with sauces THEN autocontinue BECAUSE it ensures quicker interactions."
+    },
+    "bite_initiation_wiping": {
+      "default": "open mouth",
+      "user_tendencies": "IF eating in a social setting AND relaxed AND any food THEN button BECAUSE it avoids confusion with talking. IF watching television AND neutral AND any food THEN autocontinue BECAUSE it minimizes distractions. IF working on a laptop AND energetic AND any food THEN open mouth BECAUSE it allows for efficient interaction. IF eating alone AND fatigued AND any food THEN open mouth BECAUSE it requires less effort. IF eating alone AND in a hurry AND food is with sauces THEN autocontinue BECAUSE it ensures quicker interactions."
+    },
+    "robot_bite_available_cue": {
+      "default": "speech",
+      "user_tendencies": "IF eating in a social setting AND relaxed AND any food THEN speech + LED BECAUSE it ensures clear communication. IF watching television AND neutral AND any food THEN LED BECAUSE it is less disruptive. IF working on a laptop AND energetic AND any food THEN speech BECAUSE it provides clear acknowledgment. IF eating alone AND fatigued AND any food THEN speech BECAUSE it is easier to perceive. IF eating alone AND in a hurry AND food is with sauces THEN speech + LED BECAUSE it ensures clear communication."
+    },
+    "bite_completion_feeding": {
+      "default": "perception",
+      "user_tendencies": "IF eating in a social setting AND relaxed AND any food THEN button BECAUSE it allows for explicit control. IF watching television AND neutral AND any food THEN autocontinue BECAUSE it minimizes distractions. IF working on a laptop AND energetic AND any food THEN perception BECAUSE it allows for efficient interaction. IF eating alone AND fatigued AND any food THEN perception BECAUSE it requires less effort. IF eating alone AND in a hurry AND food is with sauces THEN autocontinue BECAUSE it ensures quicker interactions."
+    },
+    "bite_completion_drinking": {
+      "default": "perception",
+      "user_tendencies": "IF eating in a social setting AND relaxed AND any food THEN button BECAUSE it allows for explicit control. IF watching television AND neutral AND any food THEN autocontinue BECAUSE it minimizes distractions. IF working on a laptop AND energetic AND any food THEN perception BECAUSE it allows for efficient interaction. IF eating alone AND fatigued AND any food THEN perception BECAUSE it requires less effort. IF eating alone AND in a hurry AND food is with sauces THEN autocontinue BECAUSE it ensures quicker interactions."
+    },
+    "bite_completion_wiping": {
+      "default": "perception",
+      "user_tendencies": "IF eating in a social setting AND relaxed AND any food THEN button BECAUSE it allows for explicit control. IF watching television AND neutral AND any food THEN autocontinue BECAUSE it minimizes distractions. IF working on a laptop AND energetic AND any food THEN perception BECAUSE it allows for efficient interaction. IF eating alone AND fatigued AND any food THEN perception BECAUSE it requires less effort. IF eating alone AND in a hurry AND food is with sauces THEN autocontinue BECAUSE it ensures quicker interactions."
+    },
+    "retract_between_bites": {
+      "default": "yes",
+      "user_tendencies": "IF eating in a social setting AND relaxed AND any food THEN yes BECAUSE it reduces visual obstruction. IF watching television AND neutral AND any food THEN yes BECAUSE it minimizes distractions. IF working on a laptop AND energetic AND any food THEN yes BECAUSE it allows for efficient interaction. IF eating alone AND fatigued AND any food THEN no BECAUSE it reduces effort. IF eating alone AND in a hurry AND food is with sauces THEN yes BECAUSE it ensures cleanliness."
+    },
+    "bite_dipping_preference": {
+      "default": "do not dip",
+      "user_tendencies": "IF eating in a social setting AND relaxed AND food is with sauces THEN do not dip BECAUSE it reduces messiness. IF watching television AND neutral AND food is with sauces THEN dip food in sauce BECAUSE it enhances flavor. IF working on a laptop AND energetic AND food is with sauces THEN dip food in sauce BECAUSE it adds enjoyment. IF eating alone AND fatigued AND food is with sauces THEN do not dip BECAUSE it reduces effort. IF eating alone AND in a hurry AND food is with sauces THEN do not dip BECAUSE it ensures quicker interactions."
+    },
+    "amount_to_dip": {
+      "default": "not applicable",
+      "user_tendencies": "IF eating in a social setting AND relaxed AND food is with sauces THEN less BECAUSE it reduces messiness. IF watching television AND neutral AND food is with sauces THEN more BECAUSE it enhances flavor. IF working on a laptop AND energetic AND food is with sauces THEN more BECAUSE it adds enjoyment. IF eating alone AND fatigued AND food is with sauces THEN less BECAUSE it reduces effort. IF eating alone AND in a hurry AND food is with sauces THEN less BECAUSE it ensures quicker interactions."
+    },
+    "wait_before_autocontinue_seconds": {
+      "default": "100",
+      "user_tendencies": "IF eating in a social setting AND relaxed AND any food THEN 1000 BECAUSE it allows for social interaction. IF watching television AND neutral AND any food THEN 100 BECAUSE it balances interaction and distraction. IF working on a laptop AND energetic AND any food THEN 10 BECAUSE it matches the user's energy level. IF eating alone AND fatigued AND any food THEN 1000 BECAUSE it reduces effort. IF eating alone AND in a hurry AND any food THEN 10 BECAUSE it ensures quicker interactions."
+    }
+  },
+  "days": [
+    {
+      "day": 1,
+      "context": {
+        "meal": "bite-sized pizza and broccoli",
+        "setting": "Working on laptop",
+        "time_of_day": "noon",
+        "transient_affective_state": "Neutral"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Dipping is not applicable as there are no sauces."
+        },
+        "bite_completion_drinking": {
+          "choice": "perception",
+          "rationale": "Perception allows for efficient interaction while the user is working on a laptop."
+        },
+        "bite_completion_feeding": {
+          "choice": "perception",
+          "rationale": "Perception allows for efficient interaction while the user is working on a laptop."
+        },
+        "bite_completion_wiping": {
+          "choice": "perception",
+          "rationale": "Perception allows for efficient interaction while the user is working on a laptop."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "No sauces are available, so dipping is not applicable."
+        },
+        "bite_initiation_drinking": {
+          "choice": "open mouth",
+          "rationale": "Open mouth allows for efficient interaction while the user is working on a laptop."
+        },
+        "bite_initiation_feeding": {
+          "choice": "open mouth",
+          "rationale": "Open mouth allows for efficient interaction while the user is working on a laptop."
+        },
+        "bite_initiation_wiping": {
+          "choice": "open mouth",
+          "rationale": "Open mouth allows for efficient interaction while the user is working on a laptop."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The meal is refrigerated leftovers intended to be served hot, and the user is working on a laptop, so warmer food is preferred to maintain focus."
+        },
+        "occlusion_relevance": {
+          "choice": "do not consider occlusion",
+          "rationale": "The user is working on a laptop and efficiency is prioritized over occlusion concerns."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "Inside mouth transfer requires the distance to be near."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Retracting reduces visual obstruction and allows for efficient interaction while working on a laptop."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech",
+          "rationale": "Speech provides clear acknowledgment while the user is working on a laptop."
+        },
+        "robot_ready_cue": {
+          "choice": "speech",
+          "rationale": "Speech provides clear acknowledgment while the user is working on a laptop."
+        },
+        "robot_speed": {
+          "choice": "fast",
+          "rationale": "The user is working on a laptop and energetic, so a faster speed matches the user's energy level."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "The user is working on a laptop and energetic, so perpendicular skewering ensures successful bite acquisition."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user is working on a laptop, so inside mouth transfer allows for efficient eating."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "10",
+          "rationale": "A shorter wait time matches the user's energetic state while working on a laptop."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "The user is working on a laptop and energetic, so explicit confirmation allows multitasking."
+        }
+      }
+    },
+    {
+      "day": 2,
+      "context": {
+        "meal": "chicken nuggets, broccoli, and ketchup",
+        "setting": "Social + Watching TV",
+        "time_of_day": "morning",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "more",
+          "rationale": "More dipping enhances flavor, which is preferred while watching TV with sauces available."
+        },
+        "bite_completion_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV, allowing for smoother interaction."
+        },
+        "bite_completion_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV, allowing for smoother interaction."
+        },
+        "bite_completion_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV, allowing for smoother interaction."
+        },
+        "bite_dipping_preference": {
+          "choice": "dip food in sauce",
+          "rationale": "Dipping enhances flavor, which is preferred while watching TV with sauces available."
+        },
+        "bite_initiation_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV, allowing for smoother interaction."
+        },
+        "bite_initiation_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV, allowing for smoother interaction."
+        },
+        "bite_initiation_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV, allowing for smoother interaction."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The meal includes meat and is intended to be served hot, aligning with the preference for hotter meals in a social setting."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "Watching TV is part of the context, so minimizing front occlusion is important to keep the TV visible."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "As inside mouth transfer is selected, the distance must be near according to hard rules."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Retracting between bites minimizes visual obstruction, which is beneficial while watching TV."
+        },
+        "robot_bite_available_cue": {
+          "choice": "LED",
+          "rationale": "Using LED is less disruptive while watching TV, aligning with the context."
+        },
+        "robot_ready_cue": {
+          "choice": "LED",
+          "rationale": "Using LED is less disruptive while watching TV, aligning with the context."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user's transient affective state is slower, suggesting a slower pace is more suitable."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "The meal includes chicken nuggets, which benefit from increased bite acquisition success with perpendicular skewering."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "Inside mouth transfer minimizes distractions while watching TV and requires less effort from the user."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100",
+          "rationale": "A balanced wait time minimizes distractions while watching TV, aligning with the user's neutral affective state."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "Minimizing interruptions is preferred while watching TV, so no additional confirmation is needed."
+        }
+      }
+    },
+    {
+      "day": 3,
+      "context": {
+        "meal": "bite-sized pizza and broccoli",
+        "setting": "Watching TV",
+        "time_of_day": "evening",
+        "transient_affective_state": "Fatigued"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Since no dipping is performed, the amount to dip is not applicable."
+        },
+        "bite_completion_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue is chosen to minimize distractions while watching TV."
+        },
+        "bite_completion_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV, aligning with the user's preference."
+        },
+        "bite_completion_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions, which is suitable for watching TV."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "No sauces are available, so the hard rule requires not dipping."
+        },
+        "bite_initiation_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue is chosen to minimize distractions while watching TV."
+        },
+        "bite_initiation_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV, aligning with the user's preference."
+        },
+        "bite_initiation_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions, which is suitable for watching TV."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The default setting of 2 min is used as no specific conditional tendency applies for watching TV with pizza and broccoli."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "When watching TV, minimizing front occlusion is preferred to keep the TV visible."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "As per the hard rule, when using inside mouth transfer, the distance must be near."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Retracting between bites minimizes distractions while watching TV."
+        },
+        "robot_bite_available_cue": {
+          "choice": "LED",
+          "rationale": "Using LED is less disruptive while watching TV, aligning with the user's preference."
+        },
+        "robot_ready_cue": {
+          "choice": "LED",
+          "rationale": "LED is less disruptive while watching TV, aligning with the user's preference to minimize distractions."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The user can tolerate moderate feeding speeds, and the default medium speed balances pace and effort."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Parallel skewering produces easier-to-eat bites, which is suitable given the user's physical limitations."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "Inside mouth transfer is chosen to minimize distractions and effort for the user."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100",
+          "rationale": "A wait time of 100 seconds balances interaction and distraction while watching TV."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "To reduce effort and minimize interruptions while watching TV, no web interface confirmation is preferred."
+        }
+      }
+    },
+    {
+      "day": 4,
+      "context": {
+        "meal": "bite-sized pizza and broccoli",
+        "setting": "Social with Person on Right",
+        "time_of_day": "noon",
+        "transient_affective_state": "Energetic"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Since there are no sauces, dipping is not applicable."
+        },
+        "bite_completion_drinking": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button allows for explicit control."
+        },
+        "bite_completion_feeding": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button allows for explicit control."
+        },
+        "bite_completion_wiping": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button allows for explicit control."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "There are no sauces available, so dipping is not applicable."
+        },
+        "bite_initiation_drinking": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button avoids confusion with talking."
+        },
+        "bite_initiation_feeding": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button avoids confusion with talking."
+        },
+        "bite_initiation_wiping": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button avoids confusion with talking."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The meal is intended to be served hot, and the user is in a social setting with an energetic state, which aligns with the preference for hotter food."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize left occlusion",
+          "rationale": "In a social setting, minimizing left occlusion is important to maintain interaction with the person on the right."
+        },
+        "outside_mouth_distance": {
+          "choice": "medium",
+          "rationale": "Medium distance allows for comfortable interaction in a social setting."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Retracting between bites reduces visual obstruction in a social setting."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech + LED",
+          "rationale": "In a social setting, using both speech and LED ensures clear communication."
+        },
+        "robot_ready_cue": {
+          "choice": "speech + LED",
+          "rationale": "In a social setting, using both speech and LED ensures clear communication."
+        },
+        "robot_speed": {
+          "choice": "fast",
+          "rationale": "The user is energetic, and in a social setting, faster interactions are preferred."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "In a social setting with an energetic state, perpendicular skewering ensures successful bite acquisition."
+        },
+        "transfer_mode": {
+          "choice": "outside mouth transfer",
+          "rationale": "In a social setting, outside mouth transfer is less intrusive and preferred."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "In a social setting, a longer wait allows for social interaction."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "In a social setting, explicit confirmation ensures precise control."
+        }
+      }
+    },
+    {
+      "day": 5,
+      "context": {
+        "meal": "bananas, brownies, and chocolate sauce",
+        "setting": "Working on laptop",
+        "time_of_day": "noon",
+        "transient_affective_state": "Fatigued"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Since dipping is not preferred, the amount to dip is not applicable."
+        },
+        "bite_completion_drinking": {
+          "choice": "perception",
+          "rationale": "Perception requires less effort from the user, who is fatigued."
+        },
+        "bite_completion_feeding": {
+          "choice": "perception",
+          "rationale": "Perception requires less effort from the user, who is fatigued."
+        },
+        "bite_completion_wiping": {
+          "choice": "perception",
+          "rationale": "Perception requires less effort from the user, who is fatigued."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "The user is fatigued, and not dipping reduces effort."
+        },
+        "bite_initiation_drinking": {
+          "choice": "open mouth",
+          "rationale": "The user can reliably open their mouth, and this requires less effort than other options."
+        },
+        "bite_initiation_feeding": {
+          "choice": "open mouth",
+          "rationale": "The user can reliably open their mouth, and this requires less effort than other options."
+        },
+        "bite_initiation_wiping": {
+          "choice": "open mouth",
+          "rationale": "The user can reliably open their mouth, and this requires less effort than other options."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The meal is intended to be served warm, and the user is working on a laptop while fatigued, so the default of 2 min is appropriate."
+        },
+        "occlusion_relevance": {
+          "choice": "do not consider occlusion",
+          "rationale": "While working on a laptop, the user prioritizes efficiency over occlusion considerations."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "With inside mouth transfer selected, the distance must be near according to the hard rules."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "Not retracting reduces effort for the user, who is fatigued."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech",
+          "rationale": "Speech is easier for the user to perceive, especially when fatigued."
+        },
+        "robot_ready_cue": {
+          "choice": "speech",
+          "rationale": "Speech is easier for the user to perceive, especially when fatigued."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The user can tolerate moderate speeds and is fatigued, so a balanced medium speed is suitable."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "Perpendicular skewering ensures successful dipping, which is relevant for the meal context."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user has severe upper-limb paralysis and is fatigued, so inside mouth transfer reduces effort."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "A longer wait time reduces effort for the user, who is fatigued."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "The user is fatigued and working on a laptop, so minimizing effort by not requiring confirmation is preferred."
+        }
+      }
+    },
+    {
+      "day": 6,
+      "context": {
+        "meal": "buffalo chicken bites, potato wedges, and ranch dressing",
+        "setting": "Working on laptop",
+        "time_of_day": "morning",
+        "transient_affective_state": "Fatigued"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Dipping is not applicable as the preference is not to dip."
+        },
+        "bite_completion_drinking": {
+          "choice": "perception",
+          "rationale": "The user is fatigued, so perception requires less effort."
+        },
+        "bite_completion_feeding": {
+          "choice": "perception",
+          "rationale": "The user is fatigued, so perception requires less effort."
+        },
+        "bite_completion_wiping": {
+          "choice": "perception",
+          "rationale": "The user is fatigued, so perception requires less effort."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "The user is fatigued, so not dipping reduces effort."
+        },
+        "bite_initiation_drinking": {
+          "choice": "open mouth",
+          "rationale": "The user is fatigued, so open mouth initiation requires less effort."
+        },
+        "bite_initiation_feeding": {
+          "choice": "open mouth",
+          "rationale": "The user is fatigued, so open mouth initiation requires less effort."
+        },
+        "bite_initiation_wiping": {
+          "choice": "open mouth",
+          "rationale": "The user is fatigued, so open mouth initiation requires less effort."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The user is working on a laptop and the food is with sauces, so warmer food is preferred to maintain focus."
+        },
+        "occlusion_relevance": {
+          "choice": "do not consider occlusion",
+          "rationale": "The user is working on a laptop and efficiency is prioritized over occlusion concerns."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "Inside mouth transfer requires the distance to be near."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "The user is fatigued, so reducing effort by not retracting is preferred."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech",
+          "rationale": "The user is fatigued, so speech is easier to perceive."
+        },
+        "robot_ready_cue": {
+          "choice": "speech",
+          "rationale": "The user is fatigued, so speech is easier to perceive."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The user is fatigued, so a balanced speed is preferred to avoid excessive effort."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "The user is working on a laptop and the food is with sauces, so successful dipping is ensured."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user is fatigued, so inside mouth transfer requires less effort."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "The user is fatigued, so a longer wait reduces effort."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "The user is fatigued, so reducing effort by not requiring confirmation is preferred."
+        }
+      }
+    },
+    {
+      "day": 7,
+      "context": {
+        "meal": "buffalo chicken bites, potato wedges, and ranch dressing",
+        "setting": "Watching TV",
+        "time_of_day": "morning",
+        "transient_affective_state": "Fatigued"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "more",
+          "rationale": "More dipping enhances flavor, which is preferred while watching TV."
+        },
+        "bite_completion_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions during TV watching."
+        },
+        "bite_completion_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions during TV watching."
+        },
+        "bite_completion_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions during TV watching."
+        },
+        "bite_dipping_preference": {
+          "choice": "dip food in sauce",
+          "rationale": "Dipping enhances flavor, which is preferred while watching TV."
+        },
+        "bite_initiation_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions during TV watching."
+        },
+        "bite_initiation_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions during TV watching."
+        },
+        "bite_initiation_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions during TV watching."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The user is watching TV and prefers food closer to room temperature, but since the food is intended to be served hot, 2 min is a balanced choice."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "While watching TV, minimizing front occlusion is important to keep the TV visible."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "With inside mouth transfer, the distance must be near as per the hard rules."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Retracting reduces visual obstruction and distractions while watching TV."
+        },
+        "robot_bite_available_cue": {
+          "choice": "LED",
+          "rationale": "LED cues are less disruptive while watching TV."
+        },
+        "robot_ready_cue": {
+          "choice": "LED",
+          "rationale": "LED cues are less disruptive while watching TV."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The user can tolerate moderate speeds and is watching TV, so medium speed balances interaction and comfort."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Parallel skewering produces easier-to-eat bites, which is suitable for the user's capabilities."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "Inside mouth transfer requires less effort from the user, which is suitable given their fatigue."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100",
+          "rationale": "A 100-second wait balances interaction and distraction while watching TV."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "To minimize interruptions while watching TV, no web interface confirmation is preferred."
+        }
+      }
+    },
+    {
+      "day": 8,
+      "context": {
+        "meal": "strawberries with whipped cream",
+        "setting": "Social with Person on Right",
+        "time_of_day": "evening",
+        "transient_affective_state": "Neutral"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Dipping is not applicable as the preference is to not dip."
+        },
+        "bite_completion_drinking": {
+          "choice": "button",
+          "rationale": "Button completion allows for explicit control in a social setting."
+        },
+        "bite_completion_feeding": {
+          "choice": "button",
+          "rationale": "Button completion allows for explicit control in a social setting."
+        },
+        "bite_completion_wiping": {
+          "choice": "button",
+          "rationale": "Button completion allows for explicit control in a social setting."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "In a social setting, not dipping reduces messiness."
+        },
+        "bite_initiation_drinking": {
+          "choice": "button",
+          "rationale": "Using a button avoids confusion with talking in a social setting."
+        },
+        "bite_initiation_feeding": {
+          "choice": "button",
+          "rationale": "Using a button avoids confusion with talking in a social setting."
+        },
+        "bite_initiation_wiping": {
+          "choice": "button",
+          "rationale": "Using a button avoids confusion with talking in a social setting."
+        },
+        "microwave_time": {
+          "choice": "no microwave",
+          "rationale": "The meal is strawberries with whipped cream, intended to be served cold, so no microwaving is needed."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize left occlusion",
+          "rationale": "In a social setting with a person on the right, minimizing left occlusion maintains social interaction."
+        },
+        "outside_mouth_distance": {
+          "choice": "medium",
+          "rationale": "A medium distance allows for comfortable interaction in a social setting."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Retracting between bites reduces visual obstruction in a social setting."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech + LED",
+          "rationale": "Combining speech and LED ensures clear communication in a social setting."
+        },
+        "robot_ready_cue": {
+          "choice": "speech + LED",
+          "rationale": "Combining speech and LED ensures clear communication in a social setting."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "In a social setting with a neutral affective state, a slower speed allows for a more leisurely pace."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Parallel skewering produces easier-to-eat bites, suitable for strawberries."
+        },
+        "transfer_mode": {
+          "choice": "outside mouth transfer",
+          "rationale": "In a social setting, outside mouth transfer is less intrusive."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "A longer wait allows for social interaction in a relaxed setting."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "In a social setting, explicit confirmation ensures precise control."
+        }
+      }
+    },
+    {
+      "day": 9,
+      "context": {
+        "meal": "strawberries with whipped cream",
+        "setting": "Social + Watching TV",
+        "time_of_day": "morning",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Since dipping is not preferred, the amount to dip is not applicable."
+        },
+        "bite_completion_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "bite_completion_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "bite_completion_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "The user's slower affective state and watching TV suggest avoiding additional effort, so no dipping is preferred."
+        },
+        "bite_initiation_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "bite_initiation_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "bite_initiation_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "microwave_time": {
+          "choice": "1 min",
+          "rationale": "The meal is fruit intended to be served cold, and the user is watching TV, so a shorter microwave time is preferred to keep the fruit closer to room temperature."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "Watching TV requires minimizing front occlusion to keep the screen visible."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "Inside mouth transfer requires the distance to be near."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Retracting between bites minimizes visual obstruction while watching TV."
+        },
+        "robot_bite_available_cue": {
+          "choice": "LED",
+          "rationale": "LED cues are less disruptive while watching TV."
+        },
+        "robot_ready_cue": {
+          "choice": "LED",
+          "rationale": "LED cues are less disruptive while watching TV."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user's affective state is slower, and they are watching TV, which suggests a leisurely pace is preferred."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "For fruit, parallel skewering produces easier-to-eat bites, which is suitable for the user's physical capabilities."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user has severe upper-limb paralysis, making inside mouth transfer less effortful."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100",
+          "rationale": "A moderate wait time balances interaction and distraction while watching TV."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "Watching TV suggests minimizing interruptions, so no web interface confirmation is needed."
+        }
+      }
+    },
+    {
+      "day": 10,
+      "context": {
+        "meal": "chicken nuggets, broccoli, and ketchup",
+        "setting": "Social with Person on Left",
+        "time_of_day": "morning",
+        "transient_affective_state": "Hurried"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Dipping is not preferred, so the amount to dip is not applicable."
+        },
+        "bite_completion_drinking": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button allows for explicit control."
+        },
+        "bite_completion_feeding": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button allows for explicit control."
+        },
+        "bite_completion_wiping": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button allows for explicit control."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "In a social setting, not dipping reduces messiness."
+        },
+        "bite_initiation_drinking": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button avoids confusion with talking."
+        },
+        "bite_initiation_feeding": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button avoids confusion with talking."
+        },
+        "bite_initiation_wiping": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button avoids confusion with talking."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The meal is meat, and the user is in a hurry, so hotter food is preferred."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize left occlusion",
+          "rationale": "In a social setting, minimizing left occlusion helps maintain social interaction."
+        },
+        "outside_mouth_distance": {
+          "choice": "medium",
+          "rationale": "A medium distance allows for comfortable interaction in a social setting."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "In a social setting, retracting reduces visual obstruction."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech + LED",
+          "rationale": "In a social setting, using both speech and LED ensures clear communication."
+        },
+        "robot_ready_cue": {
+          "choice": "speech + LED",
+          "rationale": "In a social setting, using both speech and LED ensures clear communication."
+        },
+        "robot_speed": {
+          "choice": "fast",
+          "rationale": "The user is in a hurry, so a faster speed is preferred to match the pace."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "In a social setting with meat, perpendicular skewering increases bite acquisition success."
+        },
+        "transfer_mode": {
+          "choice": "outside mouth transfer",
+          "rationale": "In a social setting, outside-mouth transfer is less intrusive."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "In a social setting, a longer wait allows for social interaction."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "In a social setting, explicit confirmation ensures precise control."
+        }
+      }
+    },
+    {
+      "day": 11,
+      "context": {
+        "meal": "general tso's chicken and broccoli",
+        "setting": "Social with Person on Right",
+        "time_of_day": "evening",
+        "transient_affective_state": "Hurried"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Dipping is not applicable due to the absence of sauces."
+        },
+        "bite_completion_drinking": {
+          "choice": "button",
+          "rationale": "Button completion allows for explicit control in a social setting."
+        },
+        "bite_completion_feeding": {
+          "choice": "button",
+          "rationale": "Button completion allows for explicit control in a social setting."
+        },
+        "bite_completion_wiping": {
+          "choice": "button",
+          "rationale": "Button completion allows for explicit control in a social setting."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "There are no sauces, so dipping is not applicable."
+        },
+        "bite_initiation_drinking": {
+          "choice": "button",
+          "rationale": "Button initiation avoids confusion with talking in a social setting."
+        },
+        "bite_initiation_feeding": {
+          "choice": "button",
+          "rationale": "In a social setting, button initiation avoids confusion with talking."
+        },
+        "bite_initiation_wiping": {
+          "choice": "button",
+          "rationale": "Button initiation avoids confusion with talking in a social setting."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The meal is meat and the user is in a hurry, so hotter food is preferred."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize left occlusion",
+          "rationale": "In a social setting, minimizing left occlusion maintains social interaction."
+        },
+        "outside_mouth_distance": {
+          "choice": "medium",
+          "rationale": "Medium distance is comfortable for social interaction."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Retracting reduces visual obstruction in a social setting."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech + LED",
+          "rationale": "Speech and LED ensure clear communication in a social setting."
+        },
+        "robot_ready_cue": {
+          "choice": "speech + LED",
+          "rationale": "In a social setting, clear communication is ensured with speech and LED."
+        },
+        "robot_speed": {
+          "choice": "fast",
+          "rationale": "The user is in a hurry, so faster interactions are preferred."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "Perpendicular skewering ensures quicker bite acquisition for meat."
+        },
+        "transfer_mode": {
+          "choice": "outside mouth transfer",
+          "rationale": "In a social setting, outside-mouth transfer is less intrusive."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "In a social setting, a longer wait allows for social interaction."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "In a social setting, precise control is important."
+        }
+      }
+    },
+    {
+      "day": 12,
+      "context": {
+        "meal": "chicken nuggets, broccoli, and ketchup",
+        "setting": "Social with Person on Left",
+        "time_of_day": "evening",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Dipping is not applicable as the preference is set to not dip."
+        },
+        "bite_completion_drinking": {
+          "choice": "button",
+          "rationale": "Explicit control is preferred in social settings to ensure proper interaction."
+        },
+        "bite_completion_feeding": {
+          "choice": "button",
+          "rationale": "Explicit control is preferred in social settings to ensure proper interaction."
+        },
+        "bite_completion_wiping": {
+          "choice": "button",
+          "rationale": "Explicit control is preferred in social settings to ensure proper interaction."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "In a social setting, avoiding dipping reduces messiness."
+        },
+        "bite_initiation_drinking": {
+          "choice": "button",
+          "rationale": "Using a button avoids confusion with talking in a social setting."
+        },
+        "bite_initiation_feeding": {
+          "choice": "button",
+          "rationale": "Using a button avoids confusion with talking in a social setting."
+        },
+        "bite_initiation_wiping": {
+          "choice": "button",
+          "rationale": "Using a button avoids confusion with talking in a social setting."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "In a social setting with meat, hotter food is preferred for a satisfying meal."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize left occlusion",
+          "rationale": "In a social setting, minimizing left occlusion maintains interaction with the person on the left."
+        },
+        "outside_mouth_distance": {
+          "choice": "medium",
+          "rationale": "A medium distance allows for comfortable interaction in a social setting."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Retracting between bites reduces visual obstruction in a social setting."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech + LED",
+          "rationale": "In a social setting, clear communication is ensured with both speech and LED cues."
+        },
+        "robot_ready_cue": {
+          "choice": "speech + LED",
+          "rationale": "In a social setting, clear communication is ensured with both speech and LED cues."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user's slower affective state suggests a slower pace to match their comfort level."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "Perpendicular skewering increases bite acquisition success, which is important for meat."
+        },
+        "transfer_mode": {
+          "choice": "outside mouth transfer",
+          "rationale": "In social settings, outside-mouth transfer is less intrusive and maintains social decorum."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "A longer wait allows for social interaction without rushing."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "In a social setting, precise control is important to avoid disruptions."
+        }
+      }
+    },
+    {
+      "day": 13,
+      "context": {
+        "meal": "chicken nuggets, broccoli, and ketchup",
+        "setting": "Watching TV",
+        "time_of_day": "evening",
+        "transient_affective_state": "Hurried"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "more",
+          "rationale": "More sauce enhances flavor, which is preferred while watching TV."
+        },
+        "bite_completion_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV and accommodates the user's physical limitations."
+        },
+        "bite_completion_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV and accommodates the user's physical limitations."
+        },
+        "bite_completion_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV and accommodates the user's physical limitations."
+        },
+        "bite_dipping_preference": {
+          "choice": "dip food in sauce",
+          "rationale": "Dipping enhances flavor, which is preferred while watching TV."
+        },
+        "bite_initiation_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV and accommodates the user's physical limitations."
+        },
+        "bite_initiation_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV and accommodates the user's physical limitations."
+        },
+        "bite_initiation_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV and accommodates the user's physical limitations."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The meal is chicken nuggets and broccoli, which are intended to be served hot, and the user is in a hurry, so a longer microwave time is preferred."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "The user is watching TV, so minimizing front occlusion is important to keep the TV visible."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "With inside mouth transfer, the distance must be near according to the hard rules."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Retracting between bites minimizes distractions while watching TV."
+        },
+        "robot_bite_available_cue": {
+          "choice": "LED",
+          "rationale": "LED cues are less disruptive while watching TV."
+        },
+        "robot_ready_cue": {
+          "choice": "LED",
+          "rationale": "LED cues are less disruptive while watching TV."
+        },
+        "robot_speed": {
+          "choice": "fast",
+          "rationale": "The user is in a hurry, so a faster robot speed is preferred to expedite the meal."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "Perpendicular skewering increases bite acquisition success, which is beneficial for the user in a hurry."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user has severe upper-limb paralysis, so inside mouth transfer minimizes effort and distractions."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "10",
+          "rationale": "A shorter wait time ensures quicker interactions, aligning with the user's hurried state."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "The user cannot reliably press buttons, and minimizing interruptions is important while watching TV."
+        }
+      }
+    },
+    {
+      "day": 14,
+      "context": {
+        "meal": "bite-sized sandwiches",
+        "setting": "Personal",
+        "time_of_day": "morning",
+        "transient_affective_state": "Fatigued"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Hard rule: do not dip implies not applicable."
+        },
+        "bite_completion_drinking": {
+          "choice": "perception",
+          "rationale": "The default setting requires less effort for the user."
+        },
+        "bite_completion_feeding": {
+          "choice": "perception",
+          "rationale": "The default setting requires less effort for the user."
+        },
+        "bite_completion_wiping": {
+          "choice": "perception",
+          "rationale": "The default setting requires less effort for the user."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Hard rule: no sauces exist, so do not dip."
+        },
+        "bite_initiation_drinking": {
+          "choice": "open mouth",
+          "rationale": "The default setting requires less effort for the user."
+        },
+        "bite_initiation_feeding": {
+          "choice": "open mouth",
+          "rationale": "The default setting requires less effort for the user."
+        },
+        "bite_initiation_wiping": {
+          "choice": "open mouth",
+          "rationale": "The default setting requires less effort for the user."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The default setting is used as no specific conditional tendency applies to sandwiches."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "The default setting is used to reduce distractions while eating alone."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "Hard rule: inside mouth transfer requires near distance."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "The default setting is overridden to reduce effort for the user."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech",
+          "rationale": "The default setting is easier for the user to perceive."
+        },
+        "robot_ready_cue": {
+          "choice": "speech",
+          "rationale": "The default setting is easier for the user to perceive."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The default setting balances speed and effort for a user with fatigue."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "The default setting is used as it requires less effort for the user."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The default setting requires less effort from the user."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "The user is fatigued, so a longer wait reduces effort."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "The default setting reduces effort for the user."
+        }
+      }
+    },
+    {
+      "day": 15,
+      "context": {
+        "meal": "bite-sized sandwiches",
+        "setting": "Watching TV",
+        "time_of_day": "evening",
+        "transient_affective_state": "Energetic"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Dipping is not applicable, so the amount to dip is not applicable."
+        },
+        "bite_completion_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "bite_completion_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "bite_completion_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "No sauces are available, so dipping is not applicable."
+        },
+        "bite_initiation_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "bite_initiation_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "bite_initiation_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The default setting applies as there are no specific rules for sandwiches while watching TV."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "Watching TV requires minimizing front occlusion to keep the TV visible."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "With inside mouth transfer, the distance must be near."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Minimizing distractions is preferred while watching TV."
+        },
+        "robot_bite_available_cue": {
+          "choice": "LED",
+          "rationale": "LED is less disruptive while watching TV."
+        },
+        "robot_ready_cue": {
+          "choice": "LED",
+          "rationale": "LED is less disruptive while watching TV."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "Watching TV and being relaxed suggests a leisurely pace."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "The default setting applies as there are no specific rules for sandwiches while watching TV."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "Inside mouth transfer minimizes distractions while watching TV."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100",
+          "rationale": "Balancing interaction and distraction while watching TV."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "Minimizing interruptions is preferred while watching TV."
+        }
+      }
+    },
+    {
+      "day": 16,
+      "context": {
+        "meal": "general tso's chicken and broccoli",
+        "setting": "Personal",
+        "time_of_day": "noon",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Dipping is not applicable as there are no sauces."
+        },
+        "bite_completion_drinking": {
+          "choice": "perception",
+          "rationale": "The user cannot press buttons, so perception minimizes effort."
+        },
+        "bite_completion_feeding": {
+          "choice": "perception",
+          "rationale": "The user cannot press buttons, so perception minimizes effort."
+        },
+        "bite_completion_wiping": {
+          "choice": "perception",
+          "rationale": "The user cannot press buttons, so perception minimizes effort."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "There are no sauces available, so dipping is not applicable."
+        },
+        "bite_initiation_drinking": {
+          "choice": "open mouth",
+          "rationale": "The user can reliably open their mouth, which requires less effort than other methods."
+        },
+        "bite_initiation_feeding": {
+          "choice": "open mouth",
+          "rationale": "The user can reliably open their mouth, which requires less effort than other methods."
+        },
+        "bite_initiation_wiping": {
+          "choice": "open mouth",
+          "rationale": "The user can reliably open their mouth, which requires less effort than other methods."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The meal is intended to be served hot and the user is eating alone, so a longer microwave time is preferred."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "The user is eating alone and minimizing distractions is preferred."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "Inside mouth transfer requires the distance to be near."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "Not retracting reduces effort for the user, who is in a slower affective state."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech",
+          "rationale": "The user can perceive verbal cues easily, which is important for clear communication."
+        },
+        "robot_ready_cue": {
+          "choice": "speech",
+          "rationale": "The user has clear speech and can perceive verbal cues easily."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The user can tolerate moderate speeds and is in a slower affective state."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "Perpendicular skewering increases bite acquisition success, which is important for this meal type."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user has severe upper-limb paralysis and requires the robot to handle most physical tasks."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "A longer wait time reduces effort, which is suitable for the user's slower affective state."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "The user cannot reliably press buttons and minimizing effort is preferred."
+        }
+      }
+    },
+    {
+      "day": 17,
+      "context": {
+        "meal": "buffalo chicken bites, potato wedges, and ranch dressing",
+        "setting": "Social with Person on Right",
+        "time_of_day": "evening",
+        "transient_affective_state": "Hurried"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Since dipping is not preferred, the amount to dip is not applicable."
+        },
+        "bite_completion_drinking": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button allows for explicit control."
+        },
+        "bite_completion_feeding": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button allows for explicit control."
+        },
+        "bite_completion_wiping": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button allows for explicit control."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "In a social setting, not dipping reduces messiness."
+        },
+        "bite_initiation_drinking": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button avoids confusion with talking."
+        },
+        "bite_initiation_feeding": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button avoids confusion with talking."
+        },
+        "bite_initiation_wiping": {
+          "choice": "button",
+          "rationale": "In a social setting, using a button avoids confusion with talking."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The meal is meat and the user is in a hurry, so hotter food is preferred."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize left occlusion",
+          "rationale": "In a social setting, minimizing left occlusion is important for interaction."
+        },
+        "outside_mouth_distance": {
+          "choice": "medium",
+          "rationale": "Medium distance allows for comfortable interaction in a social setting."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Retracting between bites reduces visual obstruction in a social setting."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech + LED",
+          "rationale": "In a social setting, combining speech and LED ensures clear communication."
+        },
+        "robot_ready_cue": {
+          "choice": "speech + LED",
+          "rationale": "In a social setting, combining speech and LED ensures clear communication."
+        },
+        "robot_speed": {
+          "choice": "fast",
+          "rationale": "The user is in a hurry, so a faster speed is preferred to expedite the meal."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "Perpendicular skewering ensures quicker bite acquisition, which is suitable for a hurried state."
+        },
+        "transfer_mode": {
+          "choice": "outside mouth transfer",
+          "rationale": "In a social setting, outside-mouth transfer is less intrusive."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "In a social setting, a longer wait allows for social interaction."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "In a social setting, explicit confirmation ensures precise control."
+        }
+      }
+    },
+    {
+      "day": 18,
+      "context": {
+        "meal": "chicken nuggets, broccoli, and ketchup",
+        "setting": "Social with Person on Left",
+        "time_of_day": "evening",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Dipping is not preferred, so amount is not applicable."
+        },
+        "bite_completion_drinking": {
+          "choice": "button",
+          "rationale": "Allows for explicit control in a social setting."
+        },
+        "bite_completion_feeding": {
+          "choice": "button",
+          "rationale": "Allows for explicit control in a social setting."
+        },
+        "bite_completion_wiping": {
+          "choice": "button",
+          "rationale": "Allows for explicit control in a social setting."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Reduces messiness in a social setting."
+        },
+        "bite_initiation_drinking": {
+          "choice": "button",
+          "rationale": "Avoids confusion with talking in a social setting."
+        },
+        "bite_initiation_feeding": {
+          "choice": "button",
+          "rationale": "Avoids confusion with talking in a social setting."
+        },
+        "bite_initiation_wiping": {
+          "choice": "button",
+          "rationale": "Avoids confusion with talking in a social setting."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "In a social setting with meat, a hotter serving is preferred."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize left occlusion",
+          "rationale": "In a social setting, minimizing left occlusion maintains social interaction."
+        },
+        "outside_mouth_distance": {
+          "choice": "medium",
+          "rationale": "Allows for comfortable interaction in a social setting."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Reduces visual obstruction in a social setting."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech + LED",
+          "rationale": "Ensures clear communication in a social setting."
+        },
+        "robot_ready_cue": {
+          "choice": "speech + LED",
+          "rationale": "Ensures clear communication in a social setting."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "Medium speed balances the user's slower affective state with the social context."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "Increases bite acquisition success for meat in a social setting."
+        },
+        "transfer_mode": {
+          "choice": "outside mouth transfer",
+          "rationale": "Less intrusive in a social setting."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "Allows for social interaction in a relaxed setting."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "Ensures precise control in a social setting."
+        }
+      }
+    },
+    {
+      "day": 19,
+      "context": {
+        "meal": "bite-sized pizza and broccoli",
+        "setting": "Personal",
+        "time_of_day": "morning",
+        "transient_affective_state": "Neutral"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Since dipping is not applicable, the amount to dip is also not applicable."
+        },
+        "bite_completion_drinking": {
+          "choice": "perception",
+          "rationale": "Perception is chosen to reduce effort for the user who cannot press buttons."
+        },
+        "bite_completion_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is chosen to reduce effort for the user who cannot press buttons."
+        },
+        "bite_completion_wiping": {
+          "choice": "perception",
+          "rationale": "Perception is chosen to reduce effort for the user who cannot press buttons."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "There are no sauces available, so dipping is not applicable."
+        },
+        "bite_initiation_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions and effort for the user who cannot press buttons."
+        },
+        "bite_initiation_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions and effort for the user who cannot press buttons."
+        },
+        "bite_initiation_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions and effort for the user who cannot press buttons."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The default setting of 2 min is chosen as the user is eating alone and not in a hurry, and the food is intended to be served hot."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "The default setting is used as the user is eating alone and watching television, minimizing front occlusion is preferred to keep the TV visible."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "As per the hard rule, when inside mouth transfer is used, the distance must be near."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "Not retracting reduces effort for the user with severe upper-limb paralysis."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech",
+          "rationale": "Speech is chosen as it is easier for the user to perceive given their clear speech capability."
+        },
+        "robot_ready_cue": {
+          "choice": "speech",
+          "rationale": "Speech is chosen as it is easier for the user to perceive given their clear speech capability."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The default medium speed is appropriate given the user's neutral affective state and moderate fatigue."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "The default setting is used as it produces easier-to-eat bites, which is suitable for the user's physical capabilities."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "Inside mouth transfer is chosen to reduce effort for the user with severe upper-limb paralysis."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100",
+          "rationale": "The default setting balances interaction and effort, suitable for the user's neutral state."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "The default setting is used to reduce effort for the user who cannot reliably press buttons."
+        }
+      }
+    },
+    {
+      "day": 20,
+      "context": {
+        "meal": "buffalo chicken bites, potato wedges, and ranch dressing",
+        "setting": "Working on laptop",
+        "time_of_day": "morning",
+        "transient_affective_state": "Fatigued"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "less",
+          "rationale": "The user is fatigued and prefers less dipping to reduce effort."
+        },
+        "bite_completion_drinking": {
+          "choice": "perception",
+          "rationale": "The user prefers reduced effort with perception-based completion."
+        },
+        "bite_completion_feeding": {
+          "choice": "perception",
+          "rationale": "The user prefers reduced effort with perception-based completion."
+        },
+        "bite_completion_wiping": {
+          "choice": "perception",
+          "rationale": "The user prefers reduced effort with perception-based completion."
+        },
+        "bite_dipping_preference": {
+          "choice": "dip food in sauce",
+          "rationale": "The user is working on a laptop and prefers dipping to enhance enjoyment."
+        },
+        "bite_initiation_drinking": {
+          "choice": "open mouth",
+          "rationale": "The user can open their mouth reliably, and it requires less effort."
+        },
+        "bite_initiation_feeding": {
+          "choice": "open mouth",
+          "rationale": "The user can open their mouth reliably, and it requires less effort."
+        },
+        "bite_initiation_wiping": {
+          "choice": "open mouth",
+          "rationale": "The user can open their mouth reliably, and it requires less effort."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The user is working on a laptop and prefers warmer food to maintain focus."
+        },
+        "occlusion_relevance": {
+          "choice": "do not consider occlusion",
+          "rationale": "The user is working on a laptop and prioritizes efficiency over occlusion."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "Inside mouth transfer requires the distance to be near."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "The user is fatigued and prefers to reduce effort by not retracting."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech",
+          "rationale": "Speech is easier for the user to perceive when fatigued."
+        },
+        "robot_ready_cue": {
+          "choice": "speech",
+          "rationale": "Speech is easier for the user to perceive when fatigued."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The user is fatigued, so a balance between speed and effort is needed."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "Perpendicular skewering ensures successful dipping with sauces."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user is fatigued and requires less effort with inside mouth transfer."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "The user is fatigued and prefers a longer wait to reduce effort."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "The user is fatigued and prefers to reduce effort by not requiring confirmation."
+        }
+      }
+    },
+    {
+      "day": 21,
+      "context": {
+        "meal": "buffalo chicken bites, potato wedges, and ranch dressing",
+        "setting": "Watching TV",
+        "time_of_day": "morning",
+        "transient_affective_state": "Fatigued"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "more",
+          "rationale": "More dipping enhances flavor, which is preferred while watching TV."
+        },
+        "bite_completion_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions during TV watching."
+        },
+        "bite_completion_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions during TV watching."
+        },
+        "bite_completion_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions during TV watching."
+        },
+        "bite_dipping_preference": {
+          "choice": "dip food in sauce",
+          "rationale": "Dipping enhances flavor, which is preferred while watching TV."
+        },
+        "bite_initiation_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions during TV watching."
+        },
+        "bite_initiation_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions during TV watching."
+        },
+        "bite_initiation_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions during TV watching."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The default setting is used because the context does not trigger any specific conditional tendencies."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "Watching TV requires minimizing front occlusion to keep the TV visible."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "The hard rule requires 'near' when using inside mouth transfer."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Retracting minimizes distractions and maintains clear view of the TV."
+        },
+        "robot_bite_available_cue": {
+          "choice": "LED",
+          "rationale": "LED is less disruptive while watching TV."
+        },
+        "robot_ready_cue": {
+          "choice": "LED",
+          "rationale": "LED is less disruptive while watching TV."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The user can tolerate moderate speeds and the default is suitable for watching TV."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "The default setting is used as it produces easier-to-eat bites, which is beneficial given the user's physical limitations."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "Inside mouth transfer minimizes distractions while watching TV."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100",
+          "rationale": "This balances interaction and distraction while watching TV."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "Minimizing interruptions is important while watching TV."
+        }
+      }
+    },
+    {
+      "day": 22,
+      "context": {
+        "meal": "buffalo chicken bites, potato wedges, and ranch dressing",
+        "setting": "Working on laptop",
+        "time_of_day": "evening",
+        "transient_affective_state": "Hurried"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "more",
+          "rationale": "More sauce enhances flavor and enjoyment."
+        },
+        "bite_completion_drinking": {
+          "choice": "perception",
+          "rationale": "It allows for efficient interaction without requiring user input."
+        },
+        "bite_completion_feeding": {
+          "choice": "perception",
+          "rationale": "It allows for efficient interaction without requiring user input."
+        },
+        "bite_completion_wiping": {
+          "choice": "perception",
+          "rationale": "It allows for efficient interaction without requiring user input."
+        },
+        "bite_dipping_preference": {
+          "choice": "dip food in sauce",
+          "rationale": "Dipping enhances flavor and enjoyment while working."
+        },
+        "bite_initiation_drinking": {
+          "choice": "open mouth",
+          "rationale": "It allows for efficient interaction without requiring button presses."
+        },
+        "bite_initiation_feeding": {
+          "choice": "open mouth",
+          "rationale": "It allows for efficient interaction without requiring button presses."
+        },
+        "bite_initiation_wiping": {
+          "choice": "open mouth",
+          "rationale": "It allows for efficient interaction without requiring button presses."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The user is working on a laptop and in a hurry, preferring warmer food to maintain focus."
+        },
+        "occlusion_relevance": {
+          "choice": "do not consider occlusion",
+          "rationale": "Efficiency is prioritized while working on a laptop."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "Inside mouth transfer requires the distance to be near."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "It ensures cleanliness and reduces visual obstruction."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech",
+          "rationale": "Speech provides clear acknowledgment while working."
+        },
+        "robot_ready_cue": {
+          "choice": "speech",
+          "rationale": "Speech provides clear acknowledgment while working."
+        },
+        "robot_speed": {
+          "choice": "fast",
+          "rationale": "The user is in a hurry and prefers quicker interactions."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "This ensures successful dipping and quicker bite acquisition."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "It allows for efficient eating while working on a laptop."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "10",
+          "rationale": "A shorter wait matches the user's hurried state."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "It allows the user to multitask efficiently."
+        }
+      }
+    },
+    {
+      "day": 23,
+      "context": {
+        "meal": "bananas, brownies, and chocolate sauce",
+        "setting": "Social with Person on Right",
+        "time_of_day": "morning",
+        "transient_affective_state": "Fatigued"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Dipping is not applicable since the preference is to not dip."
+        },
+        "bite_completion_drinking": {
+          "choice": "button",
+          "rationale": "Button completion allows for explicit control in a social setting."
+        },
+        "bite_completion_feeding": {
+          "choice": "button",
+          "rationale": "Button completion allows for explicit control in a social setting."
+        },
+        "bite_completion_wiping": {
+          "choice": "button",
+          "rationale": "Button completion allows for explicit control in a social setting."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "In a social setting, not dipping reduces messiness."
+        },
+        "bite_initiation_drinking": {
+          "choice": "button",
+          "rationale": "Button initiation avoids confusion with talking in a social setting."
+        },
+        "bite_initiation_feeding": {
+          "choice": "button",
+          "rationale": "Button initiation avoids confusion with talking in a social setting."
+        },
+        "bite_initiation_wiping": {
+          "choice": "button",
+          "rationale": "Button initiation avoids confusion with talking in a social setting."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The default setting applies since the user is fatigued and the meal includes dessert."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize left occlusion",
+          "rationale": "In a social setting, minimizing left occlusion is preferred to maintain interaction."
+        },
+        "outside_mouth_distance": {
+          "choice": "medium",
+          "rationale": "Medium distance allows for comfortable interaction in a social setting."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Retracting reduces visual obstruction in a social setting."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech + LED",
+          "rationale": "Speech + LED ensures clear communication in a social setting."
+        },
+        "robot_ready_cue": {
+          "choice": "speech + LED",
+          "rationale": "Speech + LED ensures clear communication in a social setting."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "Medium speed balances the user's fatigue and the need for consistent pacing."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Parallel skewering is easier for the user to manage due to their physical limitations."
+        },
+        "transfer_mode": {
+          "choice": "outside mouth transfer",
+          "rationale": "In a social setting, outside-mouth transfer is less intrusive."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "A longer wait allows for social interaction."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "In a social setting, explicit confirmation ensures precise control."
+        }
+      }
+    },
+    {
+      "day": 24,
+      "context": {
+        "meal": "chicken breast strips and hash brown",
+        "setting": "Social + Watching TV",
+        "time_of_day": "noon",
+        "transient_affective_state": "Neutral"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Dipping is not applicable, so the amount to dip is not applicable."
+        },
+        "bite_completion_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "bite_completion_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "bite_completion_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "No sauces are available, so dipping is not applicable."
+        },
+        "bite_initiation_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "bite_initiation_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "bite_initiation_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue minimizes distractions while watching TV."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The default is used because the meal is not dessert and the user is not in a hurry."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "Watching TV suggests minimizing front occlusion to keep the TV visible."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "With inside mouth transfer, the distance must be near."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Retracting minimizes distractions while watching TV."
+        },
+        "robot_bite_available_cue": {
+          "choice": "LED",
+          "rationale": "LED is less disruptive while watching TV."
+        },
+        "robot_ready_cue": {
+          "choice": "LED",
+          "rationale": "LED is less disruptive while watching TV."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The default speed is appropriate as the user is not in a hurry and can tolerate moderate speeds."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "The default is used as there are no specific conditions affecting skewering."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "Inside mouth transfer minimizes distractions while watching TV."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100",
+          "rationale": "A balance is needed between interaction and distraction while watching TV."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "Watching TV suggests minimizing interruptions, so no confirmation is preferred."
+        }
+      }
+    },
+    {
+      "day": 25,
+      "context": {
+        "meal": "chicken nuggets, broccoli, and ketchup",
+        "setting": "Social with Person on Right",
+        "time_of_day": "morning",
+        "transient_affective_state": "Energetic"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Since dipping is not preferred, the amount to dip is not applicable."
+        },
+        "bite_completion_drinking": {
+          "choice": "button",
+          "rationale": "Using a button allows for explicit control in a social setting."
+        },
+        "bite_completion_feeding": {
+          "choice": "button",
+          "rationale": "Using a button allows for explicit control in a social setting."
+        },
+        "bite_completion_wiping": {
+          "choice": "button",
+          "rationale": "Using a button allows for explicit control in a social setting."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "In a social setting, not dipping reduces messiness."
+        },
+        "bite_initiation_drinking": {
+          "choice": "button",
+          "rationale": "Using a button avoids confusion with talking in a social setting."
+        },
+        "bite_initiation_feeding": {
+          "choice": "button",
+          "rationale": "Using a button avoids confusion with talking in a social setting."
+        },
+        "bite_initiation_wiping": {
+          "choice": "button",
+          "rationale": "Using a button avoids confusion with talking in a social setting."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The meal includes chicken nuggets which are meat, and the user is in a social setting and energetic, preferring hotter food."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize left occlusion",
+          "rationale": "In a social setting, minimizing left occlusion is important to maintain interaction with the person on the right."
+        },
+        "outside_mouth_distance": {
+          "choice": "medium",
+          "rationale": "A medium distance allows for comfortable interaction in a social setting."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Retracting reduces visual obstruction, which is important in a social setting."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech + LED",
+          "rationale": "In a social setting, using both speech and LED ensures clear communication."
+        },
+        "robot_ready_cue": {
+          "choice": "speech + LED",
+          "rationale": "In a social setting, using both speech and LED ensures clear communication."
+        },
+        "robot_speed": {
+          "choice": "fast",
+          "rationale": "The user is energetic, and a fast speed matches their energy level in a social setting."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "Perpendicular skewering increases bite acquisition success, which is preferred for meat in a social setting."
+        },
+        "transfer_mode": {
+          "choice": "outside mouth transfer",
+          "rationale": "In a social setting, outside-mouth transfer is less intrusive."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "A longer wait allows for social interaction in a social setting."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "In a social setting, explicit confirmation ensures precise control."
+        }
+      }
+    },
+    {
+      "day": 26,
+      "context": {
+        "meal": "bite-sized pizza and broccoli",
+        "setting": "Social with Person on Left",
+        "time_of_day": "morning",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Since there is no dipping, the amount to dip is not applicable."
+        },
+        "bite_completion_drinking": {
+          "choice": "button",
+          "rationale": "Button completion allows for explicit control in a social setting."
+        },
+        "bite_completion_feeding": {
+          "choice": "button",
+          "rationale": "Button completion allows for explicit control in a social setting."
+        },
+        "bite_completion_wiping": {
+          "choice": "button",
+          "rationale": "Button completion allows for explicit control in a social setting."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "There are no sauces available, so dipping is not applicable."
+        },
+        "bite_initiation_drinking": {
+          "choice": "button",
+          "rationale": "In a social setting, button initiation avoids confusion with talking."
+        },
+        "bite_initiation_feeding": {
+          "choice": "button",
+          "rationale": "In a social setting, button initiation avoids confusion with talking."
+        },
+        "bite_initiation_wiping": {
+          "choice": "button",
+          "rationale": "In a social setting, button initiation avoids confusion with talking."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The meal is bite-sized pizza and broccoli, intended to be served hot, and the user is in a social setting, preferring hotter food."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize left occlusion",
+          "rationale": "In a social setting, minimizing left occlusion is important to maintain interaction with the person on the left."
+        },
+        "outside_mouth_distance": {
+          "choice": "medium",
+          "rationale": "Medium distance allows for comfortable interaction in a social setting."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Retracting between bites reduces visual obstruction in a social setting."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech + LED",
+          "rationale": "In a social setting, using both speech and LED ensures clear communication."
+        },
+        "robot_ready_cue": {
+          "choice": "speech + LED",
+          "rationale": "In a social setting, using both speech and LED ensures clear communication."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The user has a slower affective state, so a medium speed balances interaction without rushing."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "Perpendicular skewering increases bite acquisition success, which is beneficial for the user with severe upper-limb paralysis."
+        },
+        "transfer_mode": {
+          "choice": "outside mouth transfer",
+          "rationale": "In a social setting, outside mouth transfer is less intrusive and allows for more natural interaction."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "In a social setting, a longer wait allows for social interaction."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "In a social setting, explicit confirmation ensures precise control and avoids errors."
+        }
+      }
+    },
+    {
+      "day": 27,
+      "context": {
+        "meal": "bite-sized pizza and broccoli",
+        "setting": "Social with Person on Right",
+        "time_of_day": "noon",
+        "transient_affective_state": "Fatigued"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Since dipping is not applicable, the amount to dip is also not applicable."
+        },
+        "bite_completion_drinking": {
+          "choice": "perception",
+          "rationale": "Perception allows for efficient interaction without requiring user input."
+        },
+        "bite_completion_feeding": {
+          "choice": "perception",
+          "rationale": "Using perception reduces the need for user input, which is beneficial given their physical limitations."
+        },
+        "bite_completion_wiping": {
+          "choice": "perception",
+          "rationale": "Perception minimizes user effort and ensures efficient task completion."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "No sauces are available, so dipping is not applicable."
+        },
+        "bite_initiation_drinking": {
+          "choice": "open mouth",
+          "rationale": "Similar to feeding, open mouth initiation is suitable due to the user's reliable mouth control."
+        },
+        "bite_initiation_feeding": {
+          "choice": "open mouth",
+          "rationale": "The user can reliably open their mouth, making this a suitable and low-effort initiation method."
+        },
+        "bite_initiation_wiping": {
+          "choice": "open mouth",
+          "rationale": "Open mouth initiation is consistent with the user's capability and reduces effort."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The user is eating alone with a meal intended to be served hot, so a longer microwave time is preferred to ensure the meal is adequately reheated."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize left occlusion",
+          "rationale": "In a social setting, minimizing left occlusion is important to maintain interaction with the person on the right."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "With inside mouth transfer, the distance must be near to ensure efficient and safe delivery."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "Not retracting between bites reduces effort and maintains a consistent interaction flow."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech",
+          "rationale": "Speech cues are easier for the user to perceive, especially when fatigued."
+        },
+        "robot_ready_cue": {
+          "choice": "speech",
+          "rationale": "Speech is easier for the user to perceive, especially when fatigued."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The user can tolerate moderate speeds and is fatigued, so a medium speed balances efficiency and comfort."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Parallel skewering produces easier-to-eat bites, which is suitable given the user's limited mouth opening."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "Inside mouth transfer requires less effort for the user, which is beneficial given their physical limitations and fatigue."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "A longer wait time reduces effort and allows the user to proceed at their own pace, which is suitable given their fatigue."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "The user cannot reliably press buttons, so avoiding web interface confirmation reduces effort."
+        }
+      }
+    },
+    {
+      "day": 28,
+      "context": {
+        "meal": "strawberries with whipped cream",
+        "setting": "Working on laptop",
+        "time_of_day": "morning",
+        "transient_affective_state": "Fatigued"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Dipping is not performed, so this is not applicable."
+        },
+        "bite_completion_drinking": {
+          "choice": "perception",
+          "rationale": "Using perception reduces the user's effort in signaling completion."
+        },
+        "bite_completion_feeding": {
+          "choice": "perception",
+          "rationale": "Using perception reduces the user's effort in signaling completion."
+        },
+        "bite_completion_wiping": {
+          "choice": "perception",
+          "rationale": "Using perception reduces the user's effort in signaling completion."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Fatigue suggests minimizing effort, so dipping is avoided."
+        },
+        "bite_initiation_drinking": {
+          "choice": "open mouth",
+          "rationale": "The user can reliably open their mouth, which requires less effort than other methods."
+        },
+        "bite_initiation_feeding": {
+          "choice": "open mouth",
+          "rationale": "The user can reliably open their mouth, which requires less effort than other methods."
+        },
+        "bite_initiation_wiping": {
+          "choice": "open mouth",
+          "rationale": "The user can reliably open their mouth, which requires less effort than other methods."
+        },
+        "microwave_time": {
+          "choice": "1 min",
+          "rationale": "The strawberries are intended to be served cold, so minimal microwaving is preferred."
+        },
+        "occlusion_relevance": {
+          "choice": "do not consider occlusion",
+          "rationale": "While working on a laptop, efficiency is prioritized over occlusion."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "Inside mouth transfer mandates a near distance."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "Not retracting reduces effort for the user."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech",
+          "rationale": "Speech cues are easier for the user to perceive."
+        },
+        "robot_ready_cue": {
+          "choice": "speech",
+          "rationale": "Speech is easier to perceive for the user who has clear speech capabilities."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The user can tolerate moderate speeds, and medium speed balances efficiency and fatigue."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "Perpendicular skewering ensures successful dipping in whipped cream."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "Inside mouth transfer requires less effort from the user."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "A longer wait time reduces effort for the fatigued user."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "Minimizing effort is important due to the user's fatigue."
+        }
+      }
+    },
+    {
+      "day": 29,
+      "context": {
+        "meal": "bite-sized sandwiches",
+        "setting": "Social + Watching TV",
+        "time_of_day": "morning",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Since dipping is not applicable, the amount to dip is also not applicable."
+        },
+        "bite_completion_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Watching TV suggests minimizing distractions, so autocontinue is preferred."
+        },
+        "bite_completion_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Watching TV suggests minimizing distractions, so autocontinue is preferred."
+        },
+        "bite_completion_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Watching TV suggests minimizing distractions, so autocontinue is preferred."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "There are no sauces available, so dipping is not applicable."
+        },
+        "bite_initiation_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Watching TV suggests minimizing distractions, so autocontinue is preferred."
+        },
+        "bite_initiation_feeding": {
+          "choice": "autocontinue",
+          "rationale": "Watching TV suggests minimizing distractions, so autocontinue is preferred."
+        },
+        "bite_initiation_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Watching TV suggests minimizing distractions, so autocontinue is preferred."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The default setting is used because no specific conditional tendency applies to the current context of bite-sized sandwiches."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "Watching TV is part of the context, so minimizing front occlusion is prioritized to keep the TV visible."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "The hard rule requires near distance when using inside mouth transfer."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Retracting between bites minimizes distractions while watching TV."
+        },
+        "robot_bite_available_cue": {
+          "choice": "LED",
+          "rationale": "Watching TV suggests using LED to avoid disrupting the viewing experience."
+        },
+        "robot_ready_cue": {
+          "choice": "LED",
+          "rationale": "Watching TV suggests using LED to avoid disrupting the viewing experience."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user's transient affective state is slower, suggesting a slower pace for comfort."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "The default setting is used as there is no specific tendency for bite-sized sandwiches."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The default setting is used as it requires less effort from the user."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100",
+          "rationale": "The default setting balances interaction and distraction while watching TV."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "The default setting is used as there is no specific tendency for this context."
+        }
+      }
+    },
+    {
+      "day": 30,
+      "context": {
+        "meal": "bananas, brownies, and chocolate sauce",
+        "setting": "Social + Watching TV",
+        "time_of_day": "noon",
+        "transient_affective_state": "Fatigued"
+      },
+      "preferences": {
+        "amount_to_dip": {
+          "choice": "not applicable",
+          "rationale": "Since dipping is not preferred, the amount to dip is not applicable."
+        },
+        "bite_completion_drinking": {
+          "choice": "perception",
+          "rationale": "Perception reduces the need for user interaction, which aligns with their capabilities."
+        },
+        "bite_completion_feeding": {
+          "choice": "perception",
+          "rationale": "Perception requires less effort from the user, which is suitable given their fatigue and physical limitations."
+        },
+        "bite_completion_wiping": {
+          "choice": "perception",
+          "rationale": "Perception reduces effort and is suitable given the user's physical limitations."
+        },
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "The user is fatigued, and not dipping reduces effort."
+        },
+        "bite_initiation_drinking": {
+          "choice": "open mouth",
+          "rationale": "Open mouth initiation is consistent with the user's ability to open and close their mouth reliably."
+        },
+        "bite_initiation_feeding": {
+          "choice": "open mouth",
+          "rationale": "Open mouth initiation requires less effort and is suitable given the user's physical capabilities."
+        },
+        "bite_initiation_wiping": {
+          "choice": "open mouth",
+          "rationale": "Open mouth initiation is consistent with the user's capabilities and reduces effort."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The meal is intended to be served warm, and 2 min is the default setting for a neutral dining scenario."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "Watching TV is part of the context, so minimizing front occlusion is important to keep the TV visible."
+        },
+        "outside_mouth_distance": {
+          "choice": "near",
+          "rationale": "As inside mouth transfer is used, the distance must be near according to hard rules."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "Not retracting reduces effort, which is beneficial given the user's fatigue."
+        },
+        "robot_bite_available_cue": {
+          "choice": "speech",
+          "rationale": "Speech is easier for the user to perceive, aligning with their ability to communicate verbally."
+        },
+        "robot_ready_cue": {
+          "choice": "speech",
+          "rationale": "Speech is easier for the user to perceive given their clear speech capability and fatigue."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The user can tolerate moderate speeds, and medium speed balances interaction pace with the user's fatigue."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Parallel skewering is the default and produces easier-to-eat bites, suitable for the user's needs."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "Inside mouth transfer requires less effort from the user, which is suitable given their physical limitations and fatigue."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000",
+          "rationale": "A longer wait reduces effort, which is beneficial given the user's fatigue."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "The user cannot reliably press buttons, so avoiding extra confirmations reduces effort."
+        }
+      }
+    }
+  ]
+}
