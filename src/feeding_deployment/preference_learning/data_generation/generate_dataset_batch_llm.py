@@ -1,13 +1,12 @@
-#!/usr/bin/env python3
 """
 Batch run the LLM dataset generator for N people.
 
 Each person gets one 30-day JSON file. Physical profiles are cycled so you get
-a mix of user types (e.g. 50 people → ~12–13 per profile).
+a mix of user types.
 
 Usage:
-  python scripts/generate_dataset_batch_llm.py --num-users 50 --output-dir out
-  python scripts/generate_dataset_batch_llm.py --num-users 50 --seed-base 42
+  python scripts/generate_dataset_batch_llm.py --num-users 10 --output-dir out
+  python scripts/generate_dataset_batch_llm.py --num-users 10 --seed-base 42
 
 Requires OPENAI_API_KEY in the environment (or set in generate_dataset_llm.py).
 """
@@ -35,13 +34,13 @@ def main() -> int:
     parser.add_argument(
         "--num-users",
         type=int,
-        default=50,
-        help="Number of people (default: 50)",
+        default=10,
+        help="Number of people (default: 10)",
     )
     parser.add_argument(
         "--output-dir",
-        default="out",
-        help="Output directory for JSON files (default: out)",
+        default="../data",
+        help="Output directory for JSON files (default: ../data)",
     )
     parser.add_argument(
         "--seed-base",
@@ -62,7 +61,7 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    repo_root = Path(__file__).resolve().parent.parent
+    repo_root = Path(__file__).parent
     script = repo_root / "generate_dataset_llm.py"
     if not script.exists():
         print(f"Error: {script} not found", file=sys.stderr)

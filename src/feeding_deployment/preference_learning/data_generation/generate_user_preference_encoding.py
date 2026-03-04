@@ -124,6 +124,9 @@ def _validate_preferences_strict(prefs: Any) -> Dict[str, Dict[str, str]]:
 
         default_val = entry["default"]
         tendencies = entry["user_tendencies"]
+        
+        if isinstance(default_val, int):
+            default_val = str(default_val)  # Convert integers to strings for leniency
 
         if not isinstance(default_val, str):
             raise TypeError(f'Field "{field}.default" must be a string. Got: {type(default_val).__name__}')

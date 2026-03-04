@@ -11,7 +11,7 @@ _TEMPLATE_PATH = _PROMPTS_DIR / "bundle_prediction.txt"
 _PREF_FIELDS: List[str] = [name for (name, _, _) in root_config.PREFERENCE_BUNDLE]
 
 
-def render_bundle_prediction_prompt(
+def get_bundle_prediction_prompt(
     physical_profile: str,
     ltm_summary: str,
     retrieved_block: str,
