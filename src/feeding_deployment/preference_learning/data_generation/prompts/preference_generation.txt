@@ -10,12 +10,7 @@ Where:
 - X_t is the current dining context.
 - Y_t is the user's transient affective state.
 
-A preference bundle is the complete configuration of the robot’s behavior
-parameters for a meal. Each parameter corresponds to a preference dimension
-(e.g., robot speed, transfer mode, dipping behavior). A valid bundle assigns
-exactly one allowed option to every dimension.
-
-You must produce exactly one choice for every dimension listed in ALLOWED OPTIONS.
+A preference bundle is the complete configuration of the robot’s behavior parameters for a meal. Each parameter corresponds to a preference dimension (e.g., robot speed, transfer mode, dipping behavior). A valid bundle assigns exactly one allowed option to every dimension. You must produce exactly one choice for every dimension listed in ALLOWED OPTIONS.
 
 ----------------------------
 PHYSICAL CAPABILITY PROFILE (U^phys)
@@ -26,16 +21,11 @@ PHYSICAL CAPABILITY PROFILE (U^phys)
 USER PREFERENCE ENCODING (U^pref)
 ----------------------------
 
-This encoding describes the user's preference tendencies for how the robot-assisted
-system should behave across situations.
-
+This encoding describes the user's preference tendencies for how the robot-assisted system should behave across situations.
 For each behavior dimension the encoding specifies:
 - a default setting that applies in a neutral personal dining scenario
-- conditional tendency rules describing how preferences may change depending on
-  dining context, food type, and affective state.
-
-Use these tendencies to infer the most appropriate preference configuration
-for today's situation.
+- conditional tendency rules describing how preferences may change depending on dining context, food type, and affective state.
+Use these tendencies to infer the most appropriate preference configuration for today's situation.
 
 {user_preference_encoding}
 
@@ -64,30 +54,17 @@ DECISION PROCEDURE
 ----------------------------
 
 1. Start from the default setting for each dimension in the user preference encoding.
-
-2. Apply the conditional tendency rules using today's context
-   (dining setting, food type characteristics, and affective state).
-
-3. If multiple rules apply and conflict, resolve them using the tie-break logic
-   implied by the user's tendencies.
-
-4. Ensure the resulting configuration forms a coherent interaction style for
-   the current situation.
-
+2. Apply the conditional tendency rules using today's context (dining setting, food type characteristics, and affective state).
+3. If multiple rules apply and conflict, resolve them using the tie-break logic implied by the user's tendencies.
+4. Ensure the resulting configuration forms a coherent interaction style for the current situation.
 5. Apply HARD RULES last.
 
 ----------------------------
 HARD RULES (MUST FOLLOW)
 ----------------------------
 
-If transfer_mode = "inside mouth transfer",
-then outside_mouth_distance MUST be "near".
-
-If no dippable items exist OR no sauces exist,
-then bite_dipping_preference MUST be "do not dip".
-
-If bite_dipping_preference = "do not dip",
-amount_to_dip MUST be "not applicable".
+1. If transfer_mode = "inside mouth transfer", then outside_mouth_distance MUST be "not applicable".
+2. If no dippable items exist OR no sauces exist, then bite_dipping_preference MUST be "do not dip".
 
 ----------------------------
 OUTPUT FORMAT

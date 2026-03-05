@@ -3,11 +3,15 @@ from typing import Dict, List, Optional, Tuple
 
 SETTINGS = [
     "Personal",
-    "Social with Person on Left",
-    "Social with Person on Right",
-    "Watching TV",
-    "Social + Watching TV",
-    "Working on laptop",
+    "Social with person on Left",
+    "Social with person in Front",
+    "Social with person on Right",
+    "Watching TV with TV on Left",
+    "Watching TV with TV in Front",
+    "Watching TV with TV on Right",
+    "Working on laptop with laptop on Left",
+    "Working on laptop with laptop in Front",
+    "Working on laptop with laptop on Right",
 ]
 
 TIMES_OF_DAY = [

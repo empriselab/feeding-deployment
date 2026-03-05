@@ -10,19 +10,23 @@ class PhysicalCapability:
 
 PHYSICAL_CAPABILITY_PROFILES: List[PhysicalCapability] = [
     PhysicalCapability(
-        label="severe_paralysis_clear_speech",
-        description="Severe upper-limb paralysis with clear speech. This user has very limited voluntary control of their arms and hands and cannot reliably press buttons or perform gestures. However, they have clear and consistent speech, allowing them to communicate intentions verbally. They can open and close their mouth reliably and tolerate moderate feeding speeds, but require the robot to handle nearly all physical aspects of the task. Fatigue is present but not extreme, so they can sustain interaction through an entire meal with consistent pacing.",
+        label="limited_arms_no_trunk_good_head", # Benjamin
+        description="This user has severe upper-limb paralysis with very limited voluntary control of their arms (cannot press physical buttons). They cannot lean forward due to lack of trunk control. However, they have good neck and head control and are able to open their mouth wide and perform head gestures. They interact with the web interface through a reflective dot on their nose, which is tracked by their personal device.",
     ),
     PhysicalCapability(
-        label="moderate_motor_unreliable_speech",
-        description="Moderate motor control with unreliable speech. This user retains some arm and hand movement, enough to press a large accessible button and make small adjustments in posture. Their speech is slurred or inconsistent, making voice commands unreliable for precise interaction. They show stable mouth control and can safely receive food, but fatigue appears quickly, requiring slower pacing and occasional pauses. Because speech is unreliable, they depend heavily on simple physical interfaces for control and confirmation.",
+        label="moderate_arms_good_trunk_good_head",
+        description="This user has moderate voluntary control of their arms and is able to press physical buttons. They can lean forward to reach food during outside-mouth transfers. They have good neck and head control and can open their mouth wide and perform head gestures. They interact with the web interface on their personal device using their arms.",
     ),
     PhysicalCapability(
-        label="high_fatigue_swallowing_risk",
-        description="High fatigue with elevated swallowing risk. This user demonstrates limited endurance and becomes fatigued quickly during meals. Their mouth opening is delayed and sometimes inconsistent, requiring careful timing for safe transfer. They are sensitive to fast movements and large bite sizes, and there is heightened concern for choking or aspiration, so feeding must proceed slowly and cautiously. Although they may have some speech or motor ability, safety considerations dominate all interaction design.",
+        label="moderate_arms_limited_trunk_limited_head",
+        description="This user has moderate voluntary control of their arms and is able to press physical buttons. However, they cannot lean forward due to limited trunk control. They also have limited control of their neck muscles and cannot reliably perform head gestures. In addition, they have limited mouth opening, making open-mouth or mouth-gesture-based interaction challenging. They interact with the web interface directly using their arms.",
     ),
     PhysicalCapability(
-        label="inconsistent_mouth_control",
-        description="Inconsistent mouth control with cognitive or timing variability. This user has some physical movement but limited precision and coordination. Speech is present but slow, and gestures are minimal or absent. The most significant challenge is inconsistent mouth timing—they may open too early, too late, or unpredictably—making perception-based bite detection unreliable. They benefit from explicit confirmations and predictable pacing, even when fatigue is not severe.",
+        label="limited_arms_no_trunk_limited_head",
+        description="This user has severe upper-limb paralysis and cannot reliably press physical buttons. They also have limited control of their neck muscles and cannot reliably perform head gestures. They cannot lean forward due to limited trunk control. Mouth opening is possible but may be slow. They interact with the web interface using an assistive input device (e.g., eye gaze or switch scanning).",
+    ),
+    PhysicalCapability(
+        label="good_arms_good_trunk_good_head_limited_mouth",
+        description="This user has good voluntary control of their arms and can reliably press physical buttons and interact with the web interface directly using their arms. They can lean forward and have good neck and head control, including performing head gestures. However, they have limited mouth opening, which can make open-mouth-based readiness detection challenging and may require smaller bites during feeding.",
     ),
 ]

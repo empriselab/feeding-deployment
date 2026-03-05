@@ -1,0 +1,2576 @@
+{
+  "user": "9",
+  "deployment_id": "dep1",
+  "physical_profile_label": "limited_arms_no_trunk_limited_head",
+  "config": {
+    "days": 30,
+    "seed": null,
+    "model": "gpt-5.4"
+  },
+  "user_preference_encoding": {
+    "microwave_time": {
+      "default": "2 min",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND refrigerated savory meal THEN 2 min BECAUSE the user prefers food served warm without extra delay. IF eating alone in a quiet personal setting AND physically fatigued AND refrigerated savory meal THEN 3 min BECAUSE fatigue increases desire for comfort and hotter food is more satisfying. IF eating alone in a quiet personal setting AND in a hurry AND refrigerated savory meal THEN 1 min BECAUSE efficiency outweighs maximizing warmth. IF any dining context AND neutral AND fruit or cold dessert THEN no microwave BECAUSE these foods are intended to be served cold. IF social setting on the left or right AND relaxed with ample time AND refrigerated savory meal THEN 2 min BECAUSE the user keeps a normal warming routine even when socializing. IF watching television or working on a laptop/tablet in front AND physically fatigued AND refrigerated savory meal THEN 3 min BECAUSE comfort is prioritized when attention is divided and energy is low."
+    },
+    "occlusion_relevance": {
+      "default": "do not consider occlusion",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND any food THEN do not consider occlusion BECAUSE there is no important visual target to preserve. IF eating in a social setting with a person to the left AND neutral AND any food THEN minimize left occlusion BECAUSE the user wants to keep the social partner visible. IF eating in a social setting with a person to the right AND neutral AND any food THEN minimize right occlusion BECAUSE preserving that line of sight matters. IF watching television in front AND neutral AND any food THEN minimize front occlusion BECAUSE the user wants an unobstructed view of the screen. IF working on a laptop or tablet in front AND in a hurry AND any food THEN minimize front occlusion BECAUSE task visibility still outweighs speed. IF social setting on either side AND physically fatigued AND any food THEN minimize left occlusion or minimize right occlusion matching partner location BECAUSE this user’s tie-break favors maintaining the external visual target even when tired."
+    },
+    "robot_speed": {
+      "default": "slow",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND any food THEN slow BECAUSE the user is comfort-oriented and has slow mouth opening. IF eating alone in a quiet personal setting AND in a hurry AND easy foods like fruit or dessert THEN medium BECAUSE the user accepts some speed increase when efficiency pressure is high. IF eating alone in a quiet personal setting AND physically fatigued AND any food THEN slow BECAUSE fatigue increases desire for predictability and comfort. IF social setting on the left or right AND neutral AND any food THEN slow BECAUSE conservative motion feels safer and less disruptive around others. IF watching television or working on a laptop/tablet in front AND in a hurry AND any food THEN medium BECAUSE divided attention and time pressure support modest acceleration but not fast motion. IF any dining context AND relaxed with ample time AND messy or sauced foods THEN slow BECAUSE careful movement reduces spill risk. IF any dining context AND physically energetic AND dry easy-to-acquire foods THEN medium BECAUSE the user tolerates somewhat quicker service when feeling capable."
+    },
+    "skewering_axis": {
+      "default": "parallel to major axis",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND larger or thicker pieces of meat THEN parallel to major axis BECAUSE narrower bites are easier given limited mouth opening. IF any dining context AND neutral AND soft items that often fail to stay on the fork THEN perpendicular to major axis BECAUSE acquisition reliability can outweigh bite narrowness for fragile foods. IF social setting on the left or right AND neutral AND foods prone to failed acquisition THEN perpendicular to major axis BECAUSE avoiding repeated failed attempts is especially valuable around others. IF eating alone in a quiet personal setting AND physically fatigued AND larger or tougher foods THEN parallel to major axis BECAUSE fatigue makes easier oral transfer more important. IF watching television or working on a laptop/tablet in front AND in a hurry AND easy stable foods THEN perpendicular to major axis BECAUSE the user accepts a larger bite to improve speed and success. IF any dining context AND relaxed with ample time AND foods that can form oversized bites THEN parallel to major axis BECAUSE comfort remains the stable preference when time pressure is low."
+    },
+    "web_interface_confirmation": {
+      "default": "yes",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND any food THEN yes BECAUSE the user can access the web interface and prefers reliable bite transfer. IF eating alone in a quiet personal setting AND in a hurry AND easy stable foods THEN no BECAUSE the user temporarily accepts more automation to reduce interaction time. IF social setting on the left or right AND neutral AND any food THEN yes BECAUSE avoiding empty-fork transfers matters in front of others. IF watching television or working on a laptop/tablet in front AND neutral AND any food THEN no BECAUSE divided attention makes extra confirmation burdensome. IF any dining context AND physically fatigued AND any food THEN no BECAUSE this user’s tie-break under fatigue is to minimize effort. IF any dining context AND physically fatigued AND foods prone to failed acquisition like slippery or irregular items THEN yes BECAUSE reliability overrides effort when failure risk is high. IF relaxed with ample time in any context AND any food THEN yes BECAUSE the user prefers dependable operation when not rushed."
+    },
+    "transfer_mode": {
+      "default": "inside mouth transfer",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND any food THEN inside mouth transfer BECAUSE the user cannot reliably lean forward. IF any dining context AND physically fatigued AND any food THEN inside mouth transfer BECAUSE fatigue further reduces ability to reach toward the utensil. IF social setting on the left or right AND neutral AND any food THEN inside mouth transfer BECAUSE physical constraints outweigh possible social discomfort. IF watching television or working on a laptop/tablet in front AND neutral AND any food THEN inside mouth transfer BECAUSE the user cannot depend on trunk movement while attention is divided. IF any dining context AND in a hurry AND any food THEN inside mouth transfer BECAUSE it is the most feasible and efficient mode for this body profile. IF any dining context AND relaxed with ample time AND any food THEN inside mouth transfer BECAUSE the preference is stable due to physical necessity."
+    },
+    "outside_mouth_distance": {
+      "default": "not applicable",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND any food THEN not applicable BECAUSE the default transfer mode is inside mouth transfer. IF social setting on the left or right AND neutral AND any food THEN not applicable BECAUSE the user still requires inside mouth transfer despite social context. IF watching television or working on a laptop/tablet in front AND neutral AND any food THEN not applicable BECAUSE divided attention does not change the physical need for inside mouth transfer. IF any dining context AND physically fatigued AND any food THEN not applicable BECAUSE fatigue strengthens the need for direct transfer. IF any dining context AND in a hurry AND any food THEN not applicable BECAUSE the user cannot safely rely on reaching forward. IF any dining context AND relaxed with ample time AND any food THEN not applicable BECAUSE extra time does not change the user’s movement limitations."
+    },
+    "convey_robot_ready_for_initiating_transfer": {
+      "default": "speech + LED",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND any food THEN speech + LED BECAUSE multimodal cues are easiest to notice without requiring effort. IF watching television in front AND neutral AND any food THEN LED BECAUSE a visual cue is less disruptive to media listening. IF working on a laptop or tablet in front AND neutral AND any food THEN speech BECAUSE the user may not be looking at the robot and audio is more reliable. IF social setting on the left or right AND neutral AND any food THEN LED BECAUSE quieter signaling is less socially intrusive. IF any dining context AND physically fatigued AND any food THEN speech + LED BECAUSE redundant cues reduce missed prompts when attention and energy are low. IF any dining context AND in a hurry AND any food THEN speech BECAUSE the fastest unmistakable prompt supports efficient flow. IF relaxed with ample time in any context AND any food THEN speech + LED BECAUSE the user prefers maximum clarity when speed pressure is low."
+    },
+    "detect_user_ready_for_initiating_transfer_feeding": {
+      "default": "open mouth",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND any food THEN open mouth BECAUSE the user cannot reliably press buttons and prefers low-effort control. IF social setting on the left or right AND neutral AND any food THEN autocontinue BECAUSE open-mouth detection may be confused by conversation and button use is infeasible. IF social setting on the left or right AND physically fatigued AND any food THEN autocontinue BECAUSE this user’s tie-break under fatigue is to minimize effort and avoid unreliable cues. IF watching television in front AND neutral AND any food THEN autocontinue BECAUSE attention is divided and spontaneous mouth movements are less intentional. IF working on a laptop or tablet in front AND neutral AND any food THEN autocontinue BECAUSE task engagement makes explicit readiness signaling less reliable. IF eating alone in a quiet personal setting AND relaxed with ample time AND any food THEN open mouth BECAUSE the user prefers some control when the environment is quiet. IF eating alone in a quiet personal setting AND in a hurry AND any food THEN autocontinue BECAUSE efficiency temporarily outweighs explicit user-triggered initiation."
+    },
+    "detect_user_ready_for_initiating_transfer_drinking": {
+      "default": "open mouth",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND any drink THEN open mouth BECAUSE it provides low-effort readiness control without button use. IF social setting on the left or right AND neutral AND any drink THEN autocontinue BECAUSE talking can interfere with open-mouth interpretation and buttons are not feasible. IF watching television in front AND neutral AND any drink THEN autocontinue BECAUSE divided attention makes passive progression easier. IF working on a laptop or tablet in front AND in a hurry AND any drink THEN autocontinue BECAUSE efficient hands-free interaction is preferred. IF any dining context AND physically fatigued AND any drink THEN autocontinue BECAUSE minimizing effort is the consistent tie-break. IF eating alone in a quiet personal setting AND relaxed with ample time AND any drink THEN open mouth BECAUSE the user likes retaining some timing control when conditions are calm. IF any dining context AND neutral AND thick or awkward drinks requiring more preparation THEN open mouth BECAUSE the user may want explicit readiness before sip transfer."
+    },
+    "detect_user_ready_for_initiating_transfer_wiping": {
+      "default": "autocontinue",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND mouth wiping needed THEN autocontinue BECAUSE open mouth is not a natural readiness cue for wiping and buttons are infeasible. IF social setting on the left or right AND neutral AND mouth wiping needed THEN autocontinue BECAUSE it avoids awkward signaling during conversation. IF watching television in front AND neutral AND mouth wiping needed THEN autocontinue BECAUSE the user prefers minimal interruption. IF working on a laptop or tablet in front AND neutral AND mouth wiping needed THEN autocontinue BECAUSE attention is already occupied. IF any dining context AND physically fatigued AND mouth wiping needed THEN autocontinue BECAUSE low-effort automation is strongly preferred. IF any dining context AND relaxed with ample time AND mouth wiping needed THEN autocontinue BECAUSE the preference is stable for this task. IF any dining context AND in a hurry AND mouth wiping needed THEN autocontinue BECAUSE it is the fastest feasible initiation method."
+    },
+    "convey_robot_ready_for_completing_transfer": {
+      "default": "speech + LED",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND any task THEN speech + LED BECAUSE redundant cues clearly indicate when to take the bite or sip. IF social setting on the left or right AND neutral AND any task THEN LED BECAUSE quieter signaling is less disruptive to conversation. IF watching television in front AND neutral AND any task THEN LED BECAUSE the user may prefer not to have audio cover the program. IF working on a laptop or tablet in front AND neutral AND any task THEN speech BECAUSE the user may be visually focused on the screen rather than the robot. IF any dining context AND physically fatigued AND any task THEN speech + LED BECAUSE extra clarity helps when reactions are slower. IF any dining context AND in a hurry AND any task THEN speech BECAUSE a direct audio cue supports faster response. IF relaxed with ample time in any context AND any task THEN speech + LED BECAUSE the user values certainty over minimalism."
+    },
+    "detect_user_completed_transfer_feeding": {
+      "default": "perception",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND feeding THEN perception BECAUSE it is reliable and avoids impossible button presses. IF social setting on the left or right AND neutral AND feeding THEN perception BECAUSE it is unobtrusive and does not require explicit signaling. IF any dining context AND physically fatigued AND feeding THEN perception BECAUSE low-effort automatic detection is preferred. IF watching television in front AND neutral AND feeding THEN perception BECAUSE the user may be distracted and should not need to signal completion. IF working on a laptop or tablet in front AND in a hurry AND feeding THEN perception BECAUSE it supports efficient hands-free flow. IF any dining context AND relaxed with ample time AND feeding THEN perception BECAUSE the user still prefers reliable automation. IF any dining context AND messy or difficult foods THEN perception BECAUSE sensor-based completion remains the safest and most consistent option."
+    },
+    "detect_user_completed_transfer_drinking": {
+      "default": "autocontinue",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND drinking THEN autocontinue BECAUSE head-gesture perception is unreliable for this user and buttons are infeasible. IF social setting on the left or right AND neutral AND drinking THEN autocontinue BECAUSE explicit completion signaling would be awkward and difficult. IF any dining context AND physically fatigued AND drinking THEN autocontinue BECAUSE minimizing effort is the tie-break. IF watching television in front AND neutral AND drinking THEN autocontinue BECAUSE the user prefers passive progression while attention is divided. IF working on a laptop or tablet in front AND in a hurry AND drinking THEN autocontinue BECAUSE it best supports efficient multitasking. IF any dining context AND relaxed with ample time AND drinking THEN autocontinue BECAUSE the preference is stable given the user’s motor limits. IF any dining context AND thicker drinks or slower sipping THEN autocontinue BECAUSE the long wait setting can accommodate slower completion without requiring gestures."
+    },
+    "detect_user_completed_transfer_wiping": {
+      "default": "autocontinue",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND mouth wiping THEN autocontinue BECAUSE head-gesture perception is unreliable and buttons are infeasible. IF social setting on the left or right AND neutral AND mouth wiping THEN autocontinue BECAUSE it avoids awkward explicit signals. IF any dining context AND physically fatigued AND mouth wiping THEN autocontinue BECAUSE the user prefers the least effortful completion method. IF watching television in front AND neutral AND mouth wiping THEN autocontinue BECAUSE passive progression is less disruptive. IF working on a laptop or tablet in front AND neutral AND mouth wiping THEN autocontinue BECAUSE attention is occupied elsewhere. IF any dining context AND in a hurry AND mouth wiping THEN autocontinue BECAUSE it is the fastest feasible option. IF any dining context AND relaxed with ample time AND mouth wiping THEN autocontinue BECAUSE the preference remains unchanged by context."
+    },
+    "retract_between_bites": {
+      "default": "no",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND any food THEN no BECAUSE the user prefers efficiency when no important view is being blocked. IF watching television in front AND neutral AND any food THEN yes BECAUSE preserving the front view matters. IF working on a laptop or tablet in front AND neutral AND any food THEN yes BECAUSE the user wants the screen to remain visible between transfers. IF social setting with a person to the left or right AND neutral AND any food THEN yes BECAUSE reducing prolonged obstruction supports social comfort. IF any dining context AND physically fatigued AND any food THEN no BECAUSE this user’s tie-break under fatigue is to reduce total meal duration. IF any dining context AND in a hurry AND any food THEN no BECAUSE efficiency outweighs occlusion concerns. IF relaxed with ample time in a social or screen-focused context AND any food THEN yes BECAUSE the user is willing to trade time for better visibility."
+    },
+    "bite_dipping_preference": {
+      "default": "do not dip",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND foods without sauces or dips THEN do not dip BECAUSE dipping is not relevant. IF eating alone in a quiet personal setting AND relaxed with ample time AND dippable foods with sauce THEN more BECAUSE the user enjoys richer flavor when mess risk is low. IF eating alone in a quiet personal setting AND in a hurry AND dippable foods with sauce THEN less BECAUSE lighter dipping reduces time and mess. IF social setting on the left or right AND neutral AND dippable foods with sauce THEN less BECAUSE the user wants to avoid messy transfers around others. IF any dining context AND physically fatigued AND dippable foods with sauce THEN less BECAUSE cleaner, simpler bites are easier to manage. IF watching television or working on a laptop/tablet in front AND neutral AND dippable foods with sauce THEN less BECAUSE the user wants to minimize distraction from drips or cleanup. IF any dining context AND neutral AND desserts or fruits without intended dipping THEN do not dip BECAUSE the user does not add sauce when it is not part of the food."
+    },
+    "wait_before_autocontinue_seconds": {
+      "default": "100 sec",
+      "user_tendencies": "IF eating alone in a quiet personal setting AND neutral AND any food THEN 100 sec BECAUSE the user may need extra time for slow mouth opening and paced interaction. IF any dining context AND physically fatigued AND any food THEN 1000 sec BECAUSE fatigue increases response time and the user wants a large safety margin. IF social setting on the left or right AND neutral AND any food THEN 1000 sec BECAUSE conversation can delay readiness and completion. IF watching television in front AND neutral AND any food THEN 100 sec BECAUSE the user is somewhat distracted but still wants reasonable flow. IF working on a laptop or tablet in front AND neutral AND any food THEN 1000 sec BECAUSE task engagement can substantially delay intervention. IF any dining context AND in a hurry AND any food THEN 10 sec BECAUSE efficiency temporarily outweighs waiting for manual intervention. IF eating alone in a quiet personal setting AND physically energetic AND easy foods THEN 10 sec BECAUSE the user can keep pace with a more automated rhythm."
+    }
+  },
+  "days": [
+    {
+      "day": 1,
+      "context": {
+        "meal": "bite-sized pizza and broccoli",
+        "setting": "Working on laptop with laptop in Front",
+        "time_of_day": "morning",
+        "transient_affective_state": "Hurried"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Although the foods are dippable, there are no sauces available. The hard rule requires do not dip when no sauces exist."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech",
+          "rationale": "When working on a laptop, the user may be visually focused on the screen, so audio is more reliable. Hurry also favors a direct speech cue for fast response."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech",
+          "rationale": "For laptop use, audio is preferred because the user may not be looking at the robot. The hurried context also supports speech as the fastest unmistakable prompt."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user and button presses are not feasible. Autocontinue is their stable preference for drinking, especially during multitasking and hurry."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's reliable, hands-free completion method for feeding. It avoids impossible button presses and supports efficient flow while multitasking."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "The user cannot reliably perform head gestures or button presses, so autocontinue is the most feasible method. It also minimizes disruption while working."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "The user prefers passive progression when attention is occupied by a laptop, and button use is not feasible. This also fits the hurried need for efficient hands-free interaction."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "While working on a laptop, explicit readiness signaling is less reliable, and the user cannot use buttons. The hurried context further favors autocontinue for efficiency."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Mouth wiping defaults to autocontinue because open mouth is not a natural cue and buttons are infeasible. Laptop engagement and hurry both reinforce minimal-interruption automation."
+        },
+        "microwave_time": {
+          "choice": "1 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served hot, and the user is hurried. Their tendency in hurried situations is to reduce reheating time for efficiency."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "The user is working on a laptop positioned in front. Their preferences prioritize preserving the front visual field when using a laptop or tablet."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside mouth transfer is selected, outside-mouth distance does not apply. This follows both the user's tendencies and the hard rule."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "Laptop use would normally support retracting to preserve visibility, but the user's hurried tie-break is to prioritize efficiency. Their tendencies explicitly set no retracting when in a hurry."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "When working on a laptop in front and hurried, the user prefers a modest speed increase. Medium balances efficiency with comfort given slow mouth opening and safety needs."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Pizza and broccoli can produce larger bites, and the user has limited mouth opening. With no strong rule favoring perpendicular acquisition here, the stable comfort-oriented choice is parallel to major axis."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, making outside-mouth transfer infeasible. Their preferences consistently favor inside mouth transfer across contexts, especially when hurried."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "10 sec",
+          "rationale": "The user's hurried preference is to use the shortest wait to keep the meal moving efficiently. This overrides the longer waits sometimes preferred during laptop use."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "In laptop-focused contexts, the user prefers to skip extra confirmation because divided attention makes it burdensome. This also aligns with the hurried context and reduces interaction time."
+        }
+      }
+    },
+    {
+      "day": 2,
+      "context": {
+        "meal": "buffalo chicken bites, potato wedges, and ranch dressing",
+        "setting": "Working on laptop with laptop on Right",
+        "time_of_day": "morning",
+        "transient_affective_state": "Fatigued"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "less",
+          "rationale": "There are dippable items and sauce available, but the user prefers less dipping when fatigued to reduce mess and simplify transfers. Working at a laptop also supports minimizing drips and distraction."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech + LED",
+          "rationale": "Fatigue makes extra clarity valuable, so redundant completion cues are preferred. This helps the user notice when to take the bite, sip, or wipe despite divided attention."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech + LED",
+          "rationale": "Under fatigue, the user prefers redundant cues to reduce missed prompts. Multimodal signaling is the clearest option while working and tired."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user due to limited neck control, and buttons are infeasible. Autocontinue is therefore the most appropriate low-effort option."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's preferred low-effort and reliable method for feeding completion. It also avoids impossible button presses and works well when the user is fatigued."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "The user cannot reliably use head gestures or buttons, so autocontinue is the most feasible completion method. This also matches their stable preference for wiping."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "The user is fatigued and working, both of which support hands-free passive progression. Open-mouth signaling is less suitable when attention is occupied."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "While working on a laptop, the user prefers passive progression because explicit readiness signaling is less reliable. Fatigue also favors minimizing effort."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For wiping, the user's stable preference is autocontinue because open mouth is unnatural and buttons are infeasible. Fatigue and divided attention further support this choice."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served hot, and the user is fatigued. Their tendencies favor a longer microwave time for comfort in this situation."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize right occlusion",
+          "rationale": "The user is working on a laptop positioned on the right, so preserving visibility on that side is important. Even though the encoding explicitly mentions front occlusion for laptop/tablet use, the same visibility-preservation logic applies to the actual screen location."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside-mouth transfer is selected, outside-mouth distance does not apply. This follows both the user tendencies and the hard rule."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "Although screen visibility matters while working, the user's fatigue tie-break is to reduce total meal duration. That makes skipping retraction the better fit today."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user is fatigued and has slow mouth opening, which makes comfort and predictability more important than speed. The food is also somewhat messy due to sauce, reinforcing careful motion."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "The user has limited mouth opening, and buffalo chicken bites can produce easier-to-manage bites when skewered parallel to the major axis. There is no stronger context rule here that outweighs oral-transfer comfort."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, so inside-mouth transfer is physically necessary. Fatigue further supports direct transfer."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000 sec",
+          "rationale": "The user is fatigued, and their tendencies strongly favor a long wait time in that state. This also accommodates slower responses while multitasking on the laptop."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "The user is fatigued, and their tie-break under fatigue is to minimize effort. Although confirmation improves reliability, these foods are not especially slippery or irregular enough to override the fatigue rule."
+        }
+      }
+    },
+    {
+      "day": 3,
+      "context": {
+        "meal": "chicken breast strips and hash brown",
+        "setting": "Watching TV with TV on Left",
+        "time_of_day": "noon",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Even though the foods are dippable, there are no sauces available today. By hard rule, the robot must choose do not dip."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech + LED",
+          "rationale": "Although TV contexts can favor LED, the user’s slower state makes redundant cues more appropriate for clear timing. Speech plus LED best supports slower reactions and certainty."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech + LED",
+          "rationale": "The user is in a slower state, and their tendencies favor redundant cues when extra clarity is helpful. Multimodal signaling reduces the chance of missed prompts while watching TV."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user and buttons are infeasible, so autocontinue is the best fit. This also aligns with the TV-watching context and low-effort preference."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user’s stable preference for feeding because it is reliable and requires no impossible button press. It also supports hands-free use while attention is divided."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue is the stable preference for wiping because explicit completion signals are difficult for this user. It minimizes effort and interruption."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "For drinking while watching TV, passive progression is preferred because the user’s attention is split. This also avoids reliance on buttons, which the user cannot reliably press."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "While watching TV, the user’s tendencies prefer autocontinue because attention is divided. Button use is infeasible and open-mouth timing is less reliable in this context."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Mouth wiping defaults to autocontinue and remains so during TV watching. It is the least effortful and most natural option for this task."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served hot, and the user’s default for this situation is 2 min. The current state is slower rather than clearly fatigued or hurried, so the normal warming routine is most appropriate."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize left occlusion",
+          "rationale": "The user is watching TV and the TV is on the left, creating an important visual target in that direction. The robot should therefore avoid blocking the left side view."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule linking these two dimensions."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "The user is watching TV, and preserving visibility between transfers matters in screen-focused contexts. Retracting helps reduce prolonged visual obstruction."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user generally prefers slow motion for comfort and has slow mouth opening. The current slower state further supports a conservative, predictable speed."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Chicken breast strips are larger, thicker pieces where narrower bites are easier given the user’s limited mouth opening. Parallel skewering best matches the stable comfort-oriented preference."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, so inside-mouth transfer is physically necessary. This remains the preferred mode across contexts."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100 sec",
+          "rationale": "When watching TV, the user prefers 100 sec to balance distraction with reasonable flow. The slower state supports avoiding the shortest timeout without requiring the very longest one."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "The user can use the web interface and generally prefers reliable bite transfer when not rushed. The food is stable enough that confirmation adds dependability without conflicting with context."
+        }
+      }
+    },
+    {
+      "day": 4,
+      "context": {
+        "meal": "bite-sized sandwiches",
+        "setting": "Working on laptop with laptop on Left",
+        "time_of_day": "evening",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Although the sandwiches are dippable, there are no sauces available. The hard rule therefore requires selecting do not dip."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech",
+          "rationale": "When the user is visually focused on a laptop, an audio cue is more dependable than a visual one. Speech clearly indicates when to take the bite, sip, or wipe."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech",
+          "rationale": "While working on a laptop, the user may not be looking at the robot, so audio is the most reliable cue. Speech supports awareness without requiring visual attention shifts."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user and button presses are not feasible. Autocontinue is therefore the most practical drinking completion method."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's preferred feeding completion method because it is reliable and hands-free. This is especially appropriate when the user is multitasking and cannot press buttons."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "The user cannot reliably perform head gestures or button presses, so autocontinue is the best completion method for wiping. It also keeps the interaction low effort."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "The user is occupied with laptop work and cannot reliably use buttons. Autocontinue provides the lowest-effort, most compatible drinking workflow."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "During laptop work, explicit readiness signaling is less reliable and button use is infeasible. Autocontinue best matches hands-free multitasking."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For wiping, autocontinue is the stable preference because open-mouth signaling is unnatural and buttons are not feasible. It also minimizes interruption while working."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served warm, so the normal warming routine applies. The current slower state does not specifically trigger the fatigue-based hotter-food preference."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize left occlusion",
+          "rationale": "The user is working on a laptop positioned on the left, so preserving visibility on that side is important. Minimizing left occlusion best supports continued access to the screen."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside-mouth transfer is selected, outside-mouth distance does not apply. This follows the hard rule for transfer mode consistency."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Because the user is working on a laptop, preserving visibility between transfers matters. Retracting between bites reduces prolonged obstruction of the screen area."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user generally prefers slow motion for comfort and has slow mouth opening. The transient slower state further supports a conservative speed rather than speeding up for efficiency."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Bite-sized sandwiches can form thicker bites, and the user has limited mouth opening. Parallel skewering favors narrower, easier-to-eat bites."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, so inside-mouth transfer is physically necessary. This remains the best option even while multitasking."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000 sec",
+          "rationale": "When working on a laptop, task engagement can substantially delay intervention, so the user prefers a long wait before automatic continuation. The slower transient state is also consistent with allowing more time rather than less."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "When working on a laptop, extra confirmation is burdensome because attention is divided. The food is also fairly stable, so skipping confirmation is a reasonable efficiency tradeoff."
+        }
+      }
+    },
+    {
+      "day": 5,
+      "context": {
+        "meal": "cantaloupes, bananas, watermelon",
+        "setting": "Watching TV with TV on Left",
+        "time_of_day": "morning",
+        "transient_affective_state": "Hurried"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Even though the fruit pieces are dippable, there are no sauces available. The hard rule therefore requires choosing do not dip."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech",
+          "rationale": "The user is hurried, and their preference encoding specifies speech as the fastest direct cue in hurry contexts. This outweighs the TV-related tendency toward LED-only cues."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech",
+          "rationale": "The user is hurried, and their tie-break for hurry is speech because it is the fastest unmistakable prompt. Although TV viewing can favor visual cues, the hurry rule better supports efficient flow today."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "The user cannot reliably perform head gestures and cannot use buttons well, so autocontinue is the best fit for drinking completion. This also matches their stable preference in distracted contexts."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's preferred feeding completion method because it is reliable and hands-free. It is especially appropriate here since the user cannot reliably press buttons and is distracted by TV."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For mouth wiping, the user consistently prefers autocontinue because head-gesture perception is unreliable and buttons are infeasible. Watching TV and being hurried both reinforce passive progression."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "For drinking, the user's tendencies favor autocontinue when attention is divided, such as while watching TV. This also avoids reliance on buttons, which the user cannot reliably press."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "The user is watching TV and is also hurried, both of which favor autocontinue for feeding initiation. Open-mouth control is possible but slower and less efficient in this divided-attention context."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "The user's stable preference for mouth wiping initiation is autocontinue, especially when watching TV or when hurried. Open mouth is not a natural cue for wiping, and button use is infeasible."
+        },
+        "microwave_time": {
+          "choice": "no microwave",
+          "rationale": "The meal is fruit and intended to be served cold, which directly matches the user's rule to avoid microwaving cold fruit. Refrigeration does not override the intended cold serving temperature."
+        },
+        "occlusion_relevance": {
+          "choice": "do not consider occlusion",
+          "rationale": "The user is watching TV, but the TV is on the left rather than in front, and there is no rule for left-side TV viewing. With no matching side-specific screen rule, the default of not considering occlusion is most appropriate."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside-mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule linking transfer mode and distance."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "Although screen-focused contexts can favor retracting, the user's hurry rule says efficiency outweighs occlusion concerns. Since they want a faster meal today, not retracting is the better match."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The user is hurried, and today's meal consists of easy foods like fruit. The user's tendencies support a modest speed increase for efficiency in such cases, but not fast motion."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "Today's foods are easy, stable fruit items, and the user is hurried. The preference encoding supports perpendicular skewering in speed-oriented contexts with easy stable foods to improve acquisition success and efficiency."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, making inside-mouth transfer the physically necessary option. Being hurried also aligns with the user's preference for the most feasible and efficient transfer mode."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "10 sec",
+          "rationale": "The user is hurried, and their preference encoding explicitly sets the wait time to 10 seconds in hurry contexts. This supports a faster, more automated meal pace."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "The user is watching TV, and divided attention makes extra confirmation burdensome according to their tendencies. This meal is easy fruit rather than slippery or irregular food, so there is no stronger reliability rule pushing toward confirmation."
+        }
+      }
+    },
+    {
+      "day": 6,
+      "context": {
+        "meal": "chicken nuggets, broccoli, and ketchup",
+        "setting": "Social with person on Right",
+        "time_of_day": "noon",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "less",
+          "rationale": "The meal includes dippable items and ketchup, so dipping is relevant. In a social setting, the user prefers less dipping to reduce messiness around others."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "LED",
+          "rationale": "In a social setting, the user prefers a quieter cue when the tool has reached transfer position. LED minimizes disruption to conversation while still providing a clear signal."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "LED",
+          "rationale": "In social settings, the user prefers quieter signaling that is less intrusive to conversation. LED cues fit that preference while still indicating readiness."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "The user cannot reliably perform head gestures and cannot press buttons, so autocontinue is the most feasible drinking completion method. This is also the stable preference in social settings."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's preferred feeding completion method because it is reliable and unobtrusive. It also avoids impossible button presses and works well in social contexts."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For wiping, head-gesture perception is unreliable and button input is infeasible. Autocontinue is therefore the least effortful and most appropriate completion method."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "For drinking in social settings, the user prefers autocontinue because talking can interfere with open-mouth interpretation and physical buttons are not feasible. This keeps interaction hands-free and socially smoother."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "In a social setting, open-mouth readiness can be confused by conversation and button use is infeasible for this user. Autocontinue is therefore the preferred feeding initiation method."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Mouth wiping defaults to autocontinue and remains so in social settings. It avoids awkward explicit signaling and does not rely on difficult motor actions."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served hot. In a social setting with ample indication of normal routine and no fatigue or hurry, the user tends to keep the standard 2 minute warming time."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize right occlusion",
+          "rationale": "The user is dining socially with a person on the right. Their preferences prioritize preserving visibility of the social partner on that side."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule linking these two dimensions."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "In social settings, the user prefers retracting between bites to reduce prolonged obstruction and support social comfort. There is no fatigue or hurry rule here strong enough to override that tendency."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "In social settings, the user prefers conservative motion that feels safer and less disruptive around others. The slower affective state also supports a comfort-oriented pace rather than speeding up."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Chicken nuggets are relatively larger, thicker pieces, and the user has limited mouth opening. Parallel skewering better supports narrower, easier-to-eat bites."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, so inside-mouth transfer is the physically appropriate mode. Social context does not override this physical necessity."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000 sec",
+          "rationale": "In social settings, the user prefers a long wait because conversation can delay readiness and completion. The slower transient state further supports allowing extra time rather than pushing faster automation."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "In a social setting, the user prefers confirmation to avoid failed or empty-fork transfers in front of others. Their assistive access to the web interface makes this feasible despite upper-limb paralysis."
+        }
+      }
+    },
+    {
+      "day": 7,
+      "context": {
+        "meal": "bite-sized sandwiches",
+        "setting": "Watching TV with TV on Right",
+        "time_of_day": "evening",
+        "transient_affective_state": "Energetic"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Although the sandwiches are dippable, there are no sauces available. The hard rule therefore requires do not dip."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech + LED",
+          "rationale": "Although neutral TV viewing would favor LED, multimodal cues remain the clearest way to indicate when to take the bite, sip, or wipe. This supports robust awareness during divided attention."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech + LED",
+          "rationale": "The TV context would normally favor LED, but the user is energetic rather than neutral and benefits from clear multimodal prompting given divided attention. Speech + LED provides the most noticeable cueing."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user and buttons are infeasible, so autocontinue is the best fit. This also matches the user’s preference for passive progression during TV watching."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the reliable, low-effort method for feeding completion and avoids impossible button presses. It also works well when the user may be distracted by television."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue is the stable preference for wiping because explicit completion signals are difficult for this user. It is also less disruptive while watching TV."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "In a TV-watching context, passive progression is preferred for drinking as well. This avoids reliance on buttons and reduces effort while attention is on the screen."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "When watching TV, the user prefers autocontinue because attention is divided and explicit readiness signaling is less reliable. Button use is infeasible and open-mouth timing may be inconsistent."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Mouth wiping defaults to autocontinue and the TV context reinforces minimal interruption. Open mouth is not a natural wiping cue and button use is not feasible."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served warm, and the user’s default for this situation is 2 min. Energetic state does not trigger a hotter or shorter heating rule."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize right occlusion",
+          "rationale": "The user is watching TV and the TV is on the right, so preserving visibility on that side is most relevant. This overrides the default of not considering occlusion."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "When watching TV, the user prefers the robot to retract between bites to preserve screen visibility. This aligns with the importance of minimizing right-side occlusion."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user has slow mouth opening and generally prefers comfort-oriented motion. No rule supports increasing speed here, and sandwiches are not specified as an easy fruit/dessert case."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "No reliability-focused rule clearly applies for these sandwich bites, so the stable comfort-oriented default is used. Parallel skewering better supports narrower bites for limited mouth opening."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, making inside-mouth transfer the physically necessary option. Watching TV does not change this constraint."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100 sec",
+          "rationale": "For watching TV, the user prefers 100 sec as a balance between distraction tolerance and reasonable flow. Energetic state does not introduce a conflicting rule here."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "While watching TV, the user prefers to avoid extra confirmation because divided attention makes the web step burdensome. The food is not described as especially slippery or failure-prone, so the fatigue-related reliability override does not apply."
+        }
+      }
+    },
+    {
+      "day": 8,
+      "context": {
+        "meal": "bite-sized pizza and broccoli",
+        "setting": "Watching TV with TV in Front",
+        "time_of_day": "noon",
+        "transient_affective_state": "Energetic"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Although the foods are technically dippable, there are no sauces available. By hard rule, the robot must choose do not dip when no sauces exist."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "LED",
+          "rationale": "When watching TV, the user prefers LED rather than speech so the cue is less disruptive to the program audio. No competing fatigue or hurry rule applies."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "LED",
+          "rationale": "In a TV-in-front context, the user prefers LED cues so audio does not interfere with the program. There is no fatigue or hurry condition today to override that preference."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user, and buttons are infeasible, so autocontinue is the preferred drinking completion method. This also aligns with the TV context's preference for passive progression."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's stable preference for feeding completion because it is reliable and avoids impossible button presses. TV viewing further supports automatic detection rather than requiring explicit signaling."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For mouth wiping, the user consistently prefers autocontinue because other completion signals are awkward or infeasible. Watching TV reinforces the desire for minimal interruption."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "For drinking while watching TV, the user prefers passive progression because attention is divided. Open-mouth signaling is less suitable here, and buttons are not feasible."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "While watching TV, divided attention makes explicit readiness signaling less reliable, and button use is infeasible for this user. Autocontinue best matches the user's tendency for feeding in this context."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Mouth wiping defaults to autocontinue and remains so in TV contexts because it minimizes interruption. This also fits the user's motor limitations."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served hot. In a TV-in-front context, only the fatigued case changes this to 3 min, and the user is energetic, so the default warm-serving preference of 2 min applies."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "The user is watching TV in front, so preserving the front visual field is important. This directly matches the tendency to minimize front occlusion in screen-focused contexts."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because transfer mode is inside mouth transfer, outside-mouth distance does not apply. This also satisfies the hard rule linking these two dimensions."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "In a TV-in-front setting, the user prefers the robot to retract between bites to keep the screen visible. The fatigue and hurry exceptions that would favor no retraction do not apply today."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "No hurry is indicated, and the user generally prefers slow motion for comfort and because mouth opening can be slow. The TV context only raises speed when in a hurry, which is not the case today."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Pizza and broccoli are not described as soft items prone to falling off the fork, so there is no strong reliability-based reason to switch to perpendicular. Given the user's limited mouth opening, the stable comfort-oriented preference is parallel to major axis."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, making inside-mouth transfer the physically necessary mode. Watching TV does not change that constraint."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100 sec",
+          "rationale": "For watching TV in front, the user prefers 100 sec as a balance between distraction tolerance and reasonable flow. The energetic state only shortens this in a quiet personal setting with easy foods, which is not today's context."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "When watching TV in front, the user prefers to skip extra confirmation because divided attention makes the web step more burdensome. The foods are not described as especially slippery or failure-prone, so reliability does not override this."
+        }
+      }
+    },
+    {
+      "day": 9,
+      "context": {
+        "meal": "bananas, brownies, and chocolate sauce",
+        "setting": "Social with person in Front",
+        "time_of_day": "morning",
+        "transient_affective_state": "Neutral"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "less",
+          "rationale": "The meal includes dippable items and chocolate sauce, so dipping is relevant. In a social setting, the user prefers less dipping to reduce mess and make transfers cleaner."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech + LED",
+          "rationale": "Redundant cues best indicate when the user can take the bite, sip, or wipe. In this neutral context without screen use or side conversation, maximum clarity is preferred."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech + LED",
+          "rationale": "The default multimodal cue provides the clearest signal and is appropriate in neutral conditions. There is no front-screen media context or side social context suggesting a quieter single-modality cue."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user due to limited neck control, and buttons are infeasible. Autocontinue is therefore the stable best option for drinking completion."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's preferred feeding completion method because it is reliable and avoids impossible button presses. This remains appropriate in the current neutral context."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For wiping, head-gesture perception is unreliable and button signaling is not feasible. The user consistently prefers passive completion through autocontinue."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "open mouth",
+          "rationale": "For drinking, open mouth is the user's default low-effort readiness method when not distracted by screens or side conversation. Button use is infeasible and no stronger rule favors autocontinue here."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "open mouth",
+          "rationale": "The user cannot reliably press buttons, and in neutral non-screen, non-side-social conditions open mouth is the preferred low-effort readiness signal. Although mouth opening may be slow, it remains feasible."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "The user consistently prefers autocontinue for wiping because open mouth is not a natural cue and buttons are infeasible. This preference is stable across contexts."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The meal is a refrigerated leftover intended to be served warm, and the user's default for warm refrigerated foods in neutral conditions is 2 min. No stronger rule indicates hotter or colder serving today."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "The social partner is in front, so preserving the user's forward line of sight is most relevant. This matches the user's tendency to protect important visual targets in the active direction."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule linking these two dimensions."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "The user defaults to not retracting when efficiency is preferred and no explicit front-screen task is present. Although there is a person in front, the user's social-context retract rule is specifically for left or right partners, so no stronger override applies."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "In neutral conditions the user generally prefers slow motion for comfort and because mouth opening may be slow. There is no hurry or energetic state to justify increasing speed."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Bananas and brownies can produce larger bites, and the user has limited mouth opening. Parallel skewering better supports narrower, easier-to-eat bites."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, so inside mouth transfer is the physically appropriate mode. Neutral social context does not override this physical necessity."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100 sec",
+          "rationale": "In neutral conditions the user generally prefers 100 sec to allow for slow mouth opening and paced interaction. There is no fatigue, hurry, or laptop/tablet context requiring a longer or shorter wait."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "The user defaults to confirmation for reliable bite transfer, and there is no fatigue or screen-focused context pushing toward less interaction. Since the user can access the web interface with assistive input, reliability is favored."
+        }
+      }
+    },
+    {
+      "day": 10,
+      "context": {
+        "meal": "strawberries with whipped cream",
+        "setting": "Social with person on Left",
+        "time_of_day": "noon",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "less",
+          "rationale": "The meal includes dippable strawberries and whipped cream, so dipping is relevant. In a social setting, the user prefers less dipping to reduce messiness around others."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "LED",
+          "rationale": "In a social setting, the user prefers quieter cues when the tool reaches transfer position. LED reduces disruption to conversation while still signaling readiness."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "LED",
+          "rationale": "For social dining with a person on the left, the user prefers quieter signaling that is less socially intrusive. LED best matches that preference."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user due to limited neck control, and buttons are not feasible. The user's stable preference for drinking is therefore autocontinue."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's preferred feeding completion method because it is reliable and avoids impossible button presses. Social context also favors unobtrusive automatic detection."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For wiping, the user consistently prefers autocontinue because head gestures are unreliable and explicit signals are awkward. Social context does not change that."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "In social settings, talking can interfere with open-mouth interpretation, and the user cannot reliably press buttons. Autocontinue is the preferred low-effort method."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "In social settings, open-mouth readiness can be confused by conversation and button use is infeasible for this user. The user's rules therefore favor autocontinue for feeding."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Mouth wiping already defaults to autocontinue, and social context reinforces avoiding awkward explicit signaling. This is also the least effortful option for the user."
+        },
+        "microwave_time": {
+          "choice": "no microwave",
+          "rationale": "The meal is fruit with whipped cream and is intended to be served cold. The user's preference rules specify no microwaving for fruit or cold dessert in any context."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize left occlusion",
+          "rationale": "Today's setting is social with a person on the left. The user prefers preserving visibility of a social partner on that side."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside-mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule linking these two dimensions."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "In a social setting, the user prefers the robot to retract between bites to reduce prolonged visual obstruction. There is no fatigue or hurry rule here overriding that preference."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user generally prefers conservative motion, especially in social settings. Their slower state also supports a more comfortable, predictable pace rather than speeding up."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "Strawberries are soft items that can be harder to keep securely on the fork. The user's rules favor perpendicular skewering for soft foods to improve bite acquisition reliability."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, so inside-mouth transfer is the physically necessary and preferred mode. Social context does not override this constraint."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000 sec",
+          "rationale": "For social dining, the user prefers a long wait because conversation can delay readiness and completion. Their slower state is also consistent with allowing extra response time."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "In a social setting, the user prefers confirmation to avoid failed or empty-fork transfers in front of others. There is no stronger rule here pushing toward less confirmation."
+        }
+      }
+    },
+    {
+      "day": 11,
+      "context": {
+        "meal": "general tso's chicken and broccoli",
+        "setting": "Social with person on Right",
+        "time_of_day": "morning",
+        "transient_affective_state": "Neutral"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Although some items are dippable, there are no sauces available today. The hard rule requires selecting do not dip when no sauces exist."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "LED",
+          "rationale": "In a social setting, the user prefers quieter completion cues that do not interrupt conversation. LED signaling matches that social preference."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "LED",
+          "rationale": "For social dining with a person on the side, the user prefers quieter signaling that is less socially intrusive. LED-only cues best match that tendency."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "The user cannot reliably perform head gestures and cannot use buttons reliably, so drinking completion defaults to autocontinue. This is also the preferred option in social settings."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's preferred feeding completion method because it is reliable and avoids impossible button presses. It is also unobtrusive in social settings."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For wiping, head-gesture perception is unreliable and button signaling is infeasible for this user. Autocontinue is their stable, least-effort preference."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "In social settings, talking can interfere with interpreting open-mouth readiness, and physical buttons are not reliable for this user. Autocontinue is the preferred low-effort method."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "In social settings, open-mouth readiness can be confused by conversation and button use is not feasible for this user. The user's preference in this context is therefore autocontinue."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For mouth wiping, the user's preference is stably autocontinue across contexts because open mouth is unnatural and buttons are infeasible. Social context does not change that preference."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served hot, and in a social setting with ample indication of a normal routine there is no rule changing the standard warming preference. The user's tendency for refrigerated savory meals in social contexts is to keep the normal 2-minute microwave time."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize right occlusion",
+          "rationale": "Today's setting includes a social partner on the user's right. The user prefers preserving visibility of a right-side social partner in this context."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because the selected transfer mode is inside mouth transfer, outside-mouth distance does not apply. This also follows the hard rule requiring not applicable in that case."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "With a social partner on the right, the user prefers the robot to retract between bites to reduce prolonged visual obstruction and improve social comfort. There is no fatigue or hurry condition overriding this today."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "In social settings, the user prefers conservative robot motion that feels safer and less disruptive around others. This also aligns with their slow mouth opening and comfort-oriented baseline."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "General Tso's chicken pieces can be relatively large, and the user has limited mouth opening. The stable preference favors narrower bites that are easier to eat unless acquisition reliability clearly dominates."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, making outside-mouth transfer infeasible. Their preferences consistently favor inside-mouth transfer across contexts because of this physical necessity."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000 sec",
+          "rationale": "In social settings, the user prefers a long autocontinue wait to accommodate delays from conversation and paced interaction. This overrides the neutral personal default of 100 seconds."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "In a social setting, the user prefers confirming bite acquisition to avoid awkward empty-fork transfers in front of others. They can access the web interface with an assistive device, so reliability is prioritized."
+        }
+      }
+    },
+    {
+      "day": 12,
+      "context": {
+        "meal": "bite-sized pizza and broccoli",
+        "setting": "Working on laptop with laptop in Front",
+        "time_of_day": "noon",
+        "transient_affective_state": "Fatigued"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Even though pizza and broccoli are dippable, there are no sauces available. The hard rule therefore requires do not dip."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech + LED",
+          "rationale": "Fatigue makes redundant completion cues most appropriate because reaction times may be slower. This takes precedence over the laptop-specific speech-only tendency."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech + LED",
+          "rationale": "Under fatigue, the user prefers redundant cues to reduce missed prompts. This overrides the laptop-specific preference for speech alone."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user and button presses are not feasible. Autocontinue best matches their motor profile and fatigued state."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's reliable, low-effort completion method for feeding. It is especially appropriate given severe motor limitations and fatigue."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue is the stable preference for wiping because explicit completion signals are difficult for this user. It also minimizes effort during fatigue."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "The user is fatigued and engaged with a laptop, so passive progression is preferred. Open-mouth control is possible but less suitable when attention is divided."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "While working on a laptop, explicit readiness signaling is less reliable, and button use is infeasible. Fatigue also favors the lowest-effort option."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Mouth wiping defaults to autocontinue and remains stable across fatigue and laptop-use contexts. It avoids unnatural or effortful signaling."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served hot, and the user is fatigued while working on a laptop. Their tendencies prioritize hotter food for comfort under fatigue in screen-focused contexts."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "The user is working on a laptop positioned in front, so preserving the front visual field is important. This outweighs the default of not considering occlusion."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside-mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule linking these two dimensions."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "Although front visibility matters when using a laptop, the user's fatigue tie-break is to reduce total meal duration. Therefore they prefer not to retract between bites today."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "Fatigue and the user's slow mouth opening favor predictable, comfortable motion. The meal also includes potentially messy items, which supports slower movement."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "The user has limited mouth opening, and pizza pieces can form larger bites, so narrower bites are preferable. With no strong reliability rule triggered for these foods, comfort remains the better fit."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, making inside-mouth transfer physically necessary. Fatigue further reinforces this choice."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000 sec",
+          "rationale": "Fatigue increases response time, and the user's tendency under fatigue is to prefer a large safety margin. This also fits the laptop-work context, where attention may be delayed."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "When physically fatigued, the user's tie-break is to minimize effort, especially while multitasking on a laptop. Although confirmation improves reliability, today's foods are not especially slippery or irregular enough to override that tendency."
+        }
+      }
+    },
+    {
+      "day": 13,
+      "context": {
+        "meal": "bite-sized sandwiches",
+        "setting": "Personal",
+        "time_of_day": "noon",
+        "transient_affective_state": "Energetic"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Although the sandwiches are dippable, no sauces are present. The hard rule therefore requires choosing do not dip."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech + LED",
+          "rationale": "In a quiet personal setting, the user prefers redundant cues to clearly indicate when to take the bite, sip, or wipe. There is no TV, laptop, social, fatigue, or hurry condition that would change this."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech + LED",
+          "rationale": "In a personal setting without competing media or social concerns, the user prefers redundant multimodal cues. Speech plus LED provides the clearest prompt with minimal effort."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user because of limited neck control, and buttons are infeasible. Autocontinue is therefore the stable best option for drinking completion."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the reliable, low-effort completion method for feeding and avoids impossible button presses. It remains the preferred option in this personal setting."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For mouth wiping, head-gesture perception is unreliable and button signaling is not feasible. Autocontinue best fits the user's motor limitations and low-effort preference."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "open mouth",
+          "rationale": "In a personal setting, open mouth provides low-effort readiness control for drinking without requiring button use. No contextual rule today suggests switching to autocontinue."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "open mouth",
+          "rationale": "For feeding in a quiet personal setting, open-mouth detection is the preferred low-effort readiness signal. Buttons are not feasible for this user, and there is no social or screen-based context favoring autocontinue."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Mouth wiping defaults to autocontinue because open mouth is not a natural cue for this task and buttons are infeasible. This preference is stable across contexts."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The meal is a refrigerated leftover savory item intended to be served warm, and the user is energetic rather than fatigued or in a hurry. The default warming preference of 2 min best matches this personal setting."
+        },
+        "occlusion_relevance": {
+          "choice": "do not consider occlusion",
+          "rationale": "Today's meal is in a personal setting with no TV, laptop, or social partner specified as an important visual target. The default preference is therefore to not consider occlusion."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule linking transfer mode to distance."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "In a personal setting with no important visual target to preserve, the user prefers efficiency over retracting. There is also no social or screen-focused context that would favor retraction."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "In a personal setting without hurry, the user's stable comfort-oriented preference is slow motion. Their slow mouth opening also supports keeping robot motion conservative despite feeling energetic."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Bite-sized sandwiches can form relatively thick bites, and the user has limited mouth opening. Parallel skewering better supports narrower, easier-to-eat bites."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, making outside-mouth transfer infeasible. Inside mouth transfer is the stable preference across contexts for this body profile."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100 sec",
+          "rationale": "In a quiet personal setting, the user's default is 100 sec to allow for slow mouth opening and paced interaction. The energetic state does not trigger the 10 sec rule because that rule specifically requires physically energetic and easy foods, which is not explicitly established here."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "In a quiet personal setting, the user prefers reliable bite transfer and can access the web interface with assistive input. There is no fatigue or divided-attention context pushing toward skipping confirmation."
+        }
+      }
+    },
+    {
+      "day": 14,
+      "context": {
+        "meal": "bananas, brownies, and chocolate sauce",
+        "setting": "Personal",
+        "time_of_day": "noon",
+        "transient_affective_state": "Hurried"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "less",
+          "rationale": "The meal includes dippable items and chocolate sauce, so dipping is relevant. When hurried with dippable foods, the user prefers less dipping to reduce mess and save time."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech",
+          "rationale": "In a hurried context, the user prefers a direct audio cue to support faster response when the tool reaches transfer position. No social or media-listening context is present to make quieter cues preferable."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech",
+          "rationale": "In a hurried context, the user prefers speech as the fastest unmistakable cue for initiating transfer. There is no competing screen-viewing or social-setting rule that would favor LED-only signaling."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user due to limited neck control, and buttons are infeasible, so autocontinue is the best fit. This also aligns with the user's stable drinking preference and hurried context."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's consistent preference for feeding completion because it is reliable and avoids impossible button presses. It also supports efficient hands-free flow during a rushed meal."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue is the user's stable preference for wiping completion because explicit signaling methods are not feasible or natural. It also keeps the interaction fast and low effort while hurried."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue best supports efficient, hands-free interaction for this user, especially when rushed. Open-mouth signaling is possible but slower and less efficient for today's context."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "When hurried in a quiet personal setting, the user prefers autocontinue so feeding initiation does not depend on slow mouth-opening timing. Button use is infeasible given severe upper-limb paralysis."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "The user's preference for wiping initiation is stably autocontinue across contexts, and this is especially appropriate when hurried. It avoids unnatural or effortful signaling."
+        },
+        "microwave_time": {
+          "choice": "1 min",
+          "rationale": "The meal is a refrigerated leftover with intended warm serving temperature, and the user tends to reduce microwave time when hurried to prioritize efficiency. Although fatigue would favor hotter food, today's affective state is hurried rather than fatigued."
+        },
+        "occlusion_relevance": {
+          "choice": "do not consider occlusion",
+          "rationale": "This is a personal meal with no social partner or screen-based visual target specified, so the user's default personal-setting preference applies. In a hurried personal context, there is no indication that preserving a particular line of sight outweighs efficiency."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because transfer mode is inside mouth transfer, outside-mouth distance does not apply. This follows both the user's stable tendency and the hard rule."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "In a hurried context, the user prioritizes efficiency over reducing occlusion, so they prefer not to retract between bites. There is also no important visual target in this personal setting that would justify the extra time."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The user is hurried, and the foods are easy items like bananas and brownies, so a modest speed increase fits their tendency to accept faster service under time pressure. Fast is not selected because the user still has slow mouth opening and generally prefers conservative motion."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "In a hurried context with easy, stable foods, the user tends to prefer perpendicular skewering to improve acquisition speed and success. Bananas and brownie bites are reasonably stable compared with fragile or oversized items."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, making inside-mouth transfer the physically necessary option. The user's hurried-state tendency also favors inside-mouth transfer as the most feasible and efficient mode."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "10 sec",
+          "rationale": "The user's hurried-state rule strongly favors a short wait to keep the meal moving efficiently. Although the user may open their mouth slowly, the tie-break under hurry is to prioritize speed over long intervention windows."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "When hurried and eating easy stable foods in a personal setting, the user prefers to skip confirmation to reduce interaction time. This is also compatible with minimizing effort during a rushed meal."
+        }
+      }
+    },
+    {
+      "day": 15,
+      "context": {
+        "meal": "general tso's chicken and broccoli",
+        "setting": "Working on laptop with laptop on Right",
+        "time_of_day": "noon",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Although the food items are dippable, there are no sauces available. The hard rule therefore requires selecting do not dip."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech",
+          "rationale": "When working on a laptop, the user may be visually focused on the screen rather than the robot. A spoken cue is therefore the most reliable way to indicate that transfer can be completed."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech",
+          "rationale": "For laptop use, the user may not be looking at the robot, so an audio cue is more reliable than a purely visual one. Speech best fits the current work-focused context."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user because of limited neck control, and buttons are infeasible. Autocontinue is the stable low-effort choice for drinking completion."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the reliable, hands-free completion method for feeding and avoids impossible button presses. It also works well when the user is distracted by laptop work."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "The user cannot reliably perform head gestures or press buttons, so autocontinue is the most feasible completion method. It also minimizes disruption during laptop use."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "open mouth",
+          "rationale": "No laptop-neutral drinking rule overrides the default, and the in-a-hurry laptop rule does not apply here. Open-mouth readiness remains the lowest-effort feasible option given the user cannot press buttons."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "While working on a laptop, explicit readiness signaling is less reliable and button use is infeasible. Autocontinue minimizes effort and supports hands-free interaction."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For mouth wiping, the user’s stable preference is autocontinue because open mouth is unnatural and buttons are infeasible. Working on a laptop further supports minimal interruption."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served hot, and the user’s default for this situation is to warm it normally. The current slower state does not explicitly override this to 3 min, which is reserved for physical fatigue."
+        },
+        "occlusion_relevance": {
+          "choice": "do not consider occlusion",
+          "rationale": "The user is working on a laptop positioned on the right, but the preference rules only specify front occlusion for laptop/tablet use. Since no rule applies to preserving a right-side laptop view, the default remains appropriate."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside-mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule linking these two dimensions."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "The user’s rules specify retracting to preserve a front screen view, but the laptop is on the right rather than directly in front. Without a matching occlusion concern, the efficiency-oriented default of not retracting remains appropriate."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user has slow mouth opening and generally prefers comfort-oriented motion. The current slower state further supports conservative speed rather than accelerating."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "General Tso’s chicken pieces can be relatively large, and the user has limited mouth opening. Parallel skewering better supports narrower, easier-to-eat bites."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, so inside-mouth transfer is the physically necessary mode. Working while eating does not change that constraint."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100 sec",
+          "rationale": "The user generally prefers 100 sec in neutral personal meals to allow for slow mouth opening and paced interaction. The current slower state suggests maintaining a moderate buffer, and no explicit laptop-neutral rule overrides this to 1000 sec."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "When working on a laptop, the user prefers to avoid extra confirmation because divided attention makes the web step burdensome. This meal is not described as especially slippery or failure-prone enough to override that tendency."
+        }
+      }
+    },
+    {
+      "day": 16,
+      "context": {
+        "meal": "chicken breast strips and hash brown",
+        "setting": "Personal",
+        "time_of_day": "morning",
+        "transient_affective_state": "Hurried"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Although the foods are dippable, there are no sauces available. The hard rule requires do not dip when no sauces exist."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech",
+          "rationale": "In a hurried context, the user prefers a direct audio cue to support faster response. Speech is the clearest efficient signal for completing transfer."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech",
+          "rationale": "When hurried, the user's tendency is to prefer speech as the fastest unmistakable prompt. This supports efficient flow without requiring visual attention."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "The user cannot reliably perform head gestures and cannot use buttons, so autocontinue is the most feasible option. This also aligns with the user's stable preference for drinking completion."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is reliable for feeding completion and avoids impossible button presses. The user consistently prefers this automatic method across contexts."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue is the user's stable preference for wiping completion because head gestures are unreliable and buttons are infeasible. It also supports a faster meal when hurried."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue best matches the user's low-effort interaction style and hurried state. It avoids button use, which is not feasible, and reduces delays."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "In a personal setting when hurried, the user prefers autocontinue for feeding to reduce interaction time. This also avoids reliance on slow mouth opening or impossible button presses."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Mouth wiping defaults to autocontinue and the hurried rule also supports it. Open-mouth signaling is unnatural for wiping, and button use is not feasible."
+        },
+        "microwave_time": {
+          "choice": "1 min",
+          "rationale": "The meal is a refrigerated savory hot meal, and the user is hurried. Their tendency in this situation is to reduce reheating time for efficiency."
+        },
+        "occlusion_relevance": {
+          "choice": "do not consider occlusion",
+          "rationale": "Today's setting is personal with no social partner or screen-based visual target specified. In a quiet personal context, the user's default tendency is not to prioritize occlusion."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because transfer mode is inside mouth transfer, outside-mouth distance does not apply. This also satisfies the hard rule."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "In a hurried context, the user prioritizes efficiency over reducing occlusion. With no important visual target specified, skipping retraction is coherent."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "Although the user is hurried, the speed-up rule for personal settings applies to easy foods like fruit or dessert, which this meal is not. Given slow mouth opening and comfort-oriented preferences, slow remains the best fit."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Chicken breast strips can form larger bites, and the user has limited mouth opening. Parallel skewering better supports narrower, easier-to-eat bites."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, making outside-mouth transfer infeasible. Inside-mouth transfer is also the user's stable preference when hurried."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "10 sec",
+          "rationale": "The user's hurried-state rule sets the wait time to 10 seconds to favor efficiency. This supports a faster, more automated interaction rhythm."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "The user is hurried, but the no-confirmation rule in personal settings is for easy stable foods; this meal is not clearly in that category. Since the user can use the web interface and generally prefers reliability, confirmation should remain enabled."
+        }
+      }
+    },
+    {
+      "day": 17,
+      "context": {
+        "meal": "bite-sized pizza and broccoli",
+        "setting": "Working on laptop with laptop on Right",
+        "time_of_day": "morning",
+        "transient_affective_state": "Fatigued"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Even though pizza and broccoli are dippable, there are no sauces available. The hard rule therefore requires selecting do not dip."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech + LED",
+          "rationale": "Fatigue makes extra clarity valuable when the robot reaches the transfer location. Redundant cues help compensate for slower reactions and divided attention."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech + LED",
+          "rationale": "The user is fatigued, and redundant cues reduce the chance of missed prompts when attention and energy are low. Multimodal signaling is therefore the best fit despite the laptop-work context."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user because of limited neck control, and buttons are not feasible. Autocontinue is their stable preferred method for drinking completion."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's preferred low-effort and reliable completion method for feeding. It avoids impossible button presses and works well when the user is fatigued."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "The user cannot reliably perform head gestures and cannot press buttons, so autocontinue is the most feasible completion method. This also aligns with their low-effort preference under fatigue."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "The user is fatigued and engaged with a laptop, both of which favor passive progression. Open-mouth signaling is possible but less reliable in a divided-attention context."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "While working on a laptop, explicit readiness signaling is less reliable, and the user cannot use buttons. Fatigue further supports minimizing effort, so autocontinue is the best match."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For wiping, the user's preference is stably autocontinue across contexts because open mouth is unnatural and buttons are infeasible. Fatigue reinforces this low-effort option."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served hot, and the user is fatigued. Their tendency in fatigued screen-focused contexts is to prefer hotter food for comfort."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize right occlusion",
+          "rationale": "The user is working on a laptop positioned on the right, so preserving visibility on that side is important. Even though the encoding explicitly mentions front occlusion for laptop use, the stated laptop location makes right-side visibility the most relevant target to preserve."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule linking these two dimensions."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "Although laptop work can favor retracting to preserve visibility, the user's fatigue tie-break is to reduce total meal duration. Skipping retraction better matches today's low-energy state."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user is fatigued and has slow mouth opening, which favors predictable and comfortable motion. Nothing in today's context suggests urgency that would justify speeding up."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Pizza pieces can form thicker bites, and the user has limited mouth opening. Their stable preference under low-energy conditions is to favor narrower, easier-to-eat bites over maximum acquisition success."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, making outside-mouth transfer infeasible. Fatigue further strengthens the preference for direct inside-mouth transfer."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000 sec",
+          "rationale": "The user is fatigued, which strongly favors a long safety margin before automatic continuation. Laptop engagement also supports allowing substantial extra time for delayed responses."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "The user is fatigued, and their tie-break under fatigue is to minimize effort. Pizza and broccoli are not especially slippery or irregular compared with foods that would trigger a reliability override."
+        }
+      }
+    },
+    {
+      "day": 18,
+      "context": {
+        "meal": "cantaloupes, bananas, watermelon",
+        "setting": "Working on laptop with laptop on Right",
+        "time_of_day": "noon",
+        "transient_affective_state": "Neutral"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Although the fruits are dippable, there are no sauces available. The hard rule therefore requires do not dip."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech + LED",
+          "rationale": "The speech-only laptop rule is for work on a screen in front, which does not match today's setup. Redundant cues remain the clearest neutral choice."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech + LED",
+          "rationale": "The laptop-specific speech-only rule applies when working on a laptop or tablet in front, which is not the case here. Multimodal signaling remains the clearest default."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user and button use is not feasible. Autocontinue is therefore the stable preferred method for drinking completion."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the reliable default for feeding completion and avoids impossible button presses. This remains appropriate in the current neutral context."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue is preferred for wiping because explicit completion signals are difficult for this user. The neutral work context does not change that."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "open mouth",
+          "rationale": "The context-specific autocontinue rules do not apply because the laptop is not in front and the user is not in a hurry or fatigued. Open-mouth detection remains the low-effort default for drinking readiness."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "open mouth",
+          "rationale": "The autocontinue rule for laptop work applies when the screen is in front, not on the right. Since button use is infeasible and the setting is neutral, open-mouth detection best preserves low-effort user control."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue is the stable default for wiping because open mouth is not a natural cue and button use is infeasible. Today's context does not suggest any alternative."
+        },
+        "microwave_time": {
+          "choice": "no microwave",
+          "rationale": "The meal is fruit intended to be served cold, and the user's preference rules specify no microwaving for fruit or cold dessert in any context."
+        },
+        "occlusion_relevance": {
+          "choice": "do not consider occlusion",
+          "rationale": "The laptop is on the right rather than in front, and there is no rule prioritizing right-side occlusion for laptop work. The default therefore remains to not consider occlusion."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because transfer mode is inside mouth transfer, outside-mouth distance does not apply. This also satisfies the hard rule."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "The rule to retract for laptop work applies when the screen is in front, not on the right. With no strong occlusion target identified, the efficiency-oriented default of not retracting is appropriate."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "No rule supports speeding up for this neutral laptop-on-right context, and fruit alone does not override the comfort-oriented default. Slow motion also fits the user's slow mouth opening."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "No context-specific rule clearly overrides the default here. Parallel skewering better supports narrower bites, which is appropriate given the user's limited mouth opening."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, so inside-mouth transfer is the physically necessary and preferred mode. Nothing in today's context changes that constraint."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100 sec",
+          "rationale": "The laptop-specific longer wait applies when working on a laptop or tablet in front, which is not today's arrangement. The default 100 sec fits the user's slow mouth opening while maintaining reasonable flow."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "The specific rule to disable confirmation applies when working on a laptop or tablet in front, which is not today's setup. With neutral affect and no sauce-related mess concerns, the reliable default of confirmation is appropriate."
+        }
+      }
+    },
+    {
+      "day": 19,
+      "context": {
+        "meal": "strawberries with whipped cream",
+        "setting": "Working on laptop with laptop on Right",
+        "time_of_day": "evening",
+        "transient_affective_state": "Fatigued"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "less",
+          "rationale": "The meal includes dippable strawberries and whipped cream, so dipping is relevant. Because the user is fatigued and working on a laptop, they prefer less dipping to reduce mess and distraction."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech + LED",
+          "rationale": "Fatigue makes extra clarity valuable, and the user's preferences explicitly favor speech plus LED in that state. Redundant cues help the user know when to take the bite, sip, or wipe."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech + LED",
+          "rationale": "Under fatigue, the user prefers redundant cues so prompts are less likely to be missed. Multimodal signaling is therefore more appropriate than speech alone or LED alone today."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "The user cannot reliably perform head gestures and cannot use buttons, so autocontinue is the most feasible method. Their preferences consistently choose autocontinue for drinking, especially under fatigue."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's preferred feeding completion method because it is reliable and requires no button press. Fatigue further supports low-effort automatic detection."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue is preferred for wiping because head-gesture perception is unreliable and buttons are infeasible. This remains the stable choice when the user is fatigued and multitasking."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "The user is fatigued and occupied with laptop work, both of which favor passive hands-free progression. Autocontinue avoids reliance on buttons or deliberate mouth signaling."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "While working on a laptop, the user prefers autocontinue because task engagement makes explicit readiness signaling less reliable. Fatigue also reinforces minimizing effort and avoiding slow mouth-based triggering."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For mouth wiping, the user's preference is stably autocontinue across contexts, especially when fatigued or attention is occupied. Open-mouth signaling is not natural for this task and button use is infeasible."
+        },
+        "microwave_time": {
+          "choice": "no microwave",
+          "rationale": "The meal is strawberries with whipped cream, a cold food intended to be served cold. The user's preferences explicitly choose no microwave for fruit or cold dessert in any context."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize right occlusion",
+          "rationale": "The user is working on a laptop positioned on the right, so preserving visibility on that side is most relevant. Even though the encoding mentions front occlusion for laptop use, today's salient visual target is specifically on the right."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside-mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule linking transfer mode to this field."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "Although laptop work can favor retracting to preserve visibility, the user's fatigue tie-break is to reduce total meal duration. Therefore no retraction is preferred today."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user is fatigued, and their preferences favor slow motion under fatigue for comfort and predictability. Slow speed also fits the user's slow mouth opening and cautious interaction style."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "Strawberries are soft items that can be harder to keep securely on the fork, so the preference shifts toward better acquisition reliability. Perpendicular skewering improves bite acquisition success for such foods."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, and fatigue further supports direct delivery. Their preferences consistently require inside-mouth transfer across contexts because of physical necessity."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000 sec",
+          "rationale": "The user is fatigued, and their preferences explicitly increase the wait time to 1000 sec in that state. This provides a large safety margin for slower responses while multitasking."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "The user is fatigued, and their tie-break under fatigue is to minimize effort. Since strawberries are relatively stable compared with slippery irregular foods, skipping confirmation best matches today's context."
+        }
+      }
+    },
+    {
+      "day": 20,
+      "context": {
+        "meal": "chicken nuggets, broccoli, and ketchup",
+        "setting": "Social with person in Front",
+        "time_of_day": "morning",
+        "transient_affective_state": "Neutral"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "less",
+          "rationale": "The meal includes dippable items and sauce, so dipping is relevant. In a social context, the user prefers lighter dipping to reduce mess and make transfers cleaner around others."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech + LED",
+          "rationale": "Redundant completion cues best support clear timing for bites, sips, and wiping, especially given the user's slow mouth opening and motor limitations. No stronger front-specific rule suggests using only one cue modality."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech + LED",
+          "rationale": "The user prefers redundant cues in neutral conditions because they are easiest to notice and reduce missed prompts. There is no front-specific rule here that would justify dropping one modality."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user due to limited neck control, and button input is not feasible. Autocontinue is therefore the most appropriate and consistent drinking completion method."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's preferred feeding completion method because it is reliable and avoids impossible button presses. It also keeps the interaction unobtrusive in a social setting."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For wiping, the user consistently prefers autocontinue because head gestures are unreliable and buttons are infeasible. This minimizes effort and awkward signaling."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "open mouth",
+          "rationale": "Open-mouth readiness is the default low-effort method for drinking given the user's inability to use buttons reliably. No stronger context rule applies for a front social setting."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "open mouth",
+          "rationale": "The user cannot reliably press buttons, and open-mouth detection is the preferred low-effort readiness signal outside side-social and screen-focused contexts. A front social setting does not create the same conversation-related side-partner rule, so open mouth remains the best fit."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For wiping, the user's preference is stably autocontinue because open mouth is not a natural cue and buttons are infeasible. This remains appropriate in today's neutral social meal."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served hot, and the user's normal preference in neutral conditions is to warm it adequately without extra delay. No fatigue or hurry cues suggest changing from the standard warming routine."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "The social partner is in front, so preserving the user's forward line of sight is the closest match to the user's tendency to maintain visibility of important people in social settings. Front occlusion is therefore the most relevant direction to minimize."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside-mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule linking these two dimensions."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "The user's social-context rule for retracting is specific to partners on the left or right, not in front. Without a matching rule and with a general preference for efficiency, not retracting is the best fit."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "In neutral conditions, the user prefers conservative motion for comfort and because mouth opening can be slow. A social setting also favors less disruptive, safer-feeling robot movement."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "The user's stable preference favors narrower bites because of limited mouth opening. Nothing in today's context strongly indicates a need to prioritize acquisition reliability over bite size."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, so inside-mouth transfer is physically necessary. Neutral affect and social context do not override this constraint."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100 sec",
+          "rationale": "The user typically prefers a moderate wait in neutral conditions to accommodate slow mouth opening and paced interaction. There is no applicable rule for front social context that would clearly push this to either 10 sec or 1000 sec."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "The user generally prefers reliable bite transfer in neutral conditions, and social contexts increase the value of avoiding failed or empty-fork transfers. Since the user can access the web interface with assistive input, confirmation remains appropriate."
+        }
+      }
+    },
+    {
+      "day": 21,
+      "context": {
+        "meal": "bite-sized sandwiches",
+        "setting": "Working on laptop with laptop in Front",
+        "time_of_day": "evening",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Although the sandwiches are dippable, there are no sauces available. The hard rule therefore requires do not dip."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech",
+          "rationale": "When working on a laptop in front, the user prefers speech because their eyes may remain on the screen rather than the robot. Audio provides a clear cue that the bite, sip, or wipe can be completed."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech",
+          "rationale": "For laptop use in front, the user prefers speech because they may not be looking at the robot. Audio is the most reliable way to indicate readiness while their visual attention is on the screen."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "The user cannot reliably perform head gestures and cannot use buttons, so autocontinue remains the most feasible option. It also supports passive progression during a screen-focused meal."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's stable preference for feeding completion because it is reliable and hands-free. This is especially appropriate while multitasking on a laptop."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue is the user's stable preference for wiping completion because explicit signaling methods are unreliable or infeasible. It also minimizes disruption while working."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "open mouth",
+          "rationale": "There is no laptop-neutral drinking rule, and the in-a-hurry laptop rule does not apply. Given the user's inability to press buttons and the default low-effort control preference, open mouth is the best fit."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "While working on a laptop, the user prefers autocontinue because task engagement makes explicit readiness signaling less reliable. Button use is infeasible and open-mouth control is less suitable during divided attention."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For mouth wiping during laptop use, the user consistently prefers autocontinue to minimize interruption. This also avoids requiring unnatural or effortful readiness signals."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The meal is a refrigerated leftover savory item intended to be served warm, and there is no rule indicating a change for working on a laptop when the user is slower rather than fatigued or hurried. The default warm-serving preference of 2 min best fits today's context."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "The user is working on a laptop in front, so preserving the front visual field is important. This directly matches the user's tendency to prioritize front visibility during screen-focused activities."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule linking transfer mode and distance."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "When working on a laptop in front, the user prefers the robot to retract so the screen remains visible between transfers. There is no fatigue or hurry rule today that would override this visibility preference."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user's baseline preference is slow motion for comfort and predictability, and today's affective state is slower rather than hurried or energetic. Slow speed also fits the user's slow mouth opening and cautious interaction style."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Bite-sized sandwiches are likely to form thicker bites, and the user has limited mouth opening. Parallel skewering better supports narrower, easier-to-eat bites, with no strong contextual rule favoring perpendicular acquisition."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, making outside-mouth transfer infeasible. Inside-mouth transfer is the stable preference across contexts for this physical profile."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000 sec",
+          "rationale": "While working on a laptop in front, the user prefers a long wait because task engagement can substantially delay intervention. The slower affective state further supports allowing extra time rather than shortening the timeout."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "When working on a laptop in front, the user prefers to avoid extra confirmation because divided attention makes the web step burdensome. The food is not described as especially slippery or failure-prone, so reliability does not override that tendency."
+        }
+      }
+    },
+    {
+      "day": 22,
+      "context": {
+        "meal": "cantaloupes, bananas, watermelon",
+        "setting": "Social with person in Front",
+        "time_of_day": "evening",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Although the fruit is listed as dippable, there are no sauces available. The hard rule therefore requires do not dip."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech + LED",
+          "rationale": "The user prefers redundant completion cues for clarity, especially given slower responses today. No more specific front-social rule overrides the default multimodal signaling."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech + LED",
+          "rationale": "The user's default and slower-state-compatible preference is multimodal signaling for maximum clarity. In a social setting with a person in front, there is no specific rule favoring a different cue, so redundant cues remain best."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user because of limited neck control, and buttons are infeasible. Autocontinue is therefore the most appropriate completion method for drinking."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is reliable for feeding and avoids impossible button presses. It also supports unobtrusive completion detection in a social meal."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable and button input is not feasible, so autocontinue best fits the user's motor profile. This also keeps wiping interaction low effort."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "open mouth",
+          "rationale": "Buttons are infeasible, and the social autocontinue rule is again specific to left or right social settings. In this front-social context, open mouth remains the closest match to the user's low-effort default."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "open mouth",
+          "rationale": "The user cannot reliably press buttons, and the social-context autocontinue rule is specifically for partners on the left or right where conversation may confuse mouth cues. With a person in front and no hurry, open-mouth detection best preserves low-effort user control."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "The user consistently prefers autocontinue for wiping because open mouth is not a natural readiness cue and buttons are infeasible. This preference is stable across contexts."
+        },
+        "microwave_time": {
+          "choice": "no microwave",
+          "rationale": "The meal is fruit and intended to be served cold, so the user's rules specify no microwaving in any context. Refrigeration does not override the intended cold serving temperature."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "The dining context is social with a person in front, so preserving the user's forward line of sight is most appropriate. This extends the user's general preference to keep important visual targets visible during social meals."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because transfer mode is inside mouth transfer, outside-mouth distance does not apply. This follows the hard rule directly."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "In a social setting with another person in front, reducing prolonged visual obstruction is appropriate between transfers. There is no fatigue or hurry rule today that would push toward skipping retraction."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user generally prefers slow motion for comfort and has slow mouth opening. Today's slower state further supports predictable, conservative robot movement."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "Today's foods are soft fruit pieces that can be harder to keep on the fork, so the reliability-focused rule favors perpendicular skewering. This improves bite acquisition success for fragile items like cantaloupe, banana, and watermelon."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, making inside-mouth transfer the physically necessary option. A slower affective state does not change that constraint."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100 sec",
+          "rationale": "The user's default for neutral meals is 100 seconds, which accommodates slow mouth opening and paced interaction. Today's slower state supports keeping a moderate safety margin without jumping to the fatigue-specific 1000-second setting."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "There is no fatigue or hurry cue pushing toward less confirmation, and fruit can be slippery enough that confirming successful bite acquisition is useful. The user can access the web interface and generally prefers dependable operation when not rushed."
+        }
+      }
+    },
+    {
+      "day": 23,
+      "context": {
+        "meal": "chicken breast strips and hash brown",
+        "setting": "Working on laptop with laptop in Front",
+        "time_of_day": "evening",
+        "transient_affective_state": "Hurried"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Even though the foods are dippable, there are no sauces available. The hard rule requires selecting do not dip when no sauces exist."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech",
+          "rationale": "When the user is visually focused on a laptop, audio is the more reliable completion cue. Hurry also supports direct speech for faster response."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech",
+          "rationale": "For laptop use in front, speech is preferred because the user may not be looking at the robot. Hurry also favors the fastest unmistakable prompt, reinforcing speech."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user and buttons are infeasible. Autocontinue best supports efficient multitasking while working on the laptop."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's stable preference for feeding completion because it is reliable and hands-free. This is especially appropriate since button use is not possible."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue is the stable preference for wiping because explicit completion signals are difficult for this user. It also minimizes disruption during laptop work."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "The user is working on a laptop and is hurried, both of which favor efficient hands-free progression. Buttons are infeasible and explicit readiness cues would add burden."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "While working on a laptop, explicit readiness signaling is less reliable and the user cannot use buttons. Hurry further supports automatic progression rather than waiting for open-mouth initiation."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Mouth wiping defaults to autocontinue and this remains preferred during laptop work. It minimizes interruption and does not rely on unnatural or inaccessible signals."
+        },
+        "microwave_time": {
+          "choice": "1 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served hot, and the user is hurried. Their tendency in hurry conditions is to reduce reheating time for efficiency."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "The user is working on a laptop positioned in front. Their preferences prioritize preserving the front visual field when working on a laptop/tablet."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule linking these two dimensions."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "Although laptop work would normally favor retracting to preserve visibility, the user's hurry rule explicitly prioritizes efficiency. Their tendencies state that in a hurry, efficiency outweighs occlusion concerns."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "When working on a laptop in front and hurried, the user prefers a modest speed increase. Medium balances efficiency with comfort given slow mouth opening and safety needs."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Chicken breast strips are larger, thicker pieces where narrower bites are easier given limited mouth opening. No rule specifically favors perpendicular here more strongly than the comfort-oriented default."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, making outside-mouth transfer infeasible. Their preferences consistently favor inside-mouth transfer across contexts, especially when hurried."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "10 sec",
+          "rationale": "The user is hurried, and their preference encoding explicitly sets the autocontinue wait to 10 seconds in hurry conditions. This prioritizes efficient meal flow over longer intervention windows."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "In laptop-focused contexts, the user prefers to skip extra confirmation because divided attention makes it burdensome. Hurry further supports minimizing interaction time."
+        }
+      }
+    },
+    {
+      "day": 24,
+      "context": {
+        "meal": "bite-sized sandwiches",
+        "setting": "Watching TV with TV on Right",
+        "time_of_day": "noon",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Although the sandwiches are dippable, there are no sauces available. The hard rule requires choosing do not dip when no sauces exist."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech + LED",
+          "rationale": "The user's slower state makes redundant completion cues helpful for timing the bite, sip, or wipe. Clear multimodal signaling is preferable to a single cue when reactions may be delayed."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech + LED",
+          "rationale": "The user is in a slower state, so redundant cues reduce the chance of missed prompts. Although TV contexts can favor quieter cues, the fatigue-like need for clarity is the stronger fit here."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user because of limited neck control, and buttons are infeasible. Autocontinue is therefore the most appropriate low-effort drinking completion method."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's preferred feeding completion method because it is reliable and hands-free. It also avoids impossible button presses and works well when attention is partly on the TV."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For mouth wiping, autocontinue is the stable preference because head gestures are unreliable and button presses are not practical. It also minimizes interruption during TV watching."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "For drinking during TV watching, the user prefers autocontinue to reduce effort and support divided attention. This also avoids reliance on buttons, which the user cannot reliably press."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "While watching TV, the user prefers passive progression because attention is divided. Open-mouth readiness is possible but less reliable in this context, and button use is not feasible."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Mouth wiping defaults to autocontinue and remains stable across contexts because explicit readiness cues are awkward and unnecessary. This is especially appropriate when the user is occupied watching TV."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served warm, so the user's normal warming routine applies. The current state is slower rather than clearly physically fatigued or in a hurry, so 2 min best matches the stable preference."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize right occlusion",
+          "rationale": "The user is watching TV and the TV is on the right, making that the important visual target to preserve. The preference rules prioritize maintaining visibility of the external target in such contexts."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule linking these two dimensions."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "The user is watching TV, so retracting between bites helps preserve the viewing line and reduce prolonged obstruction. There is no strong in-a-hurry or physically fatigued cue overriding that visibility preference."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user has slow mouth opening and generally prefers comfort-oriented motion. The transient state of being slower further supports conservative movement rather than speeding up."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Bite-sized sandwiches can form thicker bites, and the user has limited mouth opening. Parallel skewering better supports narrower, easier-to-eat bites when there is no strong pressure for faster acquisition."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, making outside-mouth transfer infeasible. Inside-mouth transfer remains the stable preference across contexts for this body profile."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100 sec",
+          "rationale": "In a TV-watching context, the user wants a reasonable flow while still allowing extra time for slow responses. The slower transient state supports keeping the standard 100 sec rather than shortening it."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "In a TV-watching context, the user prefers to avoid extra confirmation because divided attention makes the web step more burdensome. Sandwich bites are relatively stable, so skipping confirmation is coherent here."
+        }
+      }
+    },
+    {
+      "day": 25,
+      "context": {
+        "meal": "chicken breast strips and hash brown",
+        "setting": "Watching TV with TV on Left",
+        "time_of_day": "morning",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Even though the foods are dippable, there are no sauces available today. The hard rule therefore requires selecting do not dip."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech + LED",
+          "rationale": "Although TV contexts often favor quieter cues, the user’s slower state makes extra clarity more important. Redundant speech and LED cues best support timely completion."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech + LED",
+          "rationale": "The user is in a slower state, and their fatigue/slowness-related tendency favors redundant cues for clarity. Multimodal signaling reduces the chance of missed prompts."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user because of limited neck control, and buttons are not feasible. Autocontinue is therefore the most appropriate drinking completion method."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the most reliable and lowest-effort method for feeding completion. It avoids impossible button presses and works well when the user may be distracted by TV."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "The user cannot reliably perform head gestures or press buttons, making autocontinue the best fit. It also minimizes interruption during TV viewing."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "For drinking while watching TV, the user prefers passive progression because attention is divided. This also avoids reliance on buttons or deliberate mouth-based signaling."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "While watching TV, the user’s divided attention makes explicit readiness signaling less reliable. Button use is infeasible and open-mouth timing is less ideal here, so autocontinue is most coherent."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Mouth wiping is not well suited to open-mouth readiness cues, and the user cannot reliably use buttons. Autocontinue is the user’s stable preference for this task."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served hot, and the user’s default for this situation is to warm it normally. The current state is slower rather than explicitly fatigued or in a hurry, so the standard warming routine fits best."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize left occlusion",
+          "rationale": "The user is watching TV and the TV is on the left, making that the important visual target to preserve. Avoiding left-side blockage best matches the context."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule linking these two dimensions."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "Although preserving visibility can matter during screen-focused activities, the TV is on the left rather than directly in front, and the user’s slower state favors reducing total meal burden. Skipping retraction keeps the interaction more efficient."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user has slow mouth opening and generally prefers comfort-oriented motion. The affective state of being slower further supports conservative movement rather than speeding up."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Chicken breast strips can produce larger bites, and the user has limited mouth opening. Parallel skewering better supports narrower, easier-to-eat bites."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, so direct delivery is physically necessary. This preference remains stable across contexts."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100 sec",
+          "rationale": "The user generally prefers a moderate wait to accommodate slow mouth opening and paced interaction. The current slower state supports keeping this generous default rather than shortening it."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "When attention is divided by screen viewing, the user tends to prefer skipping extra confirmation steps. This reduces interaction burden while watching TV."
+        }
+      }
+    },
+    {
+      "day": 26,
+      "context": {
+        "meal": "chicken nuggets, broccoli, and ketchup",
+        "setting": "Watching TV with TV on Right",
+        "time_of_day": "evening",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "less",
+          "rationale": "There are dippable items and ketchup is available, so dipping is relevant. In a screen-focused context, the user prefers less dipping to reduce mess and distraction."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech + LED",
+          "rationale": "TV watching often favors LED-only cues, but the user's slower state makes extra clarity more important. Speech plus LED helps ensure the user notices when to take the bite, sip, or wipe."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech + LED",
+          "rationale": "Although TV watching can favor LED, the user's slower state makes redundant cues preferable so prompts are not missed. Multimodal signaling provides the clearest initiation cue."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user because of limited neck control, and button presses are not feasible. Autocontinue is therefore the best fit for drinking completion."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's stable preference for feeding completion because it is reliable and hands-free. It is especially appropriate given severe upper-limb paralysis."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For wiping, the user consistently prefers autocontinue because explicit completion signals are difficult. This remains appropriate in the current TV context."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "While watching TV, passive progression is preferred for drinking readiness. This also avoids reliance on buttons, which the user cannot reliably press."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "In a TV-watching context, the user prefers autocontinue because attention is divided. Button use is not reliable for this user, and open-mouth readiness is less ideal during passive viewing."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Mouth wiping defaults to autocontinue and this remains appropriate during TV watching. It minimizes interruption and does not require unnatural readiness signaling."
+        },
+        "microwave_time": {
+          "choice": "3 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served hot. In a TV-watching context with a slower/low-energy state, the user tends to prefer hotter food for comfort."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize right occlusion",
+          "rationale": "The important visual target is the TV, which is on the user's right. Minimizing right-side occlusion best preserves that line of sight during the meal."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside mouth transfer is selected, outside-mouth distance does not apply. This follows the hard rule for transfer mode consistency."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "Because the user is watching TV to the right, reducing prolonged visual obstruction matters between transfers. Retracting supports better visibility during the meal."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user has slow mouth opening and currently feels slower, which favors predictable, comfortable motion. Slow speed also suits a potentially messy meal with ketchup."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Given limited mouth opening, the user generally benefits from narrower bites. Chicken nuggets and broccoli do not strongly require the reliability advantage of perpendicular skewering here."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, making outside-mouth transfer infeasible. A slower state further supports direct inside-mouth delivery."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100 sec",
+          "rationale": "When watching TV, the user's tendency is to keep a moderate wait that balances distraction with reasonable meal flow. A slower state supports avoiding the shortest timeout without requiring the very longest delay."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "When watching TV, the user prefers to reduce extra confirmation burden because attention is divided. The foods are fairly stable, so skipping confirmation is coherent with that tendency."
+        }
+      }
+    },
+    {
+      "day": 27,
+      "context": {
+        "meal": "cantaloupes, bananas, watermelon",
+        "setting": "Watching TV with TV on Left",
+        "time_of_day": "evening",
+        "transient_affective_state": "Hurried"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Even though the fruits are listed as dippable, there are no sauces available. The hard rule requires do not dip when no sauces exist."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech",
+          "rationale": "In a hurry, the user prefers a direct audio cue to support faster response. This takes precedence over the neutral TV preference for LED."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech",
+          "rationale": "The user is hurried, and the preference tendencies specify speech as the fastest unmistakable prompt in a hurry. This outweighs the neutral TV-related cue preference."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user and buttons are infeasible, so autocontinue is preferred. This also fits the hurried, TV-watching context."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's stable preference for feeding completion because it is reliable and hands-free. This is especially appropriate given the user's inability to press buttons reliably."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Autocontinue is the stable preference for wiping because explicit completion signals are difficult for this user. It also minimizes interruption and supports efficiency."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "For drinking while attention is divided, the user prefers passive progression. This is also consistent with the hurried context and inability to use buttons reliably."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "While watching TV, the user prefers autocontinue because attention is divided. Being hurried further supports automatic progression rather than waiting for explicit readiness cues."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Mouth wiping defaults to autocontinue and the user prefers minimal interruption in screen-focused contexts. Hurried state also supports the fastest feasible initiation method."
+        },
+        "microwave_time": {
+          "choice": "no microwave",
+          "rationale": "The meal is fruit and intended to be served cold, so the user's rule for fruit or cold dessert applies. Refrigeration does not override the intended cold serving temperature."
+        },
+        "occlusion_relevance": {
+          "choice": "do not consider occlusion",
+          "rationale": "The user is watching TV, but it is on the left rather than in front, and there is no rule for TV on the left. With no matching directional rule, the default applies."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because transfer mode is inside mouth transfer, outside-mouth distance does not apply. This also satisfies the hard rule."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "Although screen-focused contexts can favor retracting, the user is hurried and has a strong tendency to skip retraction to reduce meal duration. The hurry rule is the better fit for today's interaction style."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The user is hurried and today's meal consists of easy foods like fruit. The preference tendencies support a modest speed increase for efficiency without using fast motion."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "The meal items are easy, stable fruits and the user is hurried while watching TV. The user's rule in this kind of context favors perpendicular skewering to improve acquisition speed and success."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, making inside-mouth transfer physically necessary. Being hurried also supports the most feasible and efficient mode."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "10 sec",
+          "rationale": "The user is hurried, and their tendencies explicitly set the wait time to 10 sec in any dining context when efficiency is prioritized. This supports a faster automated meal flow."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "The user is watching TV, and divided attention makes extra confirmation burdensome. This matches the tendency to skip web confirmation in screen-focused contexts."
+        }
+      }
+    },
+    {
+      "day": 28,
+      "context": {
+        "meal": "chicken nuggets, broccoli, and ketchup",
+        "setting": "Working on laptop with laptop in Front",
+        "time_of_day": "evening",
+        "transient_affective_state": "Neutral"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "less",
+          "rationale": "The meal includes dippable items and ketchup, so dipping is relevant. In a laptop-focused context, the user prefers less dipping to reduce mess and distraction from drips or cleanup."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech",
+          "rationale": "When working on a laptop in front, the user may be visually focused on the screen rather than the robot, so speech is the most reliable completion cue. This aligns with the user’s stated preference for this context."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech",
+          "rationale": "While working on a laptop in front, the user may not be visually attending to the robot, so an audio cue is more reliable. This directly matches the user’s context-specific tendency for initiating-transfer readiness cues."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user because of limited neck control, and button input is not reliable either. Autocontinue is therefore the preferred low-effort completion method."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the reliable, hands-free option for feeding completion and avoids impossible button presses. It also fits the user’s preference for efficient operation while attention is divided by laptop work."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "The user cannot reliably perform head gestures or button presses, making autocontinue the most feasible option. It also minimizes disruption while working on the laptop."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "open mouth",
+          "rationale": "There is no specific in-a-hurry rule for laptop work with drinking, so the default low-effort method remains appropriate. Open-mouth readiness avoids impossible button presses and preserves some user timing control."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "During laptop work, explicit readiness signaling is less reliable because attention is occupied, and button use is not feasible. Autocontinue best supports hands-free interaction in this context."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For mouth wiping, the user’s preference is stably autocontinue across contexts because open mouth is unnatural and buttons are infeasible. Laptop work further supports minimizing interruption."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served hot, and the user’s default for this situation is to warm it normally. There is no fatigue or hurry today, so the standard warming routine applies."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize front occlusion",
+          "rationale": "The user is working on a laptop positioned in front, so preserving the front line of sight is important. This matches the tendency to prioritize front visibility during screen-focused contexts."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside-mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule linking these two dimensions."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "The user is working on a laptop in front and prefers the screen to remain visible between transfers. Retracting between bites helps reduce prolonged front occlusion."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "No hurry or high-energy condition is present, and the user generally prefers comfort-oriented motion. Slow speed also fits the user’s slow mouth opening and supports careful handling of the meal."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "The user has limited mouth opening, and parallel skewering tends to produce narrower bites that are easier to eat. Nothing in today’s context strongly outweighs that stable comfort preference."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, so inside-mouth transfer is the physically appropriate mode. Working on a laptop does not change that underlying necessity."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000 sec",
+          "rationale": "When working on a laptop in front under neutral conditions, the user prefers a long wait because task engagement can substantially delay intervention. This provides a large safety margin while multitasking."
+        },
+        "web_interface_confirmation": {
+          "choice": "no",
+          "rationale": "When working on a laptop/tablet in front under neutral conditions, the user prefers to skip extra confirmation because divided attention makes it burdensome. This is feasible because they can still use the web interface if needed, but prefer less interruption."
+        }
+      }
+    },
+    {
+      "day": 29,
+      "context": {
+        "meal": "chicken breast strips and hash brown",
+        "setting": "Personal",
+        "time_of_day": "morning",
+        "transient_affective_state": "Slower"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Although the foods are dippable, there are no sauces available today. By hard rule, the robot must choose do not dip when no sauces exist."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "speech + LED",
+          "rationale": "The user prefers redundant cues in a personal setting so it is clear when to take the bite, sip, or wipe. The slower state supports maximizing clarity rather than minimizing signaling."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "speech + LED",
+          "rationale": "In a personal setting, multimodal cues are the user's default because they are easiest to notice. The slower state does not create a reason to reduce cueing, so redundant signaling remains best."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "Head-gesture perception is unreliable for this user because of limited neck control, and buttons are also not feasible. Autocontinue is therefore the most appropriate drinking completion method."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the most reliable and low-effort completion method for feeding, especially since button presses are not feasible. This matches the user's stable preference across contexts."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For wiping, head-gesture perception and button signaling are both poor fits for the user's motor abilities. Autocontinue provides the least effortful and most feasible completion method."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "open mouth",
+          "rationale": "For drinking in a calm personal context, open-mouth readiness gives the user low-effort timing control without requiring buttons. There is no social or multitasking context pushing toward autocontinue."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "open mouth",
+          "rationale": "When eating in a quiet personal setting, the user prefers low-effort control through mouth opening since button use is not reliable. The slower state does not imply hurry or divided attention, so autocontinue is not preferred."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "Mouth wiping defaults to autocontinue because open mouth is not a natural readiness cue and button use is infeasible. This preference is stable across contexts for this task."
+        },
+        "microwave_time": {
+          "choice": "2 min",
+          "rationale": "The meal is a refrigerated savory leftover intended to be served hot, and the user's default for this situation is to warm it normally. The affective state is slower rather than physically fatigued or hurried, so there is no rule pushing toward 1 min or 3 min."
+        },
+        "occlusion_relevance": {
+          "choice": "do not consider occlusion",
+          "rationale": "Today's setting is personal with no social partner or screen target to preserve. In a quiet personal context, the user does not prioritize occlusion avoidance."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because inside mouth transfer is selected, outside-mouth distance does not apply. This also satisfies the hard rule linking transfer mode to distance."
+        },
+        "retract_between_bites": {
+          "choice": "no",
+          "rationale": "In a personal setting with no important visual target to preserve, the user prefers efficiency over retracting. There is no screen-focused or social context that would justify extra retraction time."
+        },
+        "robot_speed": {
+          "choice": "slow",
+          "rationale": "The user generally prefers slow motion for comfort, and their mouth opening may be slow. The current slower state also supports a conservative, predictable pace rather than speeding up."
+        },
+        "skewering_axis": {
+          "choice": "parallel to major axis",
+          "rationale": "Chicken breast strips are larger, thicker pieces where narrower bites are easier given the user's limited mouth opening. No context rule suggests prioritizing perpendicular skewering for acquisition reliability today."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, so inside-mouth transfer is the physically appropriate mode. This preference is stable across contexts because of physical necessity."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "100 sec",
+          "rationale": "In a quiet personal setting, the user's default is a moderate wait to accommodate slow mouth opening and paced interaction. The slower affective state supports keeping this generous but not extreme timeout."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "In a personal setting without hurry or fatigue, the user prefers reliable bite transfer and can use the web interface with assistive access. Confirmation helps avoid failed or empty-fork transfers."
+        }
+      }
+    },
+    {
+      "day": 30,
+      "context": {
+        "meal": "cantaloupes, bananas, watermelon",
+        "setting": "Social with person on Left",
+        "time_of_day": "morning",
+        "transient_affective_state": "Energetic"
+      },
+      "preferences": {
+        "bite_dipping_preference": {
+          "choice": "do not dip",
+          "rationale": "Although the fruit pieces are dippable, there are no sauces available. The hard rule therefore requires the choice to be do not dip."
+        },
+        "convey_robot_ready_for_completing_transfer": {
+          "choice": "LED",
+          "rationale": "In a social setting, the user prefers LED cues for transfer completion to avoid disrupting conversation. This provides a quieter interaction style around the dining partner."
+        },
+        "convey_robot_ready_for_initiating_transfer": {
+          "choice": "LED",
+          "rationale": "For social dining with a person nearby, the user prefers quieter signaling that is less socially intrusive. LED best matches that preference."
+        },
+        "detect_user_completed_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "The user cannot reliably perform head gestures and cannot press buttons, so autocontinue is the stable preferred method for drinking completion. Social context also favors avoiding awkward explicit signals."
+        },
+        "detect_user_completed_transfer_feeding": {
+          "choice": "perception",
+          "rationale": "Perception is the user's preferred feeding completion method because it is reliable and avoids impossible button presses. It is also unobtrusive in social settings."
+        },
+        "detect_user_completed_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "For mouth wiping, the user consistently prefers autocontinue because head-gesture perception is unreliable and button use is infeasible. This remains appropriate in the current social context."
+        },
+        "detect_user_ready_for_initiating_transfer_drinking": {
+          "choice": "autocontinue",
+          "rationale": "The user's social-setting preference for drinking is autocontinue because talking can interfere with open-mouth interpretation and button use is infeasible. This fits the current context."
+        },
+        "detect_user_ready_for_initiating_transfer_feeding": {
+          "choice": "autocontinue",
+          "rationale": "In a social setting, open-mouth detection may be confused by conversation, and the user cannot reliably press buttons. Autocontinue is therefore the preferred low-effort and feasible option."
+        },
+        "detect_user_ready_for_initiating_transfer_wiping": {
+          "choice": "autocontinue",
+          "rationale": "The user's preference for mouth wiping is stably autocontinue across contexts, especially in social situations where explicit signaling would be awkward. It is also the most feasible option given motor limitations."
+        },
+        "microwave_time": {
+          "choice": "no microwave",
+          "rationale": "The meal is fruit intended to be served cold, and the user's preference rules specify no microwaving for fruit or cold dessert in any context. Refrigeration does not override the intended cold serving temperature."
+        },
+        "occlusion_relevance": {
+          "choice": "minimize left occlusion",
+          "rationale": "Today's meal is in a social setting with a person on the left. The user's preferences prioritize keeping the social partner visible by minimizing left-side occlusion."
+        },
+        "outside_mouth_distance": {
+          "choice": "not applicable",
+          "rationale": "Because transfer mode is inside mouth transfer, outside-mouth distance does not apply. This also satisfies the hard rule linking these two dimensions."
+        },
+        "retract_between_bites": {
+          "choice": "yes",
+          "rationale": "In a social setting with a person on the left, the user prefers the robot to retract between bites to reduce prolonged visual obstruction. There is no fatigue or hurry condition pushing toward skipping retraction."
+        },
+        "robot_speed": {
+          "choice": "medium",
+          "rationale": "The user is energetic, and the meal consists of dry, easy foods like fruit. The preference encoding says medium speed is acceptable when the user feels capable and the food is easy to handle."
+        },
+        "skewering_axis": {
+          "choice": "perpendicular to major axis",
+          "rationale": "The meal is easy, stable fruit and the user is energetic, making acquisition reliability a good priority. Perpendicular skewering better supports successful bite acquisition for these foods."
+        },
+        "transfer_mode": {
+          "choice": "inside mouth transfer",
+          "rationale": "The user cannot lean forward due to limited trunk control, so inside-mouth transfer remains necessary. Social context does not override this physical requirement."
+        },
+        "wait_before_autocontinue_seconds": {
+          "choice": "1000 sec",
+          "rationale": "In a social setting, the user prefers a long wait before autocontinue because conversation can delay readiness and completion. This social-context rule is the strongest applicable one for today's meal."
+        },
+        "web_interface_confirmation": {
+          "choice": "yes",
+          "rationale": "In a social setting, the user prefers confirmation to avoid failed or empty-fork transfers in front of others. There is no fatigue or hurry condition here to justify skipping confirmation."
+        }
+      }
+    }
+  ]
+}

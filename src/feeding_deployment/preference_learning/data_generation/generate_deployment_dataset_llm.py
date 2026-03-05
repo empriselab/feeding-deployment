@@ -1,17 +1,3 @@
-#!/usr/bin/env python3
-"""
-LLM-based synthetic dataset generator for long-term (30-day) deployments.
-
-Generates a 30-day dataset using LLM reasoning based on:
-- User physical capability profile (U^phys)
-- A single, fixed user preference encoding for the full deployment (U^pref)
-- Context (X_t): meal, setting, time of day
-- Transient affective state (Y_t)
-
-For each day, makes ONE joint LLM call (all preference dimensions at once) to
-generate the preference bundle for that day.
-"""
-
 import argparse
 import json
 import os
@@ -32,16 +18,12 @@ from feeding_deployment.preference_learning.config.mealtime_context import (
     SETTINGS,
     TIMES_OF_DAY,
 )
-from feeding_deployment.preference_learning.config.physical_capabilities import PHYSICAL_CAPABILITY_PROFILES
 from feeding_deployment.preference_learning.config.preference_bundle import PREFERENCE_BUNDLE
-from feeding_deployment.preference_learning.data_generation.generate_user_preference_encoding import (
-    generate_user_preference_encoding_llm,
-)
 from feeding_deployment.preference_learning.data_generation.prompts.preference_generation import (
     get_preference_generation_prompt,
 )
 
-DEFAULT_MODEL = "gpt-4o"
+DEFAULT_MODEL = "gpt-5.4"
 
 
 def _strip_json_fences(raw: str) -> str:
@@ -73,17 +55,13 @@ def get_meal_info(meal_label: str) -> Dict[str, Any]:
 def apply_hard_rules(preferences: Dict[str, str], meal_info: Dict[str, Any]) -> Dict[str, str]:
     prefs = dict(preferences)
 
-    # Rule 1: If inside mouth transfer, distance must be "near" (represents 0cm)
+    # Rule 1: If inside mouth transfer, distance must be "not applicable"
     if prefs.get("transfer_mode") == "inside mouth transfer":
-        prefs["outside_mouth_distance"] = "near"
+        prefs["outside_mouth_distance"] = "not applicable"
 
     # Rule 2: If no dippable items or no sauces, must be "do not dip"
     if (not meal_info["has_dippable"]) or (not meal_info["has_sauce"]):
         prefs["bite_dipping_preference"] = "do not dip"
-
-    # Rule 3: If do not dip, amount_to_dip must be "not applicable"
-    if prefs.get("bite_dipping_preference") == "do not dip":
-        prefs["amount_to_dip"] = "not applicable"
 
     return prefs
 
@@ -188,7 +166,7 @@ def generate_joint_preferences_with_llm(
             {"role": "user", "content": prompt},
         ],
         temperature=0.3,
-        max_tokens=4000,
+        max_completion_tokens=5000,
         response_format={"type": "json_object"},
     )
 
@@ -200,29 +178,55 @@ def generate_joint_preferences_with_llm(
     return _validate_joint_output_strict(parsed)
 
 
+def _load_encoding_payload(path: str) -> Dict[str, Any]:
+    """
+    Load a user encoding payload. Expected schema:
+      {
+        "user_index": <int or str>,
+        "physical_profile": <str>,
+        "encoding": <dict>
+      }
+    Returns the whole payload dict.
+    """
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    if not isinstance(data, dict):
+        raise TypeError(f"Encoding file must be a JSON object. Got {type(data).__name__}: {path}")
+
+    for k in ("physical_profile", "encoding"):
+        if k not in data:
+            raise KeyError(f'Missing key "{k}" in encoding file: {path}')
+
+    if not isinstance(data["physical_profile"], str) or not data["physical_profile"].strip():
+        raise ValueError(f'"physical_profile" must be a non-empty string in: {path}')
+
+    if not isinstance(data["encoding"], dict) or not data["encoding"]:
+        raise ValueError(f'"encoding" must be a non-empty object in: {path}')
+
+    return data
+
+
 def run_deployment(
+    client: OpenAI,
     user_name: str,
     deployment_id: str,
     physical_profile_label: str,
+    user_preference_encoding: Dict[str, Any],
     seed: Optional[int] = None,
     days: int = 30,
-    api_key: Optional[str] = None,
     model: str = DEFAULT_MODEL,
     output_dir: str = "out",
+    output_filename: Optional[str] = None,
 ) -> str:
     """Generate a deployment dataset using LLM and save as JSON."""
-    api_key = api_key or os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise ValueError("OpenAI API key not found. Please set OPENAI_API_KEY env var or pass --api-key.")
-
-    client = OpenAI(api_key=api_key)
     rng = random.Random(seed)
 
     os.makedirs(output_dir, exist_ok=True)
-    out_path = os.path.join(output_dir, f"{user_name}__{deployment_id}__{days}d.json")
-
-    print(f"Generating user preference encoding for: {physical_profile_label}")
-    user_preference_encoding = generate_user_preference_encoding_llm(client, physical_profile_label, model=model)
+    if output_filename:
+        out_path = os.path.join(output_dir, output_filename)
+    else:
+        out_path = os.path.join(output_dir, f"{user_name}__{deployment_id}__{days}d.json")
 
     day_records: List[Dict[str, Any]] = []
 
@@ -289,18 +293,14 @@ def run_deployment(
 
 
 def parse_args(argv: List[str]) -> argparse.Namespace:
-    physical_labels = [p.label for p in PHYSICAL_CAPABILITY_PROFILES]
+    parser = argparse.ArgumentParser(description="LLM-based dataset generator (deployment).")
 
-    parser = argparse.ArgumentParser(description="LLM-based dataset generator (long-term deployment).")
-    parser.add_argument("--user", required=True, help="User name (e.g., User1)")
+    src = parser.add_mutually_exclusive_group(required=True)
+    src.add_argument("--user-encoding-file", help="Path to a single user encoding JSON file.")
+    src.add_argument("--user-encodings-dir", help="Directory containing user encoding JSON files.")
+
     parser.add_argument("--deployment-id", default="dep1", help="Deployment identifier")
-    parser.add_argument(
-        "--physical-profile",
-        required=True,
-        choices=physical_labels,
-        help="Physical capability profile label",
-    )
-    parser.add_argument("--seed", type=int, default=None, help="Random seed")
+    parser.add_argument("--seed", type=int, default=None, help="Base random seed (varied per file in dir mode).")
     parser.add_argument("--days", type=int, default=30, help="Number of days (default: 30)")
     parser.add_argument("--output-dir", default="out", help="Output directory (default: out)")
     parser.add_argument("--api-key", default=None, help="OpenAI API key (overrides env)")
@@ -310,19 +310,80 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
 
 def main(argv: List[str]) -> int:
     args = parse_args(argv)
+
+    api_key = args.api_key or os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        print("Error: OpenAI API key not found. Set OPENAI_API_KEY or pass --api-key.", file=sys.stderr)
+        return 1
+
     try:
-        out_path = run_deployment(
-            user_name=args.user,
-            deployment_id=args.deployment_id,
-            physical_profile_label=args.physical_profile,
-            seed=args.seed,
-            days=args.days,
-            api_key=args.api_key,
-            model=args.model,
-            output_dir=args.output_dir,
+        client = OpenAI(api_key=api_key)
+        out_dir = os.path.abspath(args.output_dir)
+        os.makedirs(out_dir, exist_ok=True)
+
+        def process_one(path: str, output_filename: str, seed: Optional[int]) -> str:
+            payload = _load_encoding_payload(path)
+            physical_profile_label = payload["physical_profile"]
+            user_preference_encoding = payload["encoding"]
+
+            # Prefer user_index for naming if present, otherwise fallback to basename
+            user_name = str(payload.get("user_index") or os.path.splitext(os.path.basename(path))[0])
+
+            print(f"\n=== Processing: {os.path.basename(path)} ===")
+            print(f"User: {user_name} | Physical profile: {physical_profile_label} | Output: {output_filename}")
+
+            return run_deployment(
+                client=client,
+                user_name=user_name,
+                deployment_id=args.deployment_id,
+                physical_profile_label=physical_profile_label,
+                user_preference_encoding=user_preference_encoding,
+                seed=seed,
+                days=args.days,
+                model=args.model,
+                output_dir=out_dir,
+                output_filename=output_filename,
+            )
+
+        # Single file mode
+        if args.user_encoding_file:
+            in_path = os.path.abspath(args.user_encoding_file)
+            if not os.path.isfile(in_path):
+                raise ValueError(f"--user-encoding-file does not exist: {in_path}")
+
+            out_name = os.path.basename(in_path)
+            out_path = process_one(in_path, out_name, args.seed)
+            print(f"\n✓ Done. Wrote: {out_path}")
+            return 0
+
+        # Directory mode
+        enc_dir = os.path.abspath(args.user_encodings_dir)
+        if not os.path.isdir(enc_dir):
+            raise ValueError(f"--user-encodings-dir is not a directory: {enc_dir}")
+
+        files = sorted(
+            fn
+            for fn in os.listdir(enc_dir)
+            if not fn.startswith(".")
+            and os.path.isfile(os.path.join(enc_dir, fn))
+            and fn.lower().endswith(".json")
         )
-        print(f"\n✓ Done. Wrote: {out_path}")
+        if not files:
+            raise ValueError(f"No .json files found in: {enc_dir}")
+
+        print(f"Batch mode: {len(files)} encoding files found in {enc_dir}")
+        print(f"Writing outputs to: {out_dir}")
+
+        base_seed = args.seed
+        for idx, fn in enumerate(files, start=1):
+            in_path = os.path.join(enc_dir, fn)
+            seed_i = None if base_seed is None else (base_seed + idx)
+            out_path = process_one(in_path, fn, seed_i)
+            print(f"✓ Wrote: {out_path}")
+
+        print("\n✓ Done (batch).")
         return 0
+
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         import traceback

@@ -18,12 +18,14 @@ Dining scenarios may vary along three factors:
 
 1. Environmental dining context. Examples include:
 - eating alone in a quiet personal setting
-- eating in a social setting with another person nearby (might be sitting to their left or to their right)
-- eating while watching television
-- eating while working on a laptop or tablet
+- eating in a social setting with a person to their left
+- eating in a social setting with a person to their right
+- eating while watching television infront of them
+- eating while working on a laptop or tablet in front of them
 
 2. Food items being served. Examples include:
 - meats such as chicken, beef, pork
+- dips such as barbeque sauce, ranch dressing, ketchup
 - desserts such as brownies
 - fruits such as apples, oranges, strawberries
 - foods with sauces or dips
@@ -32,8 +34,8 @@ Dining scenarios may vary along three factors:
 - neutral
 - in a hurry
 - relaxed with ample time
-- energetic
-- fatigued
+- physically energetic
+- physically fatigued
 
 User preferences may depend on combinations of these factors. For example:
 - In a social setting, a user may prefer using a button instead of open-mouth detection to initiate bites because open-mouth gestures can be confused with talking.

@@ -1,15 +1,15 @@
-Consider a care recipient being assisted by a robotic mealtime system. The robot may microwave a meal, sets it up on a table, and can then assist with feeding, drinking, and mouth wiping.
+Consider a care recipient being assisted during meals by a robotic arm. The robot may microwave a meal, set it up on a table, move to the right side of the user, and then assist with feeding, drinking, and mouth wiping.
 
-For each task:
+For each assistance task within feeding, drinking, or mouth wiping:
 1. The robot acquires the appropriate tool (feeding utensil, drink, or mouth wiper).
 2. For feeding, the robot first acquires a food item from the plate (bite acquisition).
-3. The robot then moves to a staging configuration. The staging configuration is a joint configuration the robot moves to before initiating transfers. From this configuration, the user's head is visible in the robot’s in-hand camera.
-4. The robot signals that it is ready to initiate transfer.
-5. The user signals readiness.
-6. The robot moves the tool to the transfer location (near or inside the mouth).
-7. The robot signals that transfer can be completed.
-8. The user completes the transfer (bite, sip, or wipe).
-9. The user signals that the transfer is complete.
+3. The robot then moves to a staging configuration. The staging configuration is a joint configuration that the robot moves to before initiating transfers. From this configuration, the user's head is visible in the robot’s in-hand camera.
+4. The robot signals that it is ready to initiate transfer (it is ready to begin moving toward the user's mouth).
+5. The robot detects or receives a signal from the user that they are ready for initiating transfer.
+6. The robot moves the tool to the transfer location (either near the mouth or inside the mouth).
+7. The robot signals that transfer can be completed (the tool has reached the transfer location and the user can take the bite, sip, or wipe).
+8. The user takes a bite, takes a sip, or performs mouth wiping.
+9. The user signals that the transfer (bite, sip, or wipe) is complete.
 10. The robot returns to the staging configuration.
 
 The robot exposes configurable components called preference dimensions. Each dimension corresponds to a parameter of the mealtime-assistance system that can be selected by the user.

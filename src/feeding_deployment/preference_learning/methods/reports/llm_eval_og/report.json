@@ -1,0 +1,299 @@
+{
+  "users": [
+    {
+      "file": "../data/user1__dep1__30d.json",
+      "user": "user1",
+      "meals": 30,
+      "num_rollouts": 1,
+      "mean_corrections_to_stop": 4.1,
+      "accuracy_after_m": {
+        "0": 0.7684210526315788,
+        "1": 0.763374485596708,
+        "2": 0.7151702786377709,
+        "3": 0.7734375,
+        "4": 0.7111111111111112,
+        "5": 0.7642857142857143,
+        "6": 0.6373626373626374,
+        "7": 0.6527777777777778,
+        "8": 0.6969696969696969,
+        "9": 0.7833333333333333,
+        "10": 0.7999999999999999,
+        "11": 0.925,
+        "12": 0.7142857142857143,
+        "13": 0.8333333333333334,
+        "14": 0.8,
+        "15": 1.0
+      },
+      "per_day_metrics": [
+        {
+          "day": 1,
+          "affective_state": "Neutral",
+          "acc_m0": 0.3684210526315789,
+          "acc_m1": 0.3888888888888889,
+          "m_star": 11.0
+        },
+        {
+          "day": 2,
+          "affective_state": "Slower",
+          "acc_m0": 0.2631578947368421,
+          "acc_m1": 0.2777777777777778,
+          "m_star": 15.0
+        },
+        {
+          "day": 3,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.5789473684210527,
+          "acc_m1": 0.5555555555555556,
+          "m_star": 9.0
+        },
+        {
+          "day": 4,
+          "affective_state": "Energetic",
+          "acc_m0": 0.47368421052631576,
+          "acc_m1": 0.5,
+          "m_star": 11.0
+        },
+        {
+          "day": 5,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.3684210526315789,
+          "acc_m1": 0.3888888888888889,
+          "m_star": 11.0
+        },
+        {
+          "day": 6,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.7894736842105263,
+          "acc_m1": 0.8888888888888888,
+          "m_star": 2.0
+        },
+        {
+          "day": 7,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.7894736842105263,
+          "acc_m1": 0.8333333333333334,
+          "m_star": 3.0
+        },
+        {
+          "day": 8,
+          "affective_state": "Neutral",
+          "acc_m0": 0.8947368421052632,
+          "acc_m1": 0.9444444444444444,
+          "m_star": 2.0
+        },
+        {
+          "day": 9,
+          "affective_state": "Slower",
+          "acc_m0": 0.8421052631578947,
+          "acc_m1": 0.3333333333333333,
+          "m_star": 6.0
+        },
+        {
+          "day": 10,
+          "affective_state": "Hurried",
+          "acc_m0": 0.7368421052631579,
+          "acc_m1": 0.8333333333333334,
+          "m_star": 3.0
+        },
+        {
+          "day": 11,
+          "affective_state": "Hurried",
+          "acc_m0": 1.0,
+          "acc_m1": 1.0,
+          "m_star": 0.0
+        },
+        {
+          "day": 12,
+          "affective_state": "Slower",
+          "acc_m0": 0.9473684210526315,
+          "acc_m1": 1.0,
+          "m_star": 1.0
+        },
+        {
+          "day": 13,
+          "affective_state": "Hurried",
+          "acc_m0": 0.8421052631578947,
+          "acc_m1": 0.8888888888888888,
+          "m_star": 3.0
+        },
+        {
+          "day": 14,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.7894736842105263,
+          "acc_m1": 0.7777777777777778,
+          "m_star": 5.0
+        },
+        {
+          "day": 15,
+          "affective_state": "Energetic",
+          "acc_m0": 0.9473684210526315,
+          "acc_m1": 1.0,
+          "m_star": 1.0
+        },
+        {
+          "day": 16,
+          "affective_state": "Slower",
+          "acc_m0": 0.8421052631578947,
+          "acc_m1": 0.8888888888888888,
+          "m_star": 4.0
+        },
+        {
+          "day": 17,
+          "affective_state": "Hurried",
+          "acc_m0": 0.8947368421052632,
+          "acc_m1": 1.0,
+          "m_star": 1.0
+        },
+        {
+          "day": 18,
+          "affective_state": "Slower",
+          "acc_m0": 0.9473684210526315,
+          "acc_m1": 1.0,
+          "m_star": 1.0
+        },
+        {
+          "day": 19,
+          "affective_state": "Neutral",
+          "acc_m0": 0.6842105263157895,
+          "acc_m1": 0.8333333333333334,
+          "m_star": 5.0
+        },
+        {
+          "day": 20,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.8947368421052632,
+          "acc_m1": 1.0,
+          "m_star": 1.0
+        },
+        {
+          "day": 21,
+          "affective_state": "Fatigued",
+          "acc_m0": 1.0,
+          "acc_m1": 1.0,
+          "m_star": 0.0
+        },
+        {
+          "day": 22,
+          "affective_state": "Hurried",
+          "acc_m0": 0.7368421052631579,
+          "acc_m1": 0.7777777777777778,
+          "m_star": 5.0
+        },
+        {
+          "day": 23,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.8947368421052632,
+          "acc_m1": 0.8333333333333334,
+          "m_star": 2.0
+        },
+        {
+          "day": 24,
+          "affective_state": "Neutral",
+          "acc_m0": 0.9473684210526315,
+          "acc_m1": 0.8888888888888888,
+          "m_star": 3.0
+        },
+        {
+          "day": 25,
+          "affective_state": "Energetic",
+          "acc_m0": 1.0,
+          "acc_m1": 1.0,
+          "m_star": 0.0
+        },
+        {
+          "day": 26,
+          "affective_state": "Slower",
+          "acc_m0": 0.9473684210526315,
+          "acc_m1": 1.0,
+          "m_star": 1.0
+        },
+        {
+          "day": 27,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.2631578947368421,
+          "acc_m1": 0.2777777777777778,
+          "m_star": 11.0
+        },
+        {
+          "day": 28,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.9473684210526315,
+          "acc_m1": 1.0,
+          "m_star": 1.0
+        },
+        {
+          "day": 29,
+          "affective_state": "Slower",
+          "acc_m0": 0.9473684210526315,
+          "acc_m1": 1.0,
+          "m_star": 1.0
+        },
+        {
+          "day": 30,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.47368421052631576,
+          "acc_m1": 0.5,
+          "m_star": 4.0
+        }
+      ],
+      "by_affective_state": {
+        "Energetic": {
+          "acc_m0": 0.8070175438596491,
+          "mean_m_star": 4.0
+        },
+        "Fatigued": {
+          "acc_m0": 0.7081339712918661,
+          "mean_m_star": 4.454545454545454
+        },
+        "Hurried": {
+          "acc_m0": 0.8421052631578947,
+          "mean_m_star": 2.4
+        },
+        "Neutral": {
+          "acc_m0": 0.7236842105263157,
+          "mean_m_star": 5.25
+        },
+        "Slower": {
+          "acc_m0": 0.819548872180451,
+          "mean_m_star": 4.142857142857143
+        }
+      },
+      "per_dimension_m0_accuracy": {
+        "microwave_time": 0.6,
+        "occlusion_relevance": 0.8666666666666667,
+        "robot_speed": 0.5333333333333333,
+        "skewering_axis": 0.7666666666666667,
+        "web_interface_confirmation": 0.8666666666666667,
+        "transfer_mode": 0.7666666666666667,
+        "outside_mouth_distance": 0.7666666666666667,
+        "robot_ready_cue": 0.8,
+        "bite_initiation_feeding": 0.7666666666666667,
+        "bite_initiation_drinking": 0.7666666666666667,
+        "bite_initiation_wiping": 0.7666666666666667,
+        "robot_bite_available_cue": 0.8,
+        "bite_completion_feeding": 0.8333333333333334,
+        "bite_completion_drinking": 0.8666666666666667,
+        "bite_completion_wiping": 0.8666666666666667,
+        "retract_between_bites": 0.7666666666666667,
+        "bite_dipping_preference": 0.8,
+        "amount_to_dip": 0.7333333333333333,
+        "wait_before_autocontinue_seconds": 0.6666666666666666
+      },
+      "summary_statistics": {
+        "mean_acc_m0_early_days_1_5": 0.41052631578947363,
+        "mean_acc_m0_late_days_26_30": 0.7157894736842105,
+        "delta_acc_m0_late_minus_early": 0.3052631578947369,
+        "mean_m_star_early_days_1_5": 11.4,
+        "mean_m_star_late_days_26_30": 3.6,
+        "delta_m_star_late_minus_early": -7.800000000000001,
+        "pct_zero_correction_overall": 10.0,
+        "pct_zero_correction_final_week_days_24_30": 14.285714285714286,
+        "best_single_day_acc_m0": 1.0,
+        "worst_single_day_acc_m0": 0.2631578947368421
+      }
+    }
+  ],
+  "run_timestamp": "20260304_154818",
+  "ablation": "full",
+  "metrics_notes": "Acc(t, m=1): On days where m=0 was perfect (no corrections needed), acc_m1 is recorded as 1.0 so Plot C uses the same set of days for both lines."
+}

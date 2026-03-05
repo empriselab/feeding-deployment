@@ -1,0 +1,18 @@
+You are helping a feeding-assistance robot maintain a concise semantic memory of a user's dining preferences.
+
+USER PHYSICAL CAPABILITY PROFILE:
+{physical_profile}
+
+PREVIOUS SUMMARY:
+{previous_ltm_summary}
+
+NEW EPISODES SINCE THAT SUMMARY (context + final accepted preferences):
+{new_episodes_block}
+
+Task: Update the summary to incorporate the new evidence above, explicitly reflecting how preferences evolve over time. When the same context produced different preference bundles across episodes, preserve both patterns as context-conditional variation — do not average or discard either. Clearly describe timeline-style shifts (for example: “earlier episodes favored X, but more recent episodes favor Y under the same conditions”). Flag dimensions where the user shows variability, as these likely depend on unobserved internal states. Retain everything from the previous summary unless directly contradicted by new evidence.
+
+Allowed options per dimension (only use these exact strings when you mention concrete values):
+{options_block}
+
+Keep the summary to 6–10 bullet points normally; you may use up to ~12 if there are genuine conditional branches to preserve. This summary will be used as a prior for the next meal.
+
