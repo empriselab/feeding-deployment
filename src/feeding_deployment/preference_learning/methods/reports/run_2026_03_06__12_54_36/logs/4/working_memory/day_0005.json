@@ -1,0 +1,36 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 5,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 5,
+      "m": 1,
+      "corrected": {
+        "bite_dipping_preference": "do not dip"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 5,
+      "m": 2,
+      "corrected": {
+        "bite_dipping_preference": "do not dip",
+        "web_interface_confirmation": "no"
+      }
+    }
+  ]
+}

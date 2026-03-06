@@ -1,6 +1,8 @@
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, TypeVar
 from collections import defaultdict
 import numpy as np
+import argparse
+import json
 from pathlib import Path
 
 try:
@@ -103,7 +105,6 @@ def _generate_metrics(user_reports: List[Dict[str, Any]], report_dir: Path) -> N
         "mean_mismatches_m1_last_week_days_24_30": _safe_mean(last_week_mismatches_m1),
     }
 
-    import json
     with open(report_dir / "summary_metrics.json", "w", encoding="utf-8") as f:
         json.dump(summary_metrics, f, indent=2)
 
@@ -255,3 +256,30 @@ def _generate_metrics(user_reports: List[Dict[str, Any]], report_dir: Path) -> N
         plt.close()
 
     print(f"Saved plots to {report_dir}")
+
+
+if __name__ == "__main__":
+    
+    parser = argparse.ArgumentParser(
+        description="Regenerate metrics/plots from an existing report.json"
+    )
+    parser.add_argument(
+        "report_json",
+        help="Path to report.json",
+    )
+    args = parser.parse_args()
+
+    report_path = Path(args.report_json)
+    if not report_path.exists():
+        raise SystemExit(f"report.json not found: {report_path}")
+
+    with open(report_path, "r", encoding="utf-8") as f:
+        report = json.load(f)
+
+    user_reports = report.get("users")
+    if not isinstance(user_reports, list):
+        raise SystemExit("Invalid report.json: missing or invalid 'users' field")
+
+    report_dir = report_path.parent
+
+    _generate_metrics(user_reports, report_dir)

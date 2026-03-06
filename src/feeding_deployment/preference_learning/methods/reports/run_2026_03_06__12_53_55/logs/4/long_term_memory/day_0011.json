@@ -1,0 +1,89 @@
+{
+  "run_timestamp": "2026_03_06__12_53_55",
+  "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+  "user": "4",
+  "physical_profile_label": "limited_arms_no_trunk_limited_head",
+  "rollout": 0,
+  "day": 11,
+  "context": {
+    "meal": "cantaloupes, bananas, watermelon",
+    "setting": "Social with person in Front",
+    "time_of_day": "evening",
+    "transient_affective_state": "Energetic"
+  },
+  "episode_text": "day=11; meal=cantaloupes, bananas, watermelon; setting=Social with person in Front; time_of_day=evening;\npreferences: microwave_time=no microwave; occlusion_relevance=do not consider occlusion; robot_speed=slow; skewering_axis=perpendicular to major axis; web_interface_confirmation=yes; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=open mouth; detect_user_ready_for_initiating_transfer_drinking=open mouth; detect_user_ready_for_initiating_transfer_wiping=open mouth; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=yes; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=100 sec",
+  "ltm_summary_raw": {
+    "microwave_time": {
+      "default": "no microwave",
+      "user_tendencies": "IF food is cold-served fruit or dessert AND affective state is neutral AND dining context is personal, social, or attention-directed THEN no microwave BECAUSE repeated cold-food meals, now including a front-social fruit meal, were served without reheating, consistent with intended cold serving. IF food is a warm savory meal AND affective state is neutral AND dining context involves watching TV or working on a laptop/tablet, including front-, left-, or right-attention contexts, THEN 3 min BECAUSE repeated warm savory meals in attention-directed contexts were reheated for 3 min, indicating a stable preference for thoroughly warming hot foods in those settings. IF food is a warm savory meal AND affective state is neutral AND dining context is social with a person in front THEN 2 min BECAUSE the observed front-social savory meal used moderate reheating, suggesting a context-specific preference for somewhat warm but not maximally hot food in that social setting."
+    },
+    "occlusion_relevance": {
+      "default": "do not consider occlusion",
+      "user_tendencies": "IF dining context includes a salient person or focal activity in front of the user AND affective state is neutral AND food condition is warm savory meals or general meals in front-attention contexts THEN minimize front occlusion BECAUSE repeated TV-in-front, laptop-in-front, front-social savory, and laptop-on-left meals selected front-occlusion minimization, indicating a stable preference to preserve the forward view when that view is important. IF dining context is social with a person in front AND affective state is neutral AND food condition is cold fruit THEN do not consider occlusion BECAUSE the newly observed front-social fruit meal did not prioritize occlusion avoidance, showing that front-social context alone does not always trigger occlusion minimization. IF dining context includes a focal activity to the right of the user AND affective state is neutral AND food condition is any food THEN minimize right occlusion BECAUSE right-side attention contexts selected right-occlusion minimization, showing a preference to preserve the attended right-side view. IF dining context includes a focal activity to the left of the user AND affective state is neutral AND food condition is any food THEN minimize left occlusion BECAUSE left-side attention meals prioritized preserving the attended left-side view."
+    },
+    "robot_speed": {
+      "default": "slow",
+      "user_tendencies": "IF dining context is personal, social, or involves a concurrent visually attended activity AND affective state is neutral AND food condition is any food THEN slow BECAUSE the user selected slow speed across most observed meals, now including a front-social fruit meal, indicating a generally comfort-first interaction style. IF dining context involves working on a laptop on the left AND affective state is neutral AND food condition is cold fruit THEN medium BECAUSE the observed left-laptop fruit meal used medium speed, suggesting that in at least some multitasking, low-risk meals the user may accept slightly faster motion."
+    },
+    "skewering_axis": {
+      "default": "perpendicular to major axis",
+      "user_tendencies": "IF food requires fork acquisition AND affective state is neutral AND dining context is general, social, laptop-related, or includes fruit/dessert pieces THEN perpendicular to major axis BECAUSE this option was selected across most observed meals, including the new front-social fruit meal, favoring reliable bite acquisition. IF food is a warm savory item in strips, pieces, sandwich bites, or nugget-like pieces AND affective state is neutral AND dining context involves watching TV to the right, watching TV in front, or social interaction with a person in front THEN parallel to major axis BECAUSE repeated meals with solid savory bite-sized foods in these contexts used parallel skewering, suggesting a preference for narrower or more manageable bites for these foods."
+    },
+    "web_interface_confirmation": {
+      "default": "yes",
+      "user_tendencies": "IF dining context is social, including social meals with a person in front, AND affective state is neutral AND food condition is any food requiring bite acquisition THEN yes BECAUSE observed social meals, now including a front-social fruit meal, used explicit confirmation, indicating a preference to verify bite acquisition when errors may be disruptive or visible. IF dining context involves watching TV to the right or in front, or working on a laptop positioned to the right or left, AND affective state is neutral AND food condition is any food requiring bite acquisition THEN no BECAUSE repeated attention-directed laptop/TV meals skipped confirmation, suggesting a preference to reduce interaction burden while multitasking. IF dining context involves watching TV to the left or working on a laptop in front of the user AND affective state is neutral AND food condition is any food requiring bite acquisition THEN yes BECAUSE observed meals in those contexts used explicit confirmation, indicating that some attention-directed settings still favor verification."
+    },
+    "transfer_mode": {
+      "default": "inside mouth transfer",
+      "user_tendencies": "IF dining context is any observed context AND affective state is neutral AND food condition is any food THEN inside mouth transfer BECAUSE the user cannot lean forward due to limited trunk control, and all observed meals used inside-mouth transfer."
+    },
+    "outside_mouth_distance": {
+      "default": "not applicable",
+      "user_tendencies": "IF transfer_mode is inside mouth transfer THEN not applicable BECAUSE outside-mouth distance does not apply, and the user has consistently selected inside-mouth transfer."
+    },
+    "convey_robot_ready_for_initiating_transfer": {
+      "default": "LED",
+      "user_tendencies": "IF dining context involves working on a laptop, watching TV to the left, watching TV to the right, watching TV in front, or social interaction including a person in front AND affective state is neutral AND food condition is any task THEN LED BECAUSE repeated meals in these contexts, now including a front-social fruit meal, used quiet visual initiation cues, indicating a stable preference for nonverbal signaling. IF dining context involves watching TV in front of the user AND affective state is neutral AND food condition is any task in an isolated earlier meal THEN speech + LED BECAUSE one earlier front-TV meal used multimodal initiation cues, but the stronger repeated pattern favors LED alone."
+    },
+    "detect_user_ready_for_initiating_transfer_feeding": {
+      "default": "open mouth",
+      "user_tendencies": "IF dining context is social, including social meals with a person in front, AND affective state is neutral AND food condition is feeding THEN open mouth BECAUSE the user cannot reliably press buttons and repeatedly selected open-mouth readiness in social meals, now including a front-social fruit meal, showing that low-effort initiation outweighed possible ambiguity from conversation in the observed data. IF dining context involves working on a laptop or watching TV, including front-, left-, or right-side attention contexts, AND affective state is neutral AND food condition is feeding THEN autocontinue BECAUSE the user repeatedly selected autocontinue in attention-divided contexts, indicating a stable preference to minimize interaction burden when occupied."
+    },
+    "detect_user_ready_for_initiating_transfer_drinking": {
+      "default": "open mouth",
+      "user_tendencies": "IF dining context is social, including social meals with a person in front, AND affective state is neutral AND food condition is drinking THEN open mouth BECAUSE the user cannot reliably press buttons and repeatedly selected open-mouth readiness for drink initiation in social contexts, including the new front-social fruit meal. IF dining context involves working on a laptop or watching TV, including front-, left-, or right-side attention contexts, AND affective state is neutral AND food condition is drinking THEN autocontinue BECAUSE the user repeatedly selected autocontinue in attention-divided contexts, preferring lower-effort automation when occupied."
+    },
+    "detect_user_ready_for_initiating_transfer_wiping": {
+      "default": "open mouth",
+      "user_tendencies": "IF dining context is social, including social meals with a person in front, AND affective state is neutral AND food condition is mouth wiping THEN open mouth BECAUSE the user cannot reliably press buttons and repeatedly selected open-mouth readiness for wiping initiation in social contexts, including the new front-social fruit meal. IF dining context involves working on a laptop or watching TV, including front-, left-, or right-side attention contexts, AND affective state is neutral AND food condition is mouth wiping THEN autocontinue BECAUSE the user repeatedly selected autocontinue in attention-divided contexts, consistent with preferring reduced interaction demand when occupied."
+    },
+    "convey_robot_ready_for_completing_transfer": {
+      "default": "LED",
+      "user_tendencies": "IF dining context involves working on a laptop, watching TV to the left, watching TV to the right, watching TV in front, or social interaction including a person in front AND affective state is neutral AND food condition is any task THEN LED BECAUSE the user consistently selected nonverbal completion cues across these observed contexts, now including a front-social fruit meal. IF dining context involves watching TV in front of the user AND affective state is neutral AND food condition is any task in an isolated earlier meal THEN speech + LED BECAUSE one earlier front-TV meal used multimodal completion cues, but the stronger repeated pattern favors LED alone."
+    },
+    "detect_user_completed_transfer_feeding": {
+      "default": "perception",
+      "user_tendencies": "IF task is feeding AND affective state is neutral AND dining context is any observed context THEN perception BECAUSE the user selected sensor-based bite completion detection in all observed meals, including the new front-social fruit meal, and this avoids button presses the user cannot reliably perform."
+    },
+    "detect_user_completed_transfer_drinking": {
+      "default": "autocontinue",
+      "user_tendencies": "IF task is drinking AND affective state is neutral AND dining context is any observed context THEN autocontinue BECAUSE the user cannot reliably press buttons or perform head gestures, and all observed meals used autocontinue."
+    },
+    "detect_user_completed_transfer_wiping": {
+      "default": "autocontinue",
+      "user_tendencies": "IF task is mouth wiping AND affective state is neutral AND dining context is any observed context THEN autocontinue BECAUSE the user cannot reliably press buttons or perform head gestures, and all observed meals used autocontinue."
+    },
+    "retract_between_bites": {
+      "default": "no",
+      "user_tendencies": "IF dining context includes a salient person or focal activity in front of the user AND affective state is neutral AND food condition is any food THEN yes BECAUSE the user repeatedly selected retracting between bites in front-attention contexts including social-front, laptop-in-front, multiple TV-in-front meals, the laptop-on-left meal that still prioritized front visibility, and the new front-social fruit meal, indicating willingness to accept longer meal time to reduce prolonged visual obstruction when the attended view matters. IF dining context includes a focal activity to the right of the user AND affective state is neutral AND food condition is any food THEN yes BECAUSE right-side attention meals used retracting, showing the same preference when preserving the right-side view matters. IF dining context includes a focal activity to the left of the user AND affective state is neutral AND food condition is any food THEN yes BECAUSE left-side attention meals also used retracting, extending this preference to left-side view preservation."
+    },
+    "bite_dipping_preference": {
+      "default": "do not dip",
+      "user_tendencies": "IF food has no dip or sauce THEN do not dip BECAUSE dipping is not applicable. IF food includes a dip or sauce AND dining context is social, including social meals with a person in front, AND affective state is neutral THEN less BECAUSE observed social meals with dip used less dipping, consistent with limiting messiness in social settings. IF food includes a dip or sauce AND dining context involves working on a laptop AND affective state is neutral THEN do not dip BECAUSE observed laptop meals with sauce or whipped cream used no dipping, indicating a stronger mess-avoidance preference when multitasking around equipment."
+    },
+    "wait_before_autocontinue_seconds": {
+      "default": "100 sec",
+      "user_tendencies": "IF dining context is social, including social meals with a person in front, AND affective state is neutral AND food condition is any task using autocontinue THEN 100 sec BECAUSE the user selected a moderate wait in observed social meals, now including a front-social fruit meal, balancing time to respond with meal efficiency. IF dining context involves watching TV to the left AND affective state is neutral AND food condition is any task using autocontinue THEN 100 sec BECAUSE observed left-oriented attention meals used the moderate wait. IF dining context involves working on a laptop in front or to the right, or watching TV to the right or in front of the user AND affective state is neutral AND food condition is any task using autocontinue THEN 1000 sec BECAUSE repeated attention-divided meals in those contexts used the longest wait, indicating a strong preference for extra time before automatic progression when attention is shared with another activity."
+    }
+  }
+}

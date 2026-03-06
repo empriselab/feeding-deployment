@@ -1,0 +1,89 @@
+{
+  "run_timestamp": "2026_03_06__12_53_55",
+  "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+  "user": "1",
+  "physical_profile_label": "limited_arms_no_trunk_good_head",
+  "rollout": 0,
+  "day": 2,
+  "context": {
+    "meal": "bananas, brownies, and chocolate sauce",
+    "setting": "Watching TV with TV on Left",
+    "time_of_day": "morning",
+    "transient_affective_state": "Energetic"
+  },
+  "episode_text": "day=2; meal=bananas, brownies, and chocolate sauce; setting=Watching TV with TV on Left; time_of_day=morning;\npreferences: microwave_time=3 min; occlusion_relevance=minimize left occlusion; robot_speed=medium; skewering_axis=perpendicular to major axis; web_interface_confirmation=yes; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=speech + LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=speech + LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=yes; bite_dipping_preference=less; wait_before_autocontinue_seconds=1000 sec",
+  "ltm_summary_raw": {
+    "microwave_time": {
+      "default": "1 min",
+      "user_tendencies": "IF dining context is watching TV with visual focus on the left AND affective state is neutral AND food includes dessert items with sauce THEN 3 min BECAUSE the user explicitly chose substantially hotter food in the observed TV-left meal. No broader context-dependent variation is established yet."
+    },
+    "occlusion_relevance": {
+      "default": "do not consider occlusion",
+      "user_tendencies": "IF dining context includes a social partner or visual focus in front of the user AND affective state is neutral AND food has no special sauce/dip condition THEN minimize front occlusion BECAUSE the observed social-front meal shows the user prefers preserving the forward view. IF dining context includes a TV or other visual focus on the left AND affective state is neutral AND food includes dessert items with sauce THEN minimize left occlusion BECAUSE the user explicitly chose to preserve the left-side view while watching TV."
+    },
+    "robot_speed": {
+      "default": "fast",
+      "user_tendencies": "IF dining context is watching TV with visual focus on the left AND affective state is neutral AND food includes dessert items with sauce THEN medium BECAUSE the user selected a slower-than-default pace in that context, suggesting greater comfort or attentional preference while watching TV. Otherwise, no context-dependent variation observed yet."
+    },
+    "skewering_axis": {
+      "default": "perpendicular to major axis",
+      "user_tendencies": "IF any dining context AND any affective state AND feeding transfer occurs THEN perpendicular to major axis BECAUSE the user selected this option across observed meals, favoring reliable bite acquisition."
+    },
+    "web_interface_confirmation": {
+      "default": "no",
+      "user_tendencies": "IF dining context is watching TV with visual focus on the left AND affective state is neutral AND food includes sauce or dip THEN yes BECAUSE the user explicitly chose confirmation in the observed TV-left sauced meal, consistent with wanting extra verification when bite acquisition may be messier or less certain. IF dining context is a quiet or social meal without special sauce/dip concerns AND affective state is neutral AND food has no special sauce/dip condition THEN no BECAUSE the prior evidence supports a lower-interaction workflow when extra confirmation is not needed."
+    },
+    "transfer_mode": {
+      "default": "inside mouth transfer",
+      "user_tendencies": "IF user cannot lean forward comfortably in any dining context AND affective state is neutral AND food has no special sauce/dip condition THEN inside mouth transfer BECAUSE the user's physical limitations make outside-mouth transfer less compatible. IF any dining context AND any affective state AND any food condition THEN inside mouth transfer BECAUSE all observed selections are consistent with the user's inability to lean forward."
+    },
+    "outside_mouth_distance": {
+      "default": "not applicable",
+      "user_tendencies": "IF transfer_mode is inside mouth transfer in any dining context AND any affective state AND any food condition THEN not applicable BECAUSE this parameter only applies to outside-mouth transfer, which is not supported by current evidence and is less compatible with the user's inability to lean forward."
+    },
+    "convey_robot_ready_for_initiating_transfer": {
+      "default": "LED",
+      "user_tendencies": "IF dining context is watching TV with visual focus on the left AND affective state is neutral AND food includes dessert items with sauce THEN speech + LED BECAUSE the user chose a multimodal cue in that context, likely favoring a more noticeable signal while attention is shared with TV viewing. Otherwise, no context-dependent variation observed yet."
+    },
+    "detect_user_ready_for_initiating_transfer_feeding": {
+      "default": "autocontinue",
+      "user_tendencies": "IF any dining context where button use would be required AND any affective state AND any food condition THEN not button-compatible BECAUSE severe upper-limb paralysis prevents physical button use. IF dining context is social with a person in front AND affective state is neutral AND food has no special sauce/dip condition THEN autocontinue BECAUSE the user explicitly chose low-effort automatic initiation in the observed social meal. IF dining context is watching TV with visual focus on the left AND affective state is neutral AND food includes dessert items with sauce THEN autocontinue BECAUSE the user again chose automatic initiation, indicating a stable preference for low-effort transfer initiation."
+    },
+    "detect_user_ready_for_initiating_transfer_drinking": {
+      "default": "autocontinue",
+      "user_tendencies": "IF any dining context where button use would be required AND any affective state AND any food condition THEN not button-compatible BECAUSE severe upper-limb paralysis prevents physical button use. IF dining context is social with a person in front AND affective state is neutral AND food has no special sauce/dip condition THEN autocontinue BECAUSE the user chose automatic initiation in the observed social meal. IF dining context is watching TV with visual focus on the left AND affective state is neutral AND food includes dessert items with sauce THEN autocontinue BECAUSE the user again chose automatic initiation, indicating a stable low-effort preference."
+    },
+    "detect_user_ready_for_initiating_transfer_wiping": {
+      "default": "autocontinue",
+      "user_tendencies": "IF any dining context where button use would be required AND any affective state AND any food condition THEN not button-compatible BECAUSE severe upper-limb paralysis prevents physical button use. IF dining context is social with a person in front AND affective state is neutral AND food has no special sauce/dip condition THEN autocontinue BECAUSE the user chose automatic initiation in the observed social meal. IF dining context is watching TV with visual focus on the left AND affective state is neutral AND food includes dessert items with sauce THEN autocontinue BECAUSE the user again chose automatic initiation, indicating a stable low-effort preference."
+    },
+    "convey_robot_ready_for_completing_transfer": {
+      "default": "LED",
+      "user_tendencies": "IF dining context is watching TV with visual focus on the left AND affective state is neutral AND food includes dessert items with sauce THEN speech + LED BECAUSE the user chose a multimodal completion cue in that context, likely preferring a more salient signal while attention is divided. Otherwise, no context-dependent variation observed yet."
+    },
+    "detect_user_completed_transfer_feeding": {
+      "default": "perception",
+      "user_tendencies": "IF any dining context AND any affective state AND feeding transfer occurs THEN perception BECAUSE the user consistently selected the reliable low-effort completion method, and button use is incompatible with severe upper-limb paralysis."
+    },
+    "detect_user_completed_transfer_drinking": {
+      "default": "autocontinue",
+      "user_tendencies": "IF any dining context where button use would be required AND any affective state AND drinking transfer occurs THEN not button-compatible BECAUSE severe upper-limb paralysis prevents physical button use. IF dining context is social with a person in front AND affective state is neutral AND food has no special sauce/dip condition THEN autocontinue BECAUSE the user chose automatic completion for drinking in the observed social meal. IF dining context is watching TV with visual focus on the left AND affective state is neutral AND food includes dessert items with sauce THEN autocontinue BECAUSE the user again chose automatic completion, indicating a stable preference for low-effort progression."
+    },
+    "detect_user_completed_transfer_wiping": {
+      "default": "autocontinue",
+      "user_tendencies": "IF any dining context where button use would be required AND any affective state AND mouth wiping occurs THEN not button-compatible BECAUSE severe upper-limb paralysis prevents physical button use. IF dining context is social with a person in front AND affective state is neutral AND food has no special sauce/dip condition THEN autocontinue BECAUSE the user chose automatic completion for wiping in the observed social meal. IF dining context is watching TV with visual focus on the left AND affective state is neutral AND food includes dessert items with sauce THEN autocontinue BECAUSE the user again chose automatic completion, indicating a stable preference for low-effort progression."
+    },
+    "retract_between_bites": {
+      "default": "no",
+      "user_tendencies": "IF dining context is social with a person in front AND affective state is neutral AND food has no special sauce/dip condition THEN no BECAUSE the user accepted less interruption and shorter meal time in that meal. IF dining context includes a TV or other visual focus on the left AND affective state is neutral AND food includes dessert items with sauce THEN yes BECAUSE the user explicitly chose retraction in the observed TV-left meal, consistent with prioritizing reduced visual obstruction when attending to external media."
+    },
+    "bite_dipping_preference": {
+      "default": "do not dip",
+      "user_tendencies": "IF food has no sauce or dip available AND any dining context AND any affective state THEN do not dip BECAUSE dipping is not relevant. IF food includes sauce or dip AND dining context is social with a person in front AND affective state is neutral THEN do not dip BECAUSE the user chose to avoid dipping in that meal, consistent with minimizing mess. IF food includes sauce or dip AND dining context is watching TV with visual focus on the left AND affective state is neutral THEN less BECAUSE the user explicitly preferred some dipping but not heavy dipping in the observed TV-left meal."
+    },
+    "wait_before_autocontinue_seconds": {
+      "default": "10 sec",
+      "user_tendencies": "IF dining context is social with a person in front AND affective state is neutral AND food has no special sauce/dip condition THEN 10 sec BECAUSE the user selected the shortest available wait, indicating preference for quick progression in that meal. IF dining context is watching TV with visual focus on the left AND affective state is neutral AND food includes dessert items with sauce THEN 1000 sec BECAUSE the user explicitly chose the longest wait, indicating a strong preference for ample time to intervene when attention may be divided and the food is messier."
+    }
+  }
+}

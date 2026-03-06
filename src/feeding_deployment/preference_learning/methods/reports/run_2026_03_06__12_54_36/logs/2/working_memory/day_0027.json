@@ -1,0 +1,24 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 27,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 27,
+      "m": 1,
+      "corrected": {
+        "wait_before_autocontinue_seconds": "100 sec"
+      }
+    }
+  ]
+}

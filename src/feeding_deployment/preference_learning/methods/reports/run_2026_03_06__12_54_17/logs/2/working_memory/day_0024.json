@@ -1,0 +1,78 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 24,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 24,
+      "m": 1,
+      "corrected": {
+        "retract_between_bites": "no"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 24,
+      "m": 2,
+      "corrected": {
+        "retract_between_bites": "no",
+        "detect_user_completed_transfer_wiping": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 24,
+      "m": 3,
+      "corrected": {
+        "retract_between_bites": "no",
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "robot_speed": "fast"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 24,
+      "m": 4,
+      "corrected": {
+        "retract_between_bites": "no",
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "robot_speed": "fast",
+        "microwave_time": "1 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 24,
+      "m": 5,
+      "corrected": {
+        "retract_between_bites": "no",
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "robot_speed": "fast",
+        "microwave_time": "1 min",
+        "convey_robot_ready_for_initiating_transfer": "no cue"
+      }
+    }
+  ]
+}

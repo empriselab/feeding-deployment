@@ -1,0 +1,94 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 13,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 13,
+      "m": 1,
+      "corrected": {
+        "wait_before_autocontinue_seconds": "1000 sec"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 13,
+      "m": 2,
+      "corrected": {
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "occlusion_relevance": "do not consider occlusion"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 13,
+      "m": 3,
+      "corrected": {
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "occlusion_relevance": "do not consider occlusion",
+        "bite_dipping_preference": "do not dip"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 13,
+      "m": 4,
+      "corrected": {
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "occlusion_relevance": "do not consider occlusion",
+        "bite_dipping_preference": "do not dip",
+        "detect_user_ready_for_initiating_transfer_feeding": "button"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 13,
+      "m": 5,
+      "corrected": {
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "occlusion_relevance": "do not consider occlusion",
+        "bite_dipping_preference": "do not dip",
+        "detect_user_ready_for_initiating_transfer_feeding": "button",
+        "convey_robot_ready_for_initiating_transfer": "LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 13,
+      "m": 6,
+      "corrected": {
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "occlusion_relevance": "do not consider occlusion",
+        "bite_dipping_preference": "do not dip",
+        "detect_user_ready_for_initiating_transfer_feeding": "button",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "transfer_mode": "inside mouth transfer"
+      }
+    }
+  ]
+}

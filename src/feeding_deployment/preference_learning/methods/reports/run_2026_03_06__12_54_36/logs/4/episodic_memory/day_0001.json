@@ -1,0 +1,98 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 1,
+      "m": 0,
+      "context": {
+        "meal": "strawberries with whipped cream",
+        "setting": "Social with person in Front",
+        "time_of_day": "evening",
+        "transient_affective_state": "Energetic"
+      },
+      "corrected": {},
+      "retrieved_episodes": ""
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 1,
+      "m": 1,
+      "context": {
+        "meal": "strawberries with whipped cream",
+        "setting": "Social with person in Front",
+        "time_of_day": "evening",
+        "transient_affective_state": "Energetic"
+      },
+      "corrected": {
+        "bite_dipping_preference": "less"
+      },
+      "retrieved_episodes": ""
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 1,
+      "m": 2,
+      "context": {
+        "meal": "strawberries with whipped cream",
+        "setting": "Social with person in Front",
+        "time_of_day": "evening",
+        "transient_affective_state": "Energetic"
+      },
+      "corrected": {
+        "bite_dipping_preference": "less",
+        "convey_robot_ready_for_completing_transfer": "LED"
+      },
+      "retrieved_episodes": ""
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 1,
+      "m": 3,
+      "context": {
+        "meal": "strawberries with whipped cream",
+        "setting": "Social with person in Front",
+        "time_of_day": "evening",
+        "transient_affective_state": "Energetic"
+      },
+      "corrected": {
+        "bite_dipping_preference": "less",
+        "convey_robot_ready_for_completing_transfer": "LED",
+        "skewering_axis": "perpendicular to major axis"
+      },
+      "retrieved_episodes": ""
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 1,
+      "m": 4,
+      "context": {
+        "meal": "strawberries with whipped cream",
+        "setting": "Social with person in Front",
+        "time_of_day": "evening",
+        "transient_affective_state": "Energetic"
+      },
+      "corrected": {
+        "bite_dipping_preference": "less",
+        "convey_robot_ready_for_completing_transfer": "LED",
+        "skewering_axis": "perpendicular to major axis",
+        "detect_user_ready_for_initiating_transfer_wiping": "open mouth"
+      },
+      "retrieved_episodes": ""
+    }
+  ]
+}

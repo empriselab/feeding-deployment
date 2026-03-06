@@ -1,0 +1,89 @@
+{
+  "run_timestamp": "2026_03_06__12_54_17",
+  "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+  "user": "1",
+  "physical_profile_label": "limited_arms_no_trunk_good_head",
+  "rollout": 0,
+  "day": 5,
+  "context": {
+    "meal": "bite-sized pizza and broccoli",
+    "setting": "Watching TV with TV in Front",
+    "time_of_day": "morning",
+    "transient_affective_state": "Hurried"
+  },
+  "episode_text": "day=5; meal=bite-sized pizza and broccoli; setting=Watching TV with TV in Front; time_of_day=morning;\npreferences: microwave_time=1 min; occlusion_relevance=minimize front occlusion; robot_speed=fast; skewering_axis=perpendicular to major axis; web_interface_confirmation=no; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=perception; detect_user_completed_transfer_wiping=perception; retract_between_bites=yes; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=10 sec",
+  "ltm_summary_raw": {
+    "microwave_time": {
+      "default": "1 min",
+      "user_tendencies": "IF dining context includes watching TV in front AND affective state is unspecified/unknown AND food has no sauces or dips THEN 1 min BECAUSE the user selected the baseline reheating time in repeated front-TV savory meals. IF dining context includes watching TV on the left OR working on a laptop on the left AND affective state is unspecified/unknown AND food includes sauce-bearing, dip, or dessert items THEN 3 min BECAUSE the user explicitly selected longer reheating in both observed left-attention contexts."
+    },
+    "occlusion_relevance": {
+      "default": "do not consider occlusion",
+      "user_tendencies": "IF dining context includes a social partner in front of the user AND affective state is neutral AND food has no special sauce/dip relevance THEN minimize front occlusion BECAUSE the user explicitly chose front-occlusion minimization in a front-social context. IF dining context includes watching TV in front AND affective state is unspecified/unknown AND food has no sauces or dips THEN minimize front occlusion BECAUSE the user repeatedly chose to preserve the forward view when an important visual target was directly ahead. IF dining context includes watching TV on the left OR working on a laptop on the left AND affective state is unspecified/unknown AND food includes sauce-bearing, dessert, or dip items THEN minimize left occlusion BECAUSE the user repeatedly chose left-occlusion minimization when an important visual target was on the left."
+    },
+    "robot_speed": {
+      "default": "fast",
+      "user_tendencies": "IF dining context includes watching TV in front AND affective state is unspecified/unknown AND food has no sauces or dips THEN fast BECAUSE the user selected the fastest speed in repeated front-TV meals. IF dining context includes watching TV on the left AND affective state is unspecified/unknown AND food includes dessert or sauce items THEN medium BECAUSE the user explicitly selected a slower-than-default speed in that left-attention context. IF dining context includes working on a laptop on the left AND affective state is unspecified/unknown AND food includes dip or sauce items THEN slow BECAUSE the user selected the slowest speed while attending to a left-side laptop, suggesting greater caution when preserving comfort and visual access during work."
+    },
+    "skewering_axis": {
+      "default": "perpendicular to major axis",
+      "user_tendencies": "IF dining context includes watching TV in front AND affective state is unspecified/unknown AND food has no sauces or dips THEN perpendicular to major axis BECAUSE the user selected this option in repeated observed front-TV savory meals. No context-dependent variation observed yet."
+    },
+    "web_interface_confirmation": {
+      "default": "no",
+      "user_tendencies": "IF dining context includes watching TV on the left OR working on a laptop on the left AND affective state is unspecified/unknown AND food includes sauce, dip, or dessert items THEN yes BECAUSE the user explicitly requested bite-acquisition confirmation in both observed left-attention meals, indicating a preference for extra verification when attention is divided and bite quality may matter. IF dining context includes watching TV in front AND affective state is unspecified/unknown AND food has no sauces or dips THEN no BECAUSE the user skipped confirmation in repeated front-TV savory meals, favoring lower interaction burden when the meal is simpler."
+    },
+    "transfer_mode": {
+      "default": "inside mouth transfer",
+      "user_tendencies": "IF any dining context AND any affective state AND any food condition THEN inside mouth transfer BECAUSE the user cannot lean forward due to lack of trunk control, so outside-mouth transfer is not physically compatible."
+    },
+    "outside_mouth_distance": {
+      "default": "not applicable",
+      "user_tendencies": "IF any dining context AND any affective state AND any food condition THEN not applicable BECAUSE the user's physical abilities support inside-mouth transfer rather than outside-mouth transfer."
+    },
+    "convey_robot_ready_for_initiating_transfer": {
+      "default": "LED",
+      "user_tendencies": "IF dining context includes watching TV in front AND affective state is unspecified/unknown AND food has no sauces or dips THEN LED BECAUSE the user selected LED-only signaling in repeated front-TV meals. IF dining context includes watching TV on the left OR working on a laptop on the left AND affective state is unspecified/unknown AND food includes sauce, dip, or dessert items THEN speech + LED BECAUSE the user explicitly selected multimodal readiness cues in both observed left-attention contexts, suggesting a preference for more salient signaling when attention is divided."
+    },
+    "detect_user_ready_for_initiating_transfer_feeding": {
+      "default": "autocontinue",
+      "user_tendencies": "IF dining context includes a social partner in front of the user AND affective state is neutral AND food has no special sauce/dip relevance THEN autocontinue BECAUSE the user explicitly selected low-effort automated initiation in that context. IF dining context includes watching TV in front AND affective state is unspecified/unknown AND food has no sauces or dips THEN autocontinue BECAUSE the user repeatedly selected automated initiation in front-attention meals. IF dining context includes watching TV on the left OR working on a laptop on the left AND affective state is unspecified/unknown AND food includes sauce, dip, or dessert items THEN autocontinue BECAUSE the user also selected automated initiation in both left-attention contexts. IF any dining context AND any affective state AND any food condition THEN not button BECAUSE physical button use is incompatible with the user's severe upper-limb paralysis."
+    },
+    "detect_user_ready_for_initiating_transfer_drinking": {
+      "default": "autocontinue",
+      "user_tendencies": "IF dining context includes a social partner in front of the user AND affective state is neutral AND food has no special sauce/dip relevance THEN autocontinue BECAUSE the user explicitly selected automated initiation for drinking in that context. IF dining context includes watching TV in front AND affective state is unspecified/unknown AND food has no sauces or dips THEN autocontinue BECAUSE the user repeatedly selected automated initiation in front-TV meals. IF dining context includes watching TV on the left OR working on a laptop on the left AND affective state is unspecified/unknown AND food includes sauce, dip, or dessert items THEN autocontinue BECAUSE the user also selected automated initiation in both left-attention contexts. IF any dining context AND any affective state AND any food condition THEN not button BECAUSE physical button use is incompatible with the user's severe upper-limb paralysis."
+    },
+    "detect_user_ready_for_initiating_transfer_wiping": {
+      "default": "autocontinue",
+      "user_tendencies": "IF dining context includes a social partner in front of the user AND affective state is neutral AND food has no special sauce/dip relevance THEN autocontinue BECAUSE the user explicitly selected automated initiation for mouth wiping in that context. IF dining context includes watching TV in front AND affective state is unspecified/unknown AND food has no sauces or dips THEN autocontinue BECAUSE the user repeatedly selected automated initiation in front-TV meals. IF dining context includes watching TV on the left OR working on a laptop on the left AND affective state is unspecified/unknown AND food includes sauce, dip, or dessert items THEN autocontinue BECAUSE the user also selected automated initiation in both left-attention contexts. IF any dining context AND any affective state AND any food condition THEN not button BECAUSE physical button use is incompatible with the user's severe upper-limb paralysis."
+    },
+    "convey_robot_ready_for_completing_transfer": {
+      "default": "LED",
+      "user_tendencies": "IF dining context includes watching TV in front AND affective state is unspecified/unknown AND food has no sauces or dips THEN LED BECAUSE the user selected LED-only completion signaling in repeated front-TV meals. IF dining context includes watching TV on the left OR working on a laptop on the left AND affective state is unspecified/unknown AND food includes sauce, dip, or dessert items THEN speech + LED BECAUSE the user explicitly selected multimodal completion cues in both observed left-attention contexts, suggesting a preference for more salient signaling when attention is divided."
+    },
+    "detect_user_completed_transfer_feeding": {
+      "default": "perception",
+      "user_tendencies": "IF dining context includes a social partner in front of the user AND affective state is neutral AND food has no special sauce/dip relevance THEN perception BECAUSE the user explicitly preferred reliable automatic detection for bite completion. IF dining context includes watching TV in front AND affective state is unspecified/unknown AND food has no sauces or dips THEN perception BECAUSE the user repeatedly selected perceptual completion detection in front-TV meals. IF dining context includes watching TV on the left OR working on a laptop on the left AND affective state is unspecified/unknown AND food includes sauce, dip, or dessert items THEN perception BECAUSE the user also selected automatic perceptual detection in both left-attention contexts. IF any dining context AND any affective state AND any food condition THEN not button BECAUSE physical button use is incompatible."
+    },
+    "detect_user_completed_transfer_drinking": {
+      "default": "perception",
+      "user_tendencies": "IF dining context includes watching TV in front AND affective state is unspecified/unknown AND food has no sauces or dips THEN perception BECAUSE the user selected perceptual completion detection for drinking in repeated front-TV meals. IF dining context includes a social partner in front of the user AND affective state is neutral AND food has no special sauce/dip relevance THEN autocontinue BECAUSE the user explicitly selected automated completion for drinking in that context. IF dining context includes watching TV on the left OR working on a laptop on the left AND affective state is unspecified/unknown AND food includes sauce, dip, or dessert items THEN autocontinue BECAUSE the user selected automated completion in both left-attention contexts. IF any dining context AND any affective state AND any food condition THEN not button BECAUSE physical button use is incompatible with the user's severe upper-limb paralysis."
+    },
+    "detect_user_completed_transfer_wiping": {
+      "default": "perception",
+      "user_tendencies": "IF dining context includes watching TV in front AND affective state is unspecified/unknown AND food has no sauces or dips THEN perception BECAUSE the user selected perceptual completion detection for mouth wiping in repeated front-TV meals. IF dining context includes a social partner in front of the user AND affective state is neutral AND food has no special sauce/dip relevance THEN autocontinue BECAUSE the user explicitly selected automated completion for mouth wiping in that context. IF dining context includes watching TV on the left OR working on a laptop on the left AND affective state is unspecified/unknown AND food includes sauce, dip, or dessert items THEN autocontinue BECAUSE the user selected automated completion in both left-attention contexts. IF any dining context AND any affective state AND any food condition THEN not button BECAUSE physical button use is incompatible with the user's severe upper-limb paralysis."
+    },
+    "retract_between_bites": {
+      "default": "no",
+      "user_tendencies": "IF dining context includes watching TV in front AND affective state is unspecified/unknown AND food has no sauces or dips THEN yes BECAUSE the user selected retracting in repeated front-TV meals, indicating willingness to accept longer meal time to preserve visibility of a forward visual target. IF dining context includes watching TV on the left OR working on a laptop on the left AND affective state is unspecified/unknown AND food includes sauce, dip, or dessert items THEN yes BECAUSE the user explicitly chose retracting in both observed left-attention contexts, indicating a willingness to accept longer meal time to preserve visibility of an important external target."
+    },
+    "bite_dipping_preference": {
+      "default": "do not dip",
+      "user_tendencies": "IF food has no sauces or dips AND any dining context AND any affective state THEN do not dip BECAUSE dipping is not relevant. IF food includes a dip or sauce AND dining context includes watching TV on the left OR working on a laptop on the left AND affective state is unspecified/unknown THEN less BECAUSE the user explicitly preferred light dipping rather than heavy dipping in both observed sauce-containing left-attention meals."
+    },
+    "wait_before_autocontinue_seconds": {
+      "default": "10 sec",
+      "user_tendencies": "IF dining context includes watching TV in front AND affective state is unspecified/unknown AND food has no sauces or dips THEN 10 sec BECAUSE the user selected the shortest wait in repeated front-TV savory meals. IF dining context includes watching TV on the left OR working on a laptop on the left AND affective state is unspecified/unknown AND food includes sauce, dip, or dessert items THEN 1000 sec BECAUSE the user explicitly selected a very long wait in both observed left-attention contexts, indicating a preference for ample time to intervene when attention is divided."
+    }
+  }
+}

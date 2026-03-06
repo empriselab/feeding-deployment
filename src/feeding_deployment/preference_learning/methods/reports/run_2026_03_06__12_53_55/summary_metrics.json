@@ -1,0 +1,17 @@
+{
+  "mean_m_star_all": 3.1466666666666665,
+  "mean_acc_m0_all": 0.7792592592592592,
+  "mean_acc_m1_all": 0.8294117647058823,
+  "mean_mismatches_m0_all": 3.973333333333333,
+  "mean_mismatches_m1_all": 2.9,
+  "mean_m_star_first_week_days_1_7": 3.8285714285714287,
+  "mean_acc_m0_first_week_days_1_7": 0.7317460317460318,
+  "mean_acc_m1_first_week_days_1_7": 0.8016806722689077,
+  "mean_mismatches_m0_first_week_days_1_7": 4.828571428571428,
+  "mean_mismatches_m1_first_week_days_1_7": 3.3714285714285714,
+  "mean_m_star_last_week_days_24_30": 2.142857142857143,
+  "mean_acc_m0_last_week_days_24_30": 0.8396825396825396,
+  "mean_acc_m1_last_week_days_24_30": 0.8689075630252101,
+  "mean_mismatches_m0_last_week_days_24_30": 2.8857142857142857,
+  "mean_mismatches_m1_last_week_days_24_30": 2.2285714285714286
+}

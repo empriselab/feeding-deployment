@@ -1,0 +1,129 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 29,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 29,
+      "m": 1,
+      "corrected": {
+        "transfer_mode": "inside mouth transfer"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 29,
+      "m": 2,
+      "corrected": {
+        "transfer_mode": "inside mouth transfer",
+        "microwave_time": "3 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 29,
+      "m": 3,
+      "corrected": {
+        "transfer_mode": "inside mouth transfer",
+        "microwave_time": "3 min",
+        "robot_speed": "slow"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 29,
+      "m": 4,
+      "corrected": {
+        "transfer_mode": "inside mouth transfer",
+        "microwave_time": "3 min",
+        "robot_speed": "slow",
+        "detect_user_completed_transfer_wiping": "button"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 29,
+      "m": 5,
+      "corrected": {
+        "transfer_mode": "inside mouth transfer",
+        "microwave_time": "3 min",
+        "robot_speed": "slow",
+        "detect_user_completed_transfer_wiping": "button",
+        "bite_dipping_preference": "less"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 29,
+      "m": 6,
+      "corrected": {
+        "transfer_mode": "inside mouth transfer",
+        "microwave_time": "3 min",
+        "robot_speed": "slow",
+        "detect_user_completed_transfer_wiping": "button",
+        "bite_dipping_preference": "less",
+        "skewering_axis": "perpendicular to major axis"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 29,
+      "m": 7,
+      "corrected": {
+        "transfer_mode": "inside mouth transfer",
+        "microwave_time": "3 min",
+        "robot_speed": "slow",
+        "detect_user_completed_transfer_wiping": "button",
+        "bite_dipping_preference": "less",
+        "skewering_axis": "perpendicular to major axis",
+        "convey_robot_ready_for_completing_transfer": "LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 29,
+      "m": 8,
+      "corrected": {
+        "transfer_mode": "inside mouth transfer",
+        "microwave_time": "3 min",
+        "robot_speed": "slow",
+        "detect_user_completed_transfer_wiping": "button",
+        "bite_dipping_preference": "less",
+        "skewering_axis": "perpendicular to major axis",
+        "convey_robot_ready_for_completing_transfer": "LED",
+        "wait_before_autocontinue_seconds": "10 sec"
+      }
+    }
+  ]
+}

@@ -1,0 +1,234 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 29,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 29,
+      "m": 1,
+      "corrected": {
+        "bite_dipping_preference": "do not dip"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 29,
+      "m": 2,
+      "corrected": {
+        "bite_dipping_preference": "do not dip",
+        "transfer_mode": "inside mouth transfer"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 29,
+      "m": 3,
+      "corrected": {
+        "bite_dipping_preference": "do not dip",
+        "transfer_mode": "inside mouth transfer",
+        "wait_before_autocontinue_seconds": "1000 sec"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 29,
+      "m": 4,
+      "corrected": {
+        "bite_dipping_preference": "do not dip",
+        "transfer_mode": "inside mouth transfer",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "occlusion_relevance": "do not consider occlusion"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 29,
+      "m": 5,
+      "corrected": {
+        "bite_dipping_preference": "do not dip",
+        "transfer_mode": "inside mouth transfer",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "occlusion_relevance": "do not consider occlusion",
+        "microwave_time": "2 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 29,
+      "m": 6,
+      "corrected": {
+        "bite_dipping_preference": "do not dip",
+        "transfer_mode": "inside mouth transfer",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "occlusion_relevance": "do not consider occlusion",
+        "microwave_time": "2 min",
+        "retract_between_bites": "yes"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 29,
+      "m": 7,
+      "corrected": {
+        "bite_dipping_preference": "do not dip",
+        "transfer_mode": "inside mouth transfer",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "occlusion_relevance": "do not consider occlusion",
+        "microwave_time": "2 min",
+        "retract_between_bites": "yes",
+        "skewering_axis": "perpendicular to major axis"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 29,
+      "m": 8,
+      "corrected": {
+        "bite_dipping_preference": "do not dip",
+        "transfer_mode": "inside mouth transfer",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "occlusion_relevance": "do not consider occlusion",
+        "microwave_time": "2 min",
+        "retract_between_bites": "yes",
+        "skewering_axis": "perpendicular to major axis",
+        "web_interface_confirmation": "no"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 29,
+      "m": 9,
+      "corrected": {
+        "bite_dipping_preference": "do not dip",
+        "transfer_mode": "inside mouth transfer",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "occlusion_relevance": "do not consider occlusion",
+        "microwave_time": "2 min",
+        "retract_between_bites": "yes",
+        "skewering_axis": "perpendicular to major axis",
+        "web_interface_confirmation": "no",
+        "detect_user_ready_for_initiating_transfer_feeding": "open mouth"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 29,
+      "m": 10,
+      "corrected": {
+        "bite_dipping_preference": "do not dip",
+        "transfer_mode": "inside mouth transfer",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "occlusion_relevance": "do not consider occlusion",
+        "microwave_time": "2 min",
+        "retract_between_bites": "yes",
+        "skewering_axis": "perpendicular to major axis",
+        "web_interface_confirmation": "no",
+        "detect_user_ready_for_initiating_transfer_feeding": "open mouth",
+        "detect_user_completed_transfer_drinking": "button"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 29,
+      "m": 11,
+      "corrected": {
+        "bite_dipping_preference": "do not dip",
+        "transfer_mode": "inside mouth transfer",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "occlusion_relevance": "do not consider occlusion",
+        "microwave_time": "2 min",
+        "retract_between_bites": "yes",
+        "skewering_axis": "perpendicular to major axis",
+        "web_interface_confirmation": "no",
+        "detect_user_ready_for_initiating_transfer_feeding": "open mouth",
+        "detect_user_completed_transfer_drinking": "button",
+        "detect_user_ready_for_initiating_transfer_wiping": "button"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 29,
+      "m": 12,
+      "corrected": {
+        "bite_dipping_preference": "do not dip",
+        "transfer_mode": "inside mouth transfer",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "occlusion_relevance": "do not consider occlusion",
+        "microwave_time": "2 min",
+        "retract_between_bites": "yes",
+        "skewering_axis": "perpendicular to major axis",
+        "web_interface_confirmation": "no",
+        "detect_user_ready_for_initiating_transfer_feeding": "open mouth",
+        "detect_user_completed_transfer_drinking": "button",
+        "detect_user_ready_for_initiating_transfer_wiping": "button",
+        "convey_robot_ready_for_initiating_transfer": "speech"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 29,
+      "m": 13,
+      "corrected": {
+        "bite_dipping_preference": "do not dip",
+        "transfer_mode": "inside mouth transfer",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "occlusion_relevance": "do not consider occlusion",
+        "microwave_time": "2 min",
+        "retract_between_bites": "yes",
+        "skewering_axis": "perpendicular to major axis",
+        "web_interface_confirmation": "no",
+        "detect_user_ready_for_initiating_transfer_feeding": "open mouth",
+        "detect_user_completed_transfer_drinking": "button",
+        "detect_user_ready_for_initiating_transfer_wiping": "button",
+        "convey_robot_ready_for_initiating_transfer": "speech",
+        "detect_user_ready_for_initiating_transfer_drinking": "button"
+      }
+    }
+  ]
+}

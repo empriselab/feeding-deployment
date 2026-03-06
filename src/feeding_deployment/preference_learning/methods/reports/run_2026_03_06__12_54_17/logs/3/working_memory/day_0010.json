@@ -1,0 +1,94 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 10,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 10,
+      "m": 1,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "button"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 10,
+      "m": 2,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "button",
+        "detect_user_ready_for_initiating_transfer_drinking": "button"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 10,
+      "m": 3,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "button",
+        "detect_user_ready_for_initiating_transfer_drinking": "button",
+        "convey_robot_ready_for_completing_transfer": "LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 10,
+      "m": 4,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "button",
+        "detect_user_ready_for_initiating_transfer_drinking": "button",
+        "convey_robot_ready_for_completing_transfer": "LED",
+        "detect_user_ready_for_initiating_transfer_wiping": "button"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 10,
+      "m": 5,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "button",
+        "detect_user_ready_for_initiating_transfer_drinking": "button",
+        "convey_robot_ready_for_completing_transfer": "LED",
+        "detect_user_ready_for_initiating_transfer_wiping": "button",
+        "occlusion_relevance": "minimize left occlusion"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 10,
+      "m": 6,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "button",
+        "detect_user_ready_for_initiating_transfer_drinking": "button",
+        "convey_robot_ready_for_completing_transfer": "LED",
+        "detect_user_ready_for_initiating_transfer_wiping": "button",
+        "occlusion_relevance": "minimize left occlusion",
+        "wait_before_autocontinue_seconds": "10 sec"
+      }
+    }
+  ]
+}

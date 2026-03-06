@@ -1,0 +1,129 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 1,
+      "corrected": {
+        "retract_between_bites": "yes"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 2,
+      "corrected": {
+        "retract_between_bites": "yes",
+        "convey_robot_ready_for_completing_transfer": "speech + LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 3,
+      "corrected": {
+        "retract_between_bites": "yes",
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "robot_speed": "medium"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 4,
+      "corrected": {
+        "retract_between_bites": "yes",
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "robot_speed": "medium",
+        "wait_before_autocontinue_seconds": "1000 sec"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 5,
+      "corrected": {
+        "retract_between_bites": "yes",
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "robot_speed": "medium",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "web_interface_confirmation": "yes"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 6,
+      "corrected": {
+        "retract_between_bites": "yes",
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "robot_speed": "medium",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "web_interface_confirmation": "yes",
+        "bite_dipping_preference": "less"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 7,
+      "corrected": {
+        "retract_between_bites": "yes",
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "robot_speed": "medium",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "web_interface_confirmation": "yes",
+        "bite_dipping_preference": "less",
+        "microwave_time": "3 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 8,
+      "corrected": {
+        "retract_between_bites": "yes",
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "robot_speed": "medium",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "web_interface_confirmation": "yes",
+        "bite_dipping_preference": "less",
+        "microwave_time": "3 min",
+        "convey_robot_ready_for_initiating_transfer": "speech + LED"
+      }
+    }
+  ]
+}

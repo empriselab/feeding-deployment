@@ -1,0 +1,111 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 5,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 5,
+      "m": 1,
+      "corrected": {
+        "skewering_axis": "perpendicular to major axis"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 5,
+      "m": 2,
+      "corrected": {
+        "skewering_axis": "perpendicular to major axis",
+        "wait_before_autocontinue_seconds": "1000 sec"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 5,
+      "m": 3,
+      "corrected": {
+        "skewering_axis": "perpendicular to major axis",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "bite_dipping_preference": "less"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 5,
+      "m": 4,
+      "corrected": {
+        "skewering_axis": "perpendicular to major axis",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "bite_dipping_preference": "less",
+        "convey_robot_ready_for_completing_transfer": "LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 5,
+      "m": 5,
+      "corrected": {
+        "skewering_axis": "perpendicular to major axis",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "bite_dipping_preference": "less",
+        "convey_robot_ready_for_completing_transfer": "LED",
+        "microwave_time": "2 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 5,
+      "m": 6,
+      "corrected": {
+        "skewering_axis": "perpendicular to major axis",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "bite_dipping_preference": "less",
+        "convey_robot_ready_for_completing_transfer": "LED",
+        "microwave_time": "2 min",
+        "robot_speed": "medium"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 5,
+      "m": 7,
+      "corrected": {
+        "skewering_axis": "perpendicular to major axis",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "bite_dipping_preference": "less",
+        "convey_robot_ready_for_completing_transfer": "LED",
+        "microwave_time": "2 min",
+        "robot_speed": "medium",
+        "detect_user_completed_transfer_wiping": "button"
+      }
+    }
+  ]
+}

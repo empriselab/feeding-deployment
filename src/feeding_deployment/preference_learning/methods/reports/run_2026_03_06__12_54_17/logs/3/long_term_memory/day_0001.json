@@ -1,0 +1,89 @@
+{
+  "run_timestamp": "2026_03_06__12_54_17",
+  "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+  "user": "3",
+  "physical_profile_label": "moderate_arms_limited_trunk_limited_head",
+  "rollout": 0,
+  "day": 1,
+  "context": {
+    "meal": "bananas, brownies, and chocolate sauce",
+    "setting": "Social with person in Front",
+    "time_of_day": "morning",
+    "transient_affective_state": "Slower"
+  },
+  "episode_text": "day=1; meal=bananas, brownies, and chocolate sauce; setting=Social with person in Front; time_of_day=morning;\npreferences: microwave_time=2 min; occlusion_relevance=minimize front occlusion; robot_speed=slow; skewering_axis=parallel to major axis; web_interface_confirmation=yes; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=button; detect_user_ready_for_initiating_transfer_drinking=button; detect_user_ready_for_initiating_transfer_wiping=button; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=button; detect_user_completed_transfer_wiping=button; retract_between_bites=yes; bite_dipping_preference=less; wait_before_autocontinue_seconds=1000 sec",
+  "ltm_summary_raw": {
+    "microwave_time": {
+      "default": "2 min",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "occlusion_relevance": {
+      "default": "do not consider occlusion",
+      "user_tendencies": "IF dining context includes a social partner or focal activity directly in front of the user THEN minimize front occlusion BECAUSE the user explicitly chose front-occlusion minimization in a front-social context, indicating sensitivity to blocking the forward view."
+    },
+    "robot_speed": {
+      "default": "slow",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "skewering_axis": {
+      "default": "parallel to major axis",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "web_interface_confirmation": {
+      "default": "yes",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "transfer_mode": {
+      "default": "inside mouth transfer",
+      "user_tendencies": "IF the user's physical constraints are relevant to the meal context THEN inside mouth transfer BECAUSE the user cannot lean forward due to limited trunk control, making outside-mouth transfer less compatible with their abilities."
+    },
+    "outside_mouth_distance": {
+      "default": "not applicable",
+      "user_tendencies": "IF transfer_mode is inside mouth transfer THEN not applicable BECAUSE this parameter only applies to outside-mouth transfer. IF the user's physical constraints are considered for food delivery THEN not applicable BECAUSE the observed preference and physical profile support inside-mouth transfer rather than outside-mouth transfer."
+    },
+    "convey_robot_ready_for_initiating_transfer": {
+      "default": "LED",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "detect_user_ready_for_initiating_transfer_feeding": {
+      "default": "button",
+      "user_tendencies": "IF initiating feeding transfer in contexts where physical ability constraints matter THEN button BECAUSE the user can press buttons reliably, while limited mouth opening makes open-mouth interaction challenging."
+    },
+    "detect_user_ready_for_initiating_transfer_drinking": {
+      "default": "button",
+      "user_tendencies": "IF initiating drinking transfer in contexts where physical ability constraints matter THEN button BECAUSE the user can press buttons reliably, while limited mouth opening makes open-mouth interaction challenging."
+    },
+    "detect_user_ready_for_initiating_transfer_wiping": {
+      "default": "button",
+      "user_tendencies": "IF initiating mouth-wiping transfer in contexts where physical ability constraints matter THEN button BECAUSE the user can press buttons reliably, while limited mouth opening makes open-mouth interaction challenging."
+    },
+    "convey_robot_ready_for_completing_transfer": {
+      "default": "LED",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "detect_user_completed_transfer_feeding": {
+      "default": "perception",
+      "user_tendencies": "IF completing feeding transfer in contexts where physical ability constraints matter THEN perception BECAUSE the user selected the reliable perception-based option and this avoids requiring extra physical input."
+    },
+    "detect_user_completed_transfer_drinking": {
+      "default": "button",
+      "user_tendencies": "IF completing drinking transfer in contexts where physical ability constraints matter THEN button BECAUSE the user cannot reliably perform head gestures, making perception-based drinking completion less suitable."
+    },
+    "detect_user_completed_transfer_wiping": {
+      "default": "button",
+      "user_tendencies": "IF completing mouth-wiping transfer in contexts where physical ability constraints matter THEN button BECAUSE the user cannot reliably perform head gestures, making perception-based wiping completion less suitable."
+    },
+    "retract_between_bites": {
+      "default": "no",
+      "user_tendencies": "IF dining context includes a social partner or focal activity directly in front of the user THEN yes BECAUSE the user chose retraction in a front-social context, consistent with wanting to reduce prolonged visual obstruction."
+    },
+    "bite_dipping_preference": {
+      "default": "do not dip",
+      "user_tendencies": "IF food includes a dip or sauce AND dining context is social THEN less BECAUSE the user chose reduced dipping with chocolate sauce in a social context, suggesting a preference to limit messiness around others."
+    },
+    "wait_before_autocontinue_seconds": {
+      "default": "1000 sec",
+      "user_tendencies": "No context-dependent variation observed yet."
+    }
+  }
+}

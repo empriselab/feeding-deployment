@@ -1,0 +1,49 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 30,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 30,
+      "m": 1,
+      "corrected": {
+        "web_interface_confirmation": "no"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 30,
+      "m": 2,
+      "corrected": {
+        "web_interface_confirmation": "no",
+        "convey_robot_ready_for_completing_transfer": "speech + LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 30,
+      "m": 3,
+      "corrected": {
+        "web_interface_confirmation": "no",
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "skewering_axis": "perpendicular to major axis"
+      }
+    }
+  ]
+}

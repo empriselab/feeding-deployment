@@ -1,0 +1,168 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 8,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 8,
+      "m": 1,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 8,
+      "m": 2,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "detect_user_completed_transfer_drinking": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 8,
+      "m": 3,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "detect_user_ready_for_initiating_transfer_wiping": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 8,
+      "m": 4,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "detect_user_ready_for_initiating_transfer_wiping": "autocontinue",
+        "wait_before_autocontinue_seconds": "10 sec"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 8,
+      "m": 5,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "detect_user_ready_for_initiating_transfer_wiping": "autocontinue",
+        "wait_before_autocontinue_seconds": "10 sec",
+        "transfer_mode": "inside mouth transfer"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 8,
+      "m": 6,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "detect_user_ready_for_initiating_transfer_wiping": "autocontinue",
+        "wait_before_autocontinue_seconds": "10 sec",
+        "transfer_mode": "inside mouth transfer",
+        "microwave_time": "3 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 8,
+      "m": 7,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "detect_user_ready_for_initiating_transfer_wiping": "autocontinue",
+        "wait_before_autocontinue_seconds": "10 sec",
+        "transfer_mode": "inside mouth transfer",
+        "microwave_time": "3 min",
+        "robot_speed": "slow"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 8,
+      "m": 8,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "detect_user_ready_for_initiating_transfer_wiping": "autocontinue",
+        "wait_before_autocontinue_seconds": "10 sec",
+        "transfer_mode": "inside mouth transfer",
+        "microwave_time": "3 min",
+        "robot_speed": "slow",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 8,
+      "m": 9,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "detect_user_ready_for_initiating_transfer_wiping": "autocontinue",
+        "wait_before_autocontinue_seconds": "10 sec",
+        "transfer_mode": "inside mouth transfer",
+        "microwave_time": "3 min",
+        "robot_speed": "slow",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "convey_robot_ready_for_initiating_transfer": "speech + LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 8,
+      "m": 10,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "detect_user_ready_for_initiating_transfer_wiping": "autocontinue",
+        "wait_before_autocontinue_seconds": "10 sec",
+        "transfer_mode": "inside mouth transfer",
+        "microwave_time": "3 min",
+        "robot_speed": "slow",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "convey_robot_ready_for_initiating_transfer": "speech + LED",
+        "detect_user_completed_transfer_feeding": "perception"
+      }
+    }
+  ]
+}

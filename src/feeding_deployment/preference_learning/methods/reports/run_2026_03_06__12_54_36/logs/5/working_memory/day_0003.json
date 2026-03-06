@@ -1,0 +1,78 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 3,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 3,
+      "m": 1,
+      "corrected": {
+        "web_interface_confirmation": "yes"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 3,
+      "m": 2,
+      "corrected": {
+        "web_interface_confirmation": "yes",
+        "convey_robot_ready_for_initiating_transfer": "LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 3,
+      "m": 3,
+      "corrected": {
+        "web_interface_confirmation": "yes",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "microwave_time": "2 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 3,
+      "m": 4,
+      "corrected": {
+        "web_interface_confirmation": "yes",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "microwave_time": "2 min",
+        "bite_dipping_preference": "less"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 3,
+      "m": 5,
+      "corrected": {
+        "web_interface_confirmation": "yes",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "microwave_time": "2 min",
+        "bite_dipping_preference": "less",
+        "outside_mouth_distance": "near"
+      }
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 22,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 22,
+      "m": 1,
+      "corrected": {
+        "web_interface_confirmation": "no"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 22,
+      "m": 2,
+      "corrected": {
+        "web_interface_confirmation": "no",
+        "microwave_time": "3 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 22,
+      "m": 3,
+      "corrected": {
+        "web_interface_confirmation": "no",
+        "microwave_time": "3 min",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 22,
+      "m": 4,
+      "corrected": {
+        "web_interface_confirmation": "no",
+        "microwave_time": "3 min",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "occlusion_relevance": "minimize front occlusion"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 22,
+      "m": 5,
+      "corrected": {
+        "web_interface_confirmation": "no",
+        "microwave_time": "3 min",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "occlusion_relevance": "minimize front occlusion",
+        "wait_before_autocontinue_seconds": "1000 sec"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 22,
+      "m": 6,
+      "corrected": {
+        "web_interface_confirmation": "no",
+        "microwave_time": "3 min",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "occlusion_relevance": "minimize front occlusion",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "convey_robot_ready_for_initiating_transfer": "LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 22,
+      "m": 7,
+      "corrected": {
+        "web_interface_confirmation": "no",
+        "microwave_time": "3 min",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "occlusion_relevance": "minimize front occlusion",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "bite_dipping_preference": "do not dip"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 22,
+      "m": 8,
+      "corrected": {
+        "web_interface_confirmation": "no",
+        "microwave_time": "3 min",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "occlusion_relevance": "minimize front occlusion",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "bite_dipping_preference": "do not dip",
+        "skewering_axis": "parallel to major axis"
+      }
+    }
+  ]
+}

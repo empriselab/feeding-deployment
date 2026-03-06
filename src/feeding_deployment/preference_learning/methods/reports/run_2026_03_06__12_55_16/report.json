@@ -1,0 +1,1704 @@
+{
+  "users": [
+    {
+      "file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "physical_profile_label": "limited_arms_no_trunk_good_head",
+      "meals": 30,
+      "num_rollouts": 1,
+      "mean_corrections_to_stop": 7.066666666666666,
+      "accuracy_after_m": {
+        "0": 0.5148148148148148,
+        "1": 0.5843137254901959,
+        "2": 0.6354166666666666,
+        "3": 0.686666666666667,
+        "4": 0.7547619047619049,
+        "5": 0.8275862068965519,
+        "6": 0.8405797101449275,
+        "7": 0.9134199134199134,
+        "8": 0.953846153846154,
+        "9": 1.0
+      },
+      "per_day_metrics": [
+        {
+          "day": 1,
+          "affective_state": "Hurried",
+          "acc_m0": 0.3333333333333333,
+          "acc_m1": 0.4117647058823529,
+          "mismatches_m0": 12.0,
+          "mismatches_m1": 10.0,
+          "m_star": 8.0
+        },
+        {
+          "day": 2,
+          "affective_state": "Energetic",
+          "acc_m0": 0.5555555555555556,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 7.0,
+          "m_star": 9.0
+        },
+        {
+          "day": 3,
+          "affective_state": "Slower",
+          "acc_m0": 0.5,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 7.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 4,
+          "affective_state": "Hurried",
+          "acc_m0": 0.5,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 6.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 5,
+          "affective_state": "Hurried",
+          "acc_m0": 0.5,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 5.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 6,
+          "affective_state": "Energetic",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 7.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 7,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.5,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 7.0,
+          "m_star": 9.0
+        },
+        {
+          "day": 8,
+          "affective_state": "Hurried",
+          "acc_m0": 0.5,
+          "acc_m1": 0.5294117647058824,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 8.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 9,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.5555555555555556,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 7.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 10,
+          "affective_state": "Energetic",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 11,
+          "affective_state": "Hurried",
+          "acc_m0": 0.2777777777777778,
+          "acc_m1": 0.4117647058823529,
+          "mismatches_m0": 13.0,
+          "mismatches_m1": 10.0,
+          "m_star": 8.0
+        },
+        {
+          "day": 12,
+          "affective_state": "Neutral",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 7.0,
+          "m_star": 8.0
+        },
+        {
+          "day": 13,
+          "affective_state": "Slower",
+          "acc_m0": 0.5,
+          "acc_m1": 0.47058823529411764,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 9.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 14,
+          "affective_state": "Hurried",
+          "acc_m0": 0.5,
+          "acc_m1": 0.5294117647058824,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 8.0,
+          "m_star": 8.0
+        },
+        {
+          "day": 15,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.5,
+          "acc_m1": 0.5294117647058824,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 8.0,
+          "m_star": 9.0
+        },
+        {
+          "day": 16,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 4.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 17,
+          "affective_state": "Slower",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.8235294117647058,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 18,
+          "affective_state": "Hurried",
+          "acc_m0": 0.5,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 6.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 19,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.5,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 6.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 20,
+          "affective_state": "Neutral",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 21,
+          "affective_state": "Energetic",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 7.0,
+          "m_star": 9.0
+        },
+        {
+          "day": 22,
+          "affective_state": "Hurried",
+          "acc_m0": 0.3333333333333333,
+          "acc_m1": 0.47058823529411764,
+          "mismatches_m0": 12.0,
+          "mismatches_m1": 9.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 23,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.5,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 7.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 24,
+          "affective_state": "Neutral",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0,
+          "m_star": 8.0
+        },
+        {
+          "day": 25,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.5,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 6.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 26,
+          "affective_state": "Neutral",
+          "acc_m0": 0.5555555555555556,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 6.0,
+          "m_star": 9.0
+        },
+        {
+          "day": 27,
+          "affective_state": "Slower",
+          "acc_m0": 0.5555555555555556,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 6.0,
+          "m_star": 9.0
+        },
+        {
+          "day": 28,
+          "affective_state": "Hurried",
+          "acc_m0": 0.2777777777777778,
+          "acc_m1": 0.4117647058823529,
+          "mismatches_m0": 13.0,
+          "mismatches_m1": 10.0,
+          "m_star": 8.0
+        },
+        {
+          "day": 29,
+          "affective_state": "Hurried",
+          "acc_m0": 0.2777777777777778,
+          "acc_m1": 0.35294117647058826,
+          "mismatches_m0": 13.0,
+          "mismatches_m1": 11.0,
+          "m_star": 8.0
+        },
+        {
+          "day": 30,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.5,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 7.0,
+          "m_star": 7.0
+        }
+      ],
+      "by_affective_state": {
+        "Energetic": {
+          "acc_m0": 0.5972222222222223,
+          "mean_m_star": 8.0
+        },
+        "Fatigued": {
+          "acc_m0": 0.5416666666666667,
+          "mean_m_star": 6.875
+        },
+        "Hurried": {
+          "acc_m0": 0.4,
+          "mean_m_star": 6.6
+        },
+        "Neutral": {
+          "acc_m0": 0.5972222222222223,
+          "mean_m_star": 8.0
+        },
+        "Slower": {
+          "acc_m0": 0.5833333333333333,
+          "mean_m_star": 6.75
+        }
+      },
+      "per_dimension_m0_accuracy": {
+        "microwave_time": 0.3,
+        "occlusion_relevance": 0.9666666666666667,
+        "robot_speed": 0.26666666666666666,
+        "skewering_axis": 0.8,
+        "web_interface_confirmation": 0.5,
+        "transfer_mode": 1.0,
+        "outside_mouth_distance": 1.0,
+        "convey_robot_ready_for_initiating_transfer": 0.6333333333333333,
+        "detect_user_ready_for_initiating_transfer_feeding": 0.06666666666666667,
+        "detect_user_ready_for_initiating_transfer_drinking": 0.06666666666666667,
+        "detect_user_ready_for_initiating_transfer_wiping": 0.06666666666666667,
+        "convey_robot_ready_for_completing_transfer": 0.6333333333333333,
+        "detect_user_completed_transfer_feeding": 1.0,
+        "detect_user_completed_transfer_drinking": 0.23333333333333334,
+        "detect_user_completed_transfer_wiping": 0.23333333333333334,
+        "retract_between_bites": 0.8333333333333334,
+        "bite_dipping_preference": 0.6333333333333333,
+        "wait_before_autocontinue_seconds": 0.03333333333333333
+      },
+      "summary_statistics": {
+        "zero_correction_meals_total": 0,
+        "zero_correction_meals_final_week": 0
+      }
+    },
+    {
+      "file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "physical_profile_label": "moderate_arms_good_trunk_good_head",
+      "meals": 30,
+      "num_rollouts": 1,
+      "mean_corrections_to_stop": 6.4,
+      "accuracy_after_m": {
+        "0": 0.5462962962962962,
+        "1": 0.6333333333333334,
+        "2": 0.71875,
+        "3": 0.7452380952380955,
+        "4": 0.8086734693877551,
+        "5": 0.8141025641025643,
+        "6": 0.8903508771929823,
+        "7": 0.8741258741258741,
+        "8": 0.8714285714285713,
+        "9": 0.8,
+        "10": 0.75,
+        "11": 0.8571428571428571,
+        "12": 0.8333333333333334,
+        "13": 1.0
+      },
+      "per_day_metrics": [
+        {
+          "day": 1,
+          "affective_state": "Neutral",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.8235294117647058,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 2,
+          "affective_state": "Energetic",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 3,
+          "affective_state": "Hurried",
+          "acc_m0": 0.2777777777777778,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 13.0,
+          "mismatches_m1": 7.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 4,
+          "affective_state": "Neutral",
+          "acc_m0": 0.5555555555555556,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 6.0,
+          "m_star": 9.0
+        },
+        {
+          "day": 5,
+          "affective_state": "Hurried",
+          "acc_m0": 0.3333333333333333,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 12.0,
+          "mismatches_m1": 6.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 6,
+          "affective_state": "Neutral",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 5.0,
+          "m_star": 8.0
+        },
+        {
+          "day": 7,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.3333333333333333,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 12.0,
+          "mismatches_m1": 5.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 8,
+          "affective_state": "Slower",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.8823529411764706,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 2.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 9,
+          "affective_state": "Neutral",
+          "acc_m0": 0.8333333333333334,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 7.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 10,
+          "affective_state": "Hurried",
+          "acc_m0": 0.2222222222222222,
+          "acc_m1": 0.29411764705882354,
+          "mismatches_m0": 14.0,
+          "mismatches_m1": 12.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 11,
+          "affective_state": "Slower",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 5.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 12,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.3888888888888889,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 11.0,
+          "mismatches_m1": 7.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 13,
+          "affective_state": "Slower",
+          "acc_m0": 0.5555555555555556,
+          "acc_m1": 0.47058823529411764,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 9.0,
+          "m_star": 8.0
+        },
+        {
+          "day": 14,
+          "affective_state": "Neutral",
+          "acc_m0": 0.8333333333333334,
+          "acc_m1": 0.9411764705882353,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 1.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 15,
+          "affective_state": "Energetic",
+          "acc_m0": 0.8333333333333334,
+          "acc_m1": 0.9411764705882353,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 1.0,
+          "m_star": 2.0
+        },
+        {
+          "day": 16,
+          "affective_state": "Hurried",
+          "acc_m0": 0.3333333333333333,
+          "acc_m1": 0.47058823529411764,
+          "mismatches_m0": 12.0,
+          "mismatches_m1": 9.0,
+          "m_star": 11.0
+        },
+        {
+          "day": 17,
+          "affective_state": "Slower",
+          "acc_m0": 0.6666666666666666,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 4.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 18,
+          "affective_state": "Hurried",
+          "acc_m0": 0.4444444444444444,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 10.0,
+          "mismatches_m1": 6.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 19,
+          "affective_state": "Hurried",
+          "acc_m0": 0.16666666666666666,
+          "acc_m1": 0.17647058823529413,
+          "mismatches_m0": 15.0,
+          "mismatches_m1": 14.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 20,
+          "affective_state": "Energetic",
+          "acc_m0": 0.6666666666666666,
+          "acc_m1": 0.8235294117647058,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 3.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 21,
+          "affective_state": "Hurried",
+          "acc_m0": 0.3333333333333333,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 12.0,
+          "mismatches_m1": 7.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 22,
+          "affective_state": "Energetic",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 23,
+          "affective_state": "Hurried",
+          "acc_m0": 0.5,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 6.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 24,
+          "affective_state": "Hurried",
+          "acc_m0": 0.16666666666666666,
+          "acc_m1": 0.23529411764705882,
+          "mismatches_m0": 15.0,
+          "mismatches_m1": 13.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 25,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.47058823529411764,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 9.0,
+          "m_star": 9.0
+        },
+        {
+          "day": 26,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.5294117647058824,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 8.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 27,
+          "affective_state": "Neutral",
+          "acc_m0": 0.8333333333333334,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 5.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 28,
+          "affective_state": "Slower",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.8235294117647058,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0,
+          "m_star": 2.0
+        },
+        {
+          "day": 29,
+          "affective_state": "Energetic",
+          "acc_m0": 0.5,
+          "acc_m1": 0.5294117647058824,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 8.0,
+          "m_star": 13.0
+        },
+        {
+          "day": 30,
+          "affective_state": "Slower",
+          "acc_m0": 0.5,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 6.0,
+          "m_star": 11.0
+        }
+      ],
+      "by_affective_state": {
+        "Energetic": {
+          "acc_m0": 0.6666666666666667,
+          "mean_m_star": 6.2
+        },
+        "Fatigued": {
+          "acc_m0": 0.48611111111111116,
+          "mean_m_star": 6.75
+        },
+        "Hurried": {
+          "acc_m0": 0.30864197530864196,
+          "mean_m_star": 6.555555555555555
+        },
+        "Neutral": {
+          "acc_m0": 0.7407407407407408,
+          "mean_m_star": 6.166666666666667
+        },
+        "Slower": {
+          "acc_m0": 0.6481481481481481,
+          "mean_m_star": 6.333333333333333
+        }
+      },
+      "per_dimension_m0_accuracy": {
+        "microwave_time": 0.5333333333333333,
+        "occlusion_relevance": 0.7333333333333333,
+        "robot_speed": 0.7666666666666667,
+        "skewering_axis": 0.9666666666666667,
+        "web_interface_confirmation": 0.7333333333333333,
+        "transfer_mode": 0.3,
+        "outside_mouth_distance": 0.16666666666666666,
+        "convey_robot_ready_for_initiating_transfer": 0.16666666666666666,
+        "detect_user_ready_for_initiating_transfer_feeding": 0.36666666666666664,
+        "detect_user_ready_for_initiating_transfer_drinking": 0.4666666666666667,
+        "detect_user_ready_for_initiating_transfer_wiping": 0.6333333333333333,
+        "convey_robot_ready_for_completing_transfer": 0.16666666666666666,
+        "detect_user_completed_transfer_feeding": 1.0,
+        "detect_user_completed_transfer_drinking": 0.7333333333333333,
+        "detect_user_completed_transfer_wiping": 0.7333333333333333,
+        "retract_between_bites": 0.6333333333333333,
+        "bite_dipping_preference": 0.36666666666666664,
+        "wait_before_autocontinue_seconds": 0.36666666666666664
+      },
+      "summary_statistics": {
+        "zero_correction_meals_total": 0,
+        "zero_correction_meals_final_week": 0
+      }
+    },
+    {
+      "file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "physical_profile_label": "moderate_arms_limited_trunk_limited_head",
+      "meals": 30,
+      "num_rollouts": 1,
+      "mean_corrections_to_stop": 4.366666666666666,
+      "accuracy_after_m": {
+        "0": 0.7333333333333335,
+        "1": 0.7829614604462477,
+        "2": 0.8189655172413793,
+        "3": 0.8769230769230771,
+        "4": 0.9081632653061226,
+        "5": 0.9038461538461539,
+        "6": 0.8888888888888888,
+        "7": 0.8181818181818182,
+        "8": 0.8,
+        "9": 0.8888888888888888,
+        "10": 0.75,
+        "11": 1.0
+      },
+      "per_day_metrics": [
+        {
+          "day": 1,
+          "affective_state": "Slower",
+          "acc_m0": 0.6666666666666666,
+          "acc_m1": 0.8235294117647058,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 3.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 2,
+          "affective_state": "Neutral",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 3,
+          "affective_state": "Hurried",
+          "acc_m0": 0.8333333333333334,
+          "acc_m1": 0.8235294117647058,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 3.0,
+          "m_star": 3.0
+        },
+        {
+          "day": 4,
+          "affective_state": "Energetic",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.8235294117647058,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 3.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 5,
+          "affective_state": "Hurried",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 6,
+          "affective_state": "Slower",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 4.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 7,
+          "affective_state": "Hurried",
+          "acc_m0": 0.6666666666666666,
+          "acc_m1": 0.8235294117647058,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 3.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 8,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.8823529411764706,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 2.0,
+          "m_star": 3.0
+        },
+        {
+          "day": 9,
+          "affective_state": "Hurried",
+          "acc_m0": 0.2777777777777778,
+          "acc_m1": 0.35294117647058826,
+          "mismatches_m0": 13.0,
+          "mismatches_m1": 11.0,
+          "m_star": 11.0
+        },
+        {
+          "day": 10,
+          "affective_state": "Hurried",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 5.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 11,
+          "affective_state": "Slower",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.8823529411764706,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 2.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 12,
+          "affective_state": "Slower",
+          "acc_m0": 0.8333333333333334,
+          "acc_m1": 0.9411764705882353,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 1.0,
+          "m_star": 2.0
+        },
+        {
+          "day": 13,
+          "affective_state": "Neutral",
+          "acc_m0": 0.8333333333333334,
+          "acc_m1": 0.9411764705882353,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 1.0,
+          "m_star": 2.0
+        },
+        {
+          "day": 14,
+          "affective_state": "Slower",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.8235294117647058,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 15,
+          "affective_state": "Neutral",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.8823529411764706,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 2.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 16,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.8235294117647058,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 3.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 17,
+          "affective_state": "Neutral",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 5.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 18,
+          "affective_state": "Hurried",
+          "acc_m0": 0.6666666666666666,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 7.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 19,
+          "affective_state": "Energetic",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 4.0,
+          "m_star": 3.0
+        },
+        {
+          "day": 20,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 21,
+          "affective_state": "Energetic",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 4.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 22,
+          "affective_state": "Slower",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.8235294117647058,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 3.0,
+          "m_star": 3.0
+        },
+        {
+          "day": 23,
+          "affective_state": "Slower",
+          "acc_m0": 0.6666666666666666,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 6.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 24,
+          "affective_state": "Neutral",
+          "acc_m0": 1.0,
+          "acc_m1": 1.0,
+          "mismatches_m0": 0.0,
+          "mismatches_m1": 0.0,
+          "m_star": 0.0
+        },
+        {
+          "day": 25,
+          "affective_state": "Slower",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 5.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 26,
+          "affective_state": "Slower",
+          "acc_m0": 0.6666666666666666,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 5.0,
+          "m_star": 8.0
+        },
+        {
+          "day": 27,
+          "affective_state": "Slower",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.8823529411764706,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 2.0,
+          "m_star": 3.0
+        },
+        {
+          "day": 28,
+          "affective_state": "Energetic",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.8823529411764706,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 2.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 29,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.8888888888888888,
+          "acc_m1": 0.8823529411764706,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 2.0,
+          "m_star": 2.0
+        },
+        {
+          "day": 30,
+          "affective_state": "Neutral",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0,
+          "m_star": 4.0
+        }
+      ],
+      "by_affective_state": {
+        "Energetic": {
+          "acc_m0": 0.7638888888888888,
+          "mean_m_star": 3.75
+        },
+        "Fatigued": {
+          "acc_m0": 0.7777777777777778,
+          "mean_m_star": 3.5
+        },
+        "Hurried": {
+          "acc_m0": 0.6296296296296297,
+          "mean_m_star": 6.0
+        },
+        "Neutral": {
+          "acc_m0": 0.7777777777777778,
+          "mean_m_star": 3.8333333333333335
+        },
+        "Slower": {
+          "acc_m0": 0.7388888888888889,
+          "mean_m_star": 4.3
+        }
+      },
+      "per_dimension_m0_accuracy": {
+        "microwave_time": 0.4666666666666667,
+        "occlusion_relevance": 0.8666666666666667,
+        "robot_speed": 0.5666666666666667,
+        "skewering_axis": 0.8333333333333334,
+        "web_interface_confirmation": 1.0,
+        "transfer_mode": 1.0,
+        "outside_mouth_distance": 1.0,
+        "convey_robot_ready_for_initiating_transfer": 0.13333333333333333,
+        "detect_user_ready_for_initiating_transfer_feeding": 0.9666666666666667,
+        "detect_user_ready_for_initiating_transfer_drinking": 0.9666666666666667,
+        "detect_user_ready_for_initiating_transfer_wiping": 0.9666666666666667,
+        "convey_robot_ready_for_completing_transfer": 0.13333333333333333,
+        "detect_user_completed_transfer_feeding": 1.0,
+        "detect_user_completed_transfer_drinking": 0.9666666666666667,
+        "detect_user_completed_transfer_wiping": 0.9666666666666667,
+        "retract_between_bites": 0.6,
+        "bite_dipping_preference": 0.7333333333333333,
+        "wait_before_autocontinue_seconds": 0.03333333333333333
+      },
+      "summary_statistics": {
+        "zero_correction_meals_total": 1,
+        "zero_correction_meals_final_week": 1
+      }
+    },
+    {
+      "file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "physical_profile_label": "limited_arms_no_trunk_limited_head",
+      "meals": 30,
+      "num_rollouts": 1,
+      "mean_corrections_to_stop": 5.433333333333334,
+      "accuracy_after_m": {
+        "0": 0.6481481481481483,
+        "1": 0.7196078431372552,
+        "2": 0.7366071428571429,
+        "3": 0.7925925925925926,
+        "4": 0.8273809523809524,
+        "5": 0.8571428571428573,
+        "6": 0.9264705882352944,
+        "7": 0.9636363636363635,
+        "8": 0.95,
+        "9": 1.0
+      },
+      "per_day_metrics": [
+        {
+          "day": 1,
+          "affective_state": "Energetic",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.8235294117647058,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 3.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 2,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 7.0,
+          "m_star": 8.0
+        },
+        {
+          "day": 3,
+          "affective_state": "Energetic",
+          "acc_m0": 0.5555555555555556,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 6.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 4,
+          "affective_state": "Neutral",
+          "acc_m0": 0.5,
+          "acc_m1": 0.47058823529411764,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 9.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 5,
+          "affective_state": "Neutral",
+          "acc_m0": 0.5555555555555556,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 6.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 6,
+          "affective_state": "Hurried",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 7,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 8,
+          "affective_state": "Neutral",
+          "acc_m0": 0.5,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 7.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 9,
+          "affective_state": "Neutral",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.8823529411764706,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 2.0,
+          "m_star": 3.0
+        },
+        {
+          "day": 10,
+          "affective_state": "Hurried",
+          "acc_m0": 0.5,
+          "acc_m1": 0.5294117647058824,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 8.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 11,
+          "affective_state": "Energetic",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.8235294117647058,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 3.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 12,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 5.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 13,
+          "affective_state": "Hurried",
+          "acc_m0": 0.8333333333333334,
+          "acc_m1": 0.9411764705882353,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 1.0,
+          "m_star": 2.0
+        },
+        {
+          "day": 14,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 4.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 15,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 5.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 16,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 5.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 17,
+          "affective_state": "Slower",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 1.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 0.0,
+          "m_star": 1.0
+        },
+        {
+          "day": 18,
+          "affective_state": "Slower",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 19,
+          "affective_state": "Hurried",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 5.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 20,
+          "affective_state": "Energetic",
+          "acc_m0": 0.9444444444444444,
+          "acc_m1": 1.0,
+          "mismatches_m0": 1.0,
+          "mismatches_m1": 0.0,
+          "m_star": 1.0
+        },
+        {
+          "day": 21,
+          "affective_state": "Energetic",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.8235294117647058,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 3.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 22,
+          "affective_state": "Neutral",
+          "acc_m0": 0.3888888888888889,
+          "acc_m1": 0.35294117647058826,
+          "mismatches_m0": 11.0,
+          "mismatches_m1": 11.0,
+          "m_star": 8.0
+        },
+        {
+          "day": 23,
+          "affective_state": "Slower",
+          "acc_m0": 0.5555555555555556,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 6.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 24,
+          "affective_state": "Energetic",
+          "acc_m0": 0.5,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 5.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 25,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 7.0,
+          "m_star": 9.0
+        },
+        {
+          "day": 26,
+          "affective_state": "Neutral",
+          "acc_m0": 0.8333333333333334,
+          "acc_m1": 0.9411764705882353,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 1.0,
+          "m_star": 3.0
+        },
+        {
+          "day": 27,
+          "affective_state": "Slower",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.8823529411764706,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 2.0,
+          "m_star": 3.0
+        },
+        {
+          "day": 28,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.6666666666666666,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 5.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 29,
+          "affective_state": "Hurried",
+          "acc_m0": 0.5555555555555556,
+          "acc_m1": 0.5294117647058824,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 8.0,
+          "m_star": 9.0
+        },
+        {
+          "day": 30,
+          "affective_state": "Hurried",
+          "acc_m0": 0.6666666666666666,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 5.0,
+          "m_star": 6.0
+        }
+      ],
+      "by_affective_state": {
+        "Energetic": {
+          "acc_m0": 0.6944444444444445,
+          "mean_m_star": 4.166666666666667
+        },
+        "Fatigued": {
+          "acc_m0": 0.6319444444444445,
+          "mean_m_star": 6.625
+        },
+        "Hurried": {
+          "acc_m0": 0.6481481481481481,
+          "mean_m_star": 5.833333333333333
+        },
+        "Neutral": {
+          "acc_m0": 0.5925925925925927,
+          "mean_m_star": 5.833333333333333
+        },
+        "Slower": {
+          "acc_m0": 0.6944444444444444,
+          "mean_m_star": 3.75
+        }
+      },
+      "per_dimension_m0_accuracy": {
+        "microwave_time": 0.5,
+        "occlusion_relevance": 0.7666666666666667,
+        "robot_speed": 0.9666666666666667,
+        "skewering_axis": 0.26666666666666666,
+        "web_interface_confirmation": 0.5333333333333333,
+        "transfer_mode": 1.0,
+        "outside_mouth_distance": 1.0,
+        "convey_robot_ready_for_initiating_transfer": 0.36666666666666664,
+        "detect_user_ready_for_initiating_transfer_feeding": 0.3333333333333333,
+        "detect_user_ready_for_initiating_transfer_drinking": 0.3333333333333333,
+        "detect_user_ready_for_initiating_transfer_wiping": 0.3333333333333333,
+        "convey_robot_ready_for_completing_transfer": 0.36666666666666664,
+        "detect_user_completed_transfer_feeding": 1.0,
+        "detect_user_completed_transfer_drinking": 1.0,
+        "detect_user_completed_transfer_wiping": 1.0,
+        "retract_between_bites": 0.9666666666666667,
+        "bite_dipping_preference": 0.5,
+        "wait_before_autocontinue_seconds": 0.43333333333333335
+      },
+      "summary_statistics": {
+        "zero_correction_meals_total": 0,
+        "zero_correction_meals_final_week": 0
+      }
+    },
+    {
+      "file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "physical_profile_label": "good_arms_good_trunk_good_head_limited_mouth",
+      "meals": 30,
+      "num_rollouts": 1,
+      "mean_corrections_to_stop": 5.233333333333333,
+      "accuracy_after_m": {
+        "0": 0.6481481481481481,
+        "1": 0.6627450980392157,
+        "2": 0.7604166666666666,
+        "3": 0.816666666666667,
+        "4": 0.8509316770186335,
+        "5": 0.8717948717948718,
+        "6": 0.8928571428571427,
+        "7": 0.9595959595959597,
+        "8": 0.975,
+        "9": 1.0
+      },
+      "per_day_metrics": [
+        {
+          "day": 1,
+          "affective_state": "Hurried",
+          "acc_m0": 0.5555555555555556,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 7.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 2,
+          "affective_state": "Neutral",
+          "acc_m0": 0.6666666666666666,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 4.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 3,
+          "affective_state": "Slower",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 4,
+          "affective_state": "Hurried",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 4.0,
+          "m_star": 2.0
+        },
+        {
+          "day": 5,
+          "affective_state": "Energetic",
+          "acc_m0": 0.5555555555555556,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 7.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 6,
+          "affective_state": "Energetic",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 7,
+          "affective_state": "Neutral",
+          "acc_m0": 0.5555555555555556,
+          "acc_m1": 0.5294117647058824,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 8.0,
+          "m_star": 8.0
+        },
+        {
+          "day": 8,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.3888888888888889,
+          "acc_m1": 0.4117647058823529,
+          "mismatches_m0": 11.0,
+          "mismatches_m1": 10.0,
+          "m_star": 9.0
+        },
+        {
+          "day": 9,
+          "affective_state": "Hurried",
+          "acc_m0": 0.5,
+          "acc_m1": 0.47058823529411764,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 9.0,
+          "m_star": 7.0
+        },
+        {
+          "day": 10,
+          "affective_state": "Neutral",
+          "acc_m0": 0.6666666666666666,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 6.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 11,
+          "affective_state": "Slower",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 7.0,
+          "m_star": 8.0
+        },
+        {
+          "day": 12,
+          "affective_state": "Slower",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0,
+          "m_star": 3.0
+        },
+        {
+          "day": 13,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.5555555555555556,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 6.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 14,
+          "affective_state": "Neutral",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 6.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 15,
+          "affective_state": "Hurried",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0,
+          "m_star": 3.0
+        },
+        {
+          "day": 16,
+          "affective_state": "Energetic",
+          "acc_m0": 0.6666666666666666,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 5.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 17,
+          "affective_state": "Energetic",
+          "acc_m0": 0.6666666666666666,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 5.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 18,
+          "affective_state": "Neutral",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0,
+          "m_star": 3.0
+        },
+        {
+          "day": 19,
+          "affective_state": "Slower",
+          "acc_m0": 0.6666666666666666,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 5.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 20,
+          "affective_state": "Slower",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 5.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 21,
+          "affective_state": "Hurried",
+          "acc_m0": 0.5555555555555556,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 6.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 22,
+          "affective_state": "Neutral",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.7647058823529411,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0,
+          "m_star": 4.0
+        },
+        {
+          "day": 23,
+          "affective_state": "Slower",
+          "acc_m0": 0.8333333333333334,
+          "acc_m1": 0.9411764705882353,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 1.0,
+          "m_star": 2.0
+        },
+        {
+          "day": 24,
+          "affective_state": "Neutral",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 5.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 25,
+          "affective_state": "Neutral",
+          "acc_m0": 0.7777777777777778,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 6.0,
+          "m_star": 3.0
+        },
+        {
+          "day": 26,
+          "affective_state": "Energetic",
+          "acc_m0": 0.6111111111111112,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 5.0,
+          "m_star": 5.0
+        },
+        {
+          "day": 27,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.6666666666666666,
+          "acc_m1": 0.7058823529411765,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 5.0,
+          "m_star": 3.0
+        },
+        {
+          "day": 28,
+          "affective_state": "Slower",
+          "acc_m0": 0.5555555555555556,
+          "acc_m1": 0.5882352941176471,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 7.0,
+          "m_star": 6.0
+        },
+        {
+          "day": 29,
+          "affective_state": "Fatigued",
+          "acc_m0": 0.5,
+          "acc_m1": 0.47058823529411764,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 9.0,
+          "m_star": 8.0
+        },
+        {
+          "day": 30,
+          "affective_state": "Slower",
+          "acc_m0": 0.7222222222222222,
+          "acc_m1": 0.6470588235294118,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 6.0,
+          "m_star": 7.0
+        }
+      ],
+      "by_affective_state": {
+        "Energetic": {
+          "acc_m0": 0.6222222222222222,
+          "mean_m_star": 5.4
+        },
+        "Fatigued": {
+          "acc_m0": 0.5277777777777778,
+          "mean_m_star": 6.5
+        },
+        "Hurried": {
+          "acc_m0": 0.6,
+          "mean_m_star": 4.6
+        },
+        "Neutral": {
+          "acc_m0": 0.7083333333333333,
+          "mean_m_star": 4.75
+        },
+        "Slower": {
+          "acc_m0": 0.6944444444444444,
+          "mean_m_star": 5.375
+        }
+      },
+      "per_dimension_m0_accuracy": {
+        "microwave_time": 0.6333333333333333,
+        "occlusion_relevance": 0.9,
+        "robot_speed": 0.8333333333333334,
+        "skewering_axis": 0.8666666666666667,
+        "web_interface_confirmation": 0.7666666666666667,
+        "transfer_mode": 0.8666666666666667,
+        "outside_mouth_distance": 0.6666666666666666,
+        "convey_robot_ready_for_initiating_transfer": 0.26666666666666666,
+        "detect_user_ready_for_initiating_transfer_feeding": 0.9333333333333333,
+        "detect_user_ready_for_initiating_transfer_drinking": 0.9333333333333333,
+        "detect_user_ready_for_initiating_transfer_wiping": 0.9333333333333333,
+        "convey_robot_ready_for_completing_transfer": 0.26666666666666666,
+        "detect_user_completed_transfer_feeding": 1.0,
+        "detect_user_completed_transfer_drinking": 0.1,
+        "detect_user_completed_transfer_wiping": 0.1,
+        "retract_between_bites": 0.8333333333333334,
+        "bite_dipping_preference": 0.6,
+        "wait_before_autocontinue_seconds": 0.16666666666666666
+      },
+      "summary_statistics": {
+        "zero_correction_meals_total": 0,
+        "zero_correction_meals_final_week": 0
+      }
+    }
+  ],
+  "run_timestamp": "2026_03_06__12_55_16",
+  "ablation": "no_memory",
+  "k_retrieve": 10,
+  "num_rollouts": 1
+}

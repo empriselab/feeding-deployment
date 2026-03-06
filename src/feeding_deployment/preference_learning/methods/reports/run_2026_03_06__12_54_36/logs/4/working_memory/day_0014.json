@@ -1,0 +1,49 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 14,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 14,
+      "m": 1,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 14,
+      "m": 2,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "microwave_time": "3 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 14,
+      "m": 3,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "microwave_time": "3 min",
+        "bite_dipping_preference": "do not dip"
+      }
+    }
+  ]
+}

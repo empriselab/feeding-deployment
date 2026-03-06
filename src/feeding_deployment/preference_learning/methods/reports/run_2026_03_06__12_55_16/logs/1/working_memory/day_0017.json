@@ -1,0 +1,78 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 17,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 17,
+      "m": 1,
+      "corrected": {
+        "microwave_time": "3 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 17,
+      "m": 2,
+      "corrected": {
+        "microwave_time": "3 min",
+        "wait_before_autocontinue_seconds": "10 sec"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 17,
+      "m": 3,
+      "corrected": {
+        "microwave_time": "3 min",
+        "wait_before_autocontinue_seconds": "10 sec",
+        "skewering_axis": "parallel to major axis"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 17,
+      "m": 4,
+      "corrected": {
+        "microwave_time": "3 min",
+        "wait_before_autocontinue_seconds": "10 sec",
+        "skewering_axis": "parallel to major axis",
+        "robot_speed": "slow"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 17,
+      "m": 5,
+      "corrected": {
+        "microwave_time": "3 min",
+        "wait_before_autocontinue_seconds": "10 sec",
+        "skewering_axis": "parallel to major axis",
+        "robot_speed": "slow",
+        "web_interface_confirmation": "no"
+      }
+    }
+  ]
+}

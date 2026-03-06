@@ -1,0 +1,94 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 29,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 29,
+      "m": 1,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 29,
+      "m": 2,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "convey_robot_ready_for_initiating_transfer": "speech"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 29,
+      "m": 3,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "convey_robot_ready_for_initiating_transfer": "speech",
+        "microwave_time": "1 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 29,
+      "m": 4,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "convey_robot_ready_for_initiating_transfer": "speech",
+        "microwave_time": "1 min",
+        "skewering_axis": "parallel to major axis"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 29,
+      "m": 5,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "convey_robot_ready_for_initiating_transfer": "speech",
+        "microwave_time": "1 min",
+        "skewering_axis": "parallel to major axis",
+        "web_interface_confirmation": "yes"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 29,
+      "m": 6,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "convey_robot_ready_for_initiating_transfer": "speech",
+        "microwave_time": "1 min",
+        "skewering_axis": "parallel to major axis",
+        "web_interface_confirmation": "yes",
+        "wait_before_autocontinue_seconds": "10 sec"
+      }
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "run_timestamp": "2026_03_06__12_54_17",
+  "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+  "user": "1",
+  "physical_profile_label": "limited_arms_no_trunk_good_head",
+  "rollout": 0,
+  "day": 2,
+  "context": {
+    "meal": "bananas, brownies, and chocolate sauce",
+    "setting": "Watching TV with TV on Left",
+    "time_of_day": "morning",
+    "transient_affective_state": "Energetic"
+  },
+  "episode_text": "day=2; meal=bananas, brownies, and chocolate sauce; setting=Watching TV with TV on Left; time_of_day=morning;\npreferences: microwave_time=3 min; occlusion_relevance=minimize left occlusion; robot_speed=medium; skewering_axis=perpendicular to major axis; web_interface_confirmation=yes; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=speech + LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=speech + LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=yes; bite_dipping_preference=less; wait_before_autocontinue_seconds=1000 sec",
+  "ltm_summary_raw": {
+    "microwave_time": {
+      "default": "1 min",
+      "user_tendencies": "IF dining context includes watching TV on the left AND affective state is unspecified/unknown AND food includes a dessert with sauce (e.g., brownies with chocolate sauce) THEN 3 min BECAUSE the user explicitly selected a longer reheating time in that observed meal. No broader context-dependent variation is established yet."
+    },
+    "occlusion_relevance": {
+      "default": "do not consider occlusion",
+      "user_tendencies": "IF dining context includes a social partner in front of the user AND affective state is neutral AND food has no special sauce/dip relevance THEN minimize front occlusion BECAUSE the user explicitly chose front-occlusion minimization in a front-social context, indicating sensitivity to blocking a person directly ahead. IF dining context includes watching TV on the left AND affective state is unspecified/unknown AND food includes dessert/sauce items THEN minimize left occlusion BECAUSE the user explicitly chose left-occlusion minimization when attending to a TV on the left, indicating that preserving sightlines to salient left-side stimuli matters."
+    },
+    "robot_speed": {
+      "default": "fast",
+      "user_tendencies": "IF dining context includes watching TV on the left AND affective state is unspecified/unknown AND food includes dessert/sauce items THEN medium BECAUSE the user explicitly selected a slower-than-default speed in that observed TV-viewing meal. No broader context-dependent variation is established yet."
+    },
+    "skewering_axis": {
+      "default": "perpendicular to major axis",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "web_interface_confirmation": {
+      "default": "no",
+      "user_tendencies": "IF dining context includes watching TV on the left AND affective state is unspecified/unknown AND food includes sauce/dessert items THEN yes BECAUSE the user explicitly requested confirmation of bite acquisition in that meal, suggesting more verification when the meal may be messier or bite quality may matter more."
+    },
+    "transfer_mode": {
+      "default": "inside mouth transfer",
+      "user_tendencies": "IF any dining context AND any affective state AND any food condition THEN inside mouth transfer BECAUSE the user cannot lean forward due to lack of trunk control, so outside-mouth transfer is not physically compatible."
+    },
+    "outside_mouth_distance": {
+      "default": "not applicable",
+      "user_tendencies": "IF any dining context AND any affective state AND any food condition THEN not applicable BECAUSE the user's physical abilities support inside-mouth transfer rather than outside-mouth transfer."
+    },
+    "convey_robot_ready_for_initiating_transfer": {
+      "default": "LED",
+      "user_tendencies": "IF dining context includes watching TV on the left AND affective state is unspecified/unknown AND food includes dessert/sauce items THEN speech + LED BECAUSE the user explicitly selected a multimodal cue in that context, suggesting a preference for more salient readiness signaling when attention may be divided by TV viewing."
+    },
+    "detect_user_ready_for_initiating_transfer_feeding": {
+      "default": "autocontinue",
+      "user_tendencies": "IF dining context includes a social partner in front of the user AND affective state is neutral AND food has no special sauce/dip relevance THEN autocontinue BECAUSE the user explicitly selected a low-effort automated initiation method in that context. IF dining context includes watching TV on the left AND affective state is unspecified/unknown AND food includes dessert/sauce items THEN autocontinue BECAUSE the user again selected automated initiation. Also, button use is physically incompatible because the user cannot press physical buttons."
+    },
+    "detect_user_ready_for_initiating_transfer_drinking": {
+      "default": "autocontinue",
+      "user_tendencies": "IF dining context includes a social partner in front of the user AND affective state is neutral AND food has no special sauce/dip relevance THEN autocontinue BECAUSE the user explicitly selected automated initiation for drinking in that context. IF dining context includes watching TV on the left AND affective state is unspecified/unknown AND food includes dessert/sauce items THEN autocontinue BECAUSE the user again selected automated initiation. Also, button use is physically incompatible because the user cannot press physical buttons."
+    },
+    "detect_user_ready_for_initiating_transfer_wiping": {
+      "default": "autocontinue",
+      "user_tendencies": "IF dining context includes a social partner in front of the user AND affective state is neutral AND food has no special sauce/dip relevance THEN autocontinue BECAUSE the user explicitly selected automated initiation for mouth wiping in that context. IF dining context includes watching TV on the left AND affective state is unspecified/unknown AND food includes dessert/sauce items THEN autocontinue BECAUSE the user again selected automated initiation. Also, button use is physically incompatible because the user cannot press physical buttons."
+    },
+    "convey_robot_ready_for_completing_transfer": {
+      "default": "LED",
+      "user_tendencies": "IF dining context includes watching TV on the left AND affective state is unspecified/unknown AND food includes dessert/sauce items THEN speech + LED BECAUSE the user explicitly selected a multimodal completion cue in that context, suggesting a preference for more salient signaling when attention may be divided."
+    },
+    "detect_user_completed_transfer_feeding": {
+      "default": "perception",
+      "user_tendencies": "IF dining context includes a social partner in front of the user AND affective state is neutral AND food has no special sauce/dip relevance THEN perception BECAUSE the user explicitly preferred reliable automatic detection for bite completion. IF dining context includes watching TV on the left AND affective state is unspecified/unknown AND food includes dessert/sauce items THEN perception BECAUSE the user again selected automatic perceptual detection. Button use is physically incompatible."
+    },
+    "detect_user_completed_transfer_drinking": {
+      "default": "autocontinue",
+      "user_tendencies": "IF dining context includes a social partner in front of the user AND affective state is neutral AND food has no special sauce/dip relevance THEN autocontinue BECAUSE the user explicitly selected automated completion for drinking in that context. IF dining context includes watching TV on the left AND affective state is unspecified/unknown AND food includes dessert/sauce items THEN autocontinue BECAUSE the user again selected automated completion. Button use is physically incompatible."
+    },
+    "detect_user_completed_transfer_wiping": {
+      "default": "autocontinue",
+      "user_tendencies": "IF dining context includes a social partner in front of the user AND affective state is neutral AND food has no special sauce/dip relevance THEN autocontinue BECAUSE the user explicitly selected automated completion for mouth wiping in that context. IF dining context includes watching TV on the left AND affective state is unspecified/unknown AND food includes dessert/sauce items THEN autocontinue BECAUSE the user again selected automated completion. Button use is physically incompatible."
+    },
+    "retract_between_bites": {
+      "default": "no",
+      "user_tendencies": "IF dining context includes watching TV on the left AND affective state is unspecified/unknown AND food includes dessert/sauce items THEN yes BECAUSE the user explicitly chose retracting in a context where preserving visibility of a left-side visual target appears important."
+    },
+    "bite_dipping_preference": {
+      "default": "do not dip",
+      "user_tendencies": "IF food has no sauces or dips AND any dining context AND any affective state THEN do not dip BECAUSE dipping is not relevant. IF food includes a dip or sauce AND dining context includes watching TV on the left AND affective state is unspecified/unknown THEN less BECAUSE the user explicitly preferred some dipping but not heavy dipping for a sauce-containing meal."
+    },
+    "wait_before_autocontinue_seconds": {
+      "default": "10 sec",
+      "user_tendencies": "IF dining context includes watching TV on the left AND affective state is unspecified/unknown AND food includes dessert/sauce items THEN 1000 sec BECAUSE the user explicitly selected a very long wait, indicating a preference for ample time to intervene when attention may be divided by TV viewing."
+    }
+  }
+}

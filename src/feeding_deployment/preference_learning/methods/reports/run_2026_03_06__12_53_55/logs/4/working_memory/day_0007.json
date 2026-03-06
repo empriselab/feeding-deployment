@@ -1,0 +1,94 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 7,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 7,
+      "m": 1,
+      "corrected": {
+        "microwave_time": "3 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 7,
+      "m": 2,
+      "corrected": {
+        "microwave_time": "3 min",
+        "skewering_axis": "parallel to major axis"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 7,
+      "m": 3,
+      "corrected": {
+        "microwave_time": "3 min",
+        "skewering_axis": "parallel to major axis",
+        "convey_robot_ready_for_completing_transfer": "speech + LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 7,
+      "m": 4,
+      "corrected": {
+        "microwave_time": "3 min",
+        "skewering_axis": "parallel to major axis",
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "convey_robot_ready_for_initiating_transfer": "speech + LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 7,
+      "m": 5,
+      "corrected": {
+        "microwave_time": "3 min",
+        "skewering_axis": "parallel to major axis",
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "convey_robot_ready_for_initiating_transfer": "speech + LED",
+        "web_interface_confirmation": "no"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 7,
+      "m": 6,
+      "corrected": {
+        "microwave_time": "3 min",
+        "skewering_axis": "parallel to major axis",
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "convey_robot_ready_for_initiating_transfer": "speech + LED",
+        "web_interface_confirmation": "no",
+        "wait_before_autocontinue_seconds": "1000 sec"
+      }
+    }
+  ]
+}

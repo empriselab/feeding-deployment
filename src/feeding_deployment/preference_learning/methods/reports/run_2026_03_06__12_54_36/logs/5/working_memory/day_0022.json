@@ -1,0 +1,78 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 22,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 22,
+      "m": 1,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 22,
+      "m": 2,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "robot_speed": "medium"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 22,
+      "m": 3,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "robot_speed": "medium",
+        "wait_before_autocontinue_seconds": "100 sec"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 22,
+      "m": 4,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "robot_speed": "medium",
+        "wait_before_autocontinue_seconds": "100 sec",
+        "web_interface_confirmation": "yes"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 22,
+      "m": 5,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "robot_speed": "medium",
+        "wait_before_autocontinue_seconds": "100 sec",
+        "web_interface_confirmation": "yes",
+        "bite_dipping_preference": "less"
+      }
+    }
+  ]
+}

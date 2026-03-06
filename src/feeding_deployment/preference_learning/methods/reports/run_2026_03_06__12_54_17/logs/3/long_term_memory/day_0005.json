@@ -1,0 +1,89 @@
+{
+  "run_timestamp": "2026_03_06__12_54_17",
+  "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+  "user": "3",
+  "physical_profile_label": "moderate_arms_limited_trunk_limited_head",
+  "rollout": 0,
+  "day": 5,
+  "context": {
+    "meal": "chicken breast strips and hash brown",
+    "setting": "Social with person in Front",
+    "time_of_day": "noon",
+    "transient_affective_state": "Hurried"
+  },
+  "episode_text": "day=5; meal=chicken breast strips and hash brown; setting=Social with person in Front; time_of_day=noon;\npreferences: microwave_time=1 min; occlusion_relevance=minimize front occlusion; robot_speed=medium; skewering_axis=parallel to major axis; web_interface_confirmation=yes; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=button; detect_user_ready_for_initiating_transfer_drinking=button; detect_user_ready_for_initiating_transfer_wiping=button; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=button; detect_user_completed_transfer_wiping=button; retract_between_bites=yes; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=1000 sec",
+  "ltm_summary_raw": {
+    "microwave_time": {
+      "default": "2 min",
+      "user_tendencies": "IF food is fruit or another cold-served item THEN no microwave BECAUSE the user selected no microwave for a fruit meal, consistent with preserving intended cold serving temperature. IF the meal is a hot savory item such as chicken and potatoes in a social front-facing context THEN 1 min BECAUSE the user selected a shorter reheating time for that warm meal, indicating they do not always want maximum heating. Otherwise, observed warm-meal evidence supports moderate reheating rather than extreme settings."
+    },
+    "occlusion_relevance": {
+      "default": "do not consider occlusion",
+      "user_tendencies": "IF dining context includes a social partner or focal activity directly in front of the user THEN minimize front occlusion BECAUSE the user repeatedly selected front-occlusion minimization in front-oriented social contexts, showing sensitivity to blocking the forward view. IF dining context includes a social partner or focal activity to the right of the user THEN minimize right occlusion BECAUSE the user chose right-occlusion minimization across multiple right-oriented contexts, indicating that occlusion preferences track the location of the valued visual target on the right."
+    },
+    "robot_speed": {
+      "default": "slow",
+      "user_tendencies": "IF dining context involves a social partner or valued activity to the right of the user THEN medium BECAUSE the user repeatedly selected medium speed in right-oriented contexts. IF dining context includes a social partner directly in front of the user THEN medium BECAUSE the user selected medium speed in a front-social meal, suggesting a broader social-context preference for somewhat faster service than the quiet-setting default."
+    },
+    "skewering_axis": {
+      "default": "parallel to major axis",
+      "user_tendencies": "IF food acquisition must remain compatible with limited mouth opening THEN parallel to major axis BECAUSE the user has limited mouth opening and has consistently selected the narrower-bite option."
+    },
+    "web_interface_confirmation": {
+      "default": "yes",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "transfer_mode": {
+      "default": "inside mouth transfer",
+      "user_tendencies": "IF the user's physical constraints are relevant to the meal context THEN inside mouth transfer BECAUSE the user cannot lean forward due to limited trunk control, and observed selections consistently favor the mode that does not require leaning forward."
+    },
+    "outside_mouth_distance": {
+      "default": "not applicable",
+      "user_tendencies": "IF transfer_mode is inside mouth transfer THEN not applicable BECAUSE this parameter only applies to outside-mouth transfer. IF the user's physical constraints are considered for food delivery THEN not applicable BECAUSE the observed preference and physical profile support inside-mouth transfer rather than outside-mouth transfer."
+    },
+    "convey_robot_ready_for_initiating_transfer": {
+      "default": "LED",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "detect_user_ready_for_initiating_transfer_feeding": {
+      "default": "button",
+      "user_tendencies": "IF initiating feeding transfer in contexts where physical ability constraints matter THEN button BECAUSE the user can press buttons reliably, while limited mouth opening makes open-mouth interaction challenging."
+    },
+    "detect_user_ready_for_initiating_transfer_drinking": {
+      "default": "button",
+      "user_tendencies": "IF initiating drinking transfer in contexts where physical ability constraints matter THEN button BECAUSE the user can press buttons reliably, while limited mouth opening makes open-mouth interaction challenging."
+    },
+    "detect_user_ready_for_initiating_transfer_wiping": {
+      "default": "button",
+      "user_tendencies": "IF initiating mouth-wiping transfer in contexts where physical ability constraints matter THEN button BECAUSE the user can press buttons reliably, while limited mouth opening makes open-mouth interaction challenging."
+    },
+    "convey_robot_ready_for_completing_transfer": {
+      "default": "LED",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "detect_user_completed_transfer_feeding": {
+      "default": "perception",
+      "user_tendencies": "IF completing feeding transfer in contexts where physical ability constraints matter THEN perception BECAUSE the user selected the reliable perception-based option and this avoids requiring extra physical input."
+    },
+    "detect_user_completed_transfer_drinking": {
+      "default": "button",
+      "user_tendencies": "IF completing drinking transfer in contexts where physical ability constraints matter THEN button BECAUSE the user cannot reliably perform head gestures, making perception-based drinking completion less suitable."
+    },
+    "detect_user_completed_transfer_wiping": {
+      "default": "button",
+      "user_tendencies": "IF completing mouth-wiping transfer in contexts where physical ability constraints matter THEN button BECAUSE the user cannot reliably perform head gestures, making perception-based wiping completion less suitable."
+    },
+    "retract_between_bites": {
+      "default": "no",
+      "user_tendencies": "IF dining context includes a social partner or focal activity directly in front of the user THEN yes BECAUSE the user repeatedly chose retraction in front-social contexts, consistent with wanting to reduce prolonged visual obstruction. IF dining context includes a social partner to the right of the user THEN yes BECAUSE the user selected retraction in a right-social context, indicating that social presence on the right is sufficient to favor reducing obstruction. IF dining context involves a focal activity to the right without a social partner THEN no BECAUSE the user repeatedly chose not to retract while watching TV on the right, suggesting that right-sided visual activities alone do not trigger a preference for added retraction time."
+    },
+    "bite_dipping_preference": {
+      "default": "do not dip",
+      "user_tendencies": "IF food includes a dip or sauce AND dining context is social THEN less BECAUSE the user chose reduced dipping with sauce in a social context, suggesting a preference to limit messiness around others. IF food does not include a dip or sauce THEN do not dip BECAUSE dipping is not relevant and the user selected no dipping for non-dippable meals, including fruit, bite-sized sandwiches without dipping, and a chicken-and-hash-brown meal without sauce use."
+    },
+    "wait_before_autocontinue_seconds": {
+      "default": "1000 sec",
+      "user_tendencies": "No context-dependent variation observed yet."
+    }
+  }
+}

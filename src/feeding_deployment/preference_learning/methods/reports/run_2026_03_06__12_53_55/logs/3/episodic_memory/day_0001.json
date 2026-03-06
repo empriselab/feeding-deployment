@@ -1,0 +1,98 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 1,
+      "m": 0,
+      "context": {
+        "meal": "bananas, brownies, and chocolate sauce",
+        "setting": "Social with person in Front",
+        "time_of_day": "morning",
+        "transient_affective_state": "Slower"
+      },
+      "corrected": {},
+      "retrieved_episodes": ""
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 1,
+      "m": 1,
+      "context": {
+        "meal": "bananas, brownies, and chocolate sauce",
+        "setting": "Social with person in Front",
+        "time_of_day": "morning",
+        "transient_affective_state": "Slower"
+      },
+      "corrected": {
+        "bite_dipping_preference": "less"
+      },
+      "retrieved_episodes": ""
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 1,
+      "m": 2,
+      "context": {
+        "meal": "bananas, brownies, and chocolate sauce",
+        "setting": "Social with person in Front",
+        "time_of_day": "morning",
+        "transient_affective_state": "Slower"
+      },
+      "corrected": {
+        "bite_dipping_preference": "less",
+        "convey_robot_ready_for_completing_transfer": "LED"
+      },
+      "retrieved_episodes": ""
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 1,
+      "m": 3,
+      "context": {
+        "meal": "bananas, brownies, and chocolate sauce",
+        "setting": "Social with person in Front",
+        "time_of_day": "morning",
+        "transient_affective_state": "Slower"
+      },
+      "corrected": {
+        "bite_dipping_preference": "less",
+        "convey_robot_ready_for_completing_transfer": "LED",
+        "microwave_time": "2 min"
+      },
+      "retrieved_episodes": ""
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 1,
+      "m": 4,
+      "context": {
+        "meal": "bananas, brownies, and chocolate sauce",
+        "setting": "Social with person in Front",
+        "time_of_day": "morning",
+        "transient_affective_state": "Slower"
+      },
+      "corrected": {
+        "bite_dipping_preference": "less",
+        "convey_robot_ready_for_completing_transfer": "LED",
+        "microwave_time": "2 min",
+        "wait_before_autocontinue_seconds": "1000 sec"
+      },
+      "retrieved_episodes": ""
+    }
+  ]
+}

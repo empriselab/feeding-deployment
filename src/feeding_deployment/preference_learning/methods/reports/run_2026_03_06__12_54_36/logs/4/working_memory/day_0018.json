@@ -1,0 +1,129 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 18,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 18,
+      "m": 1,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_wiping": "open mouth"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 18,
+      "m": 2,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_wiping": "open mouth",
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 18,
+      "m": 3,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_wiping": "open mouth",
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth",
+        "skewering_axis": "parallel to major axis"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 18,
+      "m": 4,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_wiping": "open mouth",
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth",
+        "skewering_axis": "parallel to major axis",
+        "bite_dipping_preference": "less"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 18,
+      "m": 5,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_wiping": "open mouth",
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth",
+        "skewering_axis": "parallel to major axis",
+        "bite_dipping_preference": "less",
+        "web_interface_confirmation": "no"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 18,
+      "m": 6,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_wiping": "open mouth",
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth",
+        "skewering_axis": "parallel to major axis",
+        "bite_dipping_preference": "less",
+        "web_interface_confirmation": "no",
+        "convey_robot_ready_for_completing_transfer": "speech + LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 18,
+      "m": 7,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_wiping": "open mouth",
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth",
+        "skewering_axis": "parallel to major axis",
+        "bite_dipping_preference": "less",
+        "web_interface_confirmation": "no",
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "retract_between_bites": "no"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 18,
+      "m": 8,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_wiping": "open mouth",
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth",
+        "skewering_axis": "parallel to major axis",
+        "bite_dipping_preference": "less",
+        "web_interface_confirmation": "no",
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "retract_between_bites": "no",
+        "wait_before_autocontinue_seconds": "1000 sec"
+      }
+    }
+  ]
+}

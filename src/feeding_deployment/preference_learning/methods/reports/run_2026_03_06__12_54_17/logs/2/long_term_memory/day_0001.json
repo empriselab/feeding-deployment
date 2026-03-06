@@ -1,0 +1,89 @@
+{
+  "run_timestamp": "2026_03_06__12_54_17",
+  "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+  "user": "2",
+  "physical_profile_label": "moderate_arms_good_trunk_good_head",
+  "rollout": 0,
+  "day": 1,
+  "context": {
+    "meal": "breaded fish bites, roasted potatoes, tartar sauce",
+    "setting": "Social with person on Right",
+    "time_of_day": "morning",
+    "transient_affective_state": "Neutral"
+  },
+  "episode_text": "day=1; meal=breaded fish bites, roasted potatoes, tartar sauce; setting=Social with person on Right; time_of_day=morning;\npreferences: microwave_time=2 min; occlusion_relevance=minimize right occlusion; robot_speed=medium; skewering_axis=perpendicular to major axis; web_interface_confirmation=no; transfer_mode=outside mouth transfer; outside_mouth_distance=medium; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=button; detect_user_ready_for_initiating_transfer_drinking=button; detect_user_ready_for_initiating_transfer_wiping=button; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=button; detect_user_completed_transfer_wiping=button; retract_between_bites=yes; bite_dipping_preference=less; wait_before_autocontinue_seconds=100 sec",
+  "ltm_summary_raw": {
+    "microwave_time": {
+      "default": "2 min",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "occlusion_relevance": {
+      "default": "do not consider occlusion",
+      "user_tendencies": "IF dining context is social with a person on the right AND affective state is unspecified/neutral AND food has no special constraint THEN minimize right occlusion BECAUSE the user explicitly chose to avoid blocking a social partner on the right."
+    },
+    "robot_speed": {
+      "default": "medium",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "skewering_axis": {
+      "default": "perpendicular to major axis",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "web_interface_confirmation": {
+      "default": "no",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "transfer_mode": {
+      "default": "outside mouth transfer",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "outside_mouth_distance": {
+      "default": "medium",
+      "user_tendencies": "IF transfer mode is outside mouth transfer AND affective state is unspecified/neutral AND food has no special constraint THEN medium BECAUSE the user selected a moderate stopping distance that balances comfort and reachability. IF transfer mode is inside mouth transfer AND any context AND any affective state AND any food condition THEN not applicable BECAUSE this parameter only applies to outside-mouth transfer."
+    },
+    "convey_robot_ready_for_initiating_transfer": {
+      "default": "LED",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "detect_user_ready_for_initiating_transfer_feeding": {
+      "default": "button",
+      "user_tendencies": "IF dining context is social AND affective state is unspecified/neutral AND food has no special constraint THEN button BECAUSE the user has the physical ability to press buttons and explicitly chose button-based initiation in a social meal, consistent with avoiding ambiguity from open-mouth signals during conversation."
+    },
+    "detect_user_ready_for_initiating_transfer_drinking": {
+      "default": "button",
+      "user_tendencies": "IF dining context is social AND affective state is unspecified/neutral AND food has no special constraint THEN button BECAUSE the user explicitly preferred manual readiness signaling for drinking in a social setting and can comfortably press buttons."
+    },
+    "detect_user_ready_for_initiating_transfer_wiping": {
+      "default": "button",
+      "user_tendencies": "IF dining context is social AND affective state is unspecified/neutral AND food has no special constraint THEN button BECAUSE the user explicitly preferred manual readiness signaling for wiping in a social setting and can comfortably press buttons."
+    },
+    "convey_robot_ready_for_completing_transfer": {
+      "default": "LED",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "detect_user_completed_transfer_feeding": {
+      "default": "perception",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "detect_user_completed_transfer_drinking": {
+      "default": "button",
+      "user_tendencies": "IF dining context is social AND affective state is unspecified/neutral AND food has no special constraint THEN button BECAUSE the user explicitly chose button-based completion for drinking in a social meal, favoring explicit control over automatic inference."
+    },
+    "detect_user_completed_transfer_wiping": {
+      "default": "button",
+      "user_tendencies": "IF dining context is social AND affective state is unspecified/neutral AND food has no special constraint THEN button BECAUSE the user explicitly chose button-based completion for wiping in a social meal, favoring explicit control over automatic inference."
+    },
+    "retract_between_bites": {
+      "default": "no",
+      "user_tendencies": "IF dining context is social with a person on the right AND affective state is unspecified/neutral AND food has no special constraint THEN yes BECAUSE the user chose to reduce prolonged visual obstruction in a social setting, even at the cost of longer meal time."
+    },
+    "bite_dipping_preference": {
+      "default": "do not dip",
+      "user_tendencies": "IF food includes a dip or sauce AND dining context is social AND affective state is unspecified/neutral THEN less BECAUSE the user selected reduced dipping for a social meal with tartar sauce, consistent with limiting messiness. IF food has no dippable item or sauce AND any dining context AND any affective state THEN do not dip BECAUSE dipping is not relevant."
+    },
+    "wait_before_autocontinue_seconds": {
+      "default": "100 sec",
+      "user_tendencies": "No context-dependent variation observed yet."
+    }
+  }
+}

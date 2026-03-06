@@ -1,0 +1,94 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 12,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 12,
+      "m": 1,
+      "corrected": {
+        "microwave_time": "2 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 12,
+      "m": 2,
+      "corrected": {
+        "microwave_time": "2 min",
+        "robot_speed": "medium"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 12,
+      "m": 3,
+      "corrected": {
+        "microwave_time": "2 min",
+        "robot_speed": "medium",
+        "retract_between_bites": "yes"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 12,
+      "m": 4,
+      "corrected": {
+        "microwave_time": "2 min",
+        "robot_speed": "medium",
+        "retract_between_bites": "yes",
+        "wait_before_autocontinue_seconds": "100 sec"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 12,
+      "m": 5,
+      "corrected": {
+        "microwave_time": "2 min",
+        "robot_speed": "medium",
+        "retract_between_bites": "yes",
+        "wait_before_autocontinue_seconds": "100 sec",
+        "convey_robot_ready_for_completing_transfer": "LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 12,
+      "m": 6,
+      "corrected": {
+        "microwave_time": "2 min",
+        "robot_speed": "medium",
+        "retract_between_bites": "yes",
+        "wait_before_autocontinue_seconds": "100 sec",
+        "convey_robot_ready_for_completing_transfer": "LED",
+        "convey_robot_ready_for_initiating_transfer": "LED"
+      }
+    }
+  ]
+}

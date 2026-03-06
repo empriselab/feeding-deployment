@@ -1,0 +1,94 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 17,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 17,
+      "m": 1,
+      "corrected": {
+        "occlusion_relevance": "do not consider occlusion"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 17,
+      "m": 2,
+      "corrected": {
+        "occlusion_relevance": "do not consider occlusion",
+        "convey_robot_ready_for_initiating_transfer": "LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 17,
+      "m": 3,
+      "corrected": {
+        "occlusion_relevance": "do not consider occlusion",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "microwave_time": "3 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 17,
+      "m": 4,
+      "corrected": {
+        "occlusion_relevance": "do not consider occlusion",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "microwave_time": "3 min",
+        "wait_before_autocontinue_seconds": "1000 sec"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 17,
+      "m": 5,
+      "corrected": {
+        "occlusion_relevance": "do not consider occlusion",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "microwave_time": "3 min",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "bite_dipping_preference": "less"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 17,
+      "m": 6,
+      "corrected": {
+        "occlusion_relevance": "do not consider occlusion",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "microwave_time": "3 min",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "bite_dipping_preference": "less",
+        "robot_speed": "medium"
+      }
+    }
+  ]
+}

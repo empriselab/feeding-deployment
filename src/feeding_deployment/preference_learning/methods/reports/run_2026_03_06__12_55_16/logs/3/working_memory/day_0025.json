@@ -1,0 +1,78 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 25,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 25,
+      "m": 1,
+      "corrected": {
+        "skewering_axis": "perpendicular to major axis"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 25,
+      "m": 2,
+      "corrected": {
+        "skewering_axis": "perpendicular to major axis",
+        "robot_speed": "slow"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 25,
+      "m": 3,
+      "corrected": {
+        "skewering_axis": "perpendicular to major axis",
+        "robot_speed": "slow",
+        "wait_before_autocontinue_seconds": "1000 sec"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 25,
+      "m": 4,
+      "corrected": {
+        "skewering_axis": "perpendicular to major axis",
+        "robot_speed": "slow",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "convey_robot_ready_for_completing_transfer": "LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 25,
+      "m": 5,
+      "corrected": {
+        "skewering_axis": "perpendicular to major axis",
+        "robot_speed": "slow",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "convey_robot_ready_for_completing_transfer": "LED",
+        "detect_user_completed_transfer_drinking": "button"
+      }
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 9,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 9,
+      "m": 1,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 9,
+      "m": 2,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "microwave_time": "1 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 9,
+      "m": 3,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "microwave_time": "1 min",
+        "outside_mouth_distance": "near"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 9,
+      "m": 4,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "microwave_time": "1 min",
+        "outside_mouth_distance": "near",
+        "detect_user_completed_transfer_drinking": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 9,
+      "m": 5,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "microwave_time": "1 min",
+        "outside_mouth_distance": "near",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "detect_user_ready_for_initiating_transfer_wiping": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 9,
+      "m": 6,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "microwave_time": "1 min",
+        "outside_mouth_distance": "near",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "detect_user_ready_for_initiating_transfer_wiping": "autocontinue",
+        "retract_between_bites": "no"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 9,
+      "m": 7,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "microwave_time": "1 min",
+        "outside_mouth_distance": "near",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "detect_user_ready_for_initiating_transfer_wiping": "autocontinue",
+        "retract_between_bites": "no",
+        "convey_robot_ready_for_initiating_transfer": "speech"
+      }
+    }
+  ]
+}

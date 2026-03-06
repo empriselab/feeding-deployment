@@ -1,0 +1,58 @@
+{
+  "Ours": {
+    "mean_m_star_all_days": 3.1466666666666665,
+    "sem_m_star_all_days": 0.21341387368557233,
+    "mean_m_star_first_5_days": 3.76,
+    "sem_m_star_first_5_days": 0.46053881486797615,
+    "mean_m_star_last_5_days": 2.04,
+    "sem_m_star_last_5_days": 0.457751024029439,
+    "mean_acc_m0_all_days": 0.7792592592592589,
+    "sem_acc_m0_all_days": 0.016379808463037025,
+    "mean_acc_m0_first_5_days": 0.7266666666666669,
+    "sem_acc_m0_first_5_days": 0.03847975257229042,
+    "mean_acc_m0_last_5_days": 0.8533333333333333,
+    "sem_acc_m0_last_5_days": 0.03353715463095731
+  },
+  "Ablation: Long-Term Memory Only": {
+    "mean_m_star_all_days": 3.46,
+    "sem_m_star_all_days": 0.2134645429833983,
+    "mean_m_star_first_5_days": 3.88,
+    "sem_m_star_first_5_days": 0.4245279731654912,
+    "mean_m_star_last_5_days": 2.52,
+    "sem_m_star_last_5_days": 0.4668875667652759,
+    "mean_acc_m0_all_days": 0.7651851851851847,
+    "sem_acc_m0_all_days": 0.016170784903889627,
+    "mean_acc_m0_first_5_days": 0.7266666666666667,
+    "sem_acc_m0_first_5_days": 0.03809280415505088,
+    "mean_acc_m0_last_5_days": 0.8244444444444444,
+    "sem_acc_m0_last_5_days": 0.034808825331913366
+  },
+  "Ablation: Episodic Memory Only": {
+    "mean_m_star_all_days": 3.1466666666666665,
+    "sem_m_star_all_days": 0.20382708721237575,
+    "mean_m_star_first_5_days": 4.12,
+    "sem_m_star_first_5_days": 0.5006236111091844,
+    "mean_m_star_last_5_days": 2.32,
+    "sem_m_star_last_5_days": 0.48569949557313724,
+    "mean_acc_m0_all_days": 0.7611111111111103,
+    "sem_acc_m0_all_days": 0.01656967663575374,
+    "mean_acc_m0_first_5_days": 0.7333333333333336,
+    "sem_acc_m0_first_5_days": 0.0387457683870282,
+    "mean_acc_m0_last_5_days": 0.8155555555555556,
+    "sem_acc_m0_last_5_days": 0.034814499604562024
+  },
+  "Ablation: No Memory": {
+    "mean_m_star_all_days": 5.7,
+    "sem_m_star_all_days": 0.18129166187849535,
+    "mean_m_star_first_5_days": 5.72,
+    "sem_m_star_first_5_days": 0.35108973211986705,
+    "mean_m_star_last_5_days": 6.32,
+    "sem_m_star_last_5_days": 0.5591994277536413,
+    "mean_acc_m0_all_days": 0.6181481481481488,
+    "sem_acc_m0_all_days": 0.012929020818778924,
+    "mean_acc_m0_first_5_days": 0.5933333333333333,
+    "sem_acc_m0_first_5_days": 0.028235342532033046,
+    "mean_acc_m0_last_5_days": 0.6288888888888887,
+    "sem_acc_m0_last_5_days": 0.030586045393929333
+  }
+}

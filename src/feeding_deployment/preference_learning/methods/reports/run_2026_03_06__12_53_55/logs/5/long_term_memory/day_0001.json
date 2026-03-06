@@ -1,0 +1,89 @@
+{
+  "run_timestamp": "2026_03_06__12_53_55",
+  "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+  "user": "5",
+  "physical_profile_label": "good_arms_good_trunk_good_head_limited_mouth",
+  "rollout": 0,
+  "day": 1,
+  "context": {
+    "meal": "breaded fish bites, roasted potatoes, tartar sauce",
+    "setting": "Watching TV with TV on Right",
+    "time_of_day": "morning",
+    "transient_affective_state": "Hurried"
+  },
+  "episode_text": "day=1; meal=breaded fish bites, roasted potatoes, tartar sauce; setting=Watching TV with TV on Right; time_of_day=morning;\npreferences: microwave_time=1 min; occlusion_relevance=minimize right occlusion; robot_speed=medium; skewering_axis=parallel to major axis; web_interface_confirmation=no; transfer_mode=outside mouth transfer; outside_mouth_distance=near; convey_robot_ready_for_initiating_transfer=speech; detect_user_ready_for_initiating_transfer_feeding=button; detect_user_ready_for_initiating_transfer_drinking=button; detect_user_ready_for_initiating_transfer_wiping=button; convey_robot_ready_for_completing_transfer=speech; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=button; detect_user_completed_transfer_wiping=button; retract_between_bites=yes; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=10 sec",
+  "ltm_summary_raw": {
+    "microwave_time": {
+      "default": "1 min",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "occlusion_relevance": {
+      "default": "do not consider occlusion",
+      "user_tendencies": "IF dining context includes watching TV on the user's right AND affective_state is neutral AND food_condition is any food condition, THEN minimize right occlusion BECAUSE the user explicitly chose to preserve visibility toward the right-side TV."
+    },
+    "robot_speed": {
+      "default": "medium",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "skewering_axis": {
+      "default": "parallel to major axis",
+      "user_tendencies": "IF feeding foods that require fork skewering AND affective_state is neutral AND food_condition is any skewered food, THEN parallel to major axis BECAUSE the user has limited mouth opening and narrower bites are more compatible with that physical constraint."
+    },
+    "web_interface_confirmation": {
+      "default": "no",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "transfer_mode": {
+      "default": "outside mouth transfer",
+      "user_tendencies": "IF dining context is a routine meal AND affective_state is neutral AND food_condition is any food condition, THEN outside mouth transfer BECAUSE the user can lean forward comfortably and explicitly selected the less intrusive transfer style."
+    },
+    "outside_mouth_distance": {
+      "default": "near",
+      "user_tendencies": "IF transfer_mode is outside mouth transfer AND affective_state is neutral AND food_condition is any food condition, THEN near BECAUSE the user selected a close stopping distance while still preferring outside-mouth transfer."
+    },
+    "convey_robot_ready_for_initiating_transfer": {
+      "default": "speech",
+      "user_tendencies": "IF dining context is a routine meal AND affective_state is neutral AND food_condition is any food condition, THEN speech BECAUSE the user explicitly preferred spoken readiness cues."
+    },
+    "detect_user_ready_for_initiating_transfer_feeding": {
+      "default": "button",
+      "user_tendencies": "IF dining context is a routine meal AND affective_state is neutral AND food_condition is any food condition, THEN button BECAUSE the user has reliable arm control, can press buttons easily, and limited mouth opening makes open-mouth readiness less suitable."
+    },
+    "detect_user_ready_for_initiating_transfer_drinking": {
+      "default": "button",
+      "user_tendencies": "IF dining context is a routine meal AND affective_state is neutral AND food_condition is any food condition, THEN button BECAUSE the user has reliable arm control and explicitly preferred direct manual signaling."
+    },
+    "detect_user_ready_for_initiating_transfer_wiping": {
+      "default": "button",
+      "user_tendencies": "IF dining context is a routine meal AND affective_state is neutral AND food_condition is any food condition, THEN button BECAUSE the user has reliable arm control and explicitly preferred direct manual signaling."
+    },
+    "convey_robot_ready_for_completing_transfer": {
+      "default": "speech",
+      "user_tendencies": "IF dining context is a routine meal AND affective_state is neutral AND food_condition is any food condition, THEN speech BECAUSE the user explicitly preferred spoken completion cues."
+    },
+    "detect_user_completed_transfer_feeding": {
+      "default": "perception",
+      "user_tendencies": "IF feeding task AND affective_state is neutral AND food_condition is any food condition, THEN perception BECAUSE the user selected the reliable automatic completion method for bites."
+    },
+    "detect_user_completed_transfer_drinking": {
+      "default": "button",
+      "user_tendencies": "IF drinking task AND affective_state is neutral AND food_condition is any food condition, THEN button BECAUSE the user preferred explicit manual completion signaling rather than automatic completion."
+    },
+    "detect_user_completed_transfer_wiping": {
+      "default": "button",
+      "user_tendencies": "IF mouth wiping task AND affective_state is neutral AND food_condition is any food condition, THEN button BECAUSE the user preferred explicit manual completion signaling rather than automatic completion."
+    },
+    "retract_between_bites": {
+      "default": "no",
+      "user_tendencies": "IF dining context includes watching TV on the user's right AND affective_state is neutral AND food_condition is any food condition, THEN yes BECAUSE the user chose to reduce prolonged visual obstruction in a context where right-side visibility matters."
+    },
+    "bite_dipping_preference": {
+      "default": "do not dip",
+      "user_tendencies": "IF food includes a dip or sauce AND affective_state is neutral AND dining context is the observed TV-watching context, THEN do not dip BECAUSE the user explicitly chose to avoid dipping despite tartar sauce being available."
+    },
+    "wait_before_autocontinue_seconds": {
+      "default": "10 sec",
+      "user_tendencies": "IF dining context is a routine meal AND affective_state is neutral AND food_condition is any food condition, THEN 10 sec BECAUSE the user preferred a short timeout, consistent with favoring efficient progression when explicit button controls are available."
+    }
+  }
+}

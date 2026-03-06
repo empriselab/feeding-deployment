@@ -1,0 +1,129 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 7,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 7,
+      "m": 1,
+      "corrected": {
+        "occlusion_relevance": "do not consider occlusion"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 7,
+      "m": 2,
+      "corrected": {
+        "occlusion_relevance": "do not consider occlusion",
+        "microwave_time": "2 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 7,
+      "m": 3,
+      "corrected": {
+        "occlusion_relevance": "do not consider occlusion",
+        "microwave_time": "2 min",
+        "web_interface_confirmation": "yes"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 7,
+      "m": 4,
+      "corrected": {
+        "occlusion_relevance": "do not consider occlusion",
+        "microwave_time": "2 min",
+        "web_interface_confirmation": "yes",
+        "wait_before_autocontinue_seconds": "1000 sec"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 7,
+      "m": 5,
+      "corrected": {
+        "occlusion_relevance": "do not consider occlusion",
+        "microwave_time": "2 min",
+        "web_interface_confirmation": "yes",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "detect_user_completed_transfer_wiping": "button"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 7,
+      "m": 6,
+      "corrected": {
+        "occlusion_relevance": "do not consider occlusion",
+        "microwave_time": "2 min",
+        "web_interface_confirmation": "yes",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "detect_user_completed_transfer_wiping": "button",
+        "bite_dipping_preference": "less"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 7,
+      "m": 7,
+      "corrected": {
+        "occlusion_relevance": "do not consider occlusion",
+        "microwave_time": "2 min",
+        "web_interface_confirmation": "yes",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "detect_user_completed_transfer_wiping": "button",
+        "bite_dipping_preference": "less",
+        "convey_robot_ready_for_initiating_transfer": "LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "rollout": 0,
+      "day": 7,
+      "m": 8,
+      "corrected": {
+        "occlusion_relevance": "do not consider occlusion",
+        "microwave_time": "2 min",
+        "web_interface_confirmation": "yes",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "detect_user_completed_transfer_wiping": "button",
+        "bite_dipping_preference": "less",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "detect_user_completed_transfer_feeding": "perception"
+      }
+    }
+  ]
+}

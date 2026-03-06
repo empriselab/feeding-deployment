@@ -1,0 +1,89 @@
+{
+  "run_timestamp": "2026_03_06__12_54_17",
+  "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+  "user": "4",
+  "physical_profile_label": "limited_arms_no_trunk_limited_head",
+  "rollout": 0,
+  "day": 1,
+  "context": {
+    "meal": "strawberries with whipped cream",
+    "setting": "Social with person in Front",
+    "time_of_day": "evening",
+    "transient_affective_state": "Energetic"
+  },
+  "episode_text": "day=1; meal=strawberries with whipped cream; setting=Social with person in Front; time_of_day=evening;\npreferences: microwave_time=no microwave; occlusion_relevance=minimize front occlusion; robot_speed=slow; skewering_axis=perpendicular to major axis; web_interface_confirmation=yes; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=open mouth; detect_user_ready_for_initiating_transfer_drinking=open mouth; detect_user_ready_for_initiating_transfer_wiping=open mouth; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=yes; bite_dipping_preference=less; wait_before_autocontinue_seconds=100 sec",
+  "ltm_summary_raw": {
+    "microwave_time": {
+      "default": "no microwave",
+      "user_tendencies": "IF food is fruit or another cold-served item AND affective_state is neutral AND dining context is social or personal THEN no microwave BECAUSE the observed cold fruit meal was explicitly preferred without reheating. No context-dependent variation observed yet."
+    },
+    "occlusion_relevance": {
+      "default": "do not consider occlusion",
+      "user_tendencies": "IF dining context includes a person, TV, or device in front of the user AND affective_state is neutral AND food_condition is any food THEN minimize front occlusion BECAUSE the user explicitly preferred preserving the front view in a front-facing social context. No other directional variation observed yet."
+    },
+    "robot_speed": {
+      "default": "slow",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "skewering_axis": {
+      "default": "perpendicular to major axis",
+      "user_tendencies": "IF food requires fork acquisition such as fruit pieces AND affective_state is neutral AND dining context is social THEN perpendicular to major axis BECAUSE the user selected the higher-acquisition-success option in the observed feeding episode. No context-dependent variation observed yet."
+    },
+    "web_interface_confirmation": {
+      "default": "yes",
+      "user_tendencies": "IF dining context is social AND affective_state is neutral AND food_condition is any fork-fed food THEN yes BECAUSE the user accepted explicit web confirmation of bite acquisition, consistent with a preference for reliability despite extra interaction time. No context-dependent variation observed yet."
+    },
+    "transfer_mode": {
+      "default": "inside mouth transfer",
+      "user_tendencies": "IF food is being transferred for feeding AND affective_state is neutral AND dining context is any context THEN inside mouth transfer BECAUSE the user cannot reliably lean forward due to limited trunk control, making outside-mouth transfer less compatible with their physical abilities. No context-dependent variation observed yet."
+    },
+    "outside_mouth_distance": {
+      "default": "not applicable",
+      "user_tendencies": "IF transfer_mode is inside mouth transfer AND affective_state is any AND dining context is any THEN not applicable BECAUSE the user selected inside-mouth transfer and their physical profile supports that mode. No context-dependent variation observed yet."
+    },
+    "convey_robot_ready_for_initiating_transfer": {
+      "default": "LED",
+      "user_tendencies": "IF dining context is social with another person in front AND affective_state is neutral AND food_condition is any assisted task THEN LED BECAUSE the user preferred a nonverbal readiness cue, which is compatible with reducing conversational disruption. No context-dependent variation observed yet."
+    },
+    "detect_user_ready_for_initiating_transfer_feeding": {
+      "default": "open mouth",
+      "user_tendencies": "IF feeding task AND affective_state is neutral AND dining context is social THEN open mouth BECAUSE the user cannot reliably press buttons and still chose open-mouth initiation even in a social setting, indicating low-effort readiness signaling is acceptable despite possible conversational ambiguity."
+    },
+    "detect_user_ready_for_initiating_transfer_drinking": {
+      "default": "open mouth",
+      "user_tendencies": "IF drinking task AND affective_state is neutral AND dining context is social THEN open mouth BECAUSE the user cannot reliably press buttons and selected open-mouth initiation for drinking in the observed social meal."
+    },
+    "detect_user_ready_for_initiating_transfer_wiping": {
+      "default": "open mouth",
+      "user_tendencies": "IF mouth wiping task AND affective_state is neutral AND dining context is social THEN open mouth BECAUSE the user cannot reliably press buttons and selected open-mouth initiation for wiping in the observed social meal."
+    },
+    "convey_robot_ready_for_completing_transfer": {
+      "default": "LED",
+      "user_tendencies": "IF dining context is social with another person in front AND affective_state is neutral AND food_condition is any assisted task THEN LED BECAUSE the user preferred a nonverbal cue when the tool reached transfer position. No context-dependent variation observed yet."
+    },
+    "detect_user_completed_transfer_feeding": {
+      "default": "perception",
+      "user_tendencies": "IF feeding task AND affective_state is neutral AND dining context is any context THEN perception BECAUSE the user selected the reliable low-effort completion method, which also fits their inability to reliably press buttons."
+    },
+    "detect_user_completed_transfer_drinking": {
+      "default": "autocontinue",
+      "user_tendencies": "IF drinking task AND affective_state is neutral AND dining context is social THEN autocontinue BECAUSE the user cannot reliably press buttons or head-gesture, making automatic progression the most compatible completion method."
+    },
+    "detect_user_completed_transfer_wiping": {
+      "default": "autocontinue",
+      "user_tendencies": "IF mouth wiping task AND affective_state is neutral AND dining context is social THEN autocontinue BECAUSE the user cannot reliably press buttons or head-gesture, making automatic progression the most compatible completion method."
+    },
+    "retract_between_bites": {
+      "default": "yes",
+      "user_tendencies": "IF dining context includes a person or focal activity in front of the user AND affective_state is neutral AND food_condition is any food THEN yes BECAUSE the user preferred reducing prolonged visual obstruction in a socially front-facing context."
+    },
+    "bite_dipping_preference": {
+      "default": "do not dip",
+      "user_tendencies": "IF food includes a dip or sauce AND dining context is social AND affective_state is neutral THEN less BECAUSE the user preferred limited dipping for strawberries with whipped cream in a social meal, consistent with reducing messiness. IF food has no dip or sauce AND affective_state is neutral AND dining context is personal THEN do not dip BECAUSE dipping is not applicable."
+    },
+    "wait_before_autocontinue_seconds": {
+      "default": "100 sec",
+      "user_tendencies": "IF dining context is social AND affective_state is neutral AND food_condition is any assisted task THEN 100 sec BECAUSE the user selected a moderate wait that balances time efficiency with enough time to respond using assistive interaction methods. No context-dependent variation observed yet."
+    }
+  }
+}

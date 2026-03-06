@@ -1,0 +1,89 @@
+{
+  "run_timestamp": "2026_03_06__12_54_17",
+  "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+  "user": "3",
+  "physical_profile_label": "moderate_arms_limited_trunk_limited_head",
+  "rollout": 0,
+  "day": 11,
+  "context": {
+    "meal": "cantaloupes, bananas, watermelon",
+    "setting": "Working on laptop with laptop on Right",
+    "time_of_day": "noon",
+    "transient_affective_state": "Slower"
+  },
+  "episode_text": "day=11; meal=cantaloupes, bananas, watermelon; setting=Working on laptop with laptop on Right; time_of_day=noon;\npreferences: microwave_time=no microwave; occlusion_relevance=minimize right occlusion; robot_speed=medium; skewering_axis=parallel to major axis; web_interface_confirmation=yes; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=button; detect_user_ready_for_initiating_transfer_drinking=button; detect_user_ready_for_initiating_transfer_wiping=button; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=button; detect_user_completed_transfer_wiping=button; retract_between_bites=no; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=1000 sec",
+  "ltm_summary_raw": {
+    "microwave_time": {
+      "default": "2 min",
+      "user_tendencies": "IF food is fruit or another cold-served item THEN no microwave BECAUSE the user selected no microwave for fruit meals, consistent with preserving intended cold serving temperature. IF the meal is a warm savory item while watching TV on the left THEN 1 min BECAUSE the user repeatedly selected a shorter reheat in that left-TV context. IF the meal is a warm savory item in a front-oriented work context THEN 1 min or 3 min depending on the specific meal BECAUSE the user has selected both 1 min and 3 min for warm savory meals while working on a laptop in front, showing meal-specific variation within that context. IF the meal is a savory item in a social context THEN 1 min or 2 min depending on context and meal BECAUSE the user has selected moderate reheating levels across social meals rather than a fixed extreme."
+    },
+    "occlusion_relevance": {
+      "default": "do not consider occlusion",
+      "user_tendencies": "IF dining context includes a social partner or focal activity directly in front of the user THEN minimize front occlusion BECAUSE the user repeatedly selected front-occlusion minimization in front-social and laptop-in-front contexts. IF dining context includes a social partner or focal activity to the right of the user THEN minimize right occlusion BECAUSE the user repeatedly selected right-occlusion minimization in right-oriented contexts, including the new right-laptop meal. IF dining context involves watching TV on the left THEN minimize left occlusion or do not consider occlusion depending on the specific meal BECAUSE the user has selected both options in left-TV meals, showing left-side sensitivity that is present but less fixed than front or right contexts."
+    },
+    "robot_speed": {
+      "default": "slow",
+      "user_tendencies": "IF dining context involves a social partner or valued activity directly in front of the user THEN medium or fast depending on the meal/context BECAUSE the user previously selected medium in front-oriented contexts and also selected fast while working on a laptop in front, indicating a tendency toward quicker motion when attention is front-focused. IF dining context involves a social partner to the right of the user or working on a laptop to the right THEN slow or medium depending on the specific right-side context BECAUSE the user has selected medium in right-oriented work contexts and slow in a right-social meal, so right-side situations support a cautious non-fast preference rather than a single fixed speed. IF dining context involves watching TV on the left THEN fast BECAUSE the user has repeatedly selected fast in that left-TV context, suggesting a preference to reduce interruption duration there."
+    },
+    "skewering_axis": {
+      "default": "parallel to major axis",
+      "user_tendencies": "IF food acquisition must remain compatible with limited mouth opening in general THEN parallel to major axis BECAUSE the user's physical profile supports narrower bites and this has been the dominant observed choice. IF the meal is a bite-acquisition-challenging savory item such as chicken and broccoli while watching TV on the left THEN perpendicular to major axis BECAUSE the user repeatedly selected the higher-acquisition-success option in that context, indicating willingness to trade narrower bites for acquisition reliability there."
+    },
+    "web_interface_confirmation": {
+      "default": "yes",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "transfer_mode": {
+      "default": "inside mouth transfer",
+      "user_tendencies": "IF the user's physical constraints are relevant to the meal context THEN inside mouth transfer BECAUSE the user cannot lean forward due to limited trunk control, and observed selections consistently favor the mode that does not require leaning forward."
+    },
+    "outside_mouth_distance": {
+      "default": "not applicable",
+      "user_tendencies": "IF transfer_mode is inside mouth transfer THEN not applicable BECAUSE this parameter only applies to outside mouth transfer. IF the user's physical constraints are considered for food delivery THEN not applicable BECAUSE the observed preference and physical profile support inside mouth transfer rather than outside mouth transfer."
+    },
+    "convey_robot_ready_for_initiating_transfer": {
+      "default": "LED",
+      "user_tendencies": "IF dining context involves watching TV on the left THEN speech or LED depending on the specific meal BECAUSE the user has selected both cue modalities in that context, so a non-combined single cue appears preferred there without a stable winner. IF dining context involves working on a laptop to the right THEN LED BECAUSE the user selected LED in that right-laptop context, consistent with a low-disruption visual cue. Otherwise, no broader stable context-dependent variation is established beyond prior LED selections."
+    },
+    "detect_user_ready_for_initiating_transfer_feeding": {
+      "default": "button",
+      "user_tendencies": "IF initiating feeding transfer in contexts where physical ability constraints matter and no stronger contextual pressure is observed THEN button BECAUSE the user can press buttons reliably, while limited mouth opening makes open-mouth interaction challenging. IF dining context involves watching TV on the left THEN button or autocontinue depending on the specific meal BECAUSE the user has selected both options in that context, indicating that left-TV settings can shift toward lower-effort automation but do not consistently override explicit control. IF dining context involves working on a laptop to the right THEN button BECAUSE the user selected button in that context, consistent with maintaining explicit control while avoiding unreliable mouth-based interaction. IF a context would require choosing between open-mouth interaction and button input THEN button BECAUSE limited mouth opening makes open-mouth interaction less suitable for this user."
+    },
+    "detect_user_ready_for_initiating_transfer_drinking": {
+      "default": "button",
+      "user_tendencies": "IF initiating drinking transfer in contexts where physical ability constraints matter and no stronger contextual pressure is observed THEN button BECAUSE the user can press buttons reliably, while limited mouth opening makes open-mouth interaction challenging. IF dining context involves watching TV on the left THEN button or autocontinue depending on the specific meal BECAUSE the user has selected both options in that context, indicating that left-TV settings can shift toward lower-effort automation but do not consistently override explicit control. IF dining context involves working on a laptop to the right THEN button BECAUSE the user selected button in that context, consistent with maintaining explicit control while avoiding unreliable mouth-based interaction. IF a context would require choosing between open-mouth interaction and button input THEN button BECAUSE limited mouth opening makes open-mouth interaction less suitable for this user."
+    },
+    "detect_user_ready_for_initiating_transfer_wiping": {
+      "default": "button",
+      "user_tendencies": "IF initiating mouth-wiping transfer in contexts where physical ability constraints matter and no stronger contextual pressure is observed THEN button BECAUSE the user can press buttons reliably, while limited mouth opening makes open-mouth interaction challenging. IF dining context involves watching TV on the left THEN button or autocontinue depending on the specific meal BECAUSE the user has selected both options in that context, indicating that left-TV settings can shift toward lower-effort automation but do not consistently override explicit control. IF dining context involves working on a laptop to the right THEN button BECAUSE the user selected button in that context, consistent with maintaining explicit control while avoiding unreliable mouth-based interaction. IF a context would require choosing between open-mouth interaction and button input THEN button BECAUSE limited mouth opening makes open-mouth interaction less suitable for this user."
+    },
+    "convey_robot_ready_for_completing_transfer": {
+      "default": "LED",
+      "user_tendencies": "IF dining context involves watching TV on the left THEN speech or LED depending on the specific meal BECAUSE the user has selected both cue modalities in that context, so a non-combined single cue appears preferred there without a stable winner. IF dining context involves working on a laptop to the right THEN LED BECAUSE the user selected LED in that right-laptop context, consistent with a low-disruption visual cue. Otherwise, no broader stable context-dependent variation is established beyond prior LED selections."
+    },
+    "detect_user_completed_transfer_feeding": {
+      "default": "perception",
+      "user_tendencies": "IF completing feeding transfer in contexts where physical ability constraints matter THEN perception BECAUSE the user selected the reliable perception-based option and this avoids requiring extra physical input."
+    },
+    "detect_user_completed_transfer_drinking": {
+      "default": "button",
+      "user_tendencies": "IF completing drinking transfer in contexts where physical ability constraints matter and no stronger contextual pressure is observed THEN button BECAUSE the user cannot reliably perform head gestures, making perception-based drinking completion less suitable. IF dining context involves watching TV on the left THEN button or autocontinue depending on the specific meal BECAUSE the user has selected both options in that context, indicating that left-TV settings can sometimes favor lower-effort automatic progression but not consistently. IF dining context involves working on a laptop to the right THEN button BECAUSE the user selected button in that context, consistent with explicit completion signaling that does not rely on head gestures. IF a context would require choosing between perception and button for drinking completion THEN button BECAUSE limited neck control makes head-gesture-based perception less suitable."
+    },
+    "detect_user_completed_transfer_wiping": {
+      "default": "button",
+      "user_tendencies": "IF completing mouth-wiping transfer in contexts where physical ability constraints matter and no stronger contextual pressure is observed THEN button BECAUSE the user cannot reliably perform head gestures, making perception-based wiping completion less suitable. IF dining context involves watching TV on the left THEN button or autocontinue depending on the specific meal BECAUSE the user has selected both options in that context, indicating that left-TV settings can sometimes favor lower-effort automatic progression but not consistently. IF dining context involves working on a laptop to the right THEN button BECAUSE the user selected button in that context, consistent with explicit completion signaling that does not rely on head gestures. IF a context would require choosing between perception and button for wiping completion THEN button BECAUSE limited neck control makes head-gesture-based perception less suitable."
+    },
+    "retract_between_bites": {
+      "default": "no",
+      "user_tendencies": "IF dining context includes a social partner or focal activity directly in front of the user THEN yes BECAUSE the user repeatedly chose retraction in front-oriented contexts, including both front-social and laptop-in-front meals, consistent with wanting to reduce prolonged visual obstruction of the main focus. IF dining context includes a social partner to the right of the user THEN yes BECAUSE the user repeatedly selected retraction in right-social contexts, indicating that social presence on the right is sufficient to favor reducing obstruction. IF dining context involves a focal activity to the right without a social partner THEN no BECAUSE the user selected no retraction while working on a laptop to the right and has also repeatedly chosen not to retract while watching TV on the right, suggesting that right-sided visual activities alone do not trigger a preference for added retraction time. IF dining context involves watching TV on the left THEN no BECAUSE the user has repeatedly selected no retraction in that left-TV context as well, reinforcing a pattern that side-oriented viewing does not justify extra retraction time."
+    },
+    "bite_dipping_preference": {
+      "default": "do not dip",
+      "user_tendencies": "IF food includes a dip or sauce AND dining context is social THEN less BECAUSE the user repeatedly chose reduced dipping for sauce-containing meals in social contexts, consistent with limiting messiness around others. IF food includes a dip or sauce AND dining context involves a front-focused activity such as working on a laptop THEN less BECAUSE the user repeatedly selected less dipping for sauce-containing meals while working on a laptop in front, indicating a stable tendency to reduce messiness when attention is on a valued front activity. IF food does not include a dip or sauce THEN do not dip BECAUSE dipping is not relevant and the user selected no dipping for non-dippable meals, including the new fruit meal. IF the meal has sauce already on the food but no separate dipping action is desired, including in left-TV contexts, THEN do not dip BECAUSE the user selected no dipping for sauced savory meals in that context."
+    },
+    "wait_before_autocontinue_seconds": {
+      "default": "1000 sec",
+      "user_tendencies": "IF dining context involves watching TV on the left THEN 10 sec BECAUSE the user has repeatedly selected the shortest wait in that context, both when using more automation and when retaining button-based control, indicating a stable preference for quick automatic progression if the system is waiting. IF dining context involves working on a laptop to the right THEN 1000 sec BECAUSE the user selected the longest wait in that context, consistent with preserving ample time to intervene while engaged in a side-oriented work task. Otherwise, no broader context-dependent variation is established yet."
+    }
+  }
+}

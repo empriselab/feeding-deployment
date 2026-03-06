@@ -1,0 +1,129 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 11,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 11,
+      "m": 1,
+      "corrected": {
+        "detect_user_completed_transfer_drinking": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 11,
+      "m": 2,
+      "corrected": {
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "wait_before_autocontinue_seconds": "10 sec"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 11,
+      "m": 3,
+      "corrected": {
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "wait_before_autocontinue_seconds": "10 sec",
+        "convey_robot_ready_for_initiating_transfer": "LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 11,
+      "m": 4,
+      "corrected": {
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "wait_before_autocontinue_seconds": "10 sec",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "microwave_time": "1 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 11,
+      "m": 5,
+      "corrected": {
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "wait_before_autocontinue_seconds": "10 sec",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "microwave_time": "1 min",
+        "detect_user_completed_transfer_wiping": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 11,
+      "m": 6,
+      "corrected": {
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "wait_before_autocontinue_seconds": "10 sec",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "microwave_time": "1 min",
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "web_interface_confirmation": "no"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 11,
+      "m": 7,
+      "corrected": {
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "wait_before_autocontinue_seconds": "10 sec",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "microwave_time": "1 min",
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "web_interface_confirmation": "no",
+        "retract_between_bites": "no"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 11,
+      "m": 8,
+      "corrected": {
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "wait_before_autocontinue_seconds": "10 sec",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "microwave_time": "1 min",
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "web_interface_confirmation": "no",
+        "retract_between_bites": "no",
+        "robot_speed": "fast"
+      }
+    }
+  ]
+}

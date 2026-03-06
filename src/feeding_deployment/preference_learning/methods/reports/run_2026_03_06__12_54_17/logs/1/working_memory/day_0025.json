@@ -1,0 +1,63 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 25,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 25,
+      "m": 1,
+      "corrected": {
+        "skewering_axis": "parallel to major axis"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 25,
+      "m": 2,
+      "corrected": {
+        "skewering_axis": "parallel to major axis",
+        "robot_speed": "slow"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 25,
+      "m": 3,
+      "corrected": {
+        "skewering_axis": "parallel to major axis",
+        "robot_speed": "slow",
+        "retract_between_bites": "yes"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 25,
+      "m": 4,
+      "corrected": {
+        "skewering_axis": "parallel to major axis",
+        "robot_speed": "slow",
+        "retract_between_bites": "yes",
+        "convey_robot_ready_for_completing_transfer": "speech + LED"
+      }
+    }
+  ]
+}

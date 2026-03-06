@@ -1,0 +1,143 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 0,
+      "context": {
+        "meal": "bananas, brownies, and chocolate sauce",
+        "setting": "Watching TV with TV on Left",
+        "time_of_day": "morning",
+        "transient_affective_state": "Energetic"
+      },
+      "corrected": {},
+      "retrieved_episodes": "day=1; meal=general tso's chicken and broccoli; setting=Social with person in Front; time_of_day=noon;\npreferences: microwave_time=1 min; occlusion_relevance=minimize front occlusion; robot_speed=fast; skewering_axis=perpendicular to major axis; web_interface_confirmation=no; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=no; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=10 sec"
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 1,
+      "context": {
+        "meal": "bananas, brownies, and chocolate sauce",
+        "setting": "Watching TV with TV on Left",
+        "time_of_day": "morning",
+        "transient_affective_state": "Energetic"
+      },
+      "corrected": {
+        "web_interface_confirmation": "yes"
+      },
+      "retrieved_episodes": "day=1; meal=general tso's chicken and broccoli; setting=Social with person in Front; time_of_day=noon;\npreferences: microwave_time=1 min; occlusion_relevance=minimize front occlusion; robot_speed=fast; skewering_axis=perpendicular to major axis; web_interface_confirmation=no; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=no; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=10 sec"
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 2,
+      "context": {
+        "meal": "bananas, brownies, and chocolate sauce",
+        "setting": "Watching TV with TV on Left",
+        "time_of_day": "morning",
+        "transient_affective_state": "Energetic"
+      },
+      "corrected": {
+        "web_interface_confirmation": "yes",
+        "bite_dipping_preference": "less"
+      },
+      "retrieved_episodes": "day=1; meal=general tso's chicken and broccoli; setting=Social with person in Front; time_of_day=noon;\npreferences: microwave_time=1 min; occlusion_relevance=minimize front occlusion; robot_speed=fast; skewering_axis=perpendicular to major axis; web_interface_confirmation=no; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=no; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=10 sec"
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 3,
+      "context": {
+        "meal": "bananas, brownies, and chocolate sauce",
+        "setting": "Watching TV with TV on Left",
+        "time_of_day": "morning",
+        "transient_affective_state": "Energetic"
+      },
+      "corrected": {
+        "web_interface_confirmation": "yes",
+        "bite_dipping_preference": "less",
+        "robot_speed": "medium"
+      },
+      "retrieved_episodes": "day=1; meal=general tso's chicken and broccoli; setting=Social with person in Front; time_of_day=noon;\npreferences: microwave_time=1 min; occlusion_relevance=minimize front occlusion; robot_speed=fast; skewering_axis=perpendicular to major axis; web_interface_confirmation=no; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=no; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=10 sec"
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 4,
+      "context": {
+        "meal": "bananas, brownies, and chocolate sauce",
+        "setting": "Watching TV with TV on Left",
+        "time_of_day": "morning",
+        "transient_affective_state": "Energetic"
+      },
+      "corrected": {
+        "web_interface_confirmation": "yes",
+        "bite_dipping_preference": "less",
+        "robot_speed": "medium",
+        "convey_robot_ready_for_initiating_transfer": "speech + LED"
+      },
+      "retrieved_episodes": "day=1; meal=general tso's chicken and broccoli; setting=Social with person in Front; time_of_day=noon;\npreferences: microwave_time=1 min; occlusion_relevance=minimize front occlusion; robot_speed=fast; skewering_axis=perpendicular to major axis; web_interface_confirmation=no; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=no; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=10 sec"
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 5,
+      "context": {
+        "meal": "bananas, brownies, and chocolate sauce",
+        "setting": "Watching TV with TV on Left",
+        "time_of_day": "morning",
+        "transient_affective_state": "Energetic"
+      },
+      "corrected": {
+        "web_interface_confirmation": "yes",
+        "bite_dipping_preference": "less",
+        "robot_speed": "medium",
+        "convey_robot_ready_for_initiating_transfer": "speech + LED",
+        "wait_before_autocontinue_seconds": "1000 sec"
+      },
+      "retrieved_episodes": "day=1; meal=general tso's chicken and broccoli; setting=Social with person in Front; time_of_day=noon;\npreferences: microwave_time=1 min; occlusion_relevance=minimize front occlusion; robot_speed=fast; skewering_axis=perpendicular to major axis; web_interface_confirmation=no; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=no; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=10 sec"
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 6,
+      "context": {
+        "meal": "bananas, brownies, and chocolate sauce",
+        "setting": "Watching TV with TV on Left",
+        "time_of_day": "morning",
+        "transient_affective_state": "Energetic"
+      },
+      "corrected": {
+        "web_interface_confirmation": "yes",
+        "bite_dipping_preference": "less",
+        "robot_speed": "medium",
+        "convey_robot_ready_for_initiating_transfer": "speech + LED",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "microwave_time": "3 min"
+      },
+      "retrieved_episodes": "day=1; meal=general tso's chicken and broccoli; setting=Social with person in Front; time_of_day=noon;\npreferences: microwave_time=1 min; occlusion_relevance=minimize front occlusion; robot_speed=fast; skewering_axis=perpendicular to major axis; web_interface_confirmation=no; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=no; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=10 sec"
+    }
+  ]
+}

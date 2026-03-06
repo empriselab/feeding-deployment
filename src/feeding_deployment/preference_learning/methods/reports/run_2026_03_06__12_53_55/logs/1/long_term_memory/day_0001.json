@@ -1,0 +1,89 @@
+{
+  "run_timestamp": "2026_03_06__12_53_55",
+  "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+  "user": "1",
+  "physical_profile_label": "limited_arms_no_trunk_good_head",
+  "rollout": 0,
+  "day": 1,
+  "context": {
+    "meal": "general tso's chicken and broccoli",
+    "setting": "Social with person in Front",
+    "time_of_day": "noon",
+    "transient_affective_state": "Hurried"
+  },
+  "episode_text": "day=1; meal=general tso's chicken and broccoli; setting=Social with person in Front; time_of_day=noon;\npreferences: microwave_time=1 min; occlusion_relevance=minimize front occlusion; robot_speed=fast; skewering_axis=perpendicular to major axis; web_interface_confirmation=no; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=no; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=10 sec",
+  "ltm_summary_raw": {
+    "microwave_time": {
+      "default": "1 min",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "occlusion_relevance": {
+      "default": "do not consider occlusion",
+      "user_tendencies": "IF dining context includes a social partner or visual focus in front of the user AND affective state is neutral AND food has no special sauce/dip condition THEN minimize front occlusion BECAUSE the observed social-front meal shows the user prefers preserving the forward view."
+    },
+    "robot_speed": {
+      "default": "fast",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "skewering_axis": {
+      "default": "perpendicular to major axis",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "web_interface_confirmation": {
+      "default": "no",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "transfer_mode": {
+      "default": "inside mouth transfer",
+      "user_tendencies": "IF user cannot lean forward comfortably in any dining context AND affective state is neutral AND food has no special sauce/dip condition THEN inside mouth transfer BECAUSE the user's physical limitations make outside-mouth transfer less compatible."
+    },
+    "outside_mouth_distance": {
+      "default": "not applicable",
+      "user_tendencies": "IF transfer_mode is inside mouth transfer in any dining context AND any affective state AND any food condition THEN not applicable BECAUSE this parameter only applies to outside-mouth transfer, which is not supported by current evidence and is less compatible with the user's inability to lean forward."
+    },
+    "convey_robot_ready_for_initiating_transfer": {
+      "default": "LED",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "detect_user_ready_for_initiating_transfer_feeding": {
+      "default": "autocontinue",
+      "user_tendencies": "IF dining context is social with a person in front AND affective state is neutral AND food has no special sauce/dip condition THEN autocontinue BECAUSE the user explicitly chose low-effort automatic initiation in the observed social meal, and physical limitations rule out button use."
+    },
+    "detect_user_ready_for_initiating_transfer_drinking": {
+      "default": "autocontinue",
+      "user_tendencies": "IF dining context is social with a person in front AND affective state is neutral AND food has no special sauce/dip condition THEN autocontinue BECAUSE the user explicitly chose low-effort automatic initiation in the observed social meal, and physical limitations rule out button use."
+    },
+    "detect_user_ready_for_initiating_transfer_wiping": {
+      "default": "autocontinue",
+      "user_tendencies": "IF dining context is social with a person in front AND affective state is neutral AND food has no special sauce/dip condition THEN autocontinue BECAUSE the user explicitly chose low-effort automatic initiation in the observed social meal, and physical limitations rule out button use."
+    },
+    "convey_robot_ready_for_completing_transfer": {
+      "default": "LED",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "detect_user_completed_transfer_feeding": {
+      "default": "perception",
+      "user_tendencies": "IF any dining context AND any affective state AND feeding transfer occurs THEN perception BECAUSE the user selected the reliable low-effort completion method, and button use is incompatible with severe upper-limb paralysis."
+    },
+    "detect_user_completed_transfer_drinking": {
+      "default": "autocontinue",
+      "user_tendencies": "IF dining context is social with a person in front AND affective state is neutral AND food has no special sauce/dip condition THEN autocontinue BECAUSE the user chose automatic completion for drinking in the observed social meal, favoring low-effort interaction over explicit signaling."
+    },
+    "detect_user_completed_transfer_wiping": {
+      "default": "autocontinue",
+      "user_tendencies": "IF dining context is social with a person in front AND affective state is neutral AND food has no special sauce/dip condition THEN autocontinue BECAUSE the user chose automatic completion for wiping in the observed social meal, favoring low-effort interaction over explicit signaling."
+    },
+    "retract_between_bites": {
+      "default": "no",
+      "user_tendencies": "IF dining context is social with a person in front AND affective state is neutral AND food has no special sauce/dip condition THEN no BECAUSE the user accepted less interruption and shorter meal time despite the social context."
+    },
+    "bite_dipping_preference": {
+      "default": "do not dip",
+      "user_tendencies": "IF food has no sauce or dip available AND any dining context AND any affective state THEN do not dip BECAUSE dipping is not relevant. IF food includes sauce or dip AND dining context is the observed social-front context AND affective state is neutral THEN do not dip BECAUSE the user chose to avoid dipping in that meal, consistent with minimizing mess."
+    },
+    "wait_before_autocontinue_seconds": {
+      "default": "10 sec",
+      "user_tendencies": "IF any dining context where autocontinue is used AND affective state is neutral AND food has no special sauce/dip condition THEN 10 sec BECAUSE the user selected the shortest available wait, indicating preference for quick progression and low meal duration."
+    }
+  }
+}

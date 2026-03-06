@@ -1,0 +1,78 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 16,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 16,
+      "m": 1,
+      "corrected": {
+        "microwave_time": "3 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 16,
+      "m": 2,
+      "corrected": {
+        "microwave_time": "3 min",
+        "retract_between_bites": "no"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 16,
+      "m": 3,
+      "corrected": {
+        "microwave_time": "3 min",
+        "retract_between_bites": "no",
+        "occlusion_relevance": "do not consider occlusion"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 16,
+      "m": 4,
+      "corrected": {
+        "microwave_time": "3 min",
+        "retract_between_bites": "no",
+        "occlusion_relevance": "do not consider occlusion",
+        "robot_speed": "slow"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_36",
+      "dataset_file": "data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "rollout": 0,
+      "day": 16,
+      "m": 5,
+      "corrected": {
+        "microwave_time": "3 min",
+        "retract_between_bites": "no",
+        "occlusion_relevance": "do not consider occlusion",
+        "robot_speed": "slow",
+        "convey_robot_ready_for_completing_transfer": "speech + LED"
+      }
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 15,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 15,
+      "m": 1,
+      "corrected": {
+        "skewering_axis": "perpendicular to major axis"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 15,
+      "m": 2,
+      "corrected": {
+        "skewering_axis": "perpendicular to major axis",
+        "web_interface_confirmation": "no"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 15,
+      "m": 3,
+      "corrected": {
+        "skewering_axis": "perpendicular to major axis",
+        "web_interface_confirmation": "no",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 15,
+      "m": 4,
+      "corrected": {
+        "skewering_axis": "perpendicular to major axis",
+        "web_interface_confirmation": "no",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "robot_speed": "slow"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 15,
+      "m": 5,
+      "corrected": {
+        "skewering_axis": "perpendicular to major axis",
+        "web_interface_confirmation": "no",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "robot_speed": "slow",
+        "wait_before_autocontinue_seconds": "1000 sec"
+      }
+    }
+  ]
+}

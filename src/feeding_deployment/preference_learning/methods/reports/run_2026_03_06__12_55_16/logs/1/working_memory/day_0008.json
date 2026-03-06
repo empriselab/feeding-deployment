@@ -1,0 +1,78 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 8,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 8,
+      "m": 1,
+      "corrected": {
+        "web_interface_confirmation": "no"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 8,
+      "m": 2,
+      "corrected": {
+        "web_interface_confirmation": "no",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 8,
+      "m": 3,
+      "corrected": {
+        "web_interface_confirmation": "no",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "convey_robot_ready_for_initiating_transfer": "LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 8,
+      "m": 4,
+      "corrected": {
+        "web_interface_confirmation": "no",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "robot_speed": "fast"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 8,
+      "m": 5,
+      "corrected": {
+        "web_interface_confirmation": "no",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "convey_robot_ready_for_initiating_transfer": "LED",
+        "robot_speed": "fast",
+        "bite_dipping_preference": "less"
+      }
+    }
+  ]
+}

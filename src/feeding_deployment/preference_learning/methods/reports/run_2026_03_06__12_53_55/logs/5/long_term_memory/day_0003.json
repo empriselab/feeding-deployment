@@ -1,0 +1,89 @@
+{
+  "run_timestamp": "2026_03_06__12_53_55",
+  "dataset_file": "data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+  "user": "5",
+  "physical_profile_label": "good_arms_good_trunk_good_head_limited_mouth",
+  "rollout": 0,
+  "day": 3,
+  "context": {
+    "meal": "breaded fish bites, roasted potatoes, tartar sauce",
+    "setting": "Working on laptop with laptop in Front",
+    "time_of_day": "morning",
+    "transient_affective_state": "Slower"
+  },
+  "episode_text": "day=3; meal=breaded fish bites, roasted potatoes, tartar sauce; setting=Working on laptop with laptop in Front; time_of_day=morning;\npreferences: microwave_time=2 min; occlusion_relevance=minimize front occlusion; robot_speed=medium; skewering_axis=parallel to major axis; web_interface_confirmation=yes; transfer_mode=outside mouth transfer; outside_mouth_distance=near; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=button; detect_user_ready_for_initiating_transfer_drinking=button; detect_user_ready_for_initiating_transfer_wiping=button; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=button; detect_user_completed_transfer_wiping=button; retract_between_bites=yes; bite_dipping_preference=less; wait_before_autocontinue_seconds=1000 sec",
+  "ltm_summary_raw": {
+    "microwave_time": {
+      "default": "1 min",
+      "user_tendencies": "IF dining context is social with a person on the right AND affective_state is neutral AND food_condition is a warm savory meal, THEN 2 min BECAUSE the user explicitly chose a longer reheat time for chicken and hash brown than in the quieter routine setting. IF dining context involves working on a laptop in front AND affective_state is neutral AND food_condition is a warm savory meal, THEN 2 min BECAUSE the user again selected a longer reheat time for a hot meal, suggesting a tendency toward hotter savory foods in attention-demanding contexts."
+    },
+    "occlusion_relevance": {
+      "default": "do not consider occlusion",
+      "user_tendencies": "IF dining context includes watching TV on the user's right AND affective_state is neutral AND food_condition is any food condition, THEN minimize right occlusion BECAUSE the user explicitly chose to preserve visibility toward the right-side TV. IF dining context is social with a person on the right AND affective_state is neutral AND food_condition is any food condition, THEN minimize right occlusion BECAUSE the user again prioritized keeping the robot from blocking the right side, indicating sensitivity to right-side social/environmental engagement. IF dining context involves working on a laptop in front AND affective_state is neutral AND food_condition is any food condition, THEN minimize front occlusion BECAUSE the user explicitly chose to keep the robot from blocking the front visual field while using the laptop."
+    },
+    "robot_speed": {
+      "default": "medium",
+      "user_tendencies": "No context-dependent variation observed yet."
+    },
+    "skewering_axis": {
+      "default": "parallel to major axis",
+      "user_tendencies": "IF feeding foods that require fork skewering AND affective_state is neutral AND food_condition is any skewered food, THEN parallel to major axis BECAUSE the user has limited mouth opening and repeatedly selected the narrower-bite option compatible with that constraint."
+    },
+    "web_interface_confirmation": {
+      "default": "no",
+      "user_tendencies": "IF dining context is social with a person on the right AND affective_state is neutral AND food_condition is a skewered solid food meal, THEN yes BECAUSE the user explicitly chose confirmation in a social context, consistent with preferring extra verification when a failed bite transfer could be more awkward or noticeable. IF dining context involves working on a laptop in front AND affective_state is neutral AND food_condition is a skewered solid food meal, THEN yes BECAUSE the user again chose explicit bite-acquisition confirmation, indicating a tendency toward extra verification in externally engaged contexts rather than only in quiet personal meals."
+    },
+    "transfer_mode": {
+      "default": "outside mouth transfer",
+      "user_tendencies": "IF dining context is a routine meal AND affective_state is neutral AND food_condition is any food condition, THEN outside mouth transfer BECAUSE the user can lean forward comfortably and explicitly selected the less intrusive transfer style. IF dining context is social with a person on the right AND affective_state is neutral AND food_condition is any food condition, THEN outside mouth transfer BECAUSE the user maintained the same less intrusive transfer style in the social setting. IF dining context involves working on a laptop in front AND affective_state is neutral AND food_condition is any food condition, THEN outside mouth transfer BECAUSE the user again kept the less intrusive transfer style while engaged with a front-facing task."
+    },
+    "outside_mouth_distance": {
+      "default": "near",
+      "user_tendencies": "IF transfer_mode is outside mouth transfer AND affective_state is neutral AND food_condition is any food condition in a routine meal, THEN near BECAUSE the user selected a close stopping distance while still preferring outside-mouth transfer. IF transfer_mode is outside mouth transfer AND dining context is social with a person on the right AND affective_state is neutral AND food_condition is any food condition, THEN medium BECAUSE the user chose a slightly larger buffer in the social setting, suggesting more interpersonal comfort distance there. IF transfer_mode is outside mouth transfer AND dining context involves working on a laptop in front AND affective_state is neutral AND food_condition is any food condition, THEN near BECAUSE the user returned to the closer stopping distance in the non-social but externally engaged context."
+    },
+    "convey_robot_ready_for_initiating_transfer": {
+      "default": "speech",
+      "user_tendencies": "IF dining context is a routine meal AND affective_state is neutral AND food_condition is any food condition, THEN speech BECAUSE the user explicitly preferred spoken readiness cues. IF dining context is social with a person on the right AND affective_state is neutral AND food_condition is any food condition, THEN LED BECAUSE the user switched to a quieter visual cue in the social setting, indicating sensitivity to conversational or social disruption. IF dining context involves working on a laptop in front AND affective_state is neutral AND food_condition is any food condition, THEN LED BECAUSE the user again preferred a visual cue in a context where audio may be more disruptive than helpful."
+    },
+    "detect_user_ready_for_initiating_transfer_feeding": {
+      "default": "button",
+      "user_tendencies": "IF dining context is a routine meal AND affective_state is neutral AND food_condition is any food condition, THEN button BECAUSE the user has reliable arm control, can press buttons easily, and limited mouth opening makes open-mouth readiness less suitable. IF dining context is social with a person on the right AND affective_state is neutral AND food_condition is any food condition, THEN button BECAUSE the user again preferred explicit manual signaling, consistent with favoring reliable control over open-mouth detection in social interaction contexts. IF dining context involves working on a laptop in front AND affective_state is neutral AND food_condition is any food condition, THEN button BECAUSE the user maintained explicit manual readiness signaling even while multitasking, reinforcing a stable preference for reliable user-controlled initiation."
+    },
+    "detect_user_ready_for_initiating_transfer_drinking": {
+      "default": "button",
+      "user_tendencies": "IF dining context is a routine meal AND affective_state is neutral AND food_condition is any food condition, THEN button BECAUSE the user has reliable arm control and explicitly preferred direct manual signaling. IF dining context is social with a person on the right AND affective_state is neutral AND food_condition is any food condition, THEN button BECAUSE the user maintained explicit manual signaling in the social setting. IF dining context involves working on a laptop in front AND affective_state is neutral AND food_condition is any food condition, THEN button BECAUSE the user again chose manual readiness signaling, indicating a stable preference for explicit control."
+    },
+    "detect_user_ready_for_initiating_transfer_wiping": {
+      "default": "button",
+      "user_tendencies": "IF dining context is a routine meal AND affective_state is neutral AND food_condition is any food condition, THEN button BECAUSE the user has reliable arm control and explicitly preferred direct manual signaling. IF dining context is social with a person on the right AND affective_state is neutral AND food_condition is any food condition, THEN button BECAUSE the user maintained explicit manual signaling in the social setting. IF dining context involves working on a laptop in front AND affective_state is neutral AND food_condition is any food condition, THEN button BECAUSE the user again chose manual readiness signaling, indicating a stable preference for explicit control."
+    },
+    "convey_robot_ready_for_completing_transfer": {
+      "default": "speech",
+      "user_tendencies": "IF dining context is a routine meal AND affective_state is neutral AND food_condition is any food condition, THEN speech BECAUSE the user explicitly preferred spoken completion cues. IF dining context is social with a person on the right AND affective_state is neutral AND food_condition is any food condition, THEN LED BECAUSE the user switched to a visual completion cue in the social setting, consistent with preferring less disruptive signaling around another person. IF dining context involves working on a laptop in front AND affective_state is neutral AND food_condition is any food condition, THEN LED BECAUSE the user again preferred a visual completion cue while engaged with a front-facing task."
+    },
+    "detect_user_completed_transfer_feeding": {
+      "default": "perception",
+      "user_tendencies": "IF feeding task AND affective_state is neutral AND food_condition is any food condition, THEN perception BECAUSE the user consistently selected the reliable automatic completion method for bites across observed contexts."
+    },
+    "detect_user_completed_transfer_drinking": {
+      "default": "button",
+      "user_tendencies": "IF drinking task AND affective_state is neutral AND food_condition is any food condition, THEN button BECAUSE the user consistently preferred explicit manual completion signaling rather than automatic completion."
+    },
+    "detect_user_completed_transfer_wiping": {
+      "default": "button",
+      "user_tendencies": "IF mouth wiping task AND affective_state is neutral AND food_condition is any food condition, THEN button BECAUSE the user consistently preferred explicit manual completion signaling rather than automatic completion."
+    },
+    "retract_between_bites": {
+      "default": "no",
+      "user_tendencies": "IF dining context includes watching TV on the user's right AND affective_state is neutral AND food_condition is any food condition, THEN yes BECAUSE the user chose to reduce prolonged visual obstruction in a context where right-side visibility matters. IF dining context is social with a person on the right AND affective_state is neutral AND food_condition is any food condition, THEN yes BECAUSE the user again chose retraction when right-side engagement mattered, indicating willingness to accept longer meal time to reduce obstruction in socially relevant contexts. IF dining context involves working on a laptop in front AND affective_state is neutral AND food_condition is any food condition, THEN yes BECAUSE the user also accepted retraction to reduce obstruction while maintaining visibility of a front-facing task."
+    },
+    "bite_dipping_preference": {
+      "default": "do not dip",
+      "user_tendencies": "IF food includes a dip or sauce AND affective_state is neutral AND dining context is the observed TV-watching context, THEN do not dip BECAUSE the user explicitly chose to avoid dipping despite sauce being available. IF food_condition is a meal without sauces or dips AND affective_state is neutral AND dining context is social with a person on the right, THEN do not dip BECAUSE the user selected no dipping in that meal as well. IF food includes a dip or sauce AND affective_state is neutral AND dining context involves working on a laptop in front, THEN less BECAUSE the user chose some dipping but limited the amount, suggesting a mess-averse compromise in a task-focused context."
+    },
+    "wait_before_autocontinue_seconds": {
+      "default": "10 sec",
+      "user_tendencies": "IF dining context is a routine meal AND affective_state is neutral AND food_condition is any food condition, THEN 10 sec BECAUSE the user preferred a short timeout, consistent with favoring efficient progression when explicit button controls are available. IF dining context is social with a person on the right AND affective_state is neutral AND food_condition is any food condition, THEN 1000 sec BECAUSE the user chose a very long timeout in the social setting, indicating a strong preference to avoid unwanted automatic progression when attention may be shared with another person. IF dining context involves working on a laptop in front AND affective_state is neutral AND food_condition is any food condition, THEN 1000 sec BECAUSE the user again chose a very long timeout, indicating that when attention is divided by an external task they prefer to prevent automatic progression."
+    }
+  }
+}

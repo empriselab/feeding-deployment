@@ -1,0 +1,300 @@
+===PROMPT===
+Consider a care recipient being assisted during meals by a robotic arm. The robot may microwave a meal, set it up on a table, move to the right side of the user, and then assist with feeding, drinking, and mouth wiping.
+
+For each assistance task within feeding, drinking, or mouth wiping:
+1. The robot acquires the appropriate tool (feeding utensil, drink, or mouth wiper).
+2. For feeding, the robot first acquires a food item from the plate (bite acquisition).
+3. The robot then moves to a staging configuration. The staging configuration is a joint configuration that the robot moves to before initiating transfers. From this configuration, the user's head is visible in the robot’s in-hand camera.
+4. The robot signals that it is ready to initiate transfer (it is ready to begin moving toward the user's mouth).
+5. The robot detects or receives a signal from the user that they are ready for initiating transfer.
+6. The robot moves the tool to the transfer location (either near the mouth or inside the mouth).
+7. The robot signals that transfer can be completed (the tool has reached the transfer location and the user can take the bite, sip, or wipe).
+8. The user takes a bite, takes a sip, or performs mouth wiping.
+9. The user signals that the transfer (bite, sip, or wipe) is complete.
+10. The robot returns to the staging configuration.
+
+The robot exposes configurable components called preference dimensions. Each dimension corresponds to a parameter of the mealtime-assistance system that can be selected by the user.
+
+Dimension definitions:
+
+1. Microwave time
+Field name: microwave_time
+Allowed options: [no microwave, 1 min, 2 min, 3 min]
+How long food should be reheated before being served. Some users may prefer hotter food, while others prefer food closer to room temperature. Many meals begin refrigerated and are intended to be served warm or hot. Fruit and dessert meals with an intended serving temperature of cold are usually eaten without microwaving.
+
+2. Occlusion relevance
+Field name: occlusion_relevance
+Allowed options: [do not consider occlusion, minimize left occlusion, minimize front occlusion, minimize right occlusion]
+How important it is that the robot avoids blocking the user's view. Some users may not care about occlusion, while others may prefer the robot to avoid blocking specific directions based on their typical dining context; for example, minimizing front occlusion if they usually look at a TV, laptop, tablet, or social partner directly in front of them, minimizing left occlusion if TV, laptop, tablet, or social partner are to their left, or minimizing right occlusion if TV, laptop, tablet, or social partner are to their right.
+
+3. Robot speed
+Field name: robot_speed
+Allowed options: [slow, medium, fast]
+The speed at which the robot moves. Some users may prefer a slower speed to feel more comfortable, or to help social partners feel comfortable, while others may prefer a faster speed to reduce overall meal time or because they are less sensitive to the robot's movements.
+
+4. Skewering axis selection
+Field name: skewering_axis
+Allowed options: [parallel to major axis, perpendicular to major axis]
+The direction in which the robot inserts the fork into food when acquiring a bite. Parallel skewering can produce narrower bites that may be easier to eat for users with limited mouth opening. Perpendicular skewering can increase bite acquisition success.
+
+5. Web interface confirmation
+Field name: web_interface_confirmation
+Allowed options: [yes, no]
+Whether the system requires explicit confirmation from the user, through the web interface, that bite acquisition has succeeded. This page allows the user to retry bite acquisition if it fails, but some users may prefer to skip this step to reduce interaction time, even if it means the robot might attempt to transfer an empty fork or a fork with a failed bite acquisition. A user might be more comfortable skipping confirmation in certain contexts (e.g., when eating alone in a personal setting) and prefer confirmation in other contexts (e.g., when eating in a social setting with a partner who might feel uncomfortable if the robot repeatedly attempts to transfer an empty fork after failed bite acquisitions). Some users may want to have confirmation in all contexts.
+
+6. Outside mouth vs inside mouth transfer
+Field name: transfer_mode
+Allowed options: [outside mouth transfer, inside mouth transfer]
+How food is delivered to the mouth: outside-mouth transfer (the robot stops just outside the mouth, and the user leans forward to take the bite) versus inside-mouth transfer (the robot inserts the food directly into the mouth). Preference may depend on the user's physical capabilities (e.g., whether they can lean forward comfortably), their comfort with the robot moving close to their mouth, or their affective state (e.g., preferring inside-mouth transfer when fatigued).
+
+7. For outside-mouth transfer: distance from the mouth
+Field name: outside_mouth_distance
+Allowed options: [not applicable, near, medium, far]
+This parameter only applies when transfer_mode is outside mouth transfer. If inside mouth transfer is used, the value should be not applicable. When using outside-mouth transfer, this determines how far from the mouth the robot stops before the user takes the bite. Far refers to the farthest distance the user can comfortably reach, and near refers to very close (2-4 cm away) from the mouth. This depends on the user's comfort with the robot and their affective state (e.g., preferring a closer distance when fatigued).
+
+8. Convey robot is ready for initiating transfer
+Field name: convey_robot_ready_for_initiating_transfer
+Allowed options: [speech, LED, speech + LED, no cue]
+How the robot signals to the user that it is ready to initiate transfer of a bite, sip, or mouth wiping.
+
+9. Detect User Ready for Initiating Transfer - FEEDING
+Field name: detect_user_ready_for_initiating_transfer_feeding
+Allowed options: [open mouth, button, autocontinue]
+How the robot determines that the user is ready to initiate bite transfer. open mouth: readiness is detected from the user opening their mouth (this can be a challenge in social settings when a user tends to open their mouth for talking); button: the user explicitly presses a physical button (this can be cumbersome if the user is fatigued); autocontinue: the robot proceeds automatically after waiting for a certain timeout.
+
+10. Detect User Ready for Initiating Transfer - DRINKING
+Field name: detect_user_ready_for_initiating_transfer_drinking
+Allowed options: [open mouth, button, autocontinue]
+How the robot determines that the user is ready to initiate sip transfer. open mouth: readiness is detected from the user opening their mouth (this can be a challenge in social settings when a user tends to open their mouth for talking); button: the user explicitly presses a physical button (this can be cumbersome if the user is fatigued); autocontinue: the robot proceeds automatically after waiting for a certain timeout.
+
+11. Detect User Ready for Initiating Transfer - MOUTH WIPING
+Field name: detect_user_ready_for_initiating_transfer_wiping
+Allowed options: [open mouth, button, autocontinue]
+How the robot determines that the user is ready to initiate transfer of mouth wiper. open mouth: readiness is detected from the user opening their mouth (this can be a challenge in social settings when a user tends to open their mouth for talking); button: the user explicitly presses a physical button (this can be cumbersome if the user is fatigued); autocontinue: the robot proceeds automatically after waiting for a certain timeout.
+
+12. Convey robot is ready for completing transfer
+Field name: convey_robot_ready_for_completing_transfer
+Allowed options: [speech, LED, speech + LED, no cue]
+How the robot signals to the user that the tool has reached the transfer location and the user can complete the transfer by taking a bite, sip, or mouth wiping.
+
+13. Detect User Completed Transfer - FEEDING
+Field name: detect_user_completed_transfer_feeding
+Allowed options: [perception, button, autocontinue]
+How the robot determines that the user has finished taking a bite. perception: the robot detects completion using a force-torque sensor on the fork (very reliable); button: the user explicitly signals completion by physically pressing a button; autocontinue: the robot proceeds automatically after a certain timeout.
+
+14. Detect User Completed Transfer - DRINKING
+Field name: detect_user_completed_transfer_drinking
+Allowed options: [perception, button, autocontinue]
+How the robot determines that the user has finished drinking. perception: the robot detects completion using a head-nod gesture (which may feel unnatural in social settings); button: the user explicitly signals completion by physically pressing a button; autocontinue: the robot proceeds automatically after a certain timeout.
+
+15. Detect User Completed Transfer - MOUTH WIPING
+Field name: detect_user_completed_transfer_wiping
+Allowed options: [perception, button, autocontinue]
+How the robot determines that the user has finished mouth wiping. perception: the robot detects completion using a head-nod gesture (which may feel unnatural in social settings); button: the user explicitly signals completion by physically pressing a button; autocontinue: the robot proceeds automatically after a certain timeout.
+
+16. Retract between bites
+Field name: retract_between_bites
+Allowed options: [yes, no]
+Whether the robot moves to a retract position between tasks to avoid obstructing the user's view. However, moving to this position makes the meal take longer, so some users may prefer to skip this step to reduce meal time, even if it means the robot might obstruct the user's view for a longer duration during the meal. A user might be more comfortable skipping retracting in certain contexts (e.g., when eating alone in a personal setting) and prefer retracting in other contexts (e.g., when working, watching TV, or eating in a social setting with a partner who might feel uncomfortable if the robot obstructs their view for a long duration).
+
+17. Bite dipping preference
+Field name: bite_dipping_preference
+Allowed options: [do not dip, less, more]
+How much sauce should be applied when dipping. This depends on the user's personal preference, as well as the context (e.g., some users might prefer more dipping when eating alone in a personal setting and less dipping when eating in a social setting to avoid messiness). Choose do not dip when the user prefers not to dip or when the meal does not have any dippable items or sauces.
+
+18. Time to wait before autocontinue
+Field name: wait_before_autocontinue_seconds
+Allowed options: [10 sec, 100 sec, 1000 sec]
+How long the robot waits before automatically continuing to the next bite, sip, or mouth wiping if the user does not intervene. Some users may prefer a shorter wait time to reduce meal time, while others may prefer a longer wait time to give themselves more time to intervene if needed, especially in contexts where they might be more distracted (e.g., when eating in a social setting with a partner or when watching TV).
+
+Consider a care recipient with the following physical functioning abilities:
+
+This user has severe upper-limb paralysis and cannot reliably press physical buttons. They also have limited control of their neck muscles and cannot reliably perform head gestures. They cannot lean forward due to limited trunk control. Mouth opening is possible but may be slow. They interact with the web interface using an assistive input device (e.g., eye gaze or switch scanning).
+
+You are a personalized preference predictor for the mealtime-assistance system.
+
+Your task is to predict the user's FINAL accepted preference bundle for the CURRENT MEAL. The FINAL accepted preference bundle is the set of preferences the user is most likely to accept during the current meal.
+
+You may use the following three memory blocks. If a memory block is empty, ignore it and rely on the remaining information sources.
+
+=== SEMANTIC MEMORY: Prior on the user's preference encoding inferred from all prior meals ===
+{
+  "microwave_time": {
+    "default": "3 min",
+    "user_tendencies": "IF food is cold-served fruit or dessert AND affective state is neutral AND dining context is personal, social, or attention-directed THEN no microwave BECAUSE repeated cold-food meals were served without reheating, consistent with intended cold serving. IF food is a warm savory meal AND affective state is neutral AND dining context is personal, watching TV, or working on a laptop/tablet THEN 3 min BECAUSE repeated warm savory meals in personal and attention-directed contexts, now including a personal buffalo-chicken meal, were reheated for 3 min, indicating a stable preference for thoroughly warming hot foods there. IF food is a warm savory meal AND affective state is neutral AND dining context is social with a person in front or right THEN 2 min BECAUSE observed social savory meals in those contexts repeatedly used moderate reheating, suggesting a stable social-setting preference for somewhat warm but not maximally hot food. IF food is a mixed cold meal that includes dessert or fruit with sauce AND affective state is neutral AND dining context is watching TV to the right THEN 3 min BECAUSE the observed right-TV sweet mixed meal was reheated, indicating a context-specific exception where some sweet mixed meals are warmed."
+  },
+  "occlusion_relevance": {
+    "default": "do not consider occlusion",
+    "user_tendencies": "IF dining context is a quiet personal meal AND affective state is neutral AND food condition is any food THEN do not consider occlusion BECAUSE the observed personal meal did not prioritize view preservation. IF dining context includes a salient person or focal activity in front of the user AND affective state is neutral AND food condition is general meals or warm savory meals in front-attention or front-social contexts THEN minimize front occlusion BECAUSE repeated TV-in-front, laptop-in-front, and social-front meals selected front-occlusion minimization, indicating a stable preference to preserve the forward view when that view matters. IF dining context is social with a person in front AND affective state is neutral AND food condition is cold fruit THEN do not consider occlusion BECAUSE the observed front-social fruit meal did not prioritize occlusion avoidance, showing that front-social context alone does not always trigger occlusion minimization. IF dining context includes a focal activity or social partner to the right AND affective state is neutral AND food condition is any food THEN minimize right occlusion BECAUSE right-attention and right-social meals selected right-occlusion minimization, showing a stable preference to preserve the attended right-side view. IF dining context includes a focal activity to the left AND affective state is neutral AND food condition is any food THEN minimize left occlusion BECAUSE left-side attention meals prioritized preserving the attended left-side view."
+  },
+  "robot_speed": {
+    "default": "slow",
+    "user_tendencies": "IF dining context is personal, social, or involves a concurrent visually attended activity AND affective state is neutral AND food condition is any food THEN slow BECAUSE the user selected slow speed across nearly all observed meals, including the new personal savory meal, indicating a generally comfort-first interaction style. IF dining context involves working on a laptop on the left AND affective state is neutral AND food condition is cold fruit THEN medium BECAUSE one observed left-laptop fruit meal used medium speed, suggesting a limited context-specific exception in a low-risk multitasking meal."
+  },
+  "skewering_axis": {
+    "default": "perpendicular to major axis",
+    "user_tendencies": "IF food requires fork acquisition AND affective state is neutral AND dining context is general, personal, social, TV-related, laptop-related, or includes fruit/dessert pieces THEN perpendicular to major axis BECAUSE this option was selected across many observed meals, favoring reliable bite acquisition. IF food is a warm savory item in strips, pieces, sandwich bites, nugget-like pieces, or bite-sized vegetables AND affective state is neutral AND dining context is personal, watching TV to the right, watching TV in front, social interaction with a person in front or right, or working on a laptop on the left THEN parallel to major axis BECAUSE repeated meals with solid savory bite-sized foods, now including the personal buffalo-chicken-bites meal, used parallel skewering, suggesting a preference for narrower or more manageable bites for these foods."
+  },
+  "web_interface_confirmation": {
+    "default": "no",
+    "user_tendencies": "IF dining context is a quiet personal meal AND affective state is neutral AND food condition is food requiring bite acquisition THEN no BECAUSE the observed personal savory meal skipped confirmation, indicating a lower-interaction preference when alone. IF dining context is social, including social meals with a person in front or right, AND affective state is neutral AND food condition is any food requiring bite acquisition THEN yes BECAUSE observed social meals repeatedly used explicit confirmation, indicating a preference to verify bite acquisition when errors may be disruptive or visible. IF dining context involves watching TV in front or working on a laptop positioned to the left or in front of the user AND affective state is neutral AND food condition is any food requiring bite acquisition THEN yes BECAUSE repeated meals in these contexts often used explicit confirmation, indicating a broad preference for verification rather than skipping this step. IF dining context involves working on a laptop to the right AND affective state is neutral AND food condition is any food requiring bite acquisition THEN no BECAUSE observed right-laptop meals skipped confirmation, suggesting a context-specific exception favoring reduced interaction burden there. IF dining context involves watching TV to the right or left AND affective state is neutral AND food condition is a cold fruit or sweet fruit/dessert meal THEN no BECAUSE observed side-TV low-stakes fruit or sweet meals skipped confirmation, indicating that in these attention-directed, lower-risk meals the user prefers less interaction. IF dining context involves watching TV in front AND affective state is neutral AND food condition is a warm savory bite-sized meal THEN no BECAUSE the observed front-TV savory meal skipped confirmation, showing that front-TV meals do not uniformly require confirmation and that straightforward savory foods can favor lower interaction burden."
+  },
+  "transfer_mode": {
+    "default": "inside mouth transfer",
+    "user_tendencies": "IF dining context is any observed context AND affective state is neutral AND food condition is any food THEN inside mouth transfer BECAUSE the user cannot lean forward due to limited trunk control, and all observed meals used inside-mouth transfer."
+  },
+  "outside_mouth_distance": {
+    "default": "not applicable",
+    "user_tendencies": "IF transfer_mode is inside mouth transfer THEN not applicable BECAUSE outside-mouth distance does not apply, and the user has consistently selected inside-mouth transfer."
+  },
+  "convey_robot_ready_for_initiating_transfer": {
+    "default": "speech + LED",
+    "user_tendencies": "IF dining context is a quiet personal meal AND affective state is neutral AND food condition is any task THEN speech + LED BECAUSE the observed personal meal used multimodal initiation cues, indicating a preference for a stronger signal when alone. IF dining context involves working on a laptop, watching TV to the left, or social interaction including a person in front or right AND affective state is neutral AND food condition is any task THEN LED BECAUSE several meals in these contexts used quiet visual initiation cues, indicating a general preference for nonverbal signaling in many socially or attentively constrained settings. IF dining context involves working on a laptop on the left, watching TV in front of the user, or watching TV to the right or left AND affective state is neutral AND food condition is screen-focused meals, including cold fruit and warm savory meals, THEN speech + LED BECAUSE observed screen-attention meals often used multimodal initiation cues, suggesting that when the user is focused on a screen they frequently prefer a stronger ready signal."
+  },
+  "detect_user_ready_for_initiating_transfer_feeding": {
+    "default": "open mouth",
+    "user_tendencies": "IF dining context is personal or social, including social meals with a person in front or right, AND affective state is neutral AND food condition is feeding THEN open mouth BECAUSE the user cannot reliably press buttons and repeatedly selected open-mouth readiness in personal and social meals, showing that low-effort initiation outweighed possible ambiguity from conversation in the observed data. IF dining context involves working on a laptop or watching TV, including front-, left-, or right-side attention contexts, AND affective state is neutral AND food condition is feeding THEN autocontinue BECAUSE the user repeatedly selected autocontinue in attention-divided contexts, indicating a stable preference to minimize interaction burden when occupied."
+  },
+  "detect_user_ready_for_initiating_transfer_drinking": {
+    "default": "open mouth",
+    "user_tendencies": "IF dining context is personal or social, including social meals with a person in front or right, AND affective state is neutral AND food condition is drinking THEN open mouth BECAUSE the user cannot reliably press buttons and repeatedly selected open-mouth readiness for drink initiation in personal and social contexts. IF dining context involves working on a laptop or watching TV, including front-, left-, or right-side attention contexts, AND affective state is neutral AND food condition is drinking THEN autocontinue BECAUSE the user repeatedly selected autocontinue in attention-divided contexts, preferring lower-effort automation when occupied."
+  },
+  "detect_user_ready_for_initiating_transfer_wiping": {
+    "default": "open mouth",
+    "user_tendencies": "IF dining context is personal or social, including social meals with a person in front or right, AND affective state is neutral AND food condition is mouth wiping THEN open mouth BECAUSE the user cannot reliably press buttons and repeatedly selected open-mouth readiness for wiping initiation in personal and social contexts. IF dining context involves working on a laptop or watching TV, including front-, left-, or right-side attention contexts, AND affective state is neutral AND food condition is mouth wiping THEN autocontinue BECAUSE the user repeatedly selected autocontinue in attention-divided contexts, consistent with preferring reduced interaction demand when occupied."
+  },
+  "convey_robot_ready_for_completing_transfer": {
+    "default": "speech + LED",
+    "user_tendencies": "IF dining context is a quiet personal meal AND affective state is neutral AND food condition is any task THEN speech + LED BECAUSE the observed personal meal used multimodal completion cues, indicating a preference for a stronger signal when alone. IF dining context involves working on a laptop, watching TV to the left, or social interaction including a person in front or right AND affective state is neutral AND food condition is any task THEN LED BECAUSE several meals in these contexts used nonverbal completion cues. IF dining context involves working on a laptop on the left, watching TV in front of the user, or watching TV to the right or left AND affective state is neutral AND food condition is screen-focused meals, including cold fruit and warm savory meals, THEN speech + LED BECAUSE observed screen-attention meals often used multimodal completion cues, suggesting that when the user is focused on a screen they frequently prefer a stronger completion signal."
+  },
+  "detect_user_completed_transfer_feeding": {
+    "default": "perception",
+    "user_tendencies": "IF task is feeding AND affective state is neutral AND dining context is any observed context THEN perception BECAUSE the user selected sensor-based bite completion detection in all observed meals, and this avoids button presses the user cannot reliably perform."
+  },
+  "detect_user_completed_transfer_drinking": {
+    "default": "autocontinue",
+    "user_tendencies": "IF task is drinking AND affective state is neutral AND dining context is any observed context THEN autocontinue BECAUSE the user cannot reliably press buttons or perform head gestures, and all observed meals used autocontinue."
+  },
+  "detect_user_completed_transfer_wiping": {
+    "default": "autocontinue",
+    "user_tendencies": "IF task is mouth wiping AND affective state is neutral AND dining context is any observed context THEN autocontinue BECAUSE the user cannot reliably press buttons or perform head gestures, and all observed meals used autocontinue."
+  },
+  "retract_between_bites": {
+    "default": "no",
+    "user_tendencies": "IF dining context is a quiet personal meal AND affective state is neutral AND food condition is any food THEN no BECAUSE the observed personal meal skipped retracting, indicating a preference for efficiency when no external view needs preserving. IF dining context includes a salient person or focal activity in front of the user AND affective state is neutral AND food condition is any food THEN yes BECAUSE the user repeatedly selected retracting between bites in front-attention contexts and front-social meals, indicating willingness to accept longer meal time to reduce prolonged visual obstruction when the attended view matters. IF dining context includes a focal activity or social partner to the right AND affective state is neutral AND food condition is any food THEN yes BECAUSE right-attention and right-social meals used retracting, showing the same preference when preserving the right-side view matters. IF dining context includes a focal activity to the left AND affective state is neutral AND food condition is any food THEN yes BECAUSE left-side attention meals also used retracting, extending this preference to left-side view preservation."
+  },
+  "bite_dipping_preference": {
+    "default": "do not dip",
+    "user_tendencies": "IF food has no dip or sauce THEN do not dip BECAUSE dipping is not applicable. IF food includes a dip or sauce AND dining context is a quiet personal meal AND affective state is neutral THEN less BECAUSE the observed personal ranch-dressing meal used some dipping but not maximal dipping, indicating moderate sauce use when alone. IF food includes a dip or sauce AND dining context is social, including social meals with a person in front, AND affective state is neutral THEN less BECAUSE observed social meals with dip used less dipping, consistent with limiting messiness in social settings. IF food includes a dip or sauce AND dining context involves working on a laptop AND affective state is neutral THEN do not dip BECAUSE observed laptop meals with sauce or whipped cream used no dipping, indicating a stronger mess-avoidance preference when multitasking around equipment. IF food includes a sweet sauce AND dining context is watching TV to the right AND affective state is neutral THEN do not dip BECAUSE the observed right-TV sweet meal with sauce selected no dipping, extending the user's mess-avoidance tendency to that attention-directed context."
+  },
+  "wait_before_autocontinue_seconds": {
+    "default": "1000 sec",
+    "user_tendencies": "IF dining context is a quiet personal meal AND affective state is neutral AND food condition is any task using autocontinue THEN 1000 sec BECAUSE the observed personal meal used the longest wait, indicating a preference for ample time before automatic progression when alone. IF dining context is social, including social meals with a person in front or right, AND affective state is neutral AND food condition is any task using autocontinue THEN 100 sec BECAUSE the user selected a moderate wait in observed social meals, balancing time to respond with meal efficiency. IF dining context involves watching TV to the left AND affective state is neutral AND food condition is any task using autocontinue THEN 1000 sec BECAUSE the observed left-TV meal used the longest wait, aligning this context with other screen-attention settings where the user prefers extra time before automatic progression. IF dining context involves working on a laptop in front, working on a laptop to the left, working on a laptop to the right, or watching TV to the right or in front of the user AND affective state is neutral AND food condition is any task using autocontinue THEN 1000 sec BECAUSE repeated attention-divided meals in those contexts used the longest wait, indicating a strong preference for extra time before automatic progression when attention is shared with another activity."
+  }
+}
+======
+
+=== EPISODIC MEMORY: Similar prior meals retrieved from memory with ground truth user preference bundles ===
+day=7; meal=bite-sized sandwiches; setting=Watching TV with TV in Front; time_of_day=noon;
+preferences: microwave_time=3 min; occlusion_relevance=minimize front occlusion; robot_speed=slow; skewering_axis=parallel to major axis; web_interface_confirmation=no; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=speech + LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=speech + LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=yes; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=1000 sec
+
+day=4; meal=chicken breast strips and hash brown; setting=Watching TV with TV on Right; time_of_day=evening;
+preferences: microwave_time=3 min; occlusion_relevance=minimize right occlusion; robot_speed=slow; skewering_axis=parallel to major axis; web_interface_confirmation=no; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=yes; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=1000 sec
+
+day=8; meal=bite-sized sandwiches; setting=Watching TV with TV in Front; time_of_day=evening;
+preferences: microwave_time=3 min; occlusion_relevance=minimize front occlusion; robot_speed=slow; skewering_axis=parallel to major axis; web_interface_confirmation=no; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=yes; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=1000 sec
+
+day=14; meal=bananas, brownies, and chocolate sauce; setting=Watching TV with TV on Right; time_of_day=morning;
+preferences: microwave_time=3 min; occlusion_relevance=minimize right occlusion; robot_speed=slow; skewering_axis=perpendicular to major axis; web_interface_confirmation=no; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=speech + LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=speech + LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=yes; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=1000 sec
+
+day=2; meal=buffalo chicken bites, potato wedges, and ranch dressing; setting=Working on laptop with laptop on Left; time_of_day=evening;
+preferences: microwave_time=3 min; occlusion_relevance=minimize front occlusion; robot_speed=slow; skewering_axis=perpendicular to major axis; web_interface_confirmation=yes; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=speech + LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=speech + LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=yes; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=1000 sec
+
+day=16; meal=bite-sized pizza and broccoli; setting=Watching TV with TV in Front; time_of_day=evening;
+preferences: microwave_time=3 min; occlusion_relevance=minimize front occlusion; robot_speed=slow; skewering_axis=parallel to major axis; web_interface_confirmation=no; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=speech + LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=speech + LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=yes; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=1000 sec
+
+day=15; meal=cantaloupes, bananas, watermelon; setting=Watching TV with TV on Left; time_of_day=morning;
+preferences: microwave_time=no microwave; occlusion_relevance=minimize left occlusion; robot_speed=slow; skewering_axis=perpendicular to major axis; web_interface_confirmation=no; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=speech + LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=speech + LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=yes; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=1000 sec
+
+day=6; meal=general tso's chicken and broccoli; setting=Watching TV with TV on Left; time_of_day=evening;
+preferences: microwave_time=3 min; occlusion_relevance=minimize left occlusion; robot_speed=slow; skewering_axis=perpendicular to major axis; web_interface_confirmation=yes; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=autocontinue; detect_user_ready_for_initiating_transfer_drinking=autocontinue; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=yes; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=100 sec
+
+day=18; meal=buffalo chicken bites, potato wedges, and ranch dressing; setting=Personal; time_of_day=morning;
+preferences: microwave_time=3 min; occlusion_relevance=do not consider occlusion; robot_speed=slow; skewering_axis=parallel to major axis; web_interface_confirmation=no; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=speech + LED; detect_user_ready_for_initiating_transfer_feeding=open mouth; detect_user_ready_for_initiating_transfer_drinking=open mouth; detect_user_ready_for_initiating_transfer_wiping=open mouth; convey_robot_ready_for_completing_transfer=speech + LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=no; bite_dipping_preference=less; wait_before_autocontinue_seconds=1000 sec
+
+day=17; meal=chicken breast strips and hash brown; setting=Social with person in Front; time_of_day=noon;
+preferences: microwave_time=2 min; occlusion_relevance=minimize front occlusion; robot_speed=slow; skewering_axis=parallel to major axis; web_interface_confirmation=yes; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=LED; detect_user_ready_for_initiating_transfer_feeding=open mouth; detect_user_ready_for_initiating_transfer_drinking=open mouth; detect_user_ready_for_initiating_transfer_wiping=open mouth; convey_robot_ready_for_completing_transfer=LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=autocontinue; detect_user_completed_transfer_wiping=autocontinue; retract_between_bites=yes; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=100 sec
+======
+
+=== WORKING MEMORY: Current meal context and revealed user corrections ===
+
+Context for current meal:
+- meal: breaded fish bites, roasted potatoes, tartar sauce
+- setting: Watching TV with TV on Right
+- time_of_day: morning
+
+Corrections made by the user for preference dimensions so far:
+wait_before_autocontinue_seconds=100 sec
+
+IMPORTANT: User corrections may reflect the user's affective state or mood during the current meal. If a correction suggests a consistent pattern (e.g., in a hurry for this meal, more inclination towards automation for this meal, etc.), adjust other related preference dimensions to maintain a coherent preference bundle.
+======
+
+Use the following information in decreasing order of priority:
+1. User physical functioning abilities (these define feasibility constraints that must not be violated)
+2. WORKING MEMORY
+3. EPISODIC MEMORY
+4. SEMANTIC MEMORY
+
+Allowed options per dimension (you MUST choose exactly one of the strings for each field):
+- microwave_time: [no microwave, 1 min, 2 min, 3 min]
+- occlusion_relevance: [do not consider occlusion, minimize left occlusion, minimize front occlusion, minimize right occlusion]
+- robot_speed: [slow, medium, fast]
+- skewering_axis: [parallel to major axis, perpendicular to major axis]
+- web_interface_confirmation: [yes, no]
+- transfer_mode: [outside mouth transfer, inside mouth transfer]
+- outside_mouth_distance: [not applicable, near, medium, far]
+- convey_robot_ready_for_initiating_transfer: [speech, LED, speech + LED, no cue]
+- detect_user_ready_for_initiating_transfer_feeding: [open mouth, button, autocontinue]
+- detect_user_ready_for_initiating_transfer_drinking: [open mouth, button, autocontinue]
+- detect_user_ready_for_initiating_transfer_wiping: [open mouth, button, autocontinue]
+- convey_robot_ready_for_completing_transfer: [speech, LED, speech + LED, no cue]
+- detect_user_completed_transfer_feeding: [perception, button, autocontinue]
+- detect_user_completed_transfer_drinking: [perception, button, autocontinue]
+- detect_user_completed_transfer_wiping: [perception, button, autocontinue]
+- retract_between_bites: [yes, no]
+- bite_dipping_preference: [do not dip, less, more]
+- wait_before_autocontinue_seconds: [10 sec, 100 sec, 1000 sec]
+
+HARD RULES (must always be satisfied):
+- If transfer_mode is "inside mouth transfer", outside_mouth_distance MUST be "not applicable".
+- If the meal description indicates no dippable items or sauces, bite_dipping_preference MUST be "do not dip".
+
+Determine the most likely value for each preference dimension while satisfying all constraints. Then output the final preference bundle as JSON.
+
+Output ONLY a valid JSON object.
+Do NOT include explanations, markdown formatting, or additional text.
+
+The JSON object must contain exactly these 18 keys:
+microwave_time, occlusion_relevance, robot_speed, skewering_axis, web_interface_confirmation, transfer_mode, outside_mouth_distance, convey_robot_ready_for_initiating_transfer, detect_user_ready_for_initiating_transfer_feeding, detect_user_ready_for_initiating_transfer_drinking, detect_user_ready_for_initiating_transfer_wiping, convey_robot_ready_for_completing_transfer, detect_user_completed_transfer_feeding, detect_user_completed_transfer_drinking, detect_user_completed_transfer_wiping, retract_between_bites, bite_dipping_preference, wait_before_autocontinue_seconds
+
+===RESPONSE===
+{
+  "microwave_time": "3 min",
+  "occlusion_relevance": "minimize right occlusion",
+  "robot_speed": "slow",
+  "skewering_axis": "parallel to major axis",
+  "web_interface_confirmation": "no",
+  "transfer_mode": "inside mouth transfer",
+  "outside_mouth_distance": "not applicable",
+  "convey_robot_ready_for_initiating_transfer": "LED",
+  "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+  "detect_user_ready_for_initiating_transfer_drinking": "autocontinue",
+  "detect_user_ready_for_initiating_transfer_wiping": "autocontinue",
+  "convey_robot_ready_for_completing_transfer": "LED",
+  "detect_user_completed_transfer_feeding": "perception",
+  "detect_user_completed_transfer_drinking": "autocontinue",
+  "detect_user_completed_transfer_wiping": "autocontinue",
+  "retract_between_bites": "yes",
+  "bite_dipping_preference": "less",
+  "wait_before_autocontinue_seconds": "100 sec"
+}

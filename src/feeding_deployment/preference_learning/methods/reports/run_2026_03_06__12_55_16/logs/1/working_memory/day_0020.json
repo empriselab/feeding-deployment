@@ -1,0 +1,111 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 20,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 20,
+      "m": 1,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 20,
+      "m": 2,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 20,
+      "m": 3,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "skewering_axis": "perpendicular to major axis"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 20,
+      "m": 4,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "skewering_axis": "perpendicular to major axis",
+        "detect_user_completed_transfer_drinking": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 20,
+      "m": 5,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "skewering_axis": "perpendicular to major axis",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "web_interface_confirmation": "yes"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 20,
+      "m": 6,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "skewering_axis": "perpendicular to major axis",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "web_interface_confirmation": "yes",
+        "wait_before_autocontinue_seconds": "1000 sec"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_55_16",
+      "dataset_file": "data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 20,
+      "m": 7,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "detect_user_ready_for_initiating_transfer_feeding": "autocontinue",
+        "skewering_axis": "perpendicular to major axis",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "web_interface_confirmation": "yes",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "robot_speed": "medium"
+      }
+    }
+  ]
+}

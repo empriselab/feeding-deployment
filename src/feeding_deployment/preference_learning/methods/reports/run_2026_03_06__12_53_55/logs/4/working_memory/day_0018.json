@@ -1,0 +1,94 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 18,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 18,
+      "m": 1,
+      "corrected": {
+        "convey_robot_ready_for_initiating_transfer": "speech + LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 18,
+      "m": 2,
+      "corrected": {
+        "convey_robot_ready_for_initiating_transfer": "speech + LED",
+        "wait_before_autocontinue_seconds": "1000 sec"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 18,
+      "m": 3,
+      "corrected": {
+        "convey_robot_ready_for_initiating_transfer": "speech + LED",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "skewering_axis": "parallel to major axis"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 18,
+      "m": 4,
+      "corrected": {
+        "convey_robot_ready_for_initiating_transfer": "speech + LED",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "skewering_axis": "parallel to major axis",
+        "web_interface_confirmation": "no"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 18,
+      "m": 5,
+      "corrected": {
+        "convey_robot_ready_for_initiating_transfer": "speech + LED",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "skewering_axis": "parallel to major axis",
+        "web_interface_confirmation": "no",
+        "detect_user_ready_for_initiating_transfer_feeding": "open mouth"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_53_55",
+      "dataset_file": "data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "rollout": 0,
+      "day": 18,
+      "m": 6,
+      "corrected": {
+        "convey_robot_ready_for_initiating_transfer": "speech + LED",
+        "wait_before_autocontinue_seconds": "1000 sec",
+        "skewering_axis": "parallel to major axis",
+        "web_interface_confirmation": "no",
+        "detect_user_ready_for_initiating_transfer_feeding": "open mouth",
+        "bite_dipping_preference": "less"
+      }
+    }
+  ]
+}

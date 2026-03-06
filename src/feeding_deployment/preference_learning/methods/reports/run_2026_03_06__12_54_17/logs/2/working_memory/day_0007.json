@@ -1,0 +1,129 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 7,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 7,
+      "m": 1,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 7,
+      "m": 2,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "bite_dipping_preference": "do not dip"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 7,
+      "m": 3,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "bite_dipping_preference": "do not dip",
+        "detect_user_completed_transfer_drinking": "autocontinue"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 7,
+      "m": 4,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "bite_dipping_preference": "do not dip",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "convey_robot_ready_for_completing_transfer": "speech + LED"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 7,
+      "m": 5,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "bite_dipping_preference": "do not dip",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 7,
+      "m": 6,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "bite_dipping_preference": "do not dip",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth",
+        "robot_speed": "medium"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 7,
+      "m": 7,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "bite_dipping_preference": "do not dip",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth",
+        "robot_speed": "medium",
+        "microwave_time": "3 min"
+      }
+    },
+    {
+      "run_timestamp": "2026_03_06__12_54_17",
+      "dataset_file": "data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 7,
+      "m": 8,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "autocontinue",
+        "bite_dipping_preference": "do not dip",
+        "detect_user_completed_transfer_drinking": "autocontinue",
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth",
+        "robot_speed": "medium",
+        "microwave_time": "3 min",
+        "wait_before_autocontinue_seconds": "10 sec"
+      }
+    }
+  ]
+}
