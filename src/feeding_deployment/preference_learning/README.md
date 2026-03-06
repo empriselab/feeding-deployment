@@ -1,16 +1,15 @@
 ## LLM Dataset Generator
 
+Generate user encodings:
+
+```bash
+python data_generation/generate_user_preference_encoding.py --num-users 5 --output-dir data/user_encodings
+```
+
 Run the 30-day LLM-based dataset generator with:
 
 ```bash
-python generate_dataset_llm.py \
-  --user User1 \
-  --physical-profile severe_paralysis_clear_speech \
-  --deployment-id User1 \
-  --days 30 \
-  --seed 42 \
-  --variation-level 0.3 \
-  --output-dir out
+python data_generation/generate_deployment_dataset_llm.py --user_encodings-dir data/user_encodings --output-dir data/deployment_datasets
 ```
 
 ## Evaluate the memory system (full model)
@@ -26,8 +25,7 @@ python3 -u scripts/evaluate_memory_model.py \
 - **All datasets in a directory** (default `generated-data/`):
 
 ```bash
-python3 -u scripts/evaluate_memory_model.py \
-  --data-dir generated-data \
+python methods/evaluate_memory_model.py --data-dir generated-data \
   --num-rollouts 1
 ```
 
