@@ -1,0 +1,30 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 23,
+      "m": 0,
+      "ablation": "ltm_only",
+      "query": "meal=bite-sized sandwiches; setting=Personal; time_of_day=evening;\ncorrected_so_far: none",
+      "use_em": false,
+      "retrieved_episodes": [],
+      "raw_model_output": "{\n  \"microwave_time\": \"2 min\",\n  \"occlusion_relevance\": \"do not consider occlusion\",\n  \"robot_speed\": \"slow\",\n  \"skewering_axis\": \"parallel to major axis\",\n  \"web_interface_confirmation\": \"no\",\n  \"transfer_mode\": \"inside mouth transfer\",\n  \"outside_mouth_distance\": \"not applicable\",\n  \"convey_robot_ready_for_initiating_transfer\": \"speech + LED\",\n  \"detect_user_ready_for_initiating_transfer_feeding\": \"open mouth\",\n  \"detect_user_ready_for_initiating_transfer_drinking\": \"open mouth\",\n  \"detect_user_ready_for_initiating_transfer_wiping\": \"autocontinue\",\n  \"convey_robot_ready_for_completing_transfer\": \"speech + LED\",\n  \"detect_user_completed_transfer_feeding\": \"perception\",\n  \"detect_user_completed_transfer_drinking\": \"perception\",\n  \"detect_user_completed_transfer_wiping\": \"perception\",\n  \"retract_between_bites\": \"no\",\n  \"bite_dipping_preference\": \"do not dip\",\n  \"wait_before_autocontinue_seconds\": \"100 sec\"\n}"
+    },
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 23,
+      "m": 1,
+      "ablation": "ltm_only",
+      "query": "meal=bite-sized sandwiches; setting=Personal; time_of_day=evening;\ncorrected_so_far: microwave_time=3 min",
+      "use_em": false,
+      "retrieved_episodes": [],
+      "raw_model_output": "{\n  \"microwave_time\": \"3 min\",\n  \"occlusion_relevance\": \"do not consider occlusion\",\n  \"robot_speed\": \"slow\",\n  \"skewering_axis\": \"parallel to major axis\",\n  \"web_interface_confirmation\": \"no\",\n  \"transfer_mode\": \"inside mouth transfer\",\n  \"outside_mouth_distance\": \"not applicable\",\n  \"convey_robot_ready_for_initiating_transfer\": \"speech + LED\",\n  \"detect_user_ready_for_initiating_transfer_feeding\": \"open mouth\",\n  \"detect_user_ready_for_initiating_transfer_drinking\": \"open mouth\",\n  \"detect_user_ready_for_initiating_transfer_wiping\": \"autocontinue\",\n  \"convey_robot_ready_for_completing_transfer\": \"speech + LED\",\n  \"detect_user_completed_transfer_feeding\": \"perception\",\n  \"detect_user_completed_transfer_drinking\": \"perception\",\n  \"detect_user_completed_transfer_wiping\": \"perception\",\n  \"retract_between_bites\": \"no\",\n  \"bite_dipping_preference\": \"do not dip\",\n  \"wait_before_autocontinue_seconds\": \"100 sec\"\n}"
+    }
+  ]
+}

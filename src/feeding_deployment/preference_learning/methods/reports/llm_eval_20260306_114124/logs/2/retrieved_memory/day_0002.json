@@ -1,0 +1,82 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 2,
+      "m": 0,
+      "ablation": "ltm_only",
+      "query": "meal=chicken nuggets, broccoli, and ketchup; setting=Social with person on Left; time_of_day=morning;\ncorrected_so_far: none",
+      "use_em": false,
+      "retrieved_episodes": [],
+      "raw_model_output": "{\n  \"microwave_time\": \"1 min\",\n  \"occlusion_relevance\": \"minimize left occlusion\",\n  \"robot_speed\": \"medium\",\n  \"skewering_axis\": \"parallel to major axis\",\n  \"web_interface_confirmation\": \"no\",\n  \"transfer_mode\": \"outside mouth transfer\",\n  \"outside_mouth_distance\": \"far\",\n  \"convey_robot_ready_for_initiating_transfer\": \"LED\",\n  \"detect_user_ready_for_initiating_transfer_feeding\": \"open mouth\",\n  \"detect_user_ready_for_initiating_transfer_drinking\": \"button\",\n  \"detect_user_ready_for_initiating_transfer_wiping\": \"button\",\n  \"convey_robot_ready_for_completing_transfer\": \"LED\",\n  \"detect_user_completed_transfer_feeding\": \"perception\",\n  \"detect_user_completed_transfer_drinking\": \"button\",\n  \"detect_user_completed_transfer_wiping\": \"button\",\n  \"retract_between_bites\": \"yes\",\n  \"bite_dipping_preference\": \"more\",\n  \"wait_before_autocontinue_seconds\": \"100 sec\"\n}"
+    },
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 2,
+      "m": 1,
+      "ablation": "ltm_only",
+      "query": "meal=chicken nuggets, broccoli, and ketchup; setting=Social with person on Left; time_of_day=morning;\ncorrected_so_far: detect_user_ready_for_initiating_transfer_feeding=button",
+      "use_em": false,
+      "retrieved_episodes": [],
+      "raw_model_output": "{\n  \"microwave_time\": \"1 min\",\n  \"occlusion_relevance\": \"minimize left occlusion\",\n  \"robot_speed\": \"medium\",\n  \"skewering_axis\": \"parallel to major axis\",\n  \"web_interface_confirmation\": \"no\",\n  \"transfer_mode\": \"outside mouth transfer\",\n  \"outside_mouth_distance\": \"far\",\n  \"convey_robot_ready_for_initiating_transfer\": \"LED\",\n  \"detect_user_ready_for_initiating_transfer_feeding\": \"button\",\n  \"detect_user_ready_for_initiating_transfer_drinking\": \"button\",\n  \"detect_user_ready_for_initiating_transfer_wiping\": \"button\",\n  \"convey_robot_ready_for_completing_transfer\": \"LED\",\n  \"detect_user_completed_transfer_feeding\": \"perception\",\n  \"detect_user_completed_transfer_drinking\": \"button\",\n  \"detect_user_completed_transfer_wiping\": \"button\",\n  \"retract_between_bites\": \"yes\",\n  \"bite_dipping_preference\": \"more\",\n  \"wait_before_autocontinue_seconds\": \"100 sec\"\n}"
+    },
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 2,
+      "m": 2,
+      "ablation": "ltm_only",
+      "query": "meal=chicken nuggets, broccoli, and ketchup; setting=Social with person on Left; time_of_day=morning;\ncorrected_so_far: detect_user_ready_for_initiating_transfer_feeding=button; outside_mouth_distance=medium",
+      "use_em": false,
+      "retrieved_episodes": [],
+      "raw_model_output": "{\n  \"microwave_time\": \"1 min\",\n  \"occlusion_relevance\": \"minimize left occlusion\",\n  \"robot_speed\": \"medium\",\n  \"skewering_axis\": \"parallel to major axis\",\n  \"web_interface_confirmation\": \"no\",\n  \"transfer_mode\": \"outside mouth transfer\",\n  \"outside_mouth_distance\": \"medium\",\n  \"convey_robot_ready_for_initiating_transfer\": \"LED\",\n  \"detect_user_ready_for_initiating_transfer_feeding\": \"button\",\n  \"detect_user_ready_for_initiating_transfer_drinking\": \"button\",\n  \"detect_user_ready_for_initiating_transfer_wiping\": \"button\",\n  \"convey_robot_ready_for_completing_transfer\": \"LED\",\n  \"detect_user_completed_transfer_feeding\": \"perception\",\n  \"detect_user_completed_transfer_drinking\": \"button\",\n  \"detect_user_completed_transfer_wiping\": \"button\",\n  \"retract_between_bites\": \"yes\",\n  \"bite_dipping_preference\": \"more\",\n  \"wait_before_autocontinue_seconds\": \"100 sec\"\n}"
+    },
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 2,
+      "m": 3,
+      "ablation": "ltm_only",
+      "query": "meal=chicken nuggets, broccoli, and ketchup; setting=Social with person on Left; time_of_day=morning;\ncorrected_so_far: detect_user_ready_for_initiating_transfer_feeding=button; outside_mouth_distance=medium; skewering_axis=perpendicular to major axis",
+      "use_em": false,
+      "retrieved_episodes": [],
+      "raw_model_output": "{\n  \"microwave_time\": \"1 min\",\n  \"occlusion_relevance\": \"minimize left occlusion\",\n  \"robot_speed\": \"medium\",\n  \"skewering_axis\": \"perpendicular to major axis\",\n  \"web_interface_confirmation\": \"no\",\n  \"transfer_mode\": \"outside mouth transfer\",\n  \"outside_mouth_distance\": \"medium\",\n  \"convey_robot_ready_for_initiating_transfer\": \"LED\",\n  \"detect_user_ready_for_initiating_transfer_feeding\": \"button\",\n  \"detect_user_ready_for_initiating_transfer_drinking\": \"button\",\n  \"detect_user_ready_for_initiating_transfer_wiping\": \"button\",\n  \"convey_robot_ready_for_completing_transfer\": \"LED\",\n  \"detect_user_completed_transfer_feeding\": \"perception\",\n  \"detect_user_completed_transfer_drinking\": \"button\",\n  \"detect_user_completed_transfer_wiping\": \"button\",\n  \"retract_between_bites\": \"yes\",\n  \"bite_dipping_preference\": \"more\",\n  \"wait_before_autocontinue_seconds\": \"100 sec\"\n}"
+    },
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 2,
+      "m": 4,
+      "ablation": "ltm_only",
+      "query": "meal=chicken nuggets, broccoli, and ketchup; setting=Social with person on Left; time_of_day=morning;\ncorrected_so_far: bite_dipping_preference=less; detect_user_ready_for_initiating_transfer_feeding=button; outside_mouth_distance=medium; skewering_axis=perpendicular to major axis",
+      "use_em": false,
+      "retrieved_episodes": [],
+      "raw_model_output": "{\n  \"microwave_time\": \"1 min\",\n  \"occlusion_relevance\": \"minimize left occlusion\",\n  \"robot_speed\": \"medium\",\n  \"skewering_axis\": \"perpendicular to major axis\",\n  \"web_interface_confirmation\": \"no\",\n  \"transfer_mode\": \"outside mouth transfer\",\n  \"outside_mouth_distance\": \"medium\",\n  \"convey_robot_ready_for_initiating_transfer\": \"LED\",\n  \"detect_user_ready_for_initiating_transfer_feeding\": \"button\",\n  \"detect_user_ready_for_initiating_transfer_drinking\": \"button\",\n  \"detect_user_ready_for_initiating_transfer_wiping\": \"button\",\n  \"convey_robot_ready_for_completing_transfer\": \"LED\",\n  \"detect_user_completed_transfer_feeding\": \"perception\",\n  \"detect_user_completed_transfer_drinking\": \"button\",\n  \"detect_user_completed_transfer_wiping\": \"button\",\n  \"retract_between_bites\": \"yes\",\n  \"bite_dipping_preference\": \"less\",\n  \"wait_before_autocontinue_seconds\": \"100 sec\"\n}"
+    },
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 2,
+      "m": 5,
+      "ablation": "ltm_only",
+      "query": "meal=chicken nuggets, broccoli, and ketchup; setting=Social with person on Left; time_of_day=morning;\ncorrected_so_far: bite_dipping_preference=less; detect_user_ready_for_initiating_transfer_feeding=button; microwave_time=2 min; outside_mouth_distance=medium; skewering_axis=perpendicular to major axis",
+      "use_em": false,
+      "retrieved_episodes": [],
+      "raw_model_output": "{\n  \"microwave_time\": \"2 min\",\n  \"occlusion_relevance\": \"minimize left occlusion\",\n  \"robot_speed\": \"medium\",\n  \"skewering_axis\": \"perpendicular to major axis\",\n  \"web_interface_confirmation\": \"no\",\n  \"transfer_mode\": \"outside mouth transfer\",\n  \"outside_mouth_distance\": \"medium\",\n  \"convey_robot_ready_for_initiating_transfer\": \"LED\",\n  \"detect_user_ready_for_initiating_transfer_feeding\": \"button\",\n  \"detect_user_ready_for_initiating_transfer_drinking\": \"button\",\n  \"detect_user_ready_for_initiating_transfer_wiping\": \"button\",\n  \"convey_robot_ready_for_completing_transfer\": \"LED\",\n  \"detect_user_completed_transfer_feeding\": \"perception\",\n  \"detect_user_completed_transfer_drinking\": \"button\",\n  \"detect_user_completed_transfer_wiping\": \"button\",\n  \"retract_between_bites\": \"yes\",\n  \"bite_dipping_preference\": \"less\",\n  \"wait_before_autocontinue_seconds\": \"100 sec\"\n}"
+    }
+  ]
+}

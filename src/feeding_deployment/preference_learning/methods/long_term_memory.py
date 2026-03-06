@@ -4,6 +4,8 @@ import argparse
 import json
 import os
 from typing import Any, Dict, List
+from pathlib import Path
+from datetime import datetime
 
 from openai import OpenAI
 
@@ -23,10 +25,11 @@ class LongTermMemoryModel:
     Stateful LTM that updates EVERY meal (online).
     """
 
-    def __init__(self, client: OpenAI, chat_model: str, retry_fn) -> None:
+    def __init__(self, client: OpenAI, chat_model: str, retry_fn, logs_dir: Path = None) -> None:
         self.client = client
         self.chat_model = chat_model
         self._retry = retry_fn
+        self.logs_dir = logs_dir
 
         self.user: str = ""
         self.physical_profile_label: str = ""
@@ -65,6 +68,16 @@ class LongTermMemoryModel:
 
         resp = self._retry(_call)
         new_ltm_summary = (resp.choices[0].message.content or "").strip()
+    
+        if self.logs_dir:
+            self.logs_dir.mkdir(parents=True, exist_ok=True)
+            log_file = self.logs_dir / f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+            try:
+                log_file.write_text(f"===PROMPT===\n{prompt}\n\n===RESPONSE===\n{json.dumps(json.loads(new_ltm_summary), indent=2)}", encoding="utf-8")
+            except Exception:
+                log_file.write_text(f"===PROMPT===\n{prompt}\n\n===RESPONSE===\nFailed to parse response as JSON. Raw response:\n{resp}", encoding="utf-8")
+
+        
         # check if the summary is a valid JSON object, if not, print a warning and the whole summary for debugging
         try:
             json.loads(new_ltm_summary)

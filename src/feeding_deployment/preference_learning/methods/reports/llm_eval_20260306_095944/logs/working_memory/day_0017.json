@@ -1,0 +1,111 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 17,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 17,
+      "m": 1,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "perception"
+      }
+    },
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 17,
+      "m": 2,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "perception",
+        "detect_user_completed_transfer_drinking": "perception"
+      }
+    },
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 17,
+      "m": 3,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "perception",
+        "detect_user_completed_transfer_drinking": "perception",
+        "skewering_axis": "perpendicular to major axis"
+      }
+    },
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 17,
+      "m": 4,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "perception",
+        "detect_user_completed_transfer_drinking": "perception",
+        "skewering_axis": "perpendicular to major axis",
+        "robot_speed": "fast"
+      }
+    },
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 17,
+      "m": 5,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "perception",
+        "detect_user_completed_transfer_drinking": "perception",
+        "skewering_axis": "perpendicular to major axis",
+        "robot_speed": "fast",
+        "wait_before_autocontinue_seconds": "10 sec"
+      }
+    },
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 17,
+      "m": 6,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "perception",
+        "detect_user_completed_transfer_drinking": "perception",
+        "skewering_axis": "perpendicular to major axis",
+        "robot_speed": "fast",
+        "wait_before_autocontinue_seconds": "10 sec",
+        "microwave_time": "1 min"
+      }
+    },
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 17,
+      "m": 7,
+      "corrected": {
+        "detect_user_completed_transfer_wiping": "perception",
+        "detect_user_completed_transfer_drinking": "perception",
+        "skewering_axis": "perpendicular to major axis",
+        "robot_speed": "fast",
+        "wait_before_autocontinue_seconds": "10 sec",
+        "microwave_time": "1 min",
+        "occlusion_relevance": "do not consider occlusion"
+      }
+    }
+  ]
+}

@@ -13,7 +13,7 @@ from typing import Any, Dict, List
 
 from openai import OpenAI
 
-from feeding_deployment.preference_learning.methods.plotting import _generate_plots
+from feeding_deployment.preference_learning.methods.metrics import _generate_metrics
 from feeding_deployment.preference_learning.methods.utils import (
     _episode_text,
     _extract_truth_bundle,
@@ -40,7 +40,6 @@ class _Tee:
         for st in self._streams:
             st.flush()
 
-
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Evaluate LLM-based interactive predictor on synthetic datasets.")
     p.add_argument("--data-file", help="Path to one JSON dataset file.")
@@ -56,6 +55,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--cache-dir", default=".cache/llm_memory_eval")
     p.add_argument("--progress", choices=["none", "meal", "step"], default="step")
     p.add_argument("--ablation", choices=["full", "ltm_only", "em_only", "no_memory"], default="full")
+    p.add_argument("--days", type=int, default=0, help="Evaluate only the first N days (0 = use all days in dataset).")
+
     return p.parse_args()
 
 
@@ -98,42 +99,10 @@ def main() -> int:
     logs_dir = report_dir / "logs"
     logs_dir.mkdir(parents=True, exist_ok=True)
 
-    # Per-day logging directories (one file per day)
-    retrieved_dir = logs_dir / "retrieved_memory"
-    ltm_dir = logs_dir / "ltm_memory"
-    wm_dir = logs_dir / "working_memory"
-    retrieved_dir.mkdir(parents=True, exist_ok=True)
-    ltm_dir.mkdir(parents=True, exist_ok=True)
-    wm_dir.mkdir(parents=True, exist_ok=True)
-
     try:
         client = OpenAI(api_key=_resolve_api_key(args.api_key))
         cache_dir = Path(args.cache_dir)
         cache_dir.mkdir(parents=True, exist_ok=True)
-
-        retriever = RetrievalModel(
-            client=client,
-            embed_model=args.embed_model,
-            cache_path=cache_dir / "embeddings.json",
-            retry_fn=_retry_on_rate_limit,
-        )
-
-        ltm = LongTermMemoryModel(
-            client=client,
-            chat_model=args.openai_model,
-            retry_fn=_retry_on_rate_limit,
-        )
-
-        memory_model = MemoryModel(
-            client=client,
-            chat_model=args.openai_model,
-            embed_model=args.embed_model,
-            k_retrieve=args.k_retrieve,
-            ablation=args.ablation,
-            ltm=ltm,
-            retriever=retriever,
-            retry_fn=_retry_on_rate_limit,
-        )
 
         user_reports: List[Dict[str, Any]] = []
 
@@ -146,9 +115,45 @@ def main() -> int:
             physical_profile_label = str(data.get("physical_profile_label", "")).strip()
             if not physical_profile_label:
                 raise SystemExit(f"Dataset missing required field: 'physical_profile_label' in {path}")
+            
+            # Per-day logging directories (one file per day)
+            retrieved_dir = logs_dir / user / "retrieved_memory"
+            ltm_dir = logs_dir / user / "ltm_memory"
+            wm_dir = logs_dir / user / "working_memory"
+            retrieved_dir.mkdir(parents=True, exist_ok=True)
+            ltm_dir.mkdir(parents=True, exist_ok=True)
+            wm_dir.mkdir(parents=True, exist_ok=True)
+
+            retriever = RetrievalModel(
+                client=client,
+                embed_model=args.embed_model,
+                cache_path=cache_dir / "embeddings.json",
+                retry_fn=_retry_on_rate_limit,
+            )
+
+            ltm = LongTermMemoryModel(
+                client=client,
+                chat_model=args.openai_model,
+                retry_fn=_retry_on_rate_limit,
+                logs_dir=logs_dir / user / "ltm_memory_llm_calls",
+            )
+
+            memory_model = MemoryModel(
+                client=client,
+                chat_model=args.openai_model,
+                embed_model=args.embed_model,
+                k_retrieve=args.k_retrieve,
+                ablation=args.ablation,
+                ltm=ltm,
+                retriever=retriever,
+                retry_fn=_retry_on_rate_limit,
+                logs_dir=logs_dir / user / "memory_model_llm_calls",
+            )
 
             days: List[Dict[str, Any]] = list(data.get("days", []))
             days.sort(key=lambda r: int(r.get("day", 0)))
+            if args.days > 0:
+                days = [d for d in days if int(d.get("day", 0)) <= args.days]
 
             # metrics
             total_meals = 0
@@ -160,6 +165,12 @@ def main() -> int:
             acc_m0_n_by_day: Dict[int, int] = defaultdict(int)
             acc_m1_sum_by_day: Dict[int, float] = defaultdict(float)
             acc_m1_n_by_day: Dict[int, int] = defaultdict(int)
+
+            mismatches_m0_sum_by_day: Dict[int, float] = defaultdict(float)
+            mismatches_m0_n_by_day: Dict[int, int] = defaultdict(int)
+            mismatches_m1_sum_by_day: Dict[int, float] = defaultdict(float)
+            mismatches_m1_n_by_day: Dict[int, int] = defaultdict(int)
+
             m_star_sum_by_day: Dict[int, float] = defaultdict(float)
             m_star_n_by_day: Dict[int, int] = defaultdict(int)
             affective_state_by_day: Dict[int, str] = {}
@@ -198,6 +209,15 @@ def main() -> int:
                     affective_state = str(ctx.get("transient_affective_state") or "unknown").strip() or "unknown"
                     affective_state_by_day[day] = affective_state
 
+                    print(
+                        f"[Day {day}] Meal: {ctx.get('meal', 'unknown')} | "
+                        f"Setting: {ctx.get('setting', 'unknown')} | "
+                        f"Time: {ctx.get('time_of_day', 'unknown')} | "
+                        f"Affective state: {affective_state}",
+                        flush=True,
+                    )
+                    print(f"  Ground truth bundle: {json.dumps(truth, indent=2)}", flush=True)
+
                     while True:
                         wm_steps.append(
                             {
@@ -219,6 +239,7 @@ def main() -> int:
                             context=ctx,
                             corrected=corrected,
                         )
+                        print(f"  [Predict] Prediction: {json.dumps(pred, indent=2)}", flush=True)
 
                         retrieved_steps.append(
                             {
@@ -240,12 +261,19 @@ def main() -> int:
                             else 1.0
                         )
 
+                        mismatches = [f for f in PREF_FIELDS if f not in corrected and pred.get(f) != truth.get(f)]
+                        num_mismatches = len(mismatches)
+                        num_retrieved = len(debug.get("retrieved_episodes", []))
+
                         acc_after_m_sum[m] = acc_after_m_sum.get(m, 0.0) + acc
                         acc_after_m_n[m] = acc_after_m_n.get(m, 0) + 1
 
                         if m == 0:
                             acc_m0_sum_by_day[day] += acc
                             acc_m0_n_by_day[day] += 1
+                            mismatches_m0_sum_by_day[day] += num_mismatches
+                            mismatches_m0_n_by_day[day] += 1
+
                             acc_m0_sum_by_state[affective_state] += acc
                             acc_m0_n_by_state[affective_state] += 1
                             for f in unrevealed:
@@ -255,11 +283,8 @@ def main() -> int:
                         elif m == 1:
                             acc_m1_sum_by_day[day] += acc
                             acc_m1_n_by_day[day] += 1
-
-                        mismatches = [f for f in PREF_FIELDS if f not in corrected and pred.get(f) != truth.get(f)]
-                        
-                        num_mismatches = len(mismatches)
-                        num_retrieved = len(debug.get("retrieved_episodes", []))
+                            mismatches_m1_sum_by_day[day] += num_mismatches
+                            mismatches_m1_n_by_day[day] += 1
 
                         print(
                             f"  [user={user}] rollout {rollout_idx+1}/{args.num_rollouts} "
@@ -280,6 +305,8 @@ def main() -> int:
                             if m == 0 and not mismatches:
                                 acc_m1_sum_by_day[day] += 1.0
                                 acc_m1_n_by_day[day] += 1
+                                mismatches_m1_sum_by_day[day] += 0.0
+                                mismatches_m1_n_by_day[day] += 1
                                 zero_correction_meals_total += 1
                                 if day >= 24:
                                     zero_correction_meals_final_week += 1
@@ -299,7 +326,7 @@ def main() -> int:
 
                         corrected[f_corr] = corrected_value
                         m += 1
-                    
+
                     # Build episode text (used for LTM update and retrieval history)
                     ep_txt = _episode_text(day=day, context=ctx, prefs=truth)
 
@@ -307,12 +334,16 @@ def main() -> int:
                     print(f"  [LTM] Updating summary (day {day}) ...", flush=True)
                     ltm.add_episode(ep_txt)
                     ltm_summary = ltm.get_ltm()  # JSON string (or empty)
-                    
+
                     log_ltm_summary = ltm_summary
                     try:
                         log_ltm_summary = json.loads(ltm_summary)
                     except Exception:
-                        print(f"Warning: LTM summary for logging is not valid JSON. Logging raw string. Summary:\n{ltm_summary}\n", flush=True)
+                        print(
+                            f"Warning: LTM summary for logging is not valid JSON. "
+                            f"Logging raw string. Summary:\n{ltm_summary}\n",
+                            flush=True,
+                        )
 
                     # Per-day logs we will write once at the end of the day
                     ltm_record = {
@@ -341,7 +372,14 @@ def main() -> int:
             mean_corr = (total_corrections / float(total_meals)) if total_meals else 0.0
             acc_after_m = {str(mm): (acc_after_m_sum[mm] / float(acc_after_m_n[mm])) for mm in sorted(acc_after_m_sum)}
 
-            all_days = sorted(set(acc_m0_sum_by_day) | set(acc_m1_sum_by_day) | set(m_star_sum_by_day))
+            all_days = sorted(
+                set(acc_m0_sum_by_day)
+                | set(acc_m1_sum_by_day)
+                | set(mismatches_m0_sum_by_day)
+                | set(mismatches_m1_sum_by_day)
+                | set(m_star_sum_by_day)
+            )
+
             per_day_metrics: List[Dict[str, Any]] = []
             for d in all_days:
                 rec: Dict[str, Any] = {"day": d, "affective_state": affective_state_by_day.get(d, "unknown")}
@@ -349,6 +387,10 @@ def main() -> int:
                     rec["acc_m0"] = acc_m0_sum_by_day[d] / float(acc_m0_n_by_day[d])
                 if acc_m1_n_by_day[d]:
                     rec["acc_m1"] = acc_m1_sum_by_day[d] / float(acc_m1_n_by_day[d])
+                if mismatches_m0_n_by_day[d]:
+                    rec["mismatches_m0"] = mismatches_m0_sum_by_day[d] / float(mismatches_m0_n_by_day[d])
+                if mismatches_m1_n_by_day[d]:
+                    rec["mismatches_m1"] = mismatches_m1_sum_by_day[d] / float(mismatches_m1_n_by_day[d])
                 if m_star_n_by_day[d]:
                     rec["m_star"] = m_star_sum_by_day[d] / float(m_star_n_by_day[d])
                 per_day_metrics.append(rec)
@@ -407,7 +449,7 @@ def main() -> int:
         print(f"\nWrote report: {report_path}")
         print(f"Terminal output saved to: {report_txt_path}")
 
-        _generate_plots(user_reports, report_dir)
+        _generate_metrics(user_reports, report_dir)
         return 0
 
     finally:

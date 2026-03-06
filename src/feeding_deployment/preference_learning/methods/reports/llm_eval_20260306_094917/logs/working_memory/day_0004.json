@@ -1,0 +1,63 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "20260306_094917",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 4,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "20260306_094917",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 4,
+      "m": 1,
+      "corrected": {
+        "bite_dipping_preference": "less"
+      }
+    },
+    {
+      "run_timestamp": "20260306_094917",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 4,
+      "m": 2,
+      "corrected": {
+        "bite_dipping_preference": "less",
+        "web_interface_confirmation": "no"
+      }
+    },
+    {
+      "run_timestamp": "20260306_094917",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 4,
+      "m": 3,
+      "corrected": {
+        "bite_dipping_preference": "less",
+        "web_interface_confirmation": "no",
+        "retract_between_bites": "no"
+      }
+    },
+    {
+      "run_timestamp": "20260306_094917",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 4,
+      "m": 4,
+      "corrected": {
+        "bite_dipping_preference": "less",
+        "web_interface_confirmation": "no",
+        "retract_between_bites": "no",
+        "microwave_time": "2 min"
+      }
+    }
+  ]
+}

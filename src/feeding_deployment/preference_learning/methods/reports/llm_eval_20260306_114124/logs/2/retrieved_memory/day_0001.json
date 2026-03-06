@@ -1,0 +1,82 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 1,
+      "m": 0,
+      "ablation": "ltm_only",
+      "query": "meal=strawberries with whipped cream; setting=Watching TV with TV in Front; time_of_day=evening;\ncorrected_so_far: none",
+      "use_em": false,
+      "retrieved_episodes": [],
+      "raw_model_output": "{\n  \"microwave_time\": \"no microwave\",\n  \"occlusion_relevance\": \"minimize front occlusion\",\n  \"robot_speed\": \"medium\",\n  \"skewering_axis\": \"perpendicular to major axis\",\n  \"web_interface_confirmation\": \"no\",\n  \"transfer_mode\": \"outside mouth transfer\",\n  \"outside_mouth_distance\": \"near\",\n  \"convey_robot_ready_for_initiating_transfer\": \"speech + LED\",\n  \"detect_user_ready_for_initiating_transfer_feeding\": \"open mouth\",\n  \"detect_user_ready_for_initiating_transfer_drinking\": \"button\",\n  \"detect_user_ready_for_initiating_transfer_wiping\": \"button\",\n  \"convey_robot_ready_for_completing_transfer\": \"speech + LED\",\n  \"detect_user_completed_transfer_feeding\": \"perception\",\n  \"detect_user_completed_transfer_drinking\": \"button\",\n  \"detect_user_completed_transfer_wiping\": \"button\",\n  \"retract_between_bites\": \"yes\",\n  \"bite_dipping_preference\": \"more\",\n  \"wait_before_autocontinue_seconds\": \"100 sec\"\n}"
+    },
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 1,
+      "m": 1,
+      "ablation": "ltm_only",
+      "query": "meal=strawberries with whipped cream; setting=Watching TV with TV in Front; time_of_day=evening;\ncorrected_so_far: convey_robot_ready_for_completing_transfer=LED",
+      "use_em": false,
+      "retrieved_episodes": [],
+      "raw_model_output": "{\n  \"microwave_time\": \"no microwave\",\n  \"occlusion_relevance\": \"minimize front occlusion\",\n  \"robot_speed\": \"medium\",\n  \"skewering_axis\": \"perpendicular to major axis\",\n  \"web_interface_confirmation\": \"no\",\n  \"transfer_mode\": \"outside mouth transfer\",\n  \"outside_mouth_distance\": \"near\",\n  \"convey_robot_ready_for_initiating_transfer\": \"LED\",\n  \"detect_user_ready_for_initiating_transfer_feeding\": \"open mouth\",\n  \"detect_user_ready_for_initiating_transfer_drinking\": \"open mouth\",\n  \"detect_user_ready_for_initiating_transfer_wiping\": \"button\",\n  \"convey_robot_ready_for_completing_transfer\": \"LED\",\n  \"detect_user_completed_transfer_feeding\": \"perception\",\n  \"detect_user_completed_transfer_drinking\": \"button\",\n  \"detect_user_completed_transfer_wiping\": \"button\",\n  \"retract_between_bites\": \"yes\",\n  \"bite_dipping_preference\": \"more\",\n  \"wait_before_autocontinue_seconds\": \"100 sec\"\n}"
+    },
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 1,
+      "m": 2,
+      "ablation": "ltm_only",
+      "query": "meal=strawberries with whipped cream; setting=Watching TV with TV in Front; time_of_day=evening;\ncorrected_so_far: convey_robot_ready_for_completing_transfer=LED; outside_mouth_distance=far",
+      "use_em": false,
+      "retrieved_episodes": [],
+      "raw_model_output": "{\n  \"microwave_time\": \"no microwave\",\n  \"occlusion_relevance\": \"minimize front occlusion\",\n  \"robot_speed\": \"medium\",\n  \"skewering_axis\": \"parallel to major axis\",\n  \"web_interface_confirmation\": \"no\",\n  \"transfer_mode\": \"outside mouth transfer\",\n  \"outside_mouth_distance\": \"far\",\n  \"convey_robot_ready_for_initiating_transfer\": \"LED\",\n  \"detect_user_ready_for_initiating_transfer_feeding\": \"open mouth\",\n  \"detect_user_ready_for_initiating_transfer_drinking\": \"open mouth\",\n  \"detect_user_ready_for_initiating_transfer_wiping\": \"button\",\n  \"convey_robot_ready_for_completing_transfer\": \"LED\",\n  \"detect_user_completed_transfer_feeding\": \"perception\",\n  \"detect_user_completed_transfer_drinking\": \"button\",\n  \"detect_user_completed_transfer_wiping\": \"button\",\n  \"retract_between_bites\": \"yes\",\n  \"bite_dipping_preference\": \"more\",\n  \"wait_before_autocontinue_seconds\": \"100 sec\"\n}"
+    },
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 1,
+      "m": 3,
+      "ablation": "ltm_only",
+      "query": "meal=strawberries with whipped cream; setting=Watching TV with TV in Front; time_of_day=evening;\ncorrected_so_far: convey_robot_ready_for_completing_transfer=LED; detect_user_ready_for_initiating_transfer_drinking=button; outside_mouth_distance=far",
+      "use_em": false,
+      "retrieved_episodes": [],
+      "raw_model_output": "{\n  \"microwave_time\": \"no microwave\",\n  \"occlusion_relevance\": \"minimize front occlusion\",\n  \"robot_speed\": \"medium\",\n  \"skewering_axis\": \"perpendicular to major axis\",\n  \"web_interface_confirmation\": \"no\",\n  \"transfer_mode\": \"outside mouth transfer\",\n  \"outside_mouth_distance\": \"far\",\n  \"convey_robot_ready_for_initiating_transfer\": \"LED\",\n  \"detect_user_ready_for_initiating_transfer_feeding\": \"button\",\n  \"detect_user_ready_for_initiating_transfer_drinking\": \"button\",\n  \"detect_user_ready_for_initiating_transfer_wiping\": \"button\",\n  \"convey_robot_ready_for_completing_transfer\": \"LED\",\n  \"detect_user_completed_transfer_feeding\": \"perception\",\n  \"detect_user_completed_transfer_drinking\": \"button\",\n  \"detect_user_completed_transfer_wiping\": \"button\",\n  \"retract_between_bites\": \"yes\",\n  \"bite_dipping_preference\": \"more\",\n  \"wait_before_autocontinue_seconds\": \"100 sec\"\n}"
+    },
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 1,
+      "m": 4,
+      "ablation": "ltm_only",
+      "query": "meal=strawberries with whipped cream; setting=Watching TV with TV in Front; time_of_day=evening;\ncorrected_so_far: convey_robot_ready_for_completing_transfer=LED; detect_user_ready_for_initiating_transfer_drinking=button; detect_user_ready_for_initiating_transfer_feeding=open mouth; outside_mouth_distance=far",
+      "use_em": false,
+      "retrieved_episodes": [],
+      "raw_model_output": "{\n  \"microwave_time\": \"no microwave\",\n  \"occlusion_relevance\": \"minimize front occlusion\",\n  \"robot_speed\": \"medium\",\n  \"skewering_axis\": \"perpendicular to major axis\",\n  \"web_interface_confirmation\": \"no\",\n  \"transfer_mode\": \"outside mouth transfer\",\n  \"outside_mouth_distance\": \"far\",\n  \"convey_robot_ready_for_initiating_transfer\": \"LED\",\n  \"detect_user_ready_for_initiating_transfer_feeding\": \"open mouth\",\n  \"detect_user_ready_for_initiating_transfer_drinking\": \"button\",\n  \"detect_user_ready_for_initiating_transfer_wiping\": \"button\",\n  \"convey_robot_ready_for_completing_transfer\": \"LED\",\n  \"detect_user_completed_transfer_feeding\": \"perception\",\n  \"detect_user_completed_transfer_drinking\": \"button\",\n  \"detect_user_completed_transfer_wiping\": \"button\",\n  \"retract_between_bites\": \"yes\",\n  \"bite_dipping_preference\": \"more\",\n  \"wait_before_autocontinue_seconds\": \"100 sec\"\n}"
+    },
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 1,
+      "m": 5,
+      "ablation": "ltm_only",
+      "query": "meal=strawberries with whipped cream; setting=Watching TV with TV in Front; time_of_day=evening;\ncorrected_so_far: convey_robot_ready_for_completing_transfer=LED; detect_user_ready_for_initiating_transfer_drinking=button; detect_user_ready_for_initiating_transfer_feeding=open mouth; outside_mouth_distance=far; skewering_axis=parallel to major axis",
+      "use_em": false,
+      "retrieved_episodes": [],
+      "raw_model_output": "{\n  \"microwave_time\": \"no microwave\",\n  \"occlusion_relevance\": \"minimize front occlusion\",\n  \"robot_speed\": \"medium\",\n  \"skewering_axis\": \"parallel to major axis\",\n  \"web_interface_confirmation\": \"no\",\n  \"transfer_mode\": \"outside mouth transfer\",\n  \"outside_mouth_distance\": \"far\",\n  \"convey_robot_ready_for_initiating_transfer\": \"LED\",\n  \"detect_user_ready_for_initiating_transfer_feeding\": \"open mouth\",\n  \"detect_user_ready_for_initiating_transfer_drinking\": \"button\",\n  \"detect_user_ready_for_initiating_transfer_wiping\": \"button\",\n  \"convey_robot_ready_for_completing_transfer\": \"LED\",\n  \"detect_user_completed_transfer_feeding\": \"perception\",\n  \"detect_user_completed_transfer_drinking\": \"button\",\n  \"detect_user_completed_transfer_wiping\": \"button\",\n  \"retract_between_bites\": \"yes\",\n  \"bite_dipping_preference\": \"more\",\n  \"wait_before_autocontinue_seconds\": \"100 sec\"\n}"
+    }
+  ]
+}

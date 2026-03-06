@@ -1,0 +1,74 @@
+{
+  "microwave_time": {
+    "default": "1 min",
+    "user_tendencies": "No context-dependent variation observed yet."
+  },
+  "occlusion_relevance": {
+    "default": "do not consider occlusion",
+    "user_tendencies": "IF dining context includes working on a laptop or tablet on the user's right AND affective state is neutral AND food condition is any food, THEN minimize right occlusion BECAUSE the user explicitly chose to preserve visibility toward the right-side workspace."
+  },
+  "robot_speed": {
+    "default": "fast",
+    "user_tendencies": "No context-dependent variation observed yet."
+  },
+  "skewering_axis": {
+    "default": "perpendicular to major axis",
+    "user_tendencies": "No context-dependent variation observed yet."
+  },
+  "web_interface_confirmation": {
+    "default": "no",
+    "user_tendencies": "No context-dependent variation observed yet."
+  },
+  "transfer_mode": {
+    "default": "inside mouth transfer",
+    "user_tendencies": "IF user has no trunk control and cannot lean forward AND affective state is any AND food condition is any, THEN inside mouth transfer BECAUSE outside-mouth transfer would require forward reach that is incompatible with the user's physical abilities."
+  },
+  "outside_mouth_distance": {
+    "default": "not applicable",
+    "user_tendencies": "IF transfer mode is inside mouth transfer AND affective state is any AND food condition is any, THEN not applicable BECAUSE the user requires inside-mouth transfer due to inability to lean forward."
+  },
+  "convey_robot_ready_for_initiating_transfer": {
+    "default": "speech",
+    "user_tendencies": "No context-dependent variation observed yet."
+  },
+  "detect_user_ready_for_initiating_transfer_feeding": {
+    "default": "autocontinue",
+    "user_tendencies": "IF dining context includes working on a laptop or tablet AND affective state is neutral AND food condition is any, THEN autocontinue BECAUSE the user explicitly preferred low-effort automatic progression in a task-focused context. IF physical ability would be required to press a button AND affective state is any AND food condition is any, THEN do not use button BECAUSE the user cannot press physical buttons."
+  },
+  "detect_user_ready_for_initiating_transfer_drinking": {
+    "default": "autocontinue",
+    "user_tendencies": "IF dining context includes working on a laptop or tablet AND affective state is neutral AND food condition is any, THEN autocontinue BECAUSE the user explicitly preferred low-effort automatic progression in a task-focused context. IF physical ability would be required to press a button AND affective state is any AND food condition is any, THEN do not use button BECAUSE the user cannot press physical buttons."
+  },
+  "detect_user_ready_for_initiating_transfer_wiping": {
+    "default": "autocontinue",
+    "user_tendencies": "IF dining context includes working on a laptop or tablet AND affective state is neutral AND food condition is any, THEN autocontinue BECAUSE the user explicitly preferred low-effort automatic progression in a task-focused context. IF physical ability would be required to press a button AND affective state is any AND food condition is any, THEN do not use button BECAUSE the user cannot press physical buttons."
+  },
+  "convey_robot_ready_for_completing_transfer": {
+    "default": "speech",
+    "user_tendencies": "No context-dependent variation observed yet."
+  },
+  "detect_user_completed_transfer_feeding": {
+    "default": "perception",
+    "user_tendencies": "IF dining context includes working on a laptop or tablet AND affective state is neutral AND food condition is any, THEN perception BECAUSE the user explicitly preferred reliable automatic completion detection. IF physical ability would be required to press a button AND affective state is any AND food condition is any, THEN do not use button BECAUSE the user cannot press physical buttons."
+  },
+  "detect_user_completed_transfer_drinking": {
+    "default": "perception",
+    "user_tendencies": "IF dining context includes working on a laptop or tablet AND affective state is neutral AND food condition is any, THEN perception BECAUSE the user explicitly preferred automatic completion detection rather than manual signaling. IF physical ability would be required to press a button AND affective state is any AND food condition is any, THEN do not use button BECAUSE the user cannot press physical buttons."
+  },
+  "detect_user_completed_transfer_wiping": {
+    "default": "perception",
+    "user_tendencies": "IF dining context includes working on a laptop or tablet AND affective state is neutral AND food condition is any, THEN perception BECAUSE the user explicitly preferred automatic completion detection rather than manual signaling. IF physical ability would be required to press a button AND affective state is any AND food condition is any, THEN do not use button BECAUSE the user cannot press physical buttons."
+  },
+  "retract_between_bites": {
+    "default": "no",
+    "user_tendencies": "IF dining context includes working on a laptop or tablet on the user's right AND affective state is neutral AND food condition is any, THEN no BECAUSE the user accepted continued robot presence despite possible obstruction in order to keep the interaction efficient."
+  },
+  "bite_dipping_preference": {
+    "default": "do not dip",
+    "user_tendencies": "IF food includes a dip or sauce AND affective state is neutral AND dining context includes working on a laptop or tablet, THEN do not dip BECAUSE the user explicitly avoided dipping in a work-oriented context, consistent with minimizing mess and interruption."
+  },
+  "wait_before_autocontinue_seconds": {
+    "default": "10 sec",
+    "user_tendencies": "IF dining context includes working on a laptop or tablet AND affective state is neutral AND food condition is any, THEN 10 sec BECAUSE the user explicitly preferred rapid automatic continuation, indicating a strong efficiency preference in task-focused settings."
+  }
+}

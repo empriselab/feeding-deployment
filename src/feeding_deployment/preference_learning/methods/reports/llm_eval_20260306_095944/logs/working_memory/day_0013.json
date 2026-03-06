@@ -1,0 +1,111 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 13,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 13,
+      "m": 1,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech"
+      }
+    },
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 13,
+      "m": 2,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech",
+        "convey_robot_ready_for_initiating_transfer": "speech"
+      }
+    },
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 13,
+      "m": 3,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech",
+        "convey_robot_ready_for_initiating_transfer": "speech",
+        "microwave_time": "2 min"
+      }
+    },
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 13,
+      "m": 4,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech",
+        "convey_robot_ready_for_initiating_transfer": "speech",
+        "microwave_time": "2 min",
+        "skewering_axis": "perpendicular to major axis"
+      }
+    },
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 13,
+      "m": 5,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech",
+        "convey_robot_ready_for_initiating_transfer": "speech",
+        "microwave_time": "2 min",
+        "skewering_axis": "perpendicular to major axis",
+        "robot_speed": "medium"
+      }
+    },
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 13,
+      "m": 6,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech",
+        "convey_robot_ready_for_initiating_transfer": "speech",
+        "microwave_time": "2 min",
+        "skewering_axis": "perpendicular to major axis",
+        "robot_speed": "medium",
+        "occlusion_relevance": "minimize right occlusion"
+      }
+    },
+    {
+      "run_timestamp": "20260306_095944",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 13,
+      "m": 7,
+      "corrected": {
+        "convey_robot_ready_for_completing_transfer": "speech",
+        "convey_robot_ready_for_initiating_transfer": "speech",
+        "microwave_time": "2 min",
+        "skewering_axis": "perpendicular to major axis",
+        "robot_speed": "medium",
+        "occlusion_relevance": "minimize right occlusion",
+        "bite_dipping_preference": "do not dip"
+      }
+    }
+  ]
+}

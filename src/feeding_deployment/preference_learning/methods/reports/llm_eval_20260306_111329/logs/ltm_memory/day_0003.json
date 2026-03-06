@@ -1,0 +1,89 @@
+{
+  "run_timestamp": "20260306_111329",
+  "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+  "user": "1",
+  "physical_profile_label": "limited_arms_no_trunk_good_head",
+  "rollout": 0,
+  "day": 3,
+  "context": {
+    "meal": "bite-sized sandwiches",
+    "setting": "Working on laptop with laptop on Left",
+    "time_of_day": "evening",
+    "transient_affective_state": "Energetic"
+  },
+  "episode_text": "day=3; meal=bite-sized sandwiches; setting=Working on laptop with laptop on Left; time_of_day=evening;\npreferences: microwave_time=2 min; occlusion_relevance=do not consider occlusion; robot_speed=medium; skewering_axis=parallel to major axis; web_interface_confirmation=no; transfer_mode=inside mouth transfer; outside_mouth_distance=not applicable; convey_robot_ready_for_initiating_transfer=speech + LED; detect_user_ready_for_initiating_transfer_feeding=open mouth; detect_user_ready_for_initiating_transfer_drinking=open mouth; detect_user_ready_for_initiating_transfer_wiping=autocontinue; convey_robot_ready_for_completing_transfer=speech + LED; detect_user_completed_transfer_feeding=perception; detect_user_completed_transfer_drinking=perception; detect_user_completed_transfer_wiping=perception; retract_between_bites=no; bite_dipping_preference=do not dip; wait_before_autocontinue_seconds=10 sec",
+  "ltm_summary_raw": {
+    "microwave_time": {
+      "default": "no microwave",
+      "user_tendencies": "IF dining context is a quiet personal setting AND affective state is neutral AND food is fruit or other cold-served items without sauces/dips THEN no microwave BECAUSE the user explicitly chose not to reheat a fruit meal, consistent with intended cold serving. IF dining context includes working on a laptop or tablet AND affective state is neutral AND food is a warm savory item such as bite-sized sandwiches THEN 2 min BECAUSE the user explicitly selected reheating for an evening work-oriented meal with savory food. Current evidence suggests food type is the main driver, with reheating used for warm savory foods and skipped for cold-served foods."
+    },
+    "occlusion_relevance": {
+      "default": "do not consider occlusion",
+      "user_tendencies": "IF dining context includes working on a laptop or tablet positioned to the user's right AND affective state is neutral AND food has no special sauce/dip requirement THEN minimize right occlusion BECAUSE the user explicitly chose to preserve visibility/access to the right-side workspace. IF dining context includes working on a laptop or tablet positioned to the user's left AND affective state is neutral AND food has no special sauce/dip requirement THEN do not consider occlusion BECAUSE the user explicitly accepted no occlusion constraint in that left-laptop work context. IF dining context is a quiet personal setting AND affective state is neutral AND food has no special sauce/dip requirement THEN do not consider occlusion BECAUSE the user explicitly accepted no occlusion constraint in a personal meal. Current evidence suggests occlusion concerns are selective rather than global, arising when the robot would interfere with a valued viewing/work direction."
+    },
+    "robot_speed": {
+      "default": "slow",
+      "user_tendencies": "IF dining context is a quiet personal setting AND affective state is neutral AND food has no special sauce/dip requirement THEN slow BECAUSE the user explicitly selected a slower pace in that low-pressure personal context. IF dining context includes working on a laptop or tablet positioned to the user's right AND affective state is neutral AND food has no special sauce/dip requirement THEN fast BECAUSE the user previously accepted a faster workflow in that task-oriented context. IF dining context includes working on a laptop or tablet positioned to the user's left AND affective state is neutral AND food is a warm savory item such as bite-sized sandwiches THEN medium BECAUSE the user explicitly selected a moderate pace in that work context. Overall, work-oriented contexts shift the user toward greater efficiency than personal meals, but the exact speed can vary within work settings."
+    },
+    "skewering_axis": {
+      "default": "perpendicular to major axis",
+      "user_tendencies": "IF dining context is a quiet personal setting AND affective state is neutral AND food has no special sauce/dip requirement THEN perpendicular to major axis BECAUSE the user previously selected this option, favoring reliable bite acquisition. IF dining context includes working on a laptop or tablet positioned to the user's left AND affective state is neutral AND food is bite-sized sandwiches THEN parallel to major axis BECAUSE the user explicitly selected parallel skewering for that food, consistent with shaping a narrower bite. Current evidence suggests skewering preference may depend on food geometry rather than dining context alone."
+    },
+    "web_interface_confirmation": {
+      "default": "no",
+      "user_tendencies": "IF any dining context AND any affective state AND any food condition observed so far THEN no BECAUSE the user has consistently preferred to skip explicit bite-acquisition confirmation, indicating a stable preference for lower interaction burden and faster flow."
+    },
+    "transfer_mode": {
+      "default": "inside mouth transfer",
+      "user_tendencies": "IF any dining context AND any affective state AND any food condition THEN inside mouth transfer BECAUSE the user cannot lean forward due to lack of trunk control, making outside-mouth transfer physically unsuitable."
+    },
+    "outside_mouth_distance": {
+      "default": "not applicable",
+      "user_tendencies": "IF any dining context AND any affective state AND any food condition THEN not applicable BECAUSE the user's physical needs support inside mouth transfer rather than outside-mouth transfer."
+    },
+    "convey_robot_ready_for_initiating_transfer": {
+      "default": "speech + LED",
+      "user_tendencies": "IF dining context is a quiet personal setting AND affective state is neutral AND food has no special sauce/dip requirement THEN speech + LED BECAUSE the user explicitly preferred multimodal readiness cues in a personal meal. IF dining context includes working on a laptop or tablet positioned to the right AND affective state is neutral AND food has no special sauce/dip requirement THEN speech BECAUSE the user previously accepted speech-only cues in that work context. IF dining context includes working on a laptop or tablet positioned to the left AND affective state is neutral AND food is a warm savory item such as bite-sized sandwiches THEN speech + LED BECAUSE the user explicitly selected multimodal cues there. Overall, the user values clear robot signaling, with speech + LED common except in at least one efficiency-oriented work context where speech alone was acceptable."
+    },
+    "detect_user_ready_for_initiating_transfer_feeding": {
+      "default": "open mouth",
+      "user_tendencies": "IF dining context is a quiet personal setting AND affective state is neutral AND food has no special sauce/dip requirement THEN open mouth BECAUSE the user explicitly selected open-mouth initiation for feeding, and this matches preserved mouth/head control while avoiding impossible button use. IF dining context includes working on a laptop or tablet positioned to the right AND affective state is neutral AND food has no special sauce/dip requirement THEN autocontinue BECAUSE the user previously preferred a more automated, lower-interruption workflow in that task-oriented context. IF dining context includes working on a laptop or tablet positioned to the left AND affective state is neutral AND food is a warm savory item such as bite-sized sandwiches THEN open mouth BECAUSE the user explicitly selected open-mouth initiation in that work context. Overall, button input is ruled out by physical ability, and the observed tie-break within work contexts is between explicit low-effort mouth signaling and stronger automation."
+    },
+    "detect_user_ready_for_initiating_transfer_drinking": {
+      "default": "open mouth",
+      "user_tendencies": "IF dining context is a quiet personal setting AND affective state is neutral AND food has no special sauce/dip requirement THEN open mouth BECAUSE the user explicitly selected open-mouth initiation for drinking, leveraging preserved mouth/head control and avoiding impossible button input. IF dining context includes working on a laptop or tablet positioned to the right AND affective state is neutral AND food has no special sauce/dip requirement THEN autocontinue BECAUSE the user previously favored automation in that work-oriented context. IF dining context includes working on a laptop or tablet positioned to the left AND affective state is neutral AND food is a warm savory item such as bite-sized sandwiches THEN open mouth BECAUSE the user explicitly selected open-mouth initiation there. Overall, button input is physically unavailable, and the user alternates between open-mouth signaling and automation depending on work context."
+    },
+    "detect_user_ready_for_initiating_transfer_wiping": {
+      "default": "autocontinue",
+      "user_tendencies": "IF any dining context AND any affective state AND any food condition observed so far THEN autocontinue BECAUSE the user has consistently selected automated initiation for wiping, consistent with minimizing effort for a secondary assistance task and avoiding impossible button use."
+    },
+    "convey_robot_ready_for_completing_transfer": {
+      "default": "speech + LED",
+      "user_tendencies": "IF dining context is a quiet personal setting AND affective state is neutral AND food has no special sauce/dip requirement THEN speech + LED BECAUSE the user explicitly preferred multimodal completion cues in a personal meal. IF dining context includes working on a laptop or tablet positioned to the right AND affective state is neutral AND food has no special sauce/dip requirement THEN speech BECAUSE the user previously accepted speech-only completion cues there. IF dining context includes working on a laptop or tablet positioned to the left AND affective state is neutral AND food is a warm savory item such as bite-sized sandwiches THEN speech + LED BECAUSE the user explicitly selected multimodal completion cues there. Overall, the user values clear completion signaling, with modality varying by work context."
+    },
+    "detect_user_completed_transfer_feeding": {
+      "default": "perception",
+      "user_tendencies": "IF any dining context AND any affective state AND any food condition THEN perception BECAUSE it minimizes user effort and is compatible with the user's severe upper-limb paralysis."
+    },
+    "detect_user_completed_transfer_drinking": {
+      "default": "perception",
+      "user_tendencies": "IF any dining context AND any affective state AND any food condition THEN perception BECAUSE it minimizes user effort, and the user has good head/neck control for gesture-based completion."
+    },
+    "detect_user_completed_transfer_wiping": {
+      "default": "perception",
+      "user_tendencies": "IF any dining context AND any affective state AND any food condition THEN perception BECAUSE it minimizes user effort, and the user has good head/neck control for gesture-based completion."
+    },
+    "retract_between_bites": {
+      "default": "no",
+      "user_tendencies": "IF dining context is a quiet personal setting AND affective state is neutral AND food has no special sauce/dip requirement THEN no BECAUSE the user explicitly preferred not to retract between bites in a personal meal, favoring efficiency. IF dining context includes working on a laptop or tablet positioned to the right AND affective state is neutral AND food has no special sauce/dip requirement THEN no BECAUSE the user also accepted a faster, less interruptive workflow in that context despite some concern about right-side occlusion. IF dining context includes working on a laptop or tablet positioned to the left AND affective state is neutral AND food is a warm savory item such as bite-sized sandwiches THEN no BECAUSE the user again explicitly chose not to retract. Across observed meals, the user consistently favors efficiency over retracting."
+    },
+    "bite_dipping_preference": {
+      "default": "do not dip",
+      "user_tendencies": "IF dining context includes working on a laptop or tablet AND affective state is neutral AND food includes a dip or sauce option THEN do not dip BECAUSE the user explicitly avoided dipping in a work-oriented context, consistent with prioritizing cleanliness and efficiency. IF dining context is a quiet personal setting AND affective state is neutral AND food has no dip or sauce option THEN do not dip BECAUSE dipping is not relevant and the user explicitly selected no dipping for a fruit meal. IF dining context includes working on a laptop or tablet positioned to the left AND affective state is neutral AND food is bite-sized sandwiches without a used dip or sauce THEN do not dip BECAUSE the user explicitly selected no dipping there as well. No context-dependent variation toward more dipping has been observed yet."
+    },
+    "wait_before_autocontinue_seconds": {
+      "default": "100 sec",
+      "user_tendencies": "IF dining context is a quiet personal setting AND affective state is neutral AND food has no special sauce/dip requirement THEN 100 sec BECAUSE the user explicitly chose a longer wait in a personal meal, indicating tolerance for a less rushed pace. IF dining context includes working on a laptop or tablet positioned to the right AND affective state is neutral AND food has no special sauce/dip requirement THEN 10 sec BECAUSE the user previously preferred a short wait in a task-oriented context, consistent with efficiency and automation. IF dining context includes working on a laptop or tablet positioned to the left AND affective state is neutral AND food is a warm savory item such as bite-sized sandwiches THEN 10 sec BECAUSE the user explicitly selected the same short wait there. Across observed meals, the stable pattern is slower, more patient timing in personal settings and short waits in work-oriented settings."
+    }
+  }
+}

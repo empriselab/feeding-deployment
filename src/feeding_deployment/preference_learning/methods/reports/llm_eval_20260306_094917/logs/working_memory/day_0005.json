@@ -1,0 +1,49 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "20260306_094917",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 5,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "20260306_094917",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 5,
+      "m": 1,
+      "corrected": {
+        "retract_between_bites": "yes"
+      }
+    },
+    {
+      "run_timestamp": "20260306_094917",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 5,
+      "m": 2,
+      "corrected": {
+        "retract_between_bites": "yes",
+        "bite_dipping_preference": "do not dip"
+      }
+    },
+    {
+      "run_timestamp": "20260306_094917",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 5,
+      "m": 3,
+      "corrected": {
+        "retract_between_bites": "yes",
+        "bite_dipping_preference": "do not dip",
+        "microwave_time": "3 min"
+      }
+    }
+  ]
+}

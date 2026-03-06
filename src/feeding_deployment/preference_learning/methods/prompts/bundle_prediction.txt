@@ -4,31 +4,50 @@ Consider a care recipient with the following physical functioning abilities:
 
 {physical_profile}
 
-You are a personalized preference predictor for the mealtime-assistance system. You can use the following information (if available) for making these predictions. 
+You are a personalized preference predictor for the mealtime-assistance system.
 
-SEMANTIC MEMORY SUMMARY (this is prior on the user preference encoding inferred from all prior episodes):
+Your task is to predict the user's FINAL accepted preference bundle for the CURRENT MEAL. The FINAL accepted preference bundle is the set of preferences the user is most likely to accept during the current meal.
+
+You may use the following three memory blocks. If a memory block is empty, ignore it and rely on the remaining information sources.
+
+=== SEMANTIC MEMORY: Prior on the user's preference encoding inferred from all prior meals ===
 {ltm_summary}
+======
 
-RETRIEVED SIMILAR PAST EPISODES (Episodic memory):
+=== EPISODIC MEMORY: Similar prior meals retrieved from memory with ground truth user preference bundles ===
 {retrieved_block}
+======
 
-CURRENT CONTEXT (X_t):
+=== WORKING MEMORY: Current meal context and revealed user corrections ===
+
+Context for current meal:
 - meal: {meal}
 - setting: {setting}
 - time_of_day: {time_of_day}
 
-REVEALED USER CORRECTIONS SO FAR (Working memory):
+Corrections made by the user for preference dimensions so far:
 {corrected_block}
 
-You must predict the user's FINAL accepted preference bundle for THIS meal.
+IMPORTANT: User corrections may reflect the user's affective state or mood during the current meal. If a correction suggests a consistent pattern (e.g., in a hurry for this meal, more inclination towards automation for this meal, etc.), adjust other related preference dimensions to maintain a coherent preference bundle.
+======
+
+Use the following information in decreasing order of priority:
+1. User physical functioning abilities (these define feasibility constraints that must not be violated)
+2. WORKING MEMORY
+3. EPISODIC MEMORY
+4. SEMANTIC MEMORY
 
 Allowed options per dimension (you MUST choose exactly one of the strings for each field):
 {options_block}
 
-HARD RULES (must satisfy):
+HARD RULES (must always be satisfied):
 - If transfer_mode is "inside mouth transfer", outside_mouth_distance MUST be "not applicable".
-- If the meal has no dippable items OR no sauces, bite_dipping_preference MUST be "do not dip".
+- If the meal description indicates no dippable items or sauces, bite_dipping_preference MUST be "do not dip".
 
-Output ONLY valid JSON with exactly these 18 keys:
+Determine the most likely value for each preference dimension while satisfying all constraints. Then output the final preference bundle as JSON.
+
+Output ONLY a valid JSON object.
+Do NOT include explanations, markdown formatting, or additional text.
+
+The JSON object must contain exactly these 18 keys:
 {pref_fields_csv}
-

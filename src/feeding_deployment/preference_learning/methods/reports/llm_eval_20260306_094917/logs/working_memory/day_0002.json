@@ -1,0 +1,111 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "20260306_094917",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "20260306_094917",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 1,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth"
+      }
+    },
+    {
+      "run_timestamp": "20260306_094917",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 2,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth",
+        "detect_user_ready_for_initiating_transfer_feeding": "open mouth"
+      }
+    },
+    {
+      "run_timestamp": "20260306_094917",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 3,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth",
+        "detect_user_ready_for_initiating_transfer_feeding": "open mouth",
+        "wait_before_autocontinue_seconds": "100 sec"
+      }
+    },
+    {
+      "run_timestamp": "20260306_094917",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 4,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth",
+        "detect_user_ready_for_initiating_transfer_feeding": "open mouth",
+        "wait_before_autocontinue_seconds": "100 sec",
+        "robot_speed": "slow"
+      }
+    },
+    {
+      "run_timestamp": "20260306_094917",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 5,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth",
+        "detect_user_ready_for_initiating_transfer_feeding": "open mouth",
+        "wait_before_autocontinue_seconds": "100 sec",
+        "robot_speed": "slow",
+        "convey_robot_ready_for_initiating_transfer": "speech + LED"
+      }
+    },
+    {
+      "run_timestamp": "20260306_094917",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 6,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth",
+        "detect_user_ready_for_initiating_transfer_feeding": "open mouth",
+        "wait_before_autocontinue_seconds": "100 sec",
+        "robot_speed": "slow",
+        "convey_robot_ready_for_initiating_transfer": "speech + LED",
+        "convey_robot_ready_for_completing_transfer": "speech + LED"
+      }
+    },
+    {
+      "run_timestamp": "20260306_094917",
+      "dataset_file": "../data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "rollout": 0,
+      "day": 2,
+      "m": 7,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_drinking": "open mouth",
+        "detect_user_ready_for_initiating_transfer_feeding": "open mouth",
+        "wait_before_autocontinue_seconds": "100 sec",
+        "robot_speed": "slow",
+        "convey_robot_ready_for_initiating_transfer": "speech + LED",
+        "convey_robot_ready_for_completing_transfer": "speech + LED",
+        "microwave_time": "no microwave"
+      }
+    }
+  ]
+}

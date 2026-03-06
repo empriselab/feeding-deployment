@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 from typing import Any, Dict, List, Optional, Tuple
+from pathlib import Path
+from datetime import datetime
 
 from openai import OpenAI
 
@@ -120,6 +122,7 @@ class MemoryModel:
         ltm: LongTermMemoryModel,
         retriever: RetrievalModel,
         retry_fn,
+        logs_dir: Path = None,
     ) -> None:
         self.client = client
         self.chat_model = chat_model
@@ -129,6 +132,7 @@ class MemoryModel:
         self.ltm = ltm
         self.retriever = retriever
         self._retry = retry_fn
+        self.logs_dir = logs_dir
 
     def predict_bundle(
         self,
@@ -184,6 +188,14 @@ class MemoryModel:
         raw = (resp.choices[0].message.content or "").strip()
         raw = _strip_code_fences(raw)
         data = _safe_json_load(raw) or {}
+            
+        if self.logs_dir:
+            self.logs_dir.mkdir(parents=True, exist_ok=True)
+            log_file = self.logs_dir / f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+            if data:
+                log_file.write_text(f"===PROMPT===\n{prompt}\n\n===RESPONSE===\n{json.dumps(data, indent=2)}", encoding="utf-8")
+            else:
+                log_file.write_text(f"===PROMPT===\n{prompt}\n\n===RESPONSE===\nFailed to parse response as JSON. Raw response:\n{resp}", encoding="utf-8")
 
         # Validate against allowed options, fallback to corrected or default
         out: Dict[str, str] = {}

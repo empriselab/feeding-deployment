@@ -19,7 +19,7 @@ PREFERENCE_BUNDLE: List[PreferenceDim] = [
         field="occlusion_relevance",
         label="Occlusion relevance",
         options=["do not consider occlusion", "minimize left occlusion", "minimize front occlusion", "minimize right occlusion"],
-        description="How important it is that the robot avoids blocking the user's view. Some users may not care about occlusion, while others may prefer the robot to avoid blocking specific directions based on their typical dining context; for example, minimizing front occlusion if they usually look at a TV, laptop, tablet, or social partner directly in front of them, minimizing left occlusion if these are to their left, or minimizing right occlusion if they are to their right."
+        description="How important it is that the robot avoids blocking the user's view. Some users may not care about occlusion, while others may prefer the robot to avoid blocking specific directions based on their typical dining context; for example, minimizing front occlusion if they usually look at a TV, laptop, tablet, or social partner directly in front of them, minimizing left occlusion if TV, laptop, tablet, or social partner are to their left, or minimizing right occlusion if TV, laptop, tablet, or social partner are to their right."
     ),
     PreferenceDim(
         field="robot_speed",

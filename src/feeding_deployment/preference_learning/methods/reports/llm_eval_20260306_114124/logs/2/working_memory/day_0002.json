@@ -1,0 +1,78 @@
+{
+  "steps": [
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 2,
+      "m": 0,
+      "corrected": {}
+    },
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 2,
+      "m": 1,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_feeding": "button"
+      }
+    },
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 2,
+      "m": 2,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_feeding": "button",
+        "outside_mouth_distance": "medium"
+      }
+    },
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 2,
+      "m": 3,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_feeding": "button",
+        "outside_mouth_distance": "medium",
+        "skewering_axis": "perpendicular to major axis"
+      }
+    },
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 2,
+      "m": 4,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_feeding": "button",
+        "outside_mouth_distance": "medium",
+        "skewering_axis": "perpendicular to major axis",
+        "bite_dipping_preference": "less"
+      }
+    },
+    {
+      "run_timestamp": "20260306_114124",
+      "dataset_file": "../data/deployment_datasets_small/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "rollout": 0,
+      "day": 2,
+      "m": 5,
+      "corrected": {
+        "detect_user_ready_for_initiating_transfer_feeding": "button",
+        "outside_mouth_distance": "medium",
+        "skewering_axis": "perpendicular to major axis",
+        "bite_dipping_preference": "less",
+        "microwave_time": "2 min"
+      }
+    }
+  ]
+}

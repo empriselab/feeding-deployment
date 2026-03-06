@@ -10,7 +10,7 @@ Where:
 - X_t is the current dining context.
 - Y_t is the user's transient affective state.
 
-A preference bundle is the complete configuration of the robot’s behavior parameters for a meal. Each parameter corresponds to a preference dimension (e.g., robot speed, transfer mode, dipping behavior). A valid bundle assigns exactly one allowed option to every dimension. You must produce exactly one choice for every dimension listed in ALLOWED OPTIONS.
+A preference bundle is the complete configuration of the robot’s behavior parameters for a meal. Each parameter corresponds to a preference dimension (e.g., robot speed, transfer mode, dipping behavior). A valid bundle assigns exactly one allowed option to every dimension. You must produce exactly one choice for every dimension listed in ALLOWED OPTIONS. Note that you should select the same choice for similar preference dimensions (i.e. consider corelations).
 
 ----------------------------
 PHYSICAL CAPABILITY PROFILE (U^phys)
