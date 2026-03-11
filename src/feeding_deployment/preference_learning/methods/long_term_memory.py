@@ -25,22 +25,15 @@ class LongTermMemoryModel:
     Stateful LTM that updates EVERY meal (online).
     """
 
-    def __init__(self, client: OpenAI, chat_model: str, retry_fn, logs_dir: Path = None) -> None:
+    def __init__(self, physical_profile_label: str, client: OpenAI, chat_model: str, retry_fn, logs_dir: Path = None) -> None:
         self.client = client
         self.chat_model = chat_model
         self._retry = retry_fn
         self.logs_dir = logs_dir
 
-        self.user: str = ""
-        self.physical_profile_label: str = ""
+        self.physical_profile_label = physical_profile_label
         self._ltm_summary: str = ""
         self._initialized: bool = False
-
-    def reset(self, user: str, physical_profile_label: str) -> None:
-        self.user = user
-        self.physical_profile_label = physical_profile_label
-        self._ltm_summary = ""
-        self._initialized = False
 
     def get_ltm(self) -> str:
         return self._ltm_summary
@@ -108,8 +101,6 @@ def main() -> int:
     with open(args.data_file, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    user = str(data.get("user", "unknown"))
-
     physical_profile_label = str(data.get("physical_profile_label", "")).strip()
     if not physical_profile_label:
         raise SystemExit("Dataset missing required field: 'physical_profile_label'")
@@ -123,13 +114,12 @@ def main() -> int:
         chat_model=args.openai_model,
         retry_fn=_retry_on_rate_limit,
     )
-    ltm.reset(user, physical_profile_label)
+    ltm.reset(physical_profile_label)
 
     wanted = {10, 20, 30}
     seen: set[int] = set()
 
     checkpoints: Dict[str, Any] = {
-        "user": user,
         "dataset_file": args.data_file,
         "openai_model": args.openai_model,
         "checkpoints": {},
@@ -154,7 +144,6 @@ def main() -> int:
             summary_logged = summary_raw
 
         record = {
-            "user": user,
             "day": day,
             "context": {
                 "meal": ctx.get("meal"),

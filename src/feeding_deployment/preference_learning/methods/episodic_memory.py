@@ -65,11 +65,19 @@ class EpisodicMemoryModel:
         embed_model: str,
         cache_path: Path,
         retry_fn,
+        k_retrieve: int = 5,
     ) -> None:
         self.client = client
         self.embed_model = embed_model
         self.cache = EmbeddingCache(cache_path)
         self._retry = retry_fn
+        self.k_retrieve = k_retrieve
+        self._history_texts: List[str] = []
+        self._last_retrieved: List[str] = []
+        
+    def add_episode(self, episode_text: str) -> None:
+        # Just cache the embedding for this episode text. Retrieval will happen later.
+        self._history_texts.append(episode_text)
 
     def _embed(self, text: str) -> List[float]:
         cached = self.cache.get(text)
@@ -84,19 +92,25 @@ class EpisodicMemoryModel:
         self.cache.set(text, emb)
         return emb
 
-    def retrieve(self, history_texts: List[str], context: Dict[str, Any], corrected: Dict[str, str], k: int) -> List[str]:
+    def retrieve(self, context: Dict[str, Any], corrected: Dict[str, str]) -> List[str]:
         query = _query_text(context, corrected)
-        if not history_texts or k <= 0:
+        if not self._history_texts or self.k_retrieve <= 0:
             return []
         q_emb = self._embed(query)
         scored: List[Tuple[float, str]] = []
-        for txt in history_texts:
+        for txt in self._history_texts:
             e_emb = self._embed(txt)
             scored.append((_cosine_sim(q_emb, e_emb), txt))
         scored.sort(key=lambda t: t[0], reverse=True)
-        retrieved = [t[1] for t in scored[:k]]
+        retrieved = [t[1] for t in scored[:self.k_retrieve]]
         retrieved = "\n\n".join(retrieved) if retrieved else ""
+        self._last_retrieved = retrieved 
         return retrieved
+        
+    def get_last_retrieved(self) -> List[str]:
+        return self._last_retrieved
 
-    def flush(self) -> None:
+    def reset(self) -> None:
+        self._history_texts = []
         self.cache.flush()
+        

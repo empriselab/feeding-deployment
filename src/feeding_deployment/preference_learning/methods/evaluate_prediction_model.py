@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import glob
 import json
-from multiprocessing import context
 import os
 import random
 import sys
@@ -16,14 +15,11 @@ from openai import OpenAI
 
 from feeding_deployment.preference_learning.methods.metrics import _generate_metrics
 from feeding_deployment.preference_learning.methods.utils import (
-    _episode_text,
     _extract_truth_bundle,
     _resolve_api_key,
     _retry_on_rate_limit,
 )
 
-from feeding_deployment.preference_learning.methods.episodic_memory import EpisodicMemoryModel
-from feeding_deployment.preference_learning.methods.long_term_memory import LongTermMemoryModel
 from feeding_deployment.preference_learning.methods.prediction_model import PredictionModel
 from feeding_deployment.preference_learning.methods.utils import PREF_FIELDS
 
@@ -53,8 +49,6 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--openai-model", default="gpt-5.4")
     p.add_argument("--embed-model", default="text-embedding-3-small")
     p.add_argument("--api-key", default="")
-    p.add_argument("--cache-dir", default=".cache/llm_memory_eval")
-    p.add_argument("--progress", choices=["none", "meal", "step"], default="step")
     p.add_argument("--ablation", choices=["full", "ltm_only", "em_only", "no_memory"], default="full")
     p.add_argument("--days", type=int, default=0, help="Evaluate only the first N days (0 = use all days in dataset).")
 
@@ -68,16 +62,6 @@ def _load_files(args: argparse.Namespace) -> List[str]:
     if args.data_dir:
         files.extend(sorted(glob.glob(os.path.join(args.data_dir, "*.json"))))
     return files
-
-
-def _day_path(dir_path: Path, day: int) -> Path:
-    return dir_path / f"day_{day:04d}.json"
-
-
-def _write_json(path: Path, obj: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(obj, f, ensure_ascii=False, indent=2)
 
 
 def main() -> int:
@@ -105,8 +89,6 @@ def main() -> int:
 
     try:
         client = OpenAI(api_key=_resolve_api_key(args.api_key))
-        cache_dir = Path(args.cache_dir)
-        cache_dir.mkdir(parents=True, exist_ok=True)
 
         user_reports: List[Dict[str, Any]] = []
 
@@ -119,37 +101,6 @@ def main() -> int:
             physical_profile_label = str(data.get("physical_profile_label", "")).strip()
             if not physical_profile_label:
                 raise SystemExit(f"Dataset missing required field: 'physical_profile_label' in {path}")
-            
-            # Per-day logging directories (one file per day)
-            episodic_memory_dir = logs_dir / user / "episodic_memory"
-            long_term_memory_dir = logs_dir / user / "long_term_memory"
-            working_memory_dir = logs_dir / user / "working_memory"
-            episodic_memory_dir.mkdir(parents=True, exist_ok=True)
-            long_term_memory_dir.mkdir(parents=True, exist_ok=True)
-            working_memory_dir.mkdir(parents=True, exist_ok=True)
-
-            if use_long_term_memory:
-                long_term_memory_model = LongTermMemoryModel(
-                    client=client,
-                    chat_model=args.openai_model,
-                    retry_fn=_retry_on_rate_limit,
-                    logs_dir=logs_dir / user / "long_term_memory_llm_calls",
-                )
-                
-            if use_episodic_memory:
-                episodic_memory_model = EpisodicMemoryModel(
-                    client=client,
-                    embed_model=args.embed_model,
-                    cache_path=cache_dir / "embeddings.json",
-                    retry_fn=_retry_on_rate_limit,
-                )
-
-            prediction_model = PredictionModel(
-                client=client,
-                chat_model=args.openai_model,
-                retry_fn=_retry_on_rate_limit,
-                logs_dir=logs_dir / user / "prediction_model_llm_calls",
-            )
 
             days: List[Dict[str, Any]] = list(data.get("days", []))
             days.sort(key=lambda r: int(r.get("day", 0)))
@@ -189,24 +140,26 @@ def main() -> int:
 
             for rollout_idx in range(args.num_rollouts):
                 rng = random.Random(args.seed + rollout_idx)
+                
+                prediction_model = PredictionModel(
+                    user=user,
+                    physical_profile_label=physical_profile_label,
+                    client=client,
+                    chat_model=args.openai_model,
+                    embed_model=args.embed_model,
+                    retry_fn=_retry_on_rate_limit,
+                    logs_dir=logs_dir,
+                    use_long_term_memory=use_long_term_memory,
+                    use_episodic_memory=use_episodic_memory,
+                    k_retrieve=args.k_retrieve,
+                )
 
-                history_texts: List[str] = []
                 meals_this_rollout = 0
-
-                long_term_memory = ""  # start with empty long_term_memory_model summary for the first day
-                episodic_memory = ""
-
-                # Reset long_term_memory_model for this rollout/user
-                if use_long_term_memory:
-                    long_term_memory_model.reset(user=user, physical_profile_label=physical_profile_label)
 
                 for day_rec in days:
                     day = int(day_rec.get("day", 0))
                     context = day_rec.get("context", {}) or {}
                     truth = _extract_truth_bundle(day_rec)
-
-                    wm_steps: List[Dict[str, Any]] = []
-                    retrieved_steps: List[Dict[str, Any]] = []
 
                     corrected: Dict[str, str] = {}
                     m = 0
@@ -223,46 +176,13 @@ def main() -> int:
                     print(f"  Ground truth bundle: {json.dumps(truth, indent=2)}", flush=True)
 
                     while True:
-                        wm_steps.append(
-                            {
-                                "run_timestamp": run_ts,
-                                "dataset_file": path,
-                                "user": user,
-                                "rollout": rollout_idx,
-                                "day": day,
-                                "m": m,
-                                "corrected": dict(corrected),
-                            }
-                        )
-
                         print(f"  [Predict] Calling OpenAI for bundle (day {day}, m={m}) ...", flush=True)
                         
-                        
-                        if use_episodic_memory and args.k_retrieve > 0 and history_texts:
-                            episodic_memory = episodic_memory_model.retrieve(history_texts, context, corrected, args.k_retrieve)
-        
                         pred = prediction_model.predict_bundle(
-                            physical_profile_label=physical_profile_label,
-                            long_term_memory=long_term_memory,
-                            episodic_memory=episodic_memory,
                             context=context,
                             corrected=corrected,
                         )
                         print(f"  [Predict] Prediction: {json.dumps(pred, indent=2)}", flush=True)
-
-                        retrieved_steps.append(
-                            {
-                                "run_timestamp": run_ts,
-                                "dataset_file": path,
-                                "user": user,
-                                "rollout": rollout_idx,
-                                "day": day,
-                                "m": m,
-                                "context": context,
-                                "corrected": dict(corrected),
-                                "retrieved_episodes": episodic_memory if use_episodic_memory else [],                                
-                            }
-                        )
 
                         unrevealed = [f for f in PREF_FIELDS if f not in corrected]
                         acc = (
@@ -337,46 +257,7 @@ def main() -> int:
                         m += 1
 
                     # Build episode text (used for long_term_memory_model update and retrieval history)
-                    ep_txt = _episode_text(day=day, context=context, prefs=truth)
-
-                    if use_long_term_memory:
-                        # Update long_term_memory_model every day
-                        print(f"  [long_term_memory_model] Updating summary (day {day}) ...", flush=True)
-                        long_term_memory_model.add_episode(ep_txt)
-                        long_term_memory = long_term_memory_model.get_ltm()  # JSON string (or empty)
-
-                        log_ltm_summary = long_term_memory
-                        try:
-                            log_ltm_summary = json.loads(long_term_memory)
-                        except Exception:
-                            print(
-                                f"Warning: long_term_memory_model summary for logging is not valid JSON. "
-                                f"Logging raw string. Summary:\n{long_term_memory}\n",
-                                flush=True,
-                            )
-                            
-                        # Per-day logs we will write once at the end of the day
-                        ltm_record = {
-                            "run_timestamp": run_ts,
-                            "dataset_file": path,
-                            "user": user,
-                            "physical_profile_label": physical_profile_label,
-                            "rollout": rollout_idx,
-                            "day": day,
-                            "context": context,
-                            "episode_text": ep_txt,
-                            "ltm_summary_raw": log_ltm_summary,
-                        }
-                        
-                        _write_json(_day_path(long_term_memory_dir, day), ltm_record)
-
-                    if use_episodic_memory:
-                        # Update retrieval history after finishing the interactive correction loop
-                        history_texts.append(ep_txt)
-                        
-                        _write_json(_day_path(episodic_memory_dir, day), {"steps": retrieved_steps})
-                        
-                    _write_json(_day_path(working_memory_dir, day), {"steps": wm_steps})
+                    prediction_model.update(day, context, corrected, truth)
 
                     if args.max_meals and meals_this_rollout >= args.max_meals:
                         break

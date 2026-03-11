@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 from pathlib import Path
 from datetime import datetime
 
@@ -11,12 +11,12 @@ import feeding_deployment.preference_learning.config as root_config  # type: ign
 from feeding_deployment.preference_learning.config.preference_bundle import (
     PREFERENCE_BUNDLE as _PREF_BUNDLE_DIMS,
 )
-
+from feeding_deployment.preference_learning.methods.episodic_memory import EpisodicMemoryModel
+from feeding_deployment.preference_learning.methods.long_term_memory import LongTermMemoryModel
 from feeding_deployment.preference_learning.methods.prompts.bundle_prediction import (
     get_bundle_prediction_prompt,
 )
-
-from feeding_deployment.preference_learning.methods.utils import PREF_FIELDS
+from feeding_deployment.preference_learning.methods.utils import _episode_text, PREF_FIELDS
 
 PREF_OPTIONS: Dict[str, List[str]] = {name: opts for (name, _, opts) in root_config.PREFERENCE_BUNDLE}
 PREF_DESCRIPTIONS: Dict[str, str] = {dim.field: dim.description for dim in _PREF_BUNDLE_DIMS}
@@ -90,6 +90,14 @@ def _format_corrected_block(corrected: Dict[str, str]) -> str:
         return "(none)"
     return "\n".join(f"{k}={v}" for k, v in corrected.items())
 
+def _day_path(dir_path: Path, day: int) -> Path:
+    return dir_path / f"day_{day:04d}.json"
+
+def _write_json(path: Path, obj: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(obj, f, ensure_ascii=False, indent=2)
+
 
 class PredictionModel:
     """
@@ -102,37 +110,128 @@ class PredictionModel:
 
     def __init__(
         self,
+        user: str,
+        physical_profile_label: str,
         client: OpenAI,
         chat_model: str,
+        embed_model: str,
         retry_fn,
-        logs_dir: Path = None,
+        logs_dir: Path,
+        use_long_term_memory: bool = True,
+        use_episodic_memory: bool = True,
+        k_retrieve: int = 5,
     ) -> None:
+        
+        self.user = user
+        self.physical_profile_label = physical_profile_label
         self.client = client
         self.chat_model = chat_model
+        self.embed_model = embed_model
         self._retry = retry_fn
         self.logs_dir = logs_dir
+        self.long_term_memory_model: Optional[LongTermMemoryModel] = None
+        self.episodic_memory_model: Optional[EpisodicMemoryModel] = None
+        
+        if use_long_term_memory:
+            self.long_term_memory_dir = self.logs_dir / user / "long_term_memory"
+            self.long_term_memory_dir.mkdir(parents=True, exist_ok=True)
+            self.long_term_memory_model = LongTermMemoryModel(
+                physical_profile_label=self.physical_profile_label,
+                client=client,
+                chat_model=chat_model,
+                retry_fn=retry_fn,
+                logs_dir=self.logs_dir / "long_term_memory_llm_calls",
+            )
+            
+        if use_episodic_memory:
+            self.episodic_memory_dir = self.logs_dir / user / "episodic_memory"
+            self.episodic_memory_dir.mkdir(parents=True, exist_ok=True)
+            self.episodic_memory_model = EpisodicMemoryModel(
+                client=client,
+                embed_model=self.embed_model,
+                cache_path=self.logs_dir / "embeddings.json",
+                retry_fn=self._retry,
+                k_retrieve=k_retrieve,
+            )
+            
+        self.working_memory_dir = self.logs_dir / user / "working_memory"
+        self.working_memory_dir.mkdir(parents=True, exist_ok=True)
+        
+        self.working_memory_calls_dir = self.logs_dir / user / "prediction_model_llm_calls"
+        self.working_memory_calls_dir.mkdir(parents=True, exist_ok=True)
+        
+    def update(self, day: int, context: Dict[str, Any], corrected: Dict[str, str], ground_truth_bundle: Dict[str, str]) -> None:
+        
+        ep_txt = _episode_text(day=day, context=context, prefs=ground_truth_bundle)
+        
+        if self.long_term_memory_model:
+            print(f"  [long_term_memory_model] Updating summary (day {day}) ...", flush=True)
+            self.long_term_memory_model.add_episode(ep_txt)
+            long_term_memory = self.long_term_memory_model.get_ltm()  # JSON string (or empty)
+
+            log_ltm_summary = long_term_memory
+            try:
+                log_ltm_summary = json.loads(long_term_memory)
+            except Exception:
+                print(
+                    f"Warning: long_term_memory_model summary for logging is not valid JSON. "
+                    f"Logging raw string. Summary:\n{long_term_memory}\n",
+                    flush=True,
+                )
+                
+            # Per-day logs we will write once at the end of the day
+            long_term_memory_record = {
+                "day": day,
+                "context": context,
+                "episode_text": ep_txt,
+                "ltm_summary_raw": log_ltm_summary,
+            }
+            
+            _write_json(_day_path(self.long_term_memory_dir, day), long_term_memory_record)
+
+        if self.episodic_memory_model:
+            # Update retrieval history after finishing the interactive correction loop
+            self.episodic_memory_model.add_episode(ep_txt)
+            
+            episodic_memory_record = {
+                "day": day,
+                "context": context,
+                "corrected": dict(corrected),
+                "episode_text": ep_txt,
+                "retrieved_episodes": self.episodic_memory_model.get_last_retrieved(),
+            }
+            _write_json(_day_path(self.episodic_memory_dir, day), episodic_memory_record)
+            
+        working_memory_record = {
+            "day": day,
+            "context": context,
+            "corrected": dict(corrected)
+        }
+        _write_json(_day_path(self.working_memory_dir, day), working_memory_record)
 
     def predict_bundle(
         self,
-        physical_profile_label: str,
-        long_term_memory: str,
-        episodic_memory: str,
         context: Dict[str, Any],
         corrected: Dict[str, str],
-    ) -> Tuple[Dict[str, str], Dict[str, Any]]:
+    ) -> Dict[str, str]:
         """
-        Returns (predicted_bundle, debug_info).
+        Returns predicted_bundle.
+        """
+        
+        episodic_memory = ""
+        if self.episodic_memory_model:
+            episodic_memory = self.episodic_memory_model.retrieve(context, corrected)
 
-        - physical_profile_label: label string (used by get_bundle_prediction_prompt)
-        - ltm_summary: JSON string from your new LongTermMemoryModel (or "N/A"/"" if absent)
-        """
+        long_term_memory = ""
+        if self.long_term_memory_model:
+            long_term_memory = self.long_term_memory_model.get_ltm()  # JSON string (or empty)
 
         # Prompt blocks
         options_block = _build_options_block()
         corrected_block = _format_corrected_block(corrected)
 
         prompt = get_bundle_prediction_prompt(
-            physical_profile_label=physical_profile_label,
+            physical_profile_label=self.physical_profile_label,
             ltm_summary=long_term_memory,
             retrieved_block=episodic_memory,
             context=context,
@@ -156,9 +255,8 @@ class PredictionModel:
         raw = _strip_code_fences(raw)
         data = _safe_json_load(raw) or {}
             
-        if self.logs_dir:
-            self.logs_dir.mkdir(parents=True, exist_ok=True)
-            log_file = self.logs_dir / f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+        if self.working_memory_calls_dir:
+            log_file = self.working_memory_calls_dir / f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
             if data:
                 log_file.write_text(f"===PROMPT===\n{prompt}\n\n===RESPONSE===\n{json.dumps(data, indent=2)}", encoding="utf-8")
             else:
