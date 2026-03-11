@@ -16,7 +16,6 @@ from openai import OpenAI
 from feeding_deployment.preference_learning.methods.metrics import _generate_metrics
 from feeding_deployment.preference_learning.methods.utils import (
     _extract_truth_bundle,
-    _resolve_api_key,
     _retry_on_rate_limit,
 )
 
@@ -48,7 +47,6 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--openai-model", default="gpt-5.4")
     p.add_argument("--embed-model", default="text-embedding-3-small")
-    p.add_argument("--api-key", default="")
     p.add_argument("--ablation", choices=["full", "ltm_only", "em_only", "no_memory"], default="full")
     p.add_argument("--days", type=int, default=0, help="Evaluate only the first N days (0 = use all days in dataset).")
 
@@ -88,8 +86,6 @@ def main() -> int:
     use_episodic_memory = args.ablation not in ("ltm_only", "no_memory")
 
     try:
-        client = OpenAI(api_key=_resolve_api_key(args.api_key))
-
         user_reports: List[Dict[str, Any]] = []
 
         for path in files:
@@ -144,7 +140,6 @@ def main() -> int:
                 prediction_model = PredictionModel(
                     user=user,
                     physical_profile_label=physical_profile_label,
-                    client=client,
                     chat_model=args.openai_model,
                     embed_model=args.embed_model,
                     retry_fn=_retry_on_rate_limit,

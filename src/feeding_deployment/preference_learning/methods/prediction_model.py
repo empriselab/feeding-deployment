@@ -16,7 +16,7 @@ from feeding_deployment.preference_learning.methods.long_term_memory import Long
 from feeding_deployment.preference_learning.methods.prompts.bundle_prediction import (
     get_bundle_prediction_prompt,
 )
-from feeding_deployment.preference_learning.methods.utils import _episode_text, PREF_FIELDS
+from feeding_deployment.preference_learning.methods.utils import _episode_text, PREF_FIELDS, _resolve_api_key, _retry_on_rate_limit
 
 PREF_OPTIONS: Dict[str, List[str]] = {name: opts for (name, _, opts) in root_config.PREFERENCE_BUNDLE}
 PREF_DESCRIPTIONS: Dict[str, str] = {dim.field: dim.description for dim in _PREF_BUNDLE_DIMS}
@@ -112,19 +112,18 @@ class PredictionModel:
         self,
         user: str,
         physical_profile_label: str,
-        client: OpenAI,
-        chat_model: str,
-        embed_model: str,
-        retry_fn,
         logs_dir: Path,
+        retry_fn = _retry_on_rate_limit,
         use_long_term_memory: bool = True,
         use_episodic_memory: bool = True,
         k_retrieve: int = 5,
+        chat_model: str = "gpt-5.4",
+        embed_model: str = "text-embedding-3-small",
     ) -> None:
         
         self.user = user
         self.physical_profile_label = physical_profile_label
-        self.client = client
+        self.client = OpenAI(api_key=_resolve_api_key())
         self.chat_model = chat_model
         self.embed_model = embed_model
         self._retry = retry_fn
@@ -137,8 +136,8 @@ class PredictionModel:
             self.long_term_memory_dir.mkdir(parents=True, exist_ok=True)
             self.long_term_memory_model = LongTermMemoryModel(
                 physical_profile_label=self.physical_profile_label,
-                client=client,
-                chat_model=chat_model,
+                client=self.client,
+                chat_model=self.chat_model,
                 retry_fn=retry_fn,
                 logs_dir=self.logs_dir / "long_term_memory_llm_calls",
             )
@@ -147,7 +146,7 @@ class PredictionModel:
             self.episodic_memory_dir = self.logs_dir / user / "episodic_memory"
             self.episodic_memory_dir.mkdir(parents=True, exist_ok=True)
             self.episodic_memory_model = EpisodicMemoryModel(
-                client=client,
+                client=self.client,
                 embed_model=self.embed_model,
                 cache_path=self.logs_dir / "embeddings.json",
                 retry_fn=self._retry,
