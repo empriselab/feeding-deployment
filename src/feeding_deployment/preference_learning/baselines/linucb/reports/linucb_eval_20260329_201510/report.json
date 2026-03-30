@@ -1,0 +1,1220 @@
+{
+  "users": [
+    {
+      "file": "./data/deployment_datasets/user_1__profile_limited_arms_no_trunk_good_head.json",
+      "user": "1",
+      "meals": 30,
+      "config": {
+        "alpha": 0.7,
+        "include_affective_state": true,
+        "include_physical_profile_label": true,
+        "x_dim": 30
+      },
+      "per_day_metrics": [
+        {
+          "day": 1,
+          "acc_m0": 0.2222222222222222,
+          "m_star": 14.0,
+          "mismatches_m0": 14.0,
+          "mismatches_m1": 13.0
+        },
+        {
+          "day": 2,
+          "acc_m0": 0.5,
+          "m_star": 9.0,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 8.0
+        },
+        {
+          "day": 3,
+          "acc_m0": 0.9444444444444444,
+          "m_star": 1.0,
+          "mismatches_m0": 1.0,
+          "mismatches_m1": 0.0
+        },
+        {
+          "day": 4,
+          "acc_m0": 0.5,
+          "m_star": 9.0,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 8.0
+        },
+        {
+          "day": 5,
+          "acc_m0": 0.9444444444444444,
+          "m_star": 1.0,
+          "mismatches_m0": 1.0,
+          "mismatches_m1": 0.0
+        },
+        {
+          "day": 6,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 7,
+          "acc_m0": 0.5555555555555556,
+          "m_star": 8.0,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 7.0
+        },
+        {
+          "day": 8,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 9,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 10,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 11,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 12,
+          "acc_m0": 0.6666666666666667,
+          "m_star": 6.0,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 5.0
+        },
+        {
+          "day": 13,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        },
+        {
+          "day": 14,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 15,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 16,
+          "acc_m0": 0.2777777777777778,
+          "m_star": 13.0,
+          "mismatches_m0": 13.0,
+          "mismatches_m1": 12.0
+        },
+        {
+          "day": 17,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 18,
+          "acc_m0": 0.6666666666666667,
+          "m_star": 6.0,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 5.0
+        },
+        {
+          "day": 19,
+          "acc_m0": 0.6111111111111112,
+          "m_star": 7.0,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0
+        },
+        {
+          "day": 20,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 21,
+          "acc_m0": 0.6111111111111112,
+          "m_star": 7.0,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0
+        },
+        {
+          "day": 22,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 23,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        },
+        {
+          "day": 24,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 25,
+          "acc_m0": 0.5,
+          "m_star": 9.0,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 8.0
+        },
+        {
+          "day": 26,
+          "acc_m0": 0.6666666666666667,
+          "m_star": 6.0,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 5.0
+        },
+        {
+          "day": 27,
+          "acc_m0": 0.5555555555555556,
+          "m_star": 8.0,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 7.0
+        },
+        {
+          "day": 28,
+          "acc_m0": 1.0,
+          "m_star": 0.0,
+          "mismatches_m0": 0.0,
+          "mismatches_m1": 0.0
+        },
+        {
+          "day": 29,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        },
+        {
+          "day": 30,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        }
+      ],
+      "per_dimension_m0_accuracy": {
+        "microwave_time": 0.43333333333333335,
+        "occlusion_relevance": 0.4666666666666667,
+        "robot_speed": 0.6666666666666666,
+        "skewering_axis": 0.7666666666666667,
+        "web_interface_confirmation": 0.6333333333333333,
+        "transfer_mode": 0.9666666666666667,
+        "outside_mouth_distance": 0.9,
+        "convey_robot_ready_for_initiating_transfer": 0.6333333333333333,
+        "detect_user_ready_for_initiating_transfer_feeding": 0.8,
+        "detect_user_ready_for_initiating_transfer_drinking": 0.8,
+        "detect_user_ready_for_initiating_transfer_wiping": 0.8,
+        "convey_robot_ready_for_completing_transfer": 0.6333333333333333,
+        "detect_user_completed_transfer_feeding": 0.9333333333333333,
+        "detect_user_completed_transfer_drinking": 0.6333333333333333,
+        "detect_user_completed_transfer_wiping": 0.6333333333333333,
+        "retract_between_bites": 0.6333333333333333,
+        "bite_dipping_preference": 0.7666666666666667,
+        "wait_before_autocontinue_seconds": 0.6
+      }
+    },
+    {
+      "file": "./data/deployment_datasets/user_2__profile_moderate_arms_good_trunk_good_head.json",
+      "user": "2",
+      "meals": 30,
+      "config": {
+        "alpha": 0.7,
+        "include_affective_state": true,
+        "include_physical_profile_label": true,
+        "x_dim": 30
+      },
+      "per_day_metrics": [
+        {
+          "day": 1,
+          "acc_m0": 0.16666666666666663,
+          "m_star": 15.0,
+          "mismatches_m0": 15.0,
+          "mismatches_m1": 14.0
+        },
+        {
+          "day": 2,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 3,
+          "acc_m0": 0.33333333333333337,
+          "m_star": 12.0,
+          "mismatches_m0": 12.0,
+          "mismatches_m1": 11.0
+        },
+        {
+          "day": 4,
+          "acc_m0": 0.5,
+          "m_star": 9.0,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 8.0
+        },
+        {
+          "day": 5,
+          "acc_m0": 0.38888888888888884,
+          "m_star": 11.0,
+          "mismatches_m0": 11.0,
+          "mismatches_m1": 10.0
+        },
+        {
+          "day": 6,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 7,
+          "acc_m0": 0.5555555555555556,
+          "m_star": 8.0,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 7.0
+        },
+        {
+          "day": 8,
+          "acc_m0": 0.6111111111111112,
+          "m_star": 7.0,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0
+        },
+        {
+          "day": 9,
+          "acc_m0": 0.6111111111111112,
+          "m_star": 7.0,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0
+        },
+        {
+          "day": 10,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        },
+        {
+          "day": 11,
+          "acc_m0": 0.5,
+          "m_star": 9.0,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 8.0
+        },
+        {
+          "day": 12,
+          "acc_m0": 0.5555555555555556,
+          "m_star": 8.0,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 7.0
+        },
+        {
+          "day": 13,
+          "acc_m0": 0.5,
+          "m_star": 9.0,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 8.0
+        },
+        {
+          "day": 14,
+          "acc_m0": 0.6111111111111112,
+          "m_star": 7.0,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0
+        },
+        {
+          "day": 15,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 16,
+          "acc_m0": 0.6111111111111112,
+          "m_star": 7.0,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0
+        },
+        {
+          "day": 17,
+          "acc_m0": 0.6111111111111112,
+          "m_star": 7.0,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0
+        },
+        {
+          "day": 18,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        },
+        {
+          "day": 19,
+          "acc_m0": 0.6111111111111112,
+          "m_star": 7.0,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0
+        },
+        {
+          "day": 20,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 21,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 22,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 23,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 24,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        },
+        {
+          "day": 25,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 26,
+          "acc_m0": 0.6111111111111112,
+          "m_star": 7.0,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0
+        },
+        {
+          "day": 27,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        },
+        {
+          "day": 28,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 29,
+          "acc_m0": 0.38888888888888884,
+          "m_star": 11.0,
+          "mismatches_m0": 11.0,
+          "mismatches_m1": 10.0
+        },
+        {
+          "day": 30,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        }
+      ],
+      "per_dimension_m0_accuracy": {
+        "microwave_time": 0.36666666666666664,
+        "occlusion_relevance": 0.43333333333333335,
+        "robot_speed": 0.6333333333333333,
+        "skewering_axis": 0.9666666666666667,
+        "web_interface_confirmation": 0.9666666666666667,
+        "transfer_mode": 0.6333333333333333,
+        "outside_mouth_distance": 0.5,
+        "convey_robot_ready_for_initiating_transfer": 0.5333333333333333,
+        "detect_user_ready_for_initiating_transfer_feeding": 0.6,
+        "detect_user_ready_for_initiating_transfer_drinking": 0.6,
+        "detect_user_ready_for_initiating_transfer_wiping": 0.6,
+        "convey_robot_ready_for_completing_transfer": 0.5333333333333333,
+        "detect_user_completed_transfer_feeding": 0.9333333333333333,
+        "detect_user_completed_transfer_drinking": 0.6333333333333333,
+        "detect_user_completed_transfer_wiping": 0.6333333333333333,
+        "retract_between_bites": 0.7666666666666667,
+        "bite_dipping_preference": 0.6666666666666666,
+        "wait_before_autocontinue_seconds": 0.5333333333333333
+      }
+    },
+    {
+      "file": "./data/deployment_datasets/user_3__profile_moderate_arms_limited_trunk_limited_head.json",
+      "user": "3",
+      "meals": 30,
+      "config": {
+        "alpha": 0.7,
+        "include_affective_state": true,
+        "include_physical_profile_label": true,
+        "x_dim": 30
+      },
+      "per_day_metrics": [
+        {
+          "day": 1,
+          "acc_m0": 0.33333333333333337,
+          "m_star": 12.0,
+          "mismatches_m0": 12.0,
+          "mismatches_m1": 11.0
+        },
+        {
+          "day": 2,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 3,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        },
+        {
+          "day": 4,
+          "acc_m0": 1.0,
+          "m_star": 0.0,
+          "mismatches_m0": 0.0,
+          "mismatches_m1": 0.0
+        },
+        {
+          "day": 5,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 6,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 7,
+          "acc_m0": 0.9444444444444444,
+          "m_star": 1.0,
+          "mismatches_m0": 1.0,
+          "mismatches_m1": 0.0
+        },
+        {
+          "day": 8,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 9,
+          "acc_m0": 0.33333333333333337,
+          "m_star": 12.0,
+          "mismatches_m0": 12.0,
+          "mismatches_m1": 11.0
+        },
+        {
+          "day": 10,
+          "acc_m0": 0.11111111111111116,
+          "m_star": 16.0,
+          "mismatches_m0": 16.0,
+          "mismatches_m1": 15.0
+        },
+        {
+          "day": 11,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 12,
+          "acc_m0": 0.4444444444444444,
+          "m_star": 10.0,
+          "mismatches_m0": 10.0,
+          "mismatches_m1": 9.0
+        },
+        {
+          "day": 13,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 14,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 15,
+          "acc_m0": 0.6111111111111112,
+          "m_star": 7.0,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0
+        },
+        {
+          "day": 16,
+          "acc_m0": 0.6666666666666667,
+          "m_star": 6.0,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 5.0
+        },
+        {
+          "day": 17,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 18,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 19,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        },
+        {
+          "day": 20,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 21,
+          "acc_m0": 0.6666666666666667,
+          "m_star": 6.0,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 5.0
+        },
+        {
+          "day": 22,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 23,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 24,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 25,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 26,
+          "acc_m0": 0.6111111111111112,
+          "m_star": 7.0,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0
+        },
+        {
+          "day": 27,
+          "acc_m0": 0.6111111111111112,
+          "m_star": 7.0,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0
+        },
+        {
+          "day": 28,
+          "acc_m0": 1.0,
+          "m_star": 0.0,
+          "mismatches_m0": 0.0,
+          "mismatches_m1": 0.0
+        },
+        {
+          "day": 29,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 30,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        }
+      ],
+      "per_dimension_m0_accuracy": {
+        "microwave_time": 0.3,
+        "occlusion_relevance": 0.36666666666666664,
+        "robot_speed": 0.4666666666666667,
+        "skewering_axis": 0.7666666666666667,
+        "web_interface_confirmation": 0.9333333333333333,
+        "transfer_mode": 0.9333333333333333,
+        "outside_mouth_distance": 0.9,
+        "convey_robot_ready_for_initiating_transfer": 0.6333333333333333,
+        "detect_user_ready_for_initiating_transfer_feeding": 0.8666666666666667,
+        "detect_user_ready_for_initiating_transfer_drinking": 0.8666666666666667,
+        "detect_user_ready_for_initiating_transfer_wiping": 0.8666666666666667,
+        "convey_robot_ready_for_completing_transfer": 0.6333333333333333,
+        "detect_user_completed_transfer_feeding": 0.9,
+        "detect_user_completed_transfer_drinking": 0.8666666666666667,
+        "detect_user_completed_transfer_wiping": 0.8666666666666667,
+        "retract_between_bites": 0.6333333333333333,
+        "bite_dipping_preference": 0.6333333333333333,
+        "wait_before_autocontinue_seconds": 0.7
+      }
+    },
+    {
+      "file": "./data/deployment_datasets/user_4__profile_limited_arms_no_trunk_limited_head.json",
+      "user": "4",
+      "meals": 30,
+      "config": {
+        "alpha": 0.7,
+        "include_affective_state": true,
+        "include_physical_profile_label": true,
+        "x_dim": 30
+      },
+      "per_day_metrics": [
+        {
+          "day": 1,
+          "acc_m0": 0.5,
+          "m_star": 9.0,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 8.0
+        },
+        {
+          "day": 2,
+          "acc_m0": 0.5555555555555556,
+          "m_star": 8.0,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 7.0
+        },
+        {
+          "day": 3,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        },
+        {
+          "day": 4,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 5,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        },
+        {
+          "day": 6,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 7,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        },
+        {
+          "day": 8,
+          "acc_m0": 0.9444444444444444,
+          "m_star": 1.0,
+          "mismatches_m0": 1.0,
+          "mismatches_m1": 0.0
+        },
+        {
+          "day": 9,
+          "acc_m0": 0.5555555555555556,
+          "m_star": 8.0,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 7.0
+        },
+        {
+          "day": 10,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 11,
+          "acc_m0": 0.6111111111111112,
+          "m_star": 7.0,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0
+        },
+        {
+          "day": 12,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 13,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 14,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 15,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        },
+        {
+          "day": 16,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        },
+        {
+          "day": 17,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 18,
+          "acc_m0": 0.5555555555555556,
+          "m_star": 8.0,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 7.0
+        },
+        {
+          "day": 19,
+          "acc_m0": 0.5555555555555556,
+          "m_star": 8.0,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 7.0
+        },
+        {
+          "day": 20,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 21,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 22,
+          "acc_m0": 0.2222222222222222,
+          "m_star": 14.0,
+          "mismatches_m0": 14.0,
+          "mismatches_m1": 13.0
+        },
+        {
+          "day": 23,
+          "acc_m0": 0.5555555555555556,
+          "m_star": 8.0,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 7.0
+        },
+        {
+          "day": 24,
+          "acc_m0": 0.5,
+          "m_star": 9.0,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 8.0
+        },
+        {
+          "day": 25,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 26,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 27,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 28,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 29,
+          "acc_m0": 0.38888888888888884,
+          "m_star": 11.0,
+          "mismatches_m0": 11.0,
+          "mismatches_m1": 10.0
+        },
+        {
+          "day": 30,
+          "acc_m0": 0.38888888888888884,
+          "m_star": 11.0,
+          "mismatches_m0": 11.0,
+          "mismatches_m1": 10.0
+        }
+      ],
+      "per_dimension_m0_accuracy": {
+        "microwave_time": 0.6333333333333333,
+        "occlusion_relevance": 0.4,
+        "robot_speed": 0.7666666666666667,
+        "skewering_axis": 0.6666666666666666,
+        "web_interface_confirmation": 0.5333333333333333,
+        "transfer_mode": 0.9666666666666667,
+        "outside_mouth_distance": 0.8666666666666667,
+        "convey_robot_ready_for_initiating_transfer": 0.5333333333333333,
+        "detect_user_ready_for_initiating_transfer_feeding": 0.6666666666666666,
+        "detect_user_ready_for_initiating_transfer_drinking": 0.6666666666666666,
+        "detect_user_ready_for_initiating_transfer_wiping": 0.6666666666666666,
+        "convey_robot_ready_for_completing_transfer": 0.5333333333333333,
+        "detect_user_completed_transfer_feeding": 0.9,
+        "detect_user_completed_transfer_drinking": 0.9,
+        "detect_user_completed_transfer_wiping": 0.9,
+        "retract_between_bites": 0.7333333333333333,
+        "bite_dipping_preference": 0.6,
+        "wait_before_autocontinue_seconds": 0.6
+      }
+    },
+    {
+      "file": "./data/deployment_datasets/user_5__profile_good_arms_good_trunk_good_head_limited_mouth.json",
+      "user": "5",
+      "meals": 30,
+      "config": {
+        "alpha": 0.7,
+        "include_affective_state": true,
+        "include_physical_profile_label": true,
+        "x_dim": 30
+      },
+      "per_day_metrics": [
+        {
+          "day": 1,
+          "acc_m0": 0.4444444444444444,
+          "m_star": 10.0,
+          "mismatches_m0": 10.0,
+          "mismatches_m1": 9.0
+        },
+        {
+          "day": 2,
+          "acc_m0": 0.6666666666666667,
+          "m_star": 6.0,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 5.0
+        },
+        {
+          "day": 3,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 4,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 5,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 6,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 7,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        },
+        {
+          "day": 8,
+          "acc_m0": 0.2222222222222222,
+          "m_star": 14.0,
+          "mismatches_m0": 14.0,
+          "mismatches_m1": 13.0
+        },
+        {
+          "day": 9,
+          "acc_m0": 0.6666666666666667,
+          "m_star": 6.0,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 5.0
+        },
+        {
+          "day": 10,
+          "acc_m0": 0.38888888888888884,
+          "m_star": 11.0,
+          "mismatches_m0": 11.0,
+          "mismatches_m1": 10.0
+        },
+        {
+          "day": 11,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 12,
+          "acc_m0": 0.4444444444444444,
+          "m_star": 10.0,
+          "mismatches_m0": 10.0,
+          "mismatches_m1": 9.0
+        },
+        {
+          "day": 13,
+          "acc_m0": 0.33333333333333337,
+          "m_star": 12.0,
+          "mismatches_m0": 12.0,
+          "mismatches_m1": 11.0
+        },
+        {
+          "day": 14,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 15,
+          "acc_m0": 0.5,
+          "m_star": 9.0,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 8.0
+        },
+        {
+          "day": 16,
+          "acc_m0": 0.2222222222222222,
+          "m_star": 14.0,
+          "mismatches_m0": 14.0,
+          "mismatches_m1": 13.0
+        },
+        {
+          "day": 17,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        },
+        {
+          "day": 18,
+          "acc_m0": 0.5,
+          "m_star": 9.0,
+          "mismatches_m0": 9.0,
+          "mismatches_m1": 8.0
+        },
+        {
+          "day": 19,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 20,
+          "acc_m0": 0.6666666666666667,
+          "m_star": 6.0,
+          "mismatches_m0": 6.0,
+          "mismatches_m1": 5.0
+        },
+        {
+          "day": 21,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        },
+        {
+          "day": 22,
+          "acc_m0": 0.5555555555555556,
+          "m_star": 8.0,
+          "mismatches_m0": 8.0,
+          "mismatches_m1": 7.0
+        },
+        {
+          "day": 23,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 24,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 25,
+          "acc_m0": 0.7222222222222222,
+          "m_star": 5.0,
+          "mismatches_m0": 5.0,
+          "mismatches_m1": 4.0
+        },
+        {
+          "day": 26,
+          "acc_m0": 0.7777777777777778,
+          "m_star": 4.0,
+          "mismatches_m0": 4.0,
+          "mismatches_m1": 3.0
+        },
+        {
+          "day": 27,
+          "acc_m0": 0.8333333333333334,
+          "m_star": 3.0,
+          "mismatches_m0": 3.0,
+          "mismatches_m1": 2.0
+        },
+        {
+          "day": 28,
+          "acc_m0": 0.6111111111111112,
+          "m_star": 7.0,
+          "mismatches_m0": 7.0,
+          "mismatches_m1": 6.0
+        },
+        {
+          "day": 29,
+          "acc_m0": 0.4444444444444444,
+          "m_star": 10.0,
+          "mismatches_m0": 10.0,
+          "mismatches_m1": 9.0
+        },
+        {
+          "day": 30,
+          "acc_m0": 0.8888888888888888,
+          "m_star": 2.0,
+          "mismatches_m0": 2.0,
+          "mismatches_m1": 1.0
+        }
+      ],
+      "per_dimension_m0_accuracy": {
+        "microwave_time": 0.5,
+        "occlusion_relevance": 0.36666666666666664,
+        "robot_speed": 0.7,
+        "skewering_axis": 0.7666666666666667,
+        "web_interface_confirmation": 0.8333333333333334,
+        "transfer_mode": 0.7666666666666667,
+        "outside_mouth_distance": 0.5,
+        "convey_robot_ready_for_initiating_transfer": 0.5333333333333333,
+        "detect_user_ready_for_initiating_transfer_feeding": 0.7,
+        "detect_user_ready_for_initiating_transfer_drinking": 0.7,
+        "detect_user_ready_for_initiating_transfer_wiping": 0.7,
+        "convey_robot_ready_for_completing_transfer": 0.5333333333333333,
+        "detect_user_completed_transfer_feeding": 0.9333333333333333,
+        "detect_user_completed_transfer_drinking": 0.7,
+        "detect_user_completed_transfer_wiping": 0.7,
+        "retract_between_bites": 0.7,
+        "bite_dipping_preference": 0.6,
+        "wait_before_autocontinue_seconds": 0.5333333333333333
+      }
+    }
+  ],
+  "run_timestamp": "20260329_201510"
+}

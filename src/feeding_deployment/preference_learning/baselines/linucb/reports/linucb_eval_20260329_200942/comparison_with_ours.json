@@ -1,0 +1,30 @@
+{
+  "Ours": {
+    "mean_m_star_all_days": 3.1466666666666665,
+    "sem_m_star_all_days": 0.21341387368557233,
+    "mean_m_star_first_5_days": 3.76,
+    "sem_m_star_first_5_days": 0.46053881486797615,
+    "mean_m_star_last_5_days": 2.04,
+    "sem_m_star_last_5_days": 0.457751024029439,
+    "mean_acc_m0_all_days": 0.7792592592592589,
+    "sem_acc_m0_all_days": 0.016379808463037025,
+    "mean_acc_m0_first_5_days": 0.7266666666666669,
+    "sem_acc_m0_first_5_days": 0.03847975257229042,
+    "mean_acc_m0_last_5_days": 0.8533333333333333,
+    "sem_acc_m0_last_5_days": 0.03353715463095731
+  },
+  "LinUCB": {
+    "mean_m_star_all_days": 4.226666666666667,
+    "sem_m_star_all_days": 0.26384282638919154,
+    "mean_m_star_first_5_days": 6.16,
+    "sem_m_star_first_5_days": 0.8210822126924929,
+    "mean_m_star_last_5_days": 2.56,
+    "sem_m_star_last_5_days": 0.47016592815728353,
+    "mean_acc_m0_all_days": 0.7651851851851845,
+    "sem_acc_m0_all_days": 0.014657934799399532,
+    "mean_acc_m0_first_5_days": 0.6577777777777777,
+    "sem_acc_m0_first_5_days": 0.04561567848291627,
+    "mean_acc_m0_last_5_days": 0.8577777777777779,
+    "sem_acc_m0_last_5_days": 0.026120329342071306
+  }
+}

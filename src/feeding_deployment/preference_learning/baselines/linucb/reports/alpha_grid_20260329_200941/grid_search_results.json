@@ -1,0 +1,81 @@
+{
+  "grid": {
+    "alpha_start": 0.1,
+    "alpha_end": 0.9,
+    "alpha_step": 0.1,
+    "alphas": [
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9
+    ]
+  },
+  "selection": {
+    "metric": "mean_acc_m0_all_days",
+    "objective": "max",
+    "best_alpha": 0.1,
+    "best_score": 0.7651851851851845,
+    "best_report_dir": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_200942"
+  },
+  "runs": [
+    {
+      "alpha": 0.1,
+      "report_dir": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_200942",
+      "summary_path": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_200942/summary_metrics.json",
+      "metric_value": 0.7651851851851845
+    },
+    {
+      "alpha": 0.2,
+      "report_dir": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_201027",
+      "summary_path": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_201027/summary_metrics.json",
+      "metric_value": 0.7540740740740735
+    },
+    {
+      "alpha": 0.3,
+      "report_dir": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_201135",
+      "summary_path": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_201135/summary_metrics.json",
+      "metric_value": 0.7514814814814811
+    },
+    {
+      "alpha": 0.4,
+      "report_dir": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_201226",
+      "summary_path": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_201226/summary_metrics.json",
+      "metric_value": 0.7407407407407403
+    },
+    {
+      "alpha": 0.5,
+      "report_dir": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_201317",
+      "summary_path": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_201317/summary_metrics.json",
+      "metric_value": 0.7288888888888881
+    },
+    {
+      "alpha": 0.6,
+      "report_dir": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_201419",
+      "summary_path": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_201419/summary_metrics.json",
+      "metric_value": 0.7118518518518513
+    },
+    {
+      "alpha": 0.7,
+      "report_dir": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_201510",
+      "summary_path": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_201510/summary_metrics.json",
+      "metric_value": 0.6851851851851852
+    },
+    {
+      "alpha": 0.8,
+      "report_dir": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_201606",
+      "summary_path": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_201606/summary_metrics.json",
+      "metric_value": 0.6459259259259257
+    },
+    {
+      "alpha": 0.9,
+      "report_dir": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_201708",
+      "summary_path": "/Users/frankyang/Desktop/EmPRISE/[Winter 2026 - Present] Long-Term Deployment with Personalization Project (with Rajat)/feeding-deployment/src/feeding_deployment/preference_learning/baselines/linucb/reports/linucb_eval_20260329_201708/summary_metrics.json",
+      "metric_value": 0.6155555555555557
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "LinUCB": {
+    "mean_m_star_all_days": 5.1866666666666665,
+    "sem_m_star_all_days": 0.27461272393708946,
+    "mean_m_star_first_5_days": 6.44,
+    "sem_m_star_first_5_days": 0.8617749126076948,
+    "mean_m_star_last_5_days": 4.4,
+    "sem_m_star_last_5_days": 0.5878775382679629,
+    "mean_acc_m0_all_days": 0.7118518518518513,
+    "sem_acc_m0_all_days": 0.01525626244094942,
+    "mean_acc_m0_first_5_days": 0.6422222222222222,
+    "sem_acc_m0_first_5_days": 0.04787638403376082,
+    "mean_acc_m0_last_5_days": 0.7555555555555554,
+    "sem_acc_m0_last_5_days": 0.03265986323710904
+  }
+}
