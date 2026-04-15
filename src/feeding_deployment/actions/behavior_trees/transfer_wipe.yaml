@@ -13,7 +13,7 @@ parameters:
     description: "Interaction mode for how the robot conveys to the user that it is ready to initiate the wipe transfer."
     space:
       type: "Enum"
-      elements: ["silent", "voice", "led", "beep"]
+      elements: ["silent", "voice", "led", "beep", "voice_led"]
     is_user_editable: True
     value: "voice"
   - name: "InitiateTransferInteraction"
@@ -27,7 +27,7 @@ parameters:
     description: "Interaction mode for how the robot conveys to the user that they can take start cleaning now."
     space:
       type: "Enum"
-      elements: ["silent", "voice", "led", "beep"]
+      elements: ["silent", "voice", "led", "beep", "voice_led"]
     is_user_editable: True
     value: "voice"
   - name: "TransferCompleteInteraction"

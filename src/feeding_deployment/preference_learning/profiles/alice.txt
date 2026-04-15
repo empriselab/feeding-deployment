@@ -1,0 +1,4 @@
+The user has severe upper-limb paralysis with very limited voluntary control of their arms (cannot press physical buttons). 
+They cannot lean forward due to lack of trunk control. However, they have good neck and head control and are able to
+open their mouth wide and perform head gestures. They interact with the web interface through a reflective dot on their
+pose, which is tracked by their personal device

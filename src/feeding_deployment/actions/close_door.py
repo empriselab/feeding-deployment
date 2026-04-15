@@ -53,11 +53,7 @@ class CloseDoorHLA(HighLevelAction):
         return f"close_{appliance.name}.yaml"
 
     def close_fridge(self, speed: str) -> None:
-        del speed
-        assert self.sim.held_object_name is None
         print("Closing fridge door ...")
 
     def close_microwave(self, speed: str) -> None:
-        del speed
-        assert self.sim.held_object_name is None
         print("Closing microwave door ...")

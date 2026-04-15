@@ -9,4 +9,12 @@ parameters:
       elements: ["low", "medium", "high"]
     is_user_editable: True
     value: "medium"
+  - name: "MicrowaveDuration"
+    description: "How long the microwave should run, in seconds."
+    space:
+      type: "Box"
+      lower: 30.0
+      upper: 300.0
+    is_user_editable: True
+    value: 60.0
 fn: !hla press_microwave_button

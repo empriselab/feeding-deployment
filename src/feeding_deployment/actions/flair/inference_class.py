@@ -120,6 +120,7 @@ class BiteAcquisitionInference:
         self.preference_planner = PreferencePlanner()
 
         self.mode = mode
+        self.allow_dip = True
 
     # def recognize_items(self, image):
     #     response = self.gpt4v_client.prompt(image).strip()
@@ -1051,6 +1052,10 @@ class BiteAcquisitionInference:
         print('Next bite', next_bite)
         print('skewer_labels', skewer_labels)
         print('Next actions', skewer_actions)
+
+        if not self.allow_dip and len(next_bite) >= 2:
+            print(f"[preference] Dipping suppressed: LLM suggested {next_bite}, using only {next_bite[0]}")
+            next_bite = [next_bite[0]]
 
         if len(next_bite) == 1 and next_bite[0] in labels:
             print(skewer_labels, next_bite[0])

@@ -339,8 +339,8 @@ class HighLevelAction(abc.ABC):
     def move_to_joint_positions(self, joint_positions: list[float]) -> None:
         
         plan = None 
-        # if not self.no_waits:
-        #     plan = self.sim.plan_to_joint_positions(joint_positions)
+        if not self.no_waits:
+            plan = self.sim.plan_to_joint_positions(joint_positions)
         if self.robot_interface is None:
             self.sim.visualize_plan(plan)
         else:
@@ -349,8 +349,8 @@ class HighLevelAction(abc.ABC):
     def move_to_ee_pose(self, pose: Pose) -> None:
 
         plan = None
-        # if not self.no_waits:
-        #     plan = self.sim.plan_to_ee_pose(pose)
+        if not self.no_waits:
+            plan = self.sim.plan_to_ee_pose(pose)
         if self.robot_interface is None:
             self.sim.visualize_plan(plan)
         else:

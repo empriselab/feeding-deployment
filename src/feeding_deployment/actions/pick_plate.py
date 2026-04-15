@@ -71,15 +71,10 @@ class PickPlateFromApplianceHLA(HighLevelAction):
         return f"pick_plate_from_{appliance.name}.yaml"
     
     def pick_plate_from_fridge(self, speed: str) -> None:
-        assert self.sim.held_object_name is None
         print("Picking plate from fridge ...")
 
     def pick_plate_from_microwave(self, speed: str) -> None:
-        assert self.sim.held_object_name is None
         print("Picking plate from microwave ...")
-
-        self.move_to_joint_positions(self.sim.scene_description.home_pos)
-        self.move_to_joint_positions(self.sim.scene_description.microwave_closeup_gaze_pos)
 
 
 class PickPlateFromHolderHLA(HighLevelAction):
@@ -122,7 +117,6 @@ class PickPlateFromHolderHLA(HighLevelAction):
         return "pick_plate_from_holder.yaml"
     
     def pick_plate_from_holder(self, speed: str) -> None:
-        assert self.sim.held_object_name is None
         print("Picking plate from holder ...")
 
 class PickPlateFromTableHLA(HighLevelAction):
@@ -166,5 +160,4 @@ class PickPlateFromTableHLA(HighLevelAction):
         return "pick_plate_from_table.yaml"
 
     def pick_plate_from_table(self, speed: str) -> None:
-        assert self.sim.held_object_name is None
         print("Picking plate from table ...")

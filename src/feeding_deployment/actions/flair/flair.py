@@ -115,6 +115,9 @@ class FLAIR:
     def clear_preference(self):
         self.user_preference = None
 
+    def set_allow_dip(self, allow: bool) -> None:
+        self.inference_server.allow_dip = allow
+
     def is_preference_set(self):
         return self.user_preference is not None
     

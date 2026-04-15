@@ -104,51 +104,53 @@ class WebInterface:
             f.write(msg.data + "\n")
         
         msg_dict = json.loads(msg.data)
+        msg_state = msg_dict.get("state")
+        msg_status = msg_dict.get("status")
 
         self.task_selection_jump = False
         
-        if msg_dict["status"] == "finish_feeding":
+        if msg_status == "finish_feeding":
             task_selected = {
                 "task": "reset",
                 "type": "reset",
             }
             self.task_selection_queue.put(task_selected)
-        elif msg_dict["state"] == "task_selection":
-            if msg_dict["status"] == "take_bite":
+        elif msg_state == "task_selection":
+            if msg_status == "take_bite":
                 task_selected = {
                     "task": "meal_assistance",
                     "type": "bite",
                 }
-            elif msg_dict["status"] == "take_sip":
+            elif msg_status == "take_sip":
                 task_selected = {
                     "task": "meal_assistance",
                     "type": "sip",
                 }
-            elif msg_dict["status"] == "mouth_wiping":
+            elif msg_status == "mouth_wiping":
                 task_selected = {
                     "task": "meal_assistance",
                     "type": "wipe",
                 }
-            elif msg_dict["status"] == "transparency":
+            elif msg_status == "transparency":
                 task_selected = {
                     "task": "personalization",
                     "type": "transparency",
                 }
-            elif msg_dict["status"] == "adaptability":
+            elif msg_status == "adaptability":
                 task_selected = {
                     "task": "personalization",
                     "type": "adaptability",
                 }
-            elif msg_dict["status"] == "gesture":
+            elif msg_status == "gesture":
                 task_selected = {
                     "task": "personalization",
                     "type": "gesture",
                 }
-            elif msg_dict["status"] == "jump":
+            elif msg_status == "jump":
                 self.task_selection_jump = True
                 return
             else:
-                print("Invalid task selection status received from interface: ", msg_dict["status"])
+                print("Invalid task selection status received from interface: ", msg_status)
                 return
             
             # remove explanation lock (if it exists)
@@ -392,6 +394,91 @@ class WebInterface:
     def update_adaptability_response(self, response: str) -> None:
         assert self.current_page == "adaptability", "Cannot update adaptability response when not on the adaptability page."
         self._send_message({"state": "adaptability_response", "status": response})
+
+    #### Preference Correction Pages ####
+
+    def get_preference_context(
+        self,
+        meals: list[str],
+        settings: list[str],
+        times_of_day: list[str],
+        defaults: dict[str, str],
+    ) -> dict[str, str]:
+        """Send preference-context choices to the webapp and wait for a selection."""
+        self.current_page = "preference_context"
+        self._send_message({"state": "preference_context", "status": "jump"})
+        time.sleep(0.5)
+        self._send_message({
+            "state": "preference_context_data",
+            "meals": meals,
+            "settings": settings,
+            "time_of_day": times_of_day,
+            "defaults": defaults,
+        })
+        msg_dict = self.get_required_web_interface_message(
+            lambda msg_dict: msg_dict.get("state") == "preference_context_response"
+        )
+        if msg_dict is None:
+            raise RuntimeError(
+                "Preference context exited before submission. "
+                "A valid meal / setting / time_of_day selection is required."
+            )
+        return {
+            "meal": msg_dict["meal"],
+            "setting": msg_dict["setting"],
+            "time_of_day": msg_dict["time_of_day"],
+        }
+
+    def get_preference_corrections(
+        self,
+        predicted_bundle: dict[str, str],
+        pref_options: dict[str, list[str]],
+    ) -> dict[str, str]:
+        """Send predicted preference bundle to the webapp and wait for user corrections.
+
+        Message contract (for frontend implementation):
+
+        Sent to webapp (on /ServerComm):
+            1. {"state": "preference_correction", "status": "jump"}
+            2. {
+                   "state": "preference_correction_data",
+                   "predicted_bundle": {"field": "value", ...},
+                   "options": {"field": ["opt1", "opt2", ...], ...}
+               }
+
+        Expected back from webapp (on WebAppComm):
+            {
+                "state": "preference_correction_response",
+                "bundle": {"field": "value", ...}
+            }
+            where "bundle" contains all fields with the user's final selections
+            (unchanged fields keep their predicted values).
+        """
+        self.current_page = "preference_correction"
+        self._send_message({"state": "preference_correction", "status": "jump"})
+        time.sleep(0.5)
+        self._send_message({
+            "state": "preference_correction_data",
+            "predicted_bundle": predicted_bundle,
+            "options": pref_options,
+        })
+        msg_dict = self.get_required_web_interface_message(
+            lambda msg_dict: msg_dict.get("state") == "preference_correction_response"
+        )
+        if msg_dict is None:
+            print(
+                "Preference correction exited before submission; "
+                "using predicted bundle unchanged."
+            )
+            return dict(predicted_bundle)
+        return msg_dict["bundle"]
+
+    def notify_preference_corrections_applied(self, message: str | None = None) -> None:
+        """Notify the webapp that preference corrections were applied successfully."""
+        msg_dict: dict[str, Any] = {"state": "preference_correction_applied"}
+        if message is not None:
+            msg_dict["message"] = message
+        self._send_message(msg_dict)
 
     #### Gesture Pages ####
 

@@ -100,7 +100,7 @@ class TransferToolHLA(HighLevelAction):
         if self.web_interface is not None:
             self.web_interface.clear_explanation()
 
-        if ready_to_initiate_mode == "led":
+        if ready_to_initiate_mode in ("led", "voice_led"):
             self.perception_interface.turn_off_led()
 
     def detect_transfer_complete(self, transfer_complete_interaction: str, ready_for_transfer_interaction: str):
@@ -144,7 +144,7 @@ class TransferToolHLA(HighLevelAction):
         if self.web_interface is not None:
             self.web_interface.clear_explanation()
 
-        if ready_for_transfer_interaction == "led":
+        if ready_for_transfer_interaction in ("led", "voice_led"):
             self.perception_interface.turn_off_led()
 
     def relay_ready_to_initiate_transfer(self, ready_to_initiate_transfer_interaction: str, initiate_transfer_interaction: str):
@@ -172,6 +172,22 @@ class TransferToolHLA(HighLevelAction):
             self.perception_interface.turn_on_led()
         elif ready_to_initiate_transfer_interaction == "beep":
             self.perception_interface.speak("Beep")
+        elif ready_to_initiate_transfer_interaction == "voice_led":
+            self.perception_interface.turn_on_led()
+            if initiate_transfer_interaction == "button":
+                self.perception_interface.speak("Please press the button when ready")
+            elif initiate_transfer_interaction == "open_mouth":
+                self.perception_interface.speak("Please open your mouth when ready")
+            elif initiate_transfer_interaction == "auto_timeout":
+                self.perception_interface.speak("Please wait 5 seconds for the transfer to initiate")
+            else:
+                gestures = dict(self.load_synthesized_gestures())
+                with open(self.synthesized_gestures_dict_path, "r") as f:
+                    synthesized_gesture_function_name_to_label = json.load(f)
+                if initiate_transfer_interaction in gestures:
+                    self.perception_interface.speak(f"Please do a {synthesized_gesture_function_name_to_label[initiate_transfer_interaction]} to initiate transfer")
+                else:
+                    raise NotImplementedError
         else:
             raise NotImplementedError
 
@@ -184,6 +200,9 @@ class TransferToolHLA(HighLevelAction):
             self.perception_interface.turn_on_led()
         elif ready_for_transfer_interaction == "beep":
             self.perception_interface.speak("Beep")
+        elif ready_for_transfer_interaction == "voice_led":
+            self.perception_interface.turn_on_led()
+            self.perception_interface.speak("Ready for transfer")
         else:
             raise NotImplementedError
 
@@ -270,77 +289,20 @@ class TransferToolHLA(HighLevelAction):
         assert table.name == "table"
         return f"transfer_{tool.name}.yaml"    
     
-    def transfer_utensil(self, speed: str, *args, **kwargs) -> None:
-        # assert self.sim.held_object_name == "utensil"
-
-        print("Transferring bite with utensil ...")
-        return
-
-        if self.robot_interface is not None:
-            self.robot_interface.set_speed(speed)
-
-        # Assume the last item in args is autocontinue time
-        bite_autocontinue_time = args[-1]
-
-        if self.web_interface is not None:
-            self.web_interface.set_bite_autocontinue_timeout(bite_autocontinue_time)
-
-        # All other items (everything except the last) should go on to the next call
-        remaining_args = args[:-1]
-
-        if self.wrist_interface is not None:
-            # start the horizontal spoon thread if it is not already running
-            self.wrist_interface.start_horizontal_spoon_thread()
-
-        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
-
-        if self.wrist_interface is not None:
-            # stop the keep horizontal thread
-            self.wrist_interface.stop_horizontal_spoon_thread()
-
-        self.set_tool("fork")
-        self.execute_transfer(*remaining_args, **kwargs)
+    def transfer_utensil(
+        self, speed: str,
+        ready_to_initiate: str, initiate: str,
+        ready_for_transfer: str, transfer_complete: str,
+        outside_mouth_distance: float, time_to_wait: float,
+        retract_after_transfer: int = 0,
+    ) -> None:
+        print("Transferring utensil ...")
+        if retract_after_transfer == 1:
+            print("Retracting to rest position after bite transfer.")
+            self.move_to_joint_positions(self.sim.scene_description.retract_pos)
 
     def transfer_drink(self, speed: str, *args, **kwargs) -> None:
-        assert self.sim.held_object_name == "drink"
-
-        if self.robot_interface is not None:
-            self.robot_interface.set_speed(speed)
-        
-        # Assume the second last item in args is the ask_confirmation
-        ask_confirmation = args[-2]
-
-        # Assume the last item in args is autocontinue time
-        drink_autocontinue_time = args[-1]
-
-        # All other items (everything except the last two) should go on to the next call
-        remaining_args = args[:-2]
-
-        if self.web_interface is not None:
-            self.web_interface.set_drink_autocontinue_timeout(drink_autocontinue_time)
-            if ask_confirmation:
-                self.web_interface.get_drink_transfer_confirmation()
-
-        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
-
-        self.set_tool("drink")    
-        self.execute_transfer(*remaining_args, maintain_position_at_goal=True, **kwargs)    
+        print("Transferring drink")
 
     def transfer_wipe(self, speed: str, *args, **kwargs) -> None:
-        assert self.sim.held_object_name == "wipe"
-
-        if self.robot_interface is not None:
-            self.robot_interface.set_speed(speed)
-
-        # Assume the last item in args is the ask_confirmation
-        ask_confirmation = args[-1]
-        # All other items (everything except the last) should go on to the next call
-        remaining_args = args[:-1]
-        
-        self.move_to_joint_positions(self.sim.scene_description.before_transfer_pos)
-
-        if self.web_interface is not None and ask_confirmation:
-            self.web_interface.get_wipe_transfer_confirmation()
-
-        self.set_tool("wipe")
-        self.execute_transfer(*remaining_args, maintain_position_at_goal=True, **kwargs)
+        print("Transferring wipe")

@@ -37,7 +37,7 @@ parameters:
     space:
       type: "Box"
       lower: 5.0
-      upper: 100.0
+      upper: 1000.0
     is_user_editable: True
     value: 10.0
   - name: "TransferAskForConfirmation"

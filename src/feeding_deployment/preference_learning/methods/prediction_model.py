@@ -119,11 +119,13 @@ class PredictionModel:
         k_retrieve: int = 5,
         chat_model: str = "gpt-5.4",
         embed_model: str = "text-embedding-3-small",
+        physical_profile_description: str | None = None,
     ) -> None:
         
         self.user = user
         self.physical_profile_label = physical_profile_label
-        self.client = OpenAI(api_key=_resolve_api_key())
+        self.physical_profile_description = physical_profile_description
+        self.client = OpenAI(api_key=_resolve_api_key(None))
         self.chat_model = chat_model
         self.embed_model = embed_model
         self._retry = retry_fn
@@ -140,6 +142,7 @@ class PredictionModel:
                 chat_model=self.chat_model,
                 retry_fn=retry_fn,
                 logs_dir=self.logs_dir / "long_term_memory_llm_calls",
+                physical_profile_description=self.physical_profile_description,
             )
             
         if use_episodic_memory:
@@ -158,7 +161,15 @@ class PredictionModel:
         
         self.working_memory_calls_dir = self.logs_dir / user / "prediction_model_llm_calls"
         self.working_memory_calls_dir.mkdir(parents=True, exist_ok=True)
-        
+
+    def next_day(self) -> int:
+        """Return the next unused day number by scanning existing ``day_NNNN.json`` files."""
+        existing = sorted(self.working_memory_dir.glob("day_*.json"))
+        if not existing:
+            return 1
+        last_stem = existing[-1].stem          # e.g. "day_0003"
+        return int(last_stem.split("_", 1)[1]) + 1
+
     def update(self, day: int, context: Dict[str, Any], corrected: Dict[str, str], ground_truth_bundle: Dict[str, str]) -> None:
         
         ep_txt = _episode_text(day=day, context=context, prefs=ground_truth_bundle)
@@ -236,6 +247,7 @@ class PredictionModel:
             context=context,
             corrected_block=corrected_block,
             options_block=options_block,
+            physical_profile_description=self.physical_profile_description,
         )
 
         def _call() -> Any:

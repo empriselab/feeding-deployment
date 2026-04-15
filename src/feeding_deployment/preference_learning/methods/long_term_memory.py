@@ -25,13 +25,22 @@ class LongTermMemoryModel:
     Stateful LTM that updates EVERY meal (online).
     """
 
-    def __init__(self, physical_profile_label: str, client: OpenAI, chat_model: str, retry_fn, logs_dir: Path = None) -> None:
+    def __init__(
+        self,
+        physical_profile_label: str,
+        client: OpenAI,
+        chat_model: str,
+        retry_fn,
+        logs_dir: Path = None,
+        physical_profile_description: str | None = None,
+    ) -> None:
         self.client = client
         self.chat_model = chat_model
         self._retry = retry_fn
         self.logs_dir = logs_dir
 
         self.physical_profile_label = physical_profile_label
+        self._physical_profile_description = physical_profile_description
         self._ltm_summary: str = ""
         self._initialized: bool = False
 
@@ -46,6 +55,7 @@ class LongTermMemoryModel:
             physical_profile_label=self.physical_profile_label,
             previous_ltm_summary=previous,
             new_episode=episode_text,
+            physical_profile_description=self._physical_profile_description,
         )
 
         def _call() -> Any:
@@ -110,11 +120,12 @@ def main() -> int:
 
     client = OpenAI(api_key=_resolve_api_key(args.api_key))
     ltm = LongTermMemoryModel(
+        physical_profile_label=physical_profile_label,
         client=client,
         chat_model=args.openai_model,
         retry_fn=_retry_on_rate_limit,
+        logs_dir=Path(args.log_dir),
     )
-    ltm.reset(physical_profile_label)
 
     wanted = {10, 20, 30}
     seen: set[int] = set()

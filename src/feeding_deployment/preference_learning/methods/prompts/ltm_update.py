@@ -25,19 +25,25 @@ def get_ltm_update_prompt(
     physical_profile_label: str,
     previous_ltm_summary: str,
     new_episode: str,
+    *,
+    physical_profile_description: str | None = None,
 ) -> str:
     template = LTM_UPDATE_PROMPT_PATH.read_text(encoding="utf-8")
     system_description = get_system_description_prompt()
 
-    if physical_profile_label not in _PHYSICAL_CAPABILITY_BY_LABEL:
-        valid = ", ".join(sorted(_PHYSICAL_CAPABILITY_BY_LABEL.keys()))
-        raise ValueError(f"Unknown physical_profile_label={physical_profile_label!r}. Valid: {valid}")
-
-    physical_profile_description = _PHYSICAL_CAPABILITY_BY_LABEL[physical_profile_label].description
+    if physical_profile_description is not None:
+        desc = physical_profile_description.strip()
+        if not desc:
+            raise ValueError("physical_profile_description is empty")
+    else:
+        if physical_profile_label not in _PHYSICAL_CAPABILITY_BY_LABEL:
+            valid = ", ".join(sorted(_PHYSICAL_CAPABILITY_BY_LABEL.keys()))
+            raise ValueError(f"Unknown physical_profile_label={physical_profile_label!r}. Valid: {valid}")
+        desc = _PHYSICAL_CAPABILITY_BY_LABEL[physical_profile_label].description
 
     return template.format(
         system_description=system_description,
-        physical_profile=physical_profile_description,
+        physical_profile=desc,
         previous_ltm_summary=previous_ltm_summary,
         new_episode=new_episode,
     )

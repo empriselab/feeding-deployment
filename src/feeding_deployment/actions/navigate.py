@@ -55,17 +55,13 @@ class NavigateHLA(HighLevelAction):
         return f"navigate_to_{dst.name}.yaml"
 
     def navigate_to_fridge(self, speed: str) -> None:
-        del speed
         print("Navigating to fridge ...")
 
     def navigate_to_microwave(self, speed: str) -> None:
-        del speed
         print("Navigating to microwave ...")
 
     def navigate_to_sink(self, speed: str) -> None:
-        del speed
         print("Navigating to sink ...")
 
     def navigate_to_table(self, speed: str) -> None:
-        del speed
         print("Navigating to table ...")
