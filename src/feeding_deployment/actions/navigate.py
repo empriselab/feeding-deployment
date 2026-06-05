@@ -96,11 +96,18 @@ class NavigateHLA(HighLevelAction):
             )
 
         if not hasattr(self, "_move_base_client"):
+            # Connect to the shared_autonomy_manager's "navigate" action server
+            # (a transparent passthrough to move_base) rather than move_base
+            # directly, so a human takeover can still report SUCCEEDED. Set the
+            # FEEDING_NAV_ACTION env var to "move_base" to bypass the manager.
+            nav_action = os.environ.get("FEEDING_NAV_ACTION", "navigate").strip()
             self._move_base_client = actionlib.SimpleActionClient(
-                "move_base", MoveBaseAction
+                nav_action, MoveBaseAction
             )
             if not self._move_base_client.wait_for_server(rospy.Duration(15.0)):
-                raise RuntimeError("Timed out waiting for move_base action server")
+                raise RuntimeError(
+                    f"Timed out waiting for navigation action server '{nav_action}'"
+                )
         return self._move_base_client
 
     def _navigate_to_target(self, location_name: str, speed: str) -> None:

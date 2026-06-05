@@ -1,0 +1,50 @@
+<launch>
+  <!-- Shared-autonomy bring-up.
+
+       Prerequisites (start these first, as usual):
+         - Localization: cartographer_localization.launch (map->odom) and the
+           ZED/VIO (odom->vention_base_link). These MUST stay running during a
+           human takeover so TF stays valid.
+         - Sensors: lidar topics.
+
+       This launch starts:
+         - move_base + the cmd_vel bridge (via navigation.launch)
+         - shared_autonomy_manager : serves the "navigate" action, forwards to
+           move_base, handles takeover/done.
+         - shared_autonomy_teleop  : Xbox controller -> /cmd_vel (deadman-gated)
+           + takeover/done intents.
+
+       NavigateHLA connects to "navigate" by default, so it is routed through the
+       manager automatically. (Set FEEDING_NAV_ACTION=move_base to bypass.)
+  -->
+
+  <!-- move_base + cmd_vel bridge -->
+  <include file="$(find feeding_deployment)/launch/navigation.launch"/>
+
+  <!-- Manager: navigate action server -> move_base passthrough -->
+  <node pkg="feeding_deployment"
+        type="shared_autonomy_manager.py"
+        name="shared_autonomy_manager"
+        output="screen"
+        cwd="node">
+    <param name="navigate_action" value="navigate"/>
+    <param name="move_base_action" value="move_base"/>
+  </node>
+
+  <!-- Teleop: Xbox controller -> Twist on /cmd_vel (deadman-gated) -->
+  <node pkg="feeding_deployment"
+        type="shared_autonomy_teleop.py"
+        name="shared_autonomy_teleop"
+        output="screen"
+        cwd="node">
+    <!-- Controller mapping (pygame indices; confirm on the real pad). -->
+    <param name="deadman_button" value="5"/>   <!-- RB: hold to take over + drive -->
+    <param name="done_button" value="7"/>      <!-- Start/Menu: press = goal reached -->
+    <param name="axis_linear" value="1"/>
+    <param name="axis_angular" value="0"/>
+    <!-- Clamp to the autonomy's safe limits (see teb_local_planner.yaml). -->
+    <param name="max_vel_x" value="0.2"/>
+    <param name="max_vel_theta" value="0.5"/>
+    <param name="deadband" value="0.12"/>
+  </node>
+</launch>
