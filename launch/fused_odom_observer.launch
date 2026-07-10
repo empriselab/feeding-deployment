@@ -28,6 +28,10 @@
 
   <arg name="rviz"    default="false"/>
   <arg name="record"  default="false"/>
+  <!-- ablate:=true also spins up the parallel observe-only EKF variants
+       (see the ABLATION group below) so the drift traces isolate each
+       fusion component. Default off = the original zero-risk observer. -->
+  <arg name="ablate"  default="false"/>
   <arg name="log_dir"
        default="$(find feeding_deployment)/src/feeding_deployment/integration/log/system_logs"/>
 
@@ -44,6 +48,94 @@
               file="$(find feeding_deployment)/config/nav/ekf_zed_wheel.yaml"/>
     <remap from="odometry/filtered" to="/odometry/fused"/>
   </node>
+
+  <!-- =============================================================== -->
+  <!-- ABLATION (ablate:=true): parallel observe-only EKF variants,     -->
+  <!-- each loading ekf_zed_wheel.yaml then overriding exactly ONE      -->
+  <!-- component, so the drift traces isolate what each piece buys.     -->
+  <!-- All keep publish_tf:false (from the yaml); nothing downstream    -->
+  <!-- consumes them. imu0 fuses ONLY the gyro yaw-rate (index 11);     -->
+  <!-- odom2 is the ZUPT zero-velocity pseudo-measurement.              -->
+  <!-- =============================================================== -->
+  <group if="$(arg ablate)">
+
+    <!-- ZUPT detector: zero-twist when wheels AND gyro agree we're
+         still (feeds the +ZUPT and improved EKFs via /odometry/zupt). -->
+    <node pkg="feeding_deployment" type="zupt_publisher.py"
+          name="zupt_publisher" output="screen"/>
+
+    <!-- +gyro-yaw: IMU gyro owns yaw-rate; drop ZED vyaw (odom0 index 11). -->
+    <node pkg="robot_localization" type="ekf_localization_node"
+          name="ekf_zed_wheel_gyro" clear_params="true" output="screen">
+      <rosparam command="load"
+                file="$(find feeding_deployment)/config/nav/ekf_zed_wheel.yaml"/>
+      <rosparam param="odom0_config">[false, false, false, false, false, false, true, true, false, false, false, false, false, false, false]</rosparam>
+      <param name="imu0" value="/zed_mini/zed_node/imu/data"/>
+      <rosparam param="imu0_config">[false, false, false, false, false, false, false, false, false, false, false, true, false, false, false]</rosparam>
+      <param name="imu0_differential" value="false"/>
+      <param name="imu0_relative" value="false"/>
+      <param name="imu0_queue_size" value="20"/>
+      <remap from="odometry/filtered" to="/odometry/fused_gyro"/>
+    </node>
+
+    <!-- +reject-gate: Mahalanobis innovation gate on the ZED velocity. -->
+    <node pkg="robot_localization" type="ekf_localization_node"
+          name="ekf_zed_wheel_gate" clear_params="true" output="screen">
+      <rosparam command="load"
+                file="$(find feeding_deployment)/config/nav/ekf_zed_wheel.yaml"/>
+      <param name="odom0_twist_rejection_threshold" value="5.0"/>
+      <remap from="odometry/filtered" to="/odometry/fused_gate"/>
+    </node>
+
+    <!-- +ZUPT: stock fusion + zero-velocity update (odom2). -->
+    <node pkg="robot_localization" type="ekf_localization_node"
+          name="ekf_zed_wheel_zupt" clear_params="true" output="screen">
+      <rosparam command="load"
+                file="$(find feeding_deployment)/config/nav/ekf_zed_wheel.yaml"/>
+      <param name="odom2" value="/odometry/zupt"/>
+      <rosparam param="odom2_config">[false, false, false, false, false, false, true, true, false, false, false, true, false, false, false]</rosparam>
+      <param name="odom2_differential" value="false"/>
+      <param name="odom2_relative" value="false"/>
+      <param name="odom2_queue_size" value="10"/>
+      <remap from="odometry/filtered" to="/odometry/fused_zupt"/>
+    </node>
+
+    <!-- improved (all): gyro-yaw + reject-gate + ZUPT together. -->
+    <node pkg="robot_localization" type="ekf_localization_node"
+          name="ekf_zed_wheel_improved" clear_params="true" output="screen">
+      <rosparam command="load"
+                file="$(find feeding_deployment)/config/nav/ekf_zed_wheel.yaml"/>
+      <rosparam param="odom0_config">[false, false, false, false, false, false, true, true, false, false, false, false, false, false, false]</rosparam>
+      <param name="odom0_twist_rejection_threshold" value="5.0"/>
+      <param name="imu0" value="/zed_mini/zed_node/imu/data"/>
+      <rosparam param="imu0_config">[false, false, false, false, false, false, false, false, false, false, false, true, false, false, false]</rosparam>
+      <param name="imu0_differential" value="false"/>
+      <param name="imu0_relative" value="false"/>
+      <param name="imu0_queue_size" value="20"/>
+      <param name="odom2" value="/odometry/zupt"/>
+      <rosparam param="odom2_config">[false, false, false, false, false, false, true, true, false, false, false, true, false, false, false]</rosparam>
+      <param name="odom2_differential" value="false"/>
+      <param name="odom2_relative" value="false"/>
+      <param name="odom2_queue_size" value="10"/>
+      <remap from="odometry/filtered" to="/odometry/fused_improved"/>
+    </node>
+
+    <!-- no-VIO (specialized): wheel vx + IMU yaw only. ZED dropped by
+         pointing odom0 at a topic nobody publishes (config stays, no msgs). -->
+    <node pkg="robot_localization" type="ekf_localization_node"
+          name="ekf_zed_wheel_novio" clear_params="true" output="screen">
+      <rosparam command="load"
+                file="$(find feeding_deployment)/config/nav/ekf_zed_wheel.yaml"/>
+      <param name="odom0" value="/odometry/_novio_zed_disabled"/>
+      <param name="imu0" value="/zed_mini/zed_node/imu/data"/>
+      <rosparam param="imu0_config">[false, false, false, false, false, false, false, false, false, false, false, true, false, false, false]</rosparam>
+      <param name="imu0_differential" value="false"/>
+      <param name="imu0_relative" value="false"/>
+      <param name="imu0_queue_size" value="20"/>
+      <remap from="odometry/filtered" to="/odometry/fused_novio"/>
+    </node>
+
+  </group>
 
   <!-- Drift-trace observers (wheel_odom_publisher + drift_trace_compare, now
        with the purple /drift_test/fused_path). record:=false here; we own one
@@ -64,9 +156,16 @@
               /move_base/odom_feedback /move_base/odom_feedback_cov /odometry/fused
               /wheel_odom /wheel_odom/counts /wheel_odom/side_disagreement
               /nav_safety_hold /nav_safety_hold_reason
+              /zed_mini/zed_node/imu/data
+              /odometry/zupt
+              /odometry/fused_gyro /odometry/fused_gate /odometry/fused_zupt
+              /odometry/fused_improved /odometry/fused_novio
               /drift_test/anchor
               /drift_test/carto_path /drift_test/zed_path
               /drift_test/zed_sanitized_path /drift_test/wheel_path
               /drift_test/fused_path
+              /drift_test/fused_gyro_path /drift_test/fused_gate_path
+              /drift_test/fused_zupt_path /drift_test/fused_improved_path
+              /drift_test/fused_novio_path
               /lidar_r/scan /lidar_l/scan"/>
 </launch>

@@ -39,7 +39,14 @@ TRACES = [
     ("/drift_test/zed_path", "zed (raw ZED)", "red"),
     ("/drift_test/zed_sanitized_path", "zed_sanitized", "orange"),
     ("/drift_test/wheel_path", "wheel", "blue"),
-    ("/drift_test/fused_path", "fused (ZED+wheel EKF)", "purple"),
+    ("/drift_test/fused_path", "fused (stock EKF)", "purple"),
+    # Stage-1 ablation variants -- present only on ablate:=true runs; a bag
+    # without one of these topics simply omits that line.
+    ("/drift_test/fused_gyro_path", "fused +gyro-yaw", "cyan"),
+    ("/drift_test/fused_gate_path", "fused +reject-gate", "magenta"),
+    ("/drift_test/fused_zupt_path", "fused +ZUPT", "brown"),
+    ("/drift_test/fused_improved_path", "fused improved (all)", "black"),
+    ("/drift_test/fused_novio_path", "fused no-VIO (wheel+IMU)", "teal"),
     ("/drift_test/carto_path", "carto (reference)", "green"),
 ]
 LOG_BASE = os.path.expanduser(

@@ -146,6 +146,23 @@ class DriftTraceCompare:
         # exactly like the wheel trace; same one-sample-jump freeze on a restart.
         self.fused_topic = rospy.get_param("~fused_odom_topic", "/odometry/fused")
         self.fused_jump_m = float(rospy.get_param("~fused_jump_m", 1.0))
+        # Stage-1 ABLATION variants (fused_odom_observer.launch ablate:=true):
+        # each an observe-only EKF publishing its own /odometry/fused_* topic,
+        # baked open-loop exactly like 'fused' and never gating the lock. Absent
+        # (no messages) unless that EKF runs, so harmless when ablate:=false.
+        self.ablation_jump_m = float(rospy.get_param("~ablation_jump_m", 1.0))
+        self.ablation_topics = {
+            "fused_gyro": rospy.get_param(
+                "~fused_gyro_topic", "/odometry/fused_gyro"),
+            "fused_gate": rospy.get_param(
+                "~fused_gate_topic", "/odometry/fused_gate"),
+            "fused_zupt": rospy.get_param(
+                "~fused_zupt_topic", "/odometry/fused_zupt"),
+            "fused_improved": rospy.get_param(
+                "~fused_improved_topic", "/odometry/fused_improved"),
+            "fused_novio": rospy.get_param(
+                "~fused_novio_topic", "/odometry/fused_novio"),
+        }
 
         self.tf_buffer = tf2_ros.Buffer(rospy.Duration(30.0))
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
@@ -169,6 +186,8 @@ class DriftTraceCompare:
             "wheel": _dr_state(self.wheel_topic, self.wheel_jump_m, True),
             "fused": _dr_state(self.fused_topic, self.fused_jump_m, False),
         }
+        for _k, _t in self.ablation_topics.items():
+            self._dr[_k] = _dr_state(_t, self.ablation_jump_m, False)
 
         self.traces = {
             "carto": Trace(min_step_m, min_step_rad, max_poses),
@@ -177,6 +196,8 @@ class DriftTraceCompare:
             "wheel": Trace(min_step_m, min_step_rad, max_poses),
             "fused": Trace(min_step_m, min_step_rad, max_poses),
         }
+        for _k in self.ablation_topics:
+            self.traces[_k] = Trace(min_step_m, min_step_rad, max_poses)
         self.path_pubs = {
             "carto": rospy.Publisher("/drift_test/carto_path", Path, queue_size=2),
             "zed": rospy.Publisher("/drift_test/zed_path", Path, queue_size=2),
@@ -185,6 +206,9 @@ class DriftTraceCompare:
             "wheel": rospy.Publisher("/drift_test/wheel_path", Path, queue_size=2),
             "fused": rospy.Publisher("/drift_test/fused_path", Path, queue_size=2),
         }
+        for _k in self.ablation_topics:
+            self.path_pubs[_k] = rospy.Publisher(
+                "/drift_test/%s_path" % _k, Path, queue_size=2)
         self.anchor_pub = rospy.Publisher("/drift_test/anchor", PoseStamped,
                                           queue_size=1, latch=True)
 
