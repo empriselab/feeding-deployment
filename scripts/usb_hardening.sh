@@ -1,18 +1,26 @@
 #!/usr/bin/env bash
 #
-# USB hardening for the arm RealSense + the shared PCH bus (lidars, hubs).
+# USB hardening for the sensor USB paths: arm RealSense + its OWC TB4 hub
+# chain, and the lidars + their Realtek tree on the PCH.
 #
-# Why: the arm-mounted RealSense D435i occasionally stalls its depth stream; the
-# realsense2 nodelet's USBDEVFS_CLEAR_HALT recovery escalates to a controller-wide
-# reset that drops the two lidars it shares the PCH xHCI controller with. This
-# applies librealsense's recommended USB settings so the camera sustains its
-# 1280x720@30 depth+color config, and narrows the reset blast radius:
+# Why (two incidents):
+#  - Jul 3: the D435i's depth-endpoint stall recovery (CLEAR_HALT) escalated to
+#    a controller-wide reset that dropped the two lidars sharing the PCH xHCI.
+#  - Jul 13 (post TB4-hub rewire): starting the realsense2 node with the camera
+#    runtime-suspended breaks stream start behind the hub chain — random subsets
+#    of streams come up at 0 Hz (endpoint-130 watchdog, "HW not ready", EAGAIN
+#    control transfers); launched awake, all streams start clean at 30 Hz.
+# This applies librealsense's recommended USB settings:
 #   1. usbfs_memory_mb -> 128   (kernel default 16 is too small for the dual stream)
-#   2. USB autosuspend off for the RealSense, CP210x lidars, and Realtek hubs
+#   2. USB autosuspend off for the RealSense, both OWC TB4 hubs, CP210x lidars,
+#      and Realtek hubs
 # It also installs the persistent udev rule for (2).
 #
-# The ZED is on a separate (Thunderbolt) controller and is intentionally NOT
-# touched by this script.
+# Re-run this script after any RealSense hardware reset (initial_reset or storm
+# recovery): the re-enumerated device instance can come back at power/control=auto.
+#
+# The ZED is on Hub 1 and its autosuspend is disabled via 99-slabs.rules; it is
+# intentionally NOT touched by this script.
 #
 # Usage:  sudo scripts/usb_hardening.sh
 #
@@ -26,8 +34,9 @@ RULE_SRC="${REPO_ROOT}/config/udev/99-usb-hardening.rules"
 RULE_DST="/etc/udev/rules.d/99-usb-hardening.rules"
 USBFS_MB=128
 
-# Autosuspend-off targets: idVendor:idProduct of devices on the shared PCH bus.
-TARGETS=("8086:0b3a" "10c4:ea60" "0bda:5411" "0bda:0411")
+# Autosuspend-off targets: idVendor:idProduct of every device in the sensor
+# USB paths (RealSense, lidars, Realtek lidar-tree hubs, OWC TB4 hub functions).
+TARGETS=("8086:0b3a" "10c4:ea60" "0bda:5411" "0bda:0411" "8087:0b40" "1d5c:5801")
 
 if [[ ${EUID} -ne 0 ]]; then
   echo "This script needs root. Re-run: sudo $0" >&2
@@ -63,6 +72,14 @@ To persist usbfs_memory_mb across reboots, add the kernel arg to GRUB once
 
   grep -q 'usbcore.usbfs_memory_mb' /etc/default/grub \
     || sudo sed -i 's/\(GRUB_CMDLINE_LINUX_DEFAULT="[^"]*\)"/\1 usbcore.usbfs_memory_mb=128"/' /etc/default/grub
+  sudo update-grub
+  # takes effect on next reboot
+
+Recommended (robot is on AC power): also disable USB autosuspend globally at
+the kernel level, which closes every udev-race / reset-revert gap for good:
+
+  grep -q 'usbcore.autosuspend' /etc/default/grub \
+    || sudo sed -i 's/\(GRUB_CMDLINE_LINUX_DEFAULT="[^"]*\)"/\1 usbcore.autosuspend=-1"/' /etc/default/grub
   sudo update-grub
   # takes effect on next reboot
 

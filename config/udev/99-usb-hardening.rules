@@ -1,12 +1,24 @@
-# USB hardening for the arm RealSense and the devices it shares the PCH xHCI
-# controller (0000:00:14.0) with.
+# USB hardening: keep runtime autosuspend off for every device in the sensor
+# USB paths (arm RealSense + its TB4 hub chain, lidars + their Realtek tree).
 #
-# The arm-mounted RealSense D435i can stall its depth stream; the realsense2
-# nodelet's USBDEVFS_CLEAR_HALT recovery then escalates to a controller-wide
-# reset that tears down and re-enumerates both lidars. Disabling USB autosuspend
-# on these devices keeps a transient from suspending/flapping them and widening
-# that blast radius. (The ZED is on a separate controller and already has its
-# autosuspend disabled via 99-slabs.rules — it is intentionally not touched here.)
+# Two reasons, from two incidents:
+#  - Jul 3: the RealSense's depth-endpoint stall recovery (CLEAR_HALT) escalated
+#    to a controller-wide reset that dropped both lidars sharing the PCH xHCI.
+#    Autosuspend transients widen that blast radius.
+#  - Jul 13 (post TB4-hub rewire): launching the realsense2 node with the camera
+#    runtime-suspended breaks stream start behind the OWC hub chain — random
+#    subsets of streams come up dead (endpoint-130 watchdog, "HW not ready",
+#    EAGAIN control transfers). Launching with the camera held awake starts all
+#    streams clean at 30 Hz. So the camera AND both OWC hubs must never suspend.
+#
+# Known gap: librealsense's hardware reset (initial_reset) re-enumerates the
+# camera and the fresh device instance can come back at power/control=auto —
+# re-run scripts/usb_hardening.sh after any RealSense reset, or persist the
+# kernel-level default with usbcore.autosuspend=-1 in GRUB (robot is on AC;
+# see the script's closing notes).
+#
+# (The ZED is on Hub 1 and has autosuspend disabled via 99-slabs.rules —
+# intentionally not duplicated here.)
 #
 # Install: copy to /etc/udev/rules.d/ and `udevadm control --reload-rules`
 # (scripts/usb_hardening.sh does this and also applies it live).
@@ -20,3 +32,8 @@ ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="10c4", ATTR{idProduct}=="ea60"
 # Realtek USB hubs carrying the lidar tree on the PCH controller
 ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0bda", ATTR{idProduct}=="5411", TEST=="power/control", ATTR{power/control}="on"
 ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0bda", ATTR{idProduct}=="0411", TEST=="power/control", ATTR{power/control}="on"
+
+# OWC TB4 hubs (Goshen Ridge): USB3 hub function (carries ZED video + RealSense)
+# and USB2 hub function (carries the ZED IMU on the PCH side)
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="8087", ATTR{idProduct}=="0b40", TEST=="power/control", ATTR{power/control}="on"
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1d5c", ATTR{idProduct}=="5801", TEST=="power/control", ATTR{power/control}="on"
