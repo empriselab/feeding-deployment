@@ -171,6 +171,7 @@
   var requestedId = null, requestedLabel = '', activeLabel = '';
   var peak = 0, maxSeen = 0, rms = 0;
   var spikeThresh = 0.05, spikes = [], lastSpikeT = 0;
+  var phaseMax = 0, phaseActive = false;
   var t0 = Date.now();
 
   function log(msg, cls) {
@@ -346,6 +347,10 @@
     }
     peak = p; rms = Math.sqrt(sum / buf.length);
     if (p > maxSeen) maxSeen = p;
+    // Phase maxima must be taken here, in the audio loop. Sampling `peak` from a
+    // timer misses short transients (a click) while sustained sound (speech) still
+    // registers — which would fake exactly the press-is-dead result we are testing.
+    if (phaseActive && p > phaseMax) phaseMax = p;
 
     // Count discrete transients so an intermittent switch shows up as a hit rate.
     var now = (window.performance && performance.now) ? performance.now() : Date.now();
@@ -414,17 +419,17 @@
       }
       var ph = PHASES[idx];
       var left = ph.secs;
-      var localMax = 0;
       $('phase').textContent = ph.name + '  (' + left + ')';
       log('phase: ' + ph.name, 'hi');
-      var sample = setInterval(function () { if (peak > localMax) localMax = peak; }, 16);
+      phaseMax = 0; phaseActive = true;
       var tick = setInterval(function () {
         left--;
         $('phase').textContent = ph.name + '  (' + left + ')';
         if (left <= 0) {
-          clearInterval(tick); clearInterval(sample);
-          res[ph.key] = localMax;
-          log('  ' + ph.key + ' max = ' + localMax.toFixed(4));
+          clearInterval(tick);
+          phaseActive = false;
+          res[ph.key] = phaseMax;
+          log('  ' + ph.key + ' max = ' + phaseMax.toFixed(4));
           idx++; runPhase();
         }
       }, 1000);
