@@ -139,12 +139,14 @@
   <section>
     <h2>3c &middot; Route roulette</h2>
     <p class="sub">
-      Answers one question: <b>does the real USB device ever actually bind?</b> Each attempt opens
-      the Plugable input and plays a short tone out of the iPad speaker. The built-in mic hears that
-      tone; a switch on a mic jack cannot. So every attempt is labelled <b>HEARS PROBE</b> (we got
-      the built-in mic, whatever the label claims) or <b>DEAF</b> (we may have the real device).
-      If any attempt comes back DEAF the sweep stops and <em>holds that stream open</em> — press the
-      button then and watch the spike counter above.
+      Answers one question: <b>does the real USB device ever actually bind?</b>
+      <b>Talk or clap continuously for the whole sweep</b> — your voice is the reference, because
+      the iPad's speaker cannot be used (the adapter takes over audio output, so a tone would play
+      out of its aux jack instead). It first calibrates on the built-in mic to check you are loud
+      enough, then opens the Plugable input repeatedly. Each attempt is <b>HEARS YOU</b> (built-in
+      mic, whatever the label claims) or <b>DEAF</b> (nothing acoustic reaches it — the only
+      positive evidence the USB device is genuinely bound). If an attempt comes back DEAF the sweep
+      stops and <em>holds that stream open</em> — press the button then and watch section 3b.
     </p>
     <div class="btnrow">
       <span style="color:var(--muted);font-size:15px;align-self:center">Attempts</span>
@@ -417,35 +419,22 @@
   }
 
   // ---------- 3c. route roulette ----------
-  // A stream that hears a tone played from the iPad's own speaker is a real microphone.
-  // The button is a switch on a mic jack and cannot hear anything, so "deaf to the probe"
-  // is the only positive evidence that the USB device is genuinely bound. Metadata is not
-  // evidence: label and getSettings().deviceId report the request, not the source.
-  var PROBE_MS = 900, PROBE_DEAF_RMS = 0.004;
+  // The button is a switch on a mic jack and cannot hear anything, so "deaf while the room
+  // is loud" is the only positive evidence that the USB device is genuinely bound. Metadata
+  // is not evidence: label and getSettings().deviceId report the request, not the source.
+  // The reference sound has to come from the room, NOT the iPad: connecting the adapter takes
+  // over audio output, so anything we play would leave via its aux jack and be inaudible.
+  var PROBE_MS = 1200;          // listening window per attempt
+  var CAL_MIN_RMS = 0.02;       // built-in mic must reach this while you talk, or the test is void
+  var DEAF_FRACTION = 0.1;      // deaf = under a tenth of the calibrated room level
 
-  function playProbeAndMeasure() {
+  function measureAmbient(ms) {
     return new Promise(function (resolve) {
-      var maxRms = 0, elapsed = 0, octx = null, osc = null;
-      try {
-        octx = new (window.AudioContext || window.webkitAudioContext)();
-        osc = octx.createOscillator();
-        var g = octx.createGain();
-        osc.frequency.value = 1000;
-        g.gain.value = 0.3;
-        osc.connect(g); g.connect(octx.destination);
-        octx.resume().then(function () { try { osc.start(); } catch (e) {} });
-      } catch (e) {
-        log('could not play probe tone: ' + e.message, 'err');
-      }
+      var maxRms = 0, elapsed = 0;
       var iv = setInterval(function () {
         if (rms > maxRms) maxRms = rms;
         elapsed += 50;
-        if (elapsed >= PROBE_MS) {
-          clearInterval(iv);
-          try { if (osc) osc.stop(); } catch (e) {}
-          if (octx) octx.close().catch(function () {});
-          resolve(maxRms);
-        }
+        if (elapsed >= ms) { clearInterval(iv); resolve(maxRms); }
       }, 50);
     });
   }
@@ -464,55 +453,79 @@
     if (!dev) { log('no Plugable-looking input in the list — tap Enumerate first', 'err'); return; }
     $('btnSweep').disabled = true;
     $('sweepList').innerHTML = '';
-    var deaf = 0, i = 0;
+    var deaf = 0, i = 0, deafCut = 0;
 
-    function addRow(n, label, r, isDeaf, note) {
+    function addRow(n, r, isDeaf, note) {
       var d = document.createElement('div');
       d.className = isDeaf ? 'ok' : 'hi';
-      d.textContent = '#' + n + '  probeRms ' + r.toFixed(5) + '  ' +
-        (isDeaf ? 'DEAF — may be the real device' : 'HEARS PROBE — built-in mic') +
+      d.textContent = '#' + n + '  rms ' + r.toFixed(5) + '  ' +
+        (isDeaf ? 'DEAF — may be the real device' : 'HEARS YOU — built-in mic') +
         (note ? '  (' + note + ')' : '');
       $('sweepList').insertBefore(d, $('sweepList').firstChild);
     }
 
+    function finish(msg, cls) {
+      $('sweepStatus').textContent = msg;
+      log(msg, cls || 'hi');
+      $('btnSweep').disabled = false;
+    }
+
     function next() {
       if (i >= attempts) {
-        $('sweepStatus').textContent = 'done — 0 of ' + attempts + ' attempts were deaf';
-        log('SWEEP RESULT: 0/' + attempts + ' deaf. On this iPad the USB device never bound; ' +
-            'every stream was the built-in mic despite the label.', 'err');
-        $('btnSweep').disabled = false;
+        finish('done — ' + deaf + ' of ' + attempts + ' attempts were deaf. 0 deaf means the USB ' +
+               'device never bound: every stream was the built-in mic despite the label.',
+        deaf ? 'ok' : 'err');
         return;
       }
       i++;
-      $('sweepStatus').textContent = 'attempt ' + i + ' of ' + attempts + '…';
+      $('sweepStatus').textContent = 'attempt ' + i + ' of ' + attempts + ' — KEEP TALKING…';
       // Fully release and settle before re-acquiring, so iOS re-picks the input.
       release(false).then(function () { return pause(400); })
         .then(function () { return open(dev.deviceId, dev.label); })
         .then(function () {
-          if (!analyser) { addRow(i, dev.label, 0, false, 'open failed'); return next(); }
-          return playProbeAndMeasure().then(function (r) {
-            var isDeaf = r <= PROBE_DEAF_RMS;
+          if (!analyser) { addRow(i, 0, false, 'open failed'); return next(); }
+          return measureAmbient(PROBE_MS).then(function (r) {
+            var isDeaf = r < deafCut;
             if (isDeaf) deaf++;
-            addRow(i, activeLabel, r, isDeaf);
-            log('sweep #' + i + ': probeRms=' + r.toFixed(5) + ' → ' +
-              (isDeaf ? 'DEAF' : 'HEARS PROBE'), isDeaf ? 'ok' : 'hi');
+            addRow(i, r, isDeaf);
+            log('sweep #' + i + ': rms=' + r.toFixed(5) + ' vs cutoff ' + deafCut.toFixed(5) +
+              ' → ' + (isDeaf ? 'DEAF' : 'HEARS YOU'), isDeaf ? 'ok' : 'hi');
             if (isDeaf) {
-              $('sweepStatus').textContent = 'attempt ' + i + ' is DEAF — stream held open. ' +
-                'PRESS THE BUTTON NOW and watch section 3b.';
-              log('holding this stream open — press the button now, then read the spike count', 'ok');
-              $('btnSweep').disabled = false;
+              finish('attempt ' + i + ' is DEAF — stream held open. PRESS THE BUTTON NOW ' +
+                     'and watch the spike counter in section 3b.', 'ok');
               return;   // stop the sweep, leave the stream running
             }
             return next();
           });
         })
         .catch(function (e) {
-          addRow(i, dev.label, 0, false, e.name || 'error');
+          addRow(i, 0, false, e.name || 'error');
           log('sweep #' + i + ' failed: ' + e.message, 'err');
           next();
         });
     }
-    next();
+
+    // Calibrate on the built-in mic first, so a false DEAF cannot come from a quiet room.
+    $('sweepStatus').textContent = 'CALIBRATING — talk or clap loudly now…';
+    log('calibrating on the default input (built-in mic) — keep talking', 'hi');
+    release(false).then(function () { return pause(300); })
+      .then(function () { return open('', 'DEFAULT'); })
+      .then(function () {
+        if (!analyser) throw new Error('could not open the default input');
+        return measureAmbient(1500);
+      })
+      .then(function (ref) {
+        log('calibration: built-in mic heard ' + ref.toFixed(5), ref >= CAL_MIN_RMS ? 'ok' : 'err');
+        if (ref < CAL_MIN_RMS) {
+          finish('calibration too quiet (' + ref.toFixed(5) + ') — be louder and re-run, ' +
+                 'otherwise every attempt would falsely read DEAF', 'err');
+          return;
+        }
+        deafCut = ref * DEAF_FRACTION;
+        log('deaf cutoff set to ' + deafCut.toFixed(5), 'hi');
+        next();
+      })
+      .catch(function (e) { finish('calibration failed: ' + e.message, 'err'); });
   }
 
   // ---------- 4. guided verdict ----------
