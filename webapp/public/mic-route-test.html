@@ -118,6 +118,25 @@
   </section>
 
   <section>
+    <h2>3b &middot; Press reliability</h2>
+    <p class="sub">
+      Counts every transient louder than the spike threshold, with a 300&nbsp;ms refractory so one
+      press counts once. Press the button a known number of times (10 is good) and compare:
+      <b>10 spikes near 1.0</b> is a healthy switch, <b>2 of 10</b> is an intermittent contact.
+      Also try wiggling the 3.5&nbsp;mm plug or flexing the cable <em>without</em> pressing — spikes
+      there mean the connection is mechanically marginal, not the switch.
+    </p>
+    <div class="threshrow" style="display:flex;gap:10px;align-items:center;margin-top:12px">
+      <span style="color:var(--muted);font-size:15px">Spike threshold</span>
+      <input id="spikeThresh" type="range" min="0.005" max="0.3" step="0.005" value="0.05" style="flex:1">
+      <b id="spikeThreshVal" style="min-width:5ch;text-align:right">0.050</b>
+    </div>
+    <div class="phase" id="spikeCount">0 spikes</div>
+    <div id="spikeList" class="log" style="max-height:150px"></div>
+    <div class="btnrow"><button id="btnResetSpikes" class="btn ghost sm">Reset spike count</button></div>
+  </section>
+
+  <section>
     <h2>4 &middot; Guided verdict</h2>
     <p class="sub">Three timed phases — stay quiet, then talk, then press the button. It decides for you.</p>
     <div class="btnrow"><button id="btnGuided" class="btn">Start guided test</button></div>
@@ -151,6 +170,7 @@
   var stream = null, ctx = null, analyser = null, buf = null, raf = null;
   var requestedId = null, requestedLabel = '', activeLabel = '';
   var peak = 0, maxSeen = 0, rms = 0;
+  var spikeThresh = 0.05, spikes = [], lastSpikeT = 0;
   var t0 = Date.now();
 
   function log(msg, cls) {
@@ -279,8 +299,9 @@
         ['track label', activeLabel],
         ['sampleRate', String(st.sampleRate || '?')],
         ['channelCount', String(st.channelCount || '?')],
-        ['autoGainControl', String(st.autoGainControl),
-          st.autoGainControl ? 'warn' : 'hit', st.autoGainControl ? 'AGC forced ON' : 'off as asked'],
+        ['autoGainControl', String(st.autoGainControl)].concat(
+          st.autoGainControl === undefined ? ['warn', 'not reported']
+            : (st.autoGainControl ? ['warn', 'AGC forced ON'] : ['hit', 'off as asked'])),
         ['echoCancellation', String(st.echoCancellation)],
         ['noiseSuppression', String(st.noiseSuppression)]
       ]);
@@ -300,6 +321,7 @@
         buf = new Float32Array(analyser.fftSize);
         ctx.createMediaStreamSource(stream).connect(analyser);
         maxSeen = 0;
+        spikes = []; lastSpikeT = 0; renderSpikes();
         loop();
         log('measuring — watch peak while you talk vs press', 'ok');
       });
@@ -324,11 +346,36 @@
     }
     peak = p; rms = Math.sqrt(sum / buf.length);
     if (p > maxSeen) maxSeen = p;
+
+    // Count discrete transients so an intermittent switch shows up as a hit rate.
+    var now = (window.performance && performance.now) ? performance.now() : Date.now();
+    if (p > spikeThresh && now - lastSpikeT > 300) {
+      lastSpikeT = now;
+      spikes.push(p);
+      renderSpikes();
+      log('spike #' + spikes.length + ' peak=' + p.toFixed(4), 'ok');
+    }
+
     $('pk').textContent = p.toFixed(3);
     $('mx').textContent = maxSeen.toFixed(3);
     $('rms').textContent = rms.toFixed(3);
     $('meter').style.width = Math.min(100, p * 100) + '%';
     raf = requestAnimationFrame(loop);
+  }
+
+  function renderSpikes() {
+    var n = spikes.length;
+    var big = spikes.filter(function (v) { return v > 0.3; }).length;
+    $('spikeCount').textContent = n + (n === 1 ? ' spike' : ' spikes') +
+      (n ? '  ·  ' + big + ' strong (>0.3)' : '');
+    $('spikeList').innerHTML = '';
+    spikes.slice(-12).reverse().forEach(function (v, i) {
+      var d = document.createElement('div');
+      d.className = v > 0.3 ? 'ok' : 'hi';
+      d.textContent = '#' + (spikes.length - i) + '  peak ' + v.toFixed(4) +
+        (v > 0.3 ? '   strong' : '   weak — marginal contact?');
+      $('spikeList').appendChild(d);
+    });
   }
 
   function release(verbose) {
@@ -446,6 +493,11 @@
   $('btnEnum').onclick = function () { enumerate(true); };
   $('btnRelease').onclick = function () { release(true); };
   $('btnResetMax').onclick = function () { maxSeen = 0; };
+  $('btnResetSpikes').onclick = function () { spikes = []; renderSpikes(); log('spike count reset'); };
+  $('spikeThresh').oninput = function () {
+    spikeThresh = parseFloat(this.value);
+    $('spikeThreshVal').textContent = spikeThresh.toFixed(3);
+  };
   $('btnGuided').onclick = guided;
   $('btnSave').onclick = save;
 
