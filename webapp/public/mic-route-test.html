@@ -137,6 +137,26 @@
   </section>
 
   <section>
+    <h2>3c &middot; Route roulette</h2>
+    <p class="sub">
+      Answers one question: <b>does the real USB device ever actually bind?</b> Each attempt opens
+      the Plugable input and plays a short tone out of the iPad speaker. The built-in mic hears that
+      tone; a switch on a mic jack cannot. So every attempt is labelled <b>HEARS PROBE</b> (we got
+      the built-in mic, whatever the label claims) or <b>DEAF</b> (we may have the real device).
+      If any attempt comes back DEAF the sweep stops and <em>holds that stream open</em> — press the
+      button then and watch the spike counter above.
+    </p>
+    <div class="btnrow">
+      <span style="color:var(--muted);font-size:15px;align-self:center">Attempts</span>
+      <input id="sweepN" type="number" min="1" max="30" value="8"
+             style="width:84px;min-height:48px;font-size:16px;text-align:center;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:8px">
+      <button id="btnSweep" class="btn" style="flex:2">Run sweep</button>
+    </div>
+    <div class="phase" id="sweepStatus">&mdash; idle &mdash;</div>
+    <div id="sweepList" class="log" style="max-height:200px"></div>
+  </section>
+
+  <section>
     <h2>4 &middot; Guided verdict</h2>
     <p class="sub">Three timed phases — stay quiet, then talk, then press the button. It decides for you.</p>
     <div class="btnrow"><button id="btnGuided" class="btn">Start guided test</button></div>
@@ -276,7 +296,7 @@
 
   // ---------- 3. open a stream and measure ----------
   function open(id, label) {
-    release(false).then(function () {
+    return release(false).then(function () {
       requestedId = id; requestedLabel = label;
       var audio = { echoCancellation: false, noiseSuppression: false, autoGainControl: false };
       if (id) audio.deviceId = { exact: id };
@@ -396,6 +416,105 @@
     return Promise.resolve(done);
   }
 
+  // ---------- 3c. route roulette ----------
+  // A stream that hears a tone played from the iPad's own speaker is a real microphone.
+  // The button is a switch on a mic jack and cannot hear anything, so "deaf to the probe"
+  // is the only positive evidence that the USB device is genuinely bound. Metadata is not
+  // evidence: label and getSettings().deviceId report the request, not the source.
+  var PROBE_MS = 900, PROBE_DEAF_RMS = 0.004;
+
+  function playProbeAndMeasure() {
+    return new Promise(function (resolve) {
+      var maxRms = 0, elapsed = 0, octx = null, osc = null;
+      try {
+        octx = new (window.AudioContext || window.webkitAudioContext)();
+        osc = octx.createOscillator();
+        var g = octx.createGain();
+        osc.frequency.value = 1000;
+        g.gain.value = 0.3;
+        osc.connect(g); g.connect(octx.destination);
+        octx.resume().then(function () { try { osc.start(); } catch (e) {} });
+      } catch (e) {
+        log('could not play probe tone: ' + e.message, 'err');
+      }
+      var iv = setInterval(function () {
+        if (rms > maxRms) maxRms = rms;
+        elapsed += 50;
+        if (elapsed >= PROBE_MS) {
+          clearInterval(iv);
+          try { if (osc) osc.stop(); } catch (e) {}
+          if (octx) octx.close().catch(function () {});
+          resolve(maxRms);
+        }
+      }, 50);
+    });
+  }
+
+  function plugableDevice() {
+    return devices.filter(function (d) { return /plugable|usb/i.test(d.label || ''); })[0] || null;
+  }
+
+  function pause(ms) {
+    return new Promise(function (r) { setTimeout(r, ms); });
+  }
+
+  function sweep() {
+    var attempts = parseInt($('sweepN').value, 10) || 8;
+    var dev = plugableDevice();
+    if (!dev) { log('no Plugable-looking input in the list — tap Enumerate first', 'err'); return; }
+    $('btnSweep').disabled = true;
+    $('sweepList').innerHTML = '';
+    var deaf = 0, i = 0;
+
+    function addRow(n, label, r, isDeaf, note) {
+      var d = document.createElement('div');
+      d.className = isDeaf ? 'ok' : 'hi';
+      d.textContent = '#' + n + '  probeRms ' + r.toFixed(5) + '  ' +
+        (isDeaf ? 'DEAF — may be the real device' : 'HEARS PROBE — built-in mic') +
+        (note ? '  (' + note + ')' : '');
+      $('sweepList').insertBefore(d, $('sweepList').firstChild);
+    }
+
+    function next() {
+      if (i >= attempts) {
+        $('sweepStatus').textContent = 'done — 0 of ' + attempts + ' attempts were deaf';
+        log('SWEEP RESULT: 0/' + attempts + ' deaf. On this iPad the USB device never bound; ' +
+            'every stream was the built-in mic despite the label.', 'err');
+        $('btnSweep').disabled = false;
+        return;
+      }
+      i++;
+      $('sweepStatus').textContent = 'attempt ' + i + ' of ' + attempts + '…';
+      // Fully release and settle before re-acquiring, so iOS re-picks the input.
+      release(false).then(function () { return pause(400); })
+        .then(function () { return open(dev.deviceId, dev.label); })
+        .then(function () {
+          if (!analyser) { addRow(i, dev.label, 0, false, 'open failed'); return next(); }
+          return playProbeAndMeasure().then(function (r) {
+            var isDeaf = r <= PROBE_DEAF_RMS;
+            if (isDeaf) deaf++;
+            addRow(i, activeLabel, r, isDeaf);
+            log('sweep #' + i + ': probeRms=' + r.toFixed(5) + ' → ' +
+              (isDeaf ? 'DEAF' : 'HEARS PROBE'), isDeaf ? 'ok' : 'hi');
+            if (isDeaf) {
+              $('sweepStatus').textContent = 'attempt ' + i + ' is DEAF — stream held open. ' +
+                'PRESS THE BUTTON NOW and watch section 3b.';
+              log('holding this stream open — press the button now, then read the spike count', 'ok');
+              $('btnSweep').disabled = false;
+              return;   // stop the sweep, leave the stream running
+            }
+            return next();
+          });
+        })
+        .catch(function (e) {
+          addRow(i, dev.label, 0, false, e.name || 'error');
+          log('sweep #' + i + ' failed: ' + e.message, 'err');
+          next();
+        });
+    }
+    next();
+  }
+
   // ---------- 4. guided verdict ----------
   var PHASES = [
     { name: 'Stay completely SILENT', secs: 3, key: 'noise' },
@@ -504,6 +623,7 @@
     $('spikeThreshVal').textContent = spikeThresh.toFixed(3);
   };
   $('btnGuided').onclick = guided;
+  $('btnSweep').onclick = sweep;
   $('btnSave').onclick = save;
 
   showEnv();
